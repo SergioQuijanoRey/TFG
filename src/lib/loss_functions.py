@@ -202,6 +202,7 @@ class BatchHardTripletLoss(nn.Module):
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.list_of_classes)
 
         # Iteramos sobre todas los embeddings de las imagenes del dataset
+        # TODO -- try to use pre-computed pairwise distances and see if it speeds up the calculation
         for embedding, img_label in zip(embeddings, labels):
 
             # Calculamos las distancias a positivos y negativos
@@ -274,8 +275,6 @@ class BatchAllTripletLoss(nn.Module):
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
-        print("TODO -- computing loss for a batch")
-
         loss = 0
 
         # Precomputations to speed up calculations
@@ -303,9 +302,6 @@ class BatchAllTripletLoss(nn.Module):
 
             loss += sum(losses)
             summands_used += len(losses)
-
-        print("TODO -- ended computing loss for a batch")
-        print("")
 
         # Return the mean of the loss
         # TODO -- add feature to use != 0 mean
