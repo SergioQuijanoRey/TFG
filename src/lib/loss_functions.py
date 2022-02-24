@@ -4,7 +4,7 @@ Different loss functions used in the project
 
 import torch
 import torch.nn as nn
-from typing import List
+from typing import List, Tuple
 
 # Bases for more complex loss functions
 # ==================================================================================================
@@ -129,9 +129,13 @@ class BatchHardTripletLoss(nn.Module):
     """
     Implementation of Batch Hard Triplet Loss
     This loss function expects a batch of images, and not a batch of triplets
+
+    Large minibatches are encouraged, as we are computing, for each img in the minibatch, its hardest
+    positive and negative. So having a large minibatch makes more likely that a non-trivial positive
+    and negative get found in the minibatch
     """
 
-    def __init__(self, margin=1.0):
+    def __init__(self, margin: float = 1.0):
         super(BatchHardTripletLoss, self).__init__()
         self.margin = margin
         self.base_loss = TripletLoss(self.margin)
@@ -154,7 +158,7 @@ class BatchHardTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
-    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
         loss = 0
 
@@ -198,16 +202,21 @@ class BatchHardTripletLoss(nn.Module):
 
             loss += self.base_loss(embedding, worst_positive, worst_negative)
 
-        return loss
+        # Return the mean of the loss
+        # TODO -- implement != 0 mean
+        return loss / len(labels)
 
 class BatchAllTripletLoss(nn.Module):
     """
     Implementation of Batch All Triplet Loss
     This loss function expects a batch of images, and not a batch of triplets
+
+    In order to use this loss function, minibatches should not be very large. Otherwise, we can run
+    out of RAM. That is not the case for BatchHardTripletLoss, where large minibatches are encouraged
     """
 
     def __init__(self, margin=1.0):
-        super(BatchHardTripletLoss, self).__init__()
+        super(BatchAllTripletLoss, self).__init__()
         self.margin = margin
         self.base_loss = TripletLoss(self.margin)
 
@@ -229,48 +238,39 @@ class BatchAllTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
-    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
+
+        print("TODO -- computing loss for a batch")
 
         loss = 0
 
-        # Pre-computamos la separacion en positivos y negativos
+        # Precomputations to speed up calculations
         self.list_of_classes = self.precomputations.precompute_list_of_classes(labels)
-
-        # Pre-computamos la lista de negativos de cada clase
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.list_of_classes)
 
-        # Iteramos sobre todas los embeddings de las imagenes del dataset
+        # For computing the mean
+        summands_used = 0
+
+        # Iterate over all elements, that act as anchors
         for embedding, img_label in zip(embeddings, labels):
 
-            # Calculamos las distancias a positivos y negativos
-            # Nos aprovechamos de la pre-computacion
-            positive_distances = [
-                self.base_loss.euclidean_distance(embedding, embeddings[positive])
+            # Compute all combinations of positive / negative loss
+            # Use our pre-computated lists to speed up this calculation
+            # TODO -- this computation is very slow
+            # TODO -- maybe its a good idea to pre-compute all pair-wise distances and use them
+            # for computing the loss function
+            losses = [
+                self.base_loss(embedding, embeddings[positive], embeddings[negative])
                 for positive in self.list_of_classes[img_label]
+                for negative in self.list_of_negatives[img_label]
             ]
 
-            # Ahora nos aprovechamos del segundo pre-computo realizado
-            negative_distances = [
-                self.base_loss.euclidean_distance(embedding, embeddings[negative])
-                for negative in self.list_of_negatives
-            ]
+            loss += sum(losses)
+            summands_used += len(losses)
 
-            # Tenemos una lista de tensores de un unico elemento (el valor
-            # de la distancia). Para poder usar argmax pasamos todo esto
-            # a un unico tensor
-            positive_distances = torch.tensor(positive_distances)
-            negative_distances = torch.tensor(negative_distances)
+        print("TODO -- ended computing loss for a batch")
+        print("")
 
-            # Calculamos la funcion de perdida
-            positives = self.list_of_classes[img_label]
-            negatives = self.list_of_negatives[img_label]
-
-            worst_positive_idx = positives[torch.argmax(positive_distances)]
-            worst_negative_idx = negatives[torch.argmin(negative_distances)]
-
-            worst_positive = embeddings[worst_positive_idx]
-            worst_negative = embeddings[worst_negative_idx]
-
-            loss += self.base_loss(embedding, worst_positive, worst_negative)
-
-        return loss
+        # Return the mean of the loss
+        # TODO -- add feature to use != 0 mean
+        return loss / summands_used
