@@ -46,6 +46,47 @@ class TripletLoss(nn.Module):
         return torch.relu(positive_distance - negative_distance + self.margin)
 
 
+class SoftplusTripletLoss(nn.Module):
+    """
+    Slight modification of the basic loss function that acts as the base for all batch loss functions
+    Instead of using [• + m]_+, use softplus ln(1 + exp(•))
+
+    This loss function is thought for single triplets. If you want to calculate the loss of a batch
+    of triplets, use MeanTripletBatchTripletLoss
+    """
+
+    def __init__(self):
+        super(SoftplusTripletLoss, self).__init__()
+        self.softplus = nn.Softplus(beta = 1, threshold = 1)
+
+    def forward(self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor) -> float:
+
+        distance_positive = self.distance_function(anchor, positive)
+        distance_negative = self.distance_function(anchor, negative)
+
+        # Usamos Relu para que el error sea cero cuando la resta de las distancias
+        # este por debajo del margen. Si esta por encima del margen, devolvemos la
+        # identidad de dicho error. Es decir, aplicamos Relu a la formula que
+        # tenemos debajo
+        return self.loss_from_distances(distance_positive, distance_negative)
+
+    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> float:
+        return ((first - second) * (first - second)).sum()
+
+    def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
+        """
+        Compute the loss using the using the pre-computed distances
+        @param positive_distance the distance among anchor and positive
+        @param negative_distance the distance among anchor and negative
+        """
+
+        # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
+        return self.softplus(positive_distance - negative_distance)
+
+
+
+
+
 # Loss functions for batches of triplets
 # ==================================================================================================
 
@@ -57,10 +98,10 @@ class MeanTripletBatchTripletLoss(nn.Module):
     Thus, some offline mechanism for mining triplets is needed (ie. random triplets)
     """
 
-    def __init__(self, margin=1.0):
+    def __init__(self, margin=1.0, use_softplus = False):
         super(MeanTripletBatchTripletLoss, self).__init__()
         self.margin = margin
-        self.base_loss = TripletLoss(self.margin)
+        self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
         losses = torch.tensor(
@@ -168,10 +209,10 @@ class BatchHardTripletLoss(nn.Module):
     we need to constantly compute all positive all negative distances.
     """
 
-    def __init__(self, margin: float = 1.0):
+    def __init__(self, margin: float = 1.0, use_softplus = False):
         super(BatchHardTripletLoss, self).__init__()
         self.margin = margin
-        self.base_loss = TripletLoss(self.margin)
+        self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
 
         # Class to access shared code across all Batch Triplet Loss functions
         self.precomputations = BatchBaseTripletLoss()
@@ -250,10 +291,10 @@ class BatchAllTripletLoss(nn.Module):
     out of RAM. That is not the case for BatchHardTripletLoss, where large minibatches are encouraged
     """
 
-    def __init__(self, margin=1.0):
+    def __init__(self, margin=1.0, use_softplus = False):
         super(BatchAllTripletLoss, self).__init__()
         self.margin = margin
-        self.base_loss = TripletLoss(self.margin)
+        self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
 
         # Class to access shared code across all Batch Triplet Loss functions
         self.precomputations = BatchBaseTripletLoss()

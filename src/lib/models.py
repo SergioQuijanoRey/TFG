@@ -77,6 +77,8 @@ class LightModel(torch.nn.Module):
         self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
         self.fc = nn.Linear(in_features = 3200, out_features = self.embedding_dimension)
 
+        self.should_permute = True
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
 
         # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
