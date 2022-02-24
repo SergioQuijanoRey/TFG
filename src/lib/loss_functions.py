@@ -6,7 +6,17 @@ import torch
 import torch.nn as nn
 from typing import List
 
+# Bases for more complex loss functions
+# ==================================================================================================
+
 class TripletLoss(nn.Module):
+    """
+    Basic loss function that acts as the base for all batch loss functions
+
+    This loss function is thought for single triplets. If you want to calculate the loss of a batch
+    of triplets, use MeanTripletBatchTripletLoss
+    """
+
     def __init__(self, margin=1.0):
         super(TripletLoss, self).__init__()
         self.margin = margin
@@ -27,9 +37,19 @@ class TripletLoss(nn.Module):
     def euclidean_distance(self, first: torch.Tensor, second: torch.Tensor) -> float:
         return ((first - second) * (first - second)).sum()
 
-class TripletLossCustom(nn.Module):
+# Loss functions for batches of triplets
+# ==================================================================================================
+
+class MeanTripletBatchTripletLoss(nn.Module):
+    """
+    Computes the mean triplet loss of a batch of triplets
+    Note that we are expecting a batch of triplets, and not a batch of images
+
+    Thus, some offline mechanism for mining triplets is needed (ie. random triplets)
+    """
+
     def __init__(self, margin=1.0):
-        super(TripletLossCustom, self).__init__()
+        super(MeanTripletBatchTripletLoss, self).__init__()
         self.margin = margin
         self.base_loss = TripletLoss(self.margin)
 
@@ -40,6 +60,9 @@ class TripletLossCustom(nn.Module):
         )
         return losses.mean()
 
+# Loss functions for batches of images (and not triplets)
+# ==================================================================================================
+
 # Copiamos esto de https://stackoverflow.com/a/22279947
 # Lo necesitamos para saltarnos el elemento de una lista de
 # forma eficiente
@@ -49,10 +72,14 @@ def skip_i(iterable, i):
     return it.chain(it.islice(itr, 0, i), it.islice(itr, 1, None))
 
 
-class OnlineTripletLoss(nn.Module):
+class BatchHardTripletLoss(nn.Module):
+    """
+    Implementation of Batch Hard Triplet Loss
+    This loss function expects a batch of images, and not a batch of triplets
+    """
 
     def __init__(self, margin=1.0):
-        super(OnlineTripletLoss, self).__init__()
+        super(BatchHardTripletLoss, self).__init__()
         self.margin = margin
         self.base_loss = TripletLoss(self.margin)
 
