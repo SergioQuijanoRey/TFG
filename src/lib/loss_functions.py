@@ -4,7 +4,7 @@ Different loss functions used in the project
 
 import torch
 import torch.nn as nn
-import numpy as np
+from torch.autograd import Variable
 from typing import List, Tuple, Dict
 
 # Bases for more complex loss functions
@@ -352,7 +352,8 @@ class BatchAllTripletLoss(nn.Module):
         self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings, self.base_loss.distance_function)
 
         # For computing the mean
-        summands_used = 0
+        # We have to instantiate the var using this syntax so backpropagation can be done properly
+        summands_used = Variable(torch.tensor(0.0), requires_grad = True)
 
         # Iterate over all elements, that act as anchors
         for [anchor_idx, _], anchor_label in zip(enumerate(embeddings), labels):
@@ -373,9 +374,9 @@ class BatchAllTripletLoss(nn.Module):
 
             # Compute summands used, depending if we're counting all summands or only > 0 summands
             if self.use_gt_than_zero_mean is True:
-                summands_used += torch.count_nonzero(losses)
+                summands_used = summands_used + torch.count_nonzero(losses)
             else:
-                summands_used += len(losses)
+                summands_used = summands_used + len(losses)
 
         # Return the mean of the loss
         # Summands used depend on self.use_gt_than_zero_mean
