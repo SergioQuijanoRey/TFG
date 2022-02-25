@@ -10,6 +10,13 @@ from typing import List, Tuple, Dict
 # Bases for more complex loss functions
 # ==================================================================================================
 
+def distance_function(first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
+    """
+    Basic distance function. It's the base for all losses implemented in this module
+    """
+    return ((first - second) * (first - second)).sum().sqrt()
+
+
 class TripletLoss(nn.Module):
     """
     Basic loss function that acts as the base for all batch loss functions
@@ -24,17 +31,14 @@ class TripletLoss(nn.Module):
 
     def forward(self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor) -> float:
 
-        distance_positive = self.distance_function(anchor, positive)
-        distance_negative = self.distance_function(anchor, negative)
+        distance_positive = distance_function(anchor, positive)
+        distance_negative = distance_function(anchor, negative)
 
         # Usamos Relu para que el error sea cero cuando la resta de las distancias
         # este por debajo del margen. Si esta por encima del margen, devolvemos la
         # identidad de dicho error. Es decir, aplicamos Relu a la formula que
         # tenemos debajo
         return self.loss_from_distances(distance_positive, distance_negative)
-
-    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
-        return ((first - second) * (first - second)).sum().sqrt()
 
     def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
         """
@@ -62,17 +66,14 @@ class SoftplusTripletLoss(nn.Module):
 
     def forward(self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor) -> float:
 
-        distance_positive = self.distance_function(anchor, positive)
-        distance_negative = self.distance_function(anchor, negative)
+        distance_positive = distance_function(anchor, positive)
+        distance_negative = distance_function(anchor, negative)
 
         # Usamos Relu para que el error sea cero cuando la resta de las distancias
         # este por debajo del margen. Si esta por encima del margen, devolvemos la
         # identidad de dicho error. Es decir, aplicamos Relu a la formula que
         # tenemos debajo
         return self.loss_from_distances(distance_positive, distance_negative)
-
-    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
-        return ((first - second) * (first - second)).sum().sqrt()
 
     def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
         """
@@ -260,13 +261,13 @@ class BatchHardTripletLoss(nn.Module):
             # Calculamos las distancias a positivos y negativos
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
-                self.base_loss.distance_function(embedding, embeddings[positive])
+                distance_function(embedding, embeddings[positive])
                 for positive in self.list_of_classes[img_label]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
             negative_distances = [
-                self.base_loss.distance_function(embedding, embeddings[negative])
+                distance_function(embedding, embeddings[negative])
                 for negative in self.list_of_negatives
             ]
 
@@ -349,7 +350,7 @@ class BatchAllTripletLoss(nn.Module):
         # Precomputations to speed up calculations
         self.list_of_classes = self.precomputations.precompute_list_of_classes(labels)
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.list_of_classes)
-        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings, self.base_loss.distance_function)
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings, distance_function)
 
         # For computing the mean
         # We have to instantiate the var using this syntax so backpropagation can be done properly
