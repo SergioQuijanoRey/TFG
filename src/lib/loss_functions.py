@@ -195,7 +195,6 @@ class BatchBaseTripletLoss(nn.Module):
         return distances
 
 
-
 class BatchHardTripletLoss(nn.Module):
     """
     Implementation of Batch Hard Triplet Loss
@@ -209,10 +208,18 @@ class BatchHardTripletLoss(nn.Module):
     we need to constantly compute all positive all negative distances.
     """
 
-    def __init__(self, margin: float = 1.0, use_softplus = False):
+    def __init__(self, margin: float = 1.0, use_softplus = False, use_gt_than_zero_mean = False):
         super(BatchHardTripletLoss, self).__init__()
+
         self.margin = margin
+
+        # Select base loss depending on given parameters
         self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+
+        # Select if all summands have to taken in account to compute the mean or only those sumamnds
+        # greater than zero
+        # This is useless when using softplus loss function
+        self.use_gt_than_zero_mean = use_gt_than_zero_mean
 
         # Class to access shared code across all Batch Triplet Loss functions
         self.precomputations = BatchBaseTripletLoss()
@@ -241,6 +248,9 @@ class BatchHardTripletLoss(nn.Module):
 
         # Pre-computamos la lista de negativos de cada clase
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.list_of_classes)
+
+        # Count non zero losses in order to compute the > 0 mean
+        non_zero_losses = 0
 
         # Iteramos sobre todas los embeddings de las imagenes del dataset
         # TODO -- try to use pre-computed pairwise distances and see if it speeds up the calculation
@@ -275,11 +285,21 @@ class BatchHardTripletLoss(nn.Module):
             worst_positive = embeddings[worst_positive_idx]
             worst_negative = embeddings[worst_negative_idx]
 
-            loss += self.base_loss(embedding, worst_positive, worst_negative)
+            curr_loss = self.base_loss(embedding, worst_positive, worst_negative)
+            loss += curr_loss
+
+            if curr_loss > 0:
+                non_zero_losses += 1
 
         # Return the mean of the loss
-        # TODO -- implement != 0 mean
-        return loss / len(labels)
+        # Compute the mean depending on self.use_gt_than_zero_mean
+        mean = None
+        if self.use_gt_than_zero_mean is True:
+            mean = loss / non_zero_losses
+        else:
+            mean = loss / len(labels)
+
+        return mean
 
 
 class BatchAllTripletLoss(nn.Module):
@@ -291,13 +311,20 @@ class BatchAllTripletLoss(nn.Module):
     out of RAM. That is not the case for BatchHardTripletLoss, where large minibatches are encouraged
     """
 
-    def __init__(self, margin=1.0, use_softplus = False):
+    def __init__(self, margin=1.0, use_softplus = False, use_gt_than_zero_mean = False):
         super(BatchAllTripletLoss, self).__init__()
         self.margin = margin
+
+        # Select the base loss depending on given parameters
         self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
 
         # Class to access shared code across all Batch Triplet Loss functions
         self.precomputations = BatchBaseTripletLoss()
+
+        # Select if all summands have to taken in account to compute the mean or only those sumamnds
+        # greater than zero
+        # This is useless when using softplus loss function
+        self.use_gt_than_zero_mean = use_gt_than_zero_mean
 
         # Pre-computamos una lista de listas en la que accedemos a los
         # elementos de la forma list[label][posicion]
