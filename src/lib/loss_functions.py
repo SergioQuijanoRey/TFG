@@ -33,8 +33,8 @@ class TripletLoss(nn.Module):
         # tenemos debajo
         return self.loss_from_distances(distance_positive, distance_negative)
 
-    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> float:
-        return ((first - second) * (first - second)).sum()
+    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
+        return ((first - second) * (first - second)).sum().sqrt()
 
     def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
         """
@@ -71,8 +71,8 @@ class SoftplusTripletLoss(nn.Module):
         # tenemos debajo
         return self.loss_from_distances(distance_positive, distance_negative)
 
-    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> float:
-        return ((first - second) * (first - second)).sum()
+    def distance_function(self, first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
+        return ((first - second) * (first - second)).sum().sqrt()
 
     def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
         """
