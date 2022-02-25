@@ -4,6 +4,7 @@ Different loss functions used in the project
 
 import torch
 import torch.nn as nn
+import numpy as np
 from typing import List, Tuple, Dict
 
 # Bases for more complex loss functions
@@ -358,21 +359,26 @@ class BatchAllTripletLoss(nn.Module):
 
             # Compute all combinations of positive / negative loss
             # Use the precomputed distances to speed up this calculation
-            # TODO -- instead of using plain lists, use np arrays and use np.sum
-            losses = [
+            losses = torch.tensor([
                 self.base_loss.loss_from_distances(
                     self.pairwise_distances[self.__resort_dict_idx(anchor_idx, positive_idx)],
                     self.pairwise_distances[self.__resort_dict_idx(anchor_idx, negative_idx)]
                 )
                 for positive_idx in self.list_of_classes[anchor_label]
                 for negative_idx in self.list_of_negatives[anchor_label]
-            ]
+            ])
 
-            loss += sum(losses)
-            summands_used += len(losses)
+            # Accumulate loss
+            loss += torch.sum(losses)
+
+            # Compute summands used, depending if we're counting all summands or only > 0 summands
+            if self.use_gt_than_zero_mean is True:
+                summands_used += torch.count_nonzero(losses)
+            else:
+                summands_used += len(losses)
 
         # Return the mean of the loss
-        # TODO -- add feature to use != 0 mean
+        # Summands used depend on self.use_gt_than_zero_mean
         return loss / summands_used
 
     def __resort_dict_idx(self, first: int, second: int) -> Tuple[int, int]:
