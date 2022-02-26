@@ -6,7 +6,7 @@ import unittest
 import torch
 import math
 
-from src.lib.loss_functions import distance_function, TripletLoss
+from src.lib.loss_functions import distance_function, TripletLoss, SoftplusTripletLoss
 
 # Number of repetitions, when needed
 NUMBER_OF_REPETITIONS = 100
@@ -111,3 +111,45 @@ class TestTripletLoss(unittest.TestCase):
         loss_expected = margin + math.sqrt(20) - math.sqrt(2)
         loss_expected = loss_expected if loss_expected >= 0 else 0
         self.assertAlmostEqual(loss_computed, loss_expected)
+
+
+class TestSoftplusTripletLoss(unittest.TestCase):
+
+    def test_basic_cases(self):
+        softplus_loss = SoftplusTripletLoss()
+
+        # First basic example
+        anchor = torch.tensor([0.0, 0.0])
+        positive = torch.tensor([1.0, 1.0])
+        negative = torch.tensor([2.0, 2.0])
+
+        loss_computed = float(softplus_loss(anchor, positive, negative))
+        loss_expected = 0.21762172158174375
+        self.assertAlmostEqual(loss_computed, loss_expected)
+
+        # Second basic example
+        anchor = torch.tensor([0.0, 0.0])
+        positive = torch.tensor([2.0, 2.0])
+        negative = torch.tensor([2.0, 2.0])
+
+        loss_computed = float(softplus_loss(anchor, positive, negative))
+        loss_expected = 0.6931471805599453
+        self.assertAlmostEqual(loss_computed, loss_expected)
+
+        # Third basic example
+        anchor = torch.tensor([0.0, 0.0])
+        positive = torch.tensor([1.0, 1.0])
+        negative = torch.tensor([-4.0, 2.0])
+
+        loss_computed = float(softplus_loss(anchor, positive, negative))
+        loss_expected = 0.04591480638813308
+        self.assertAlmostEqual(loss_computed, loss_expected)
+
+        # Fourth basic example
+        anchor = torch.tensor([0.0, 0.0])
+        positive = torch.tensor([-4.0, 2.0])
+        negative = torch.tensor([1.0, 1.0])
+
+        loss_computed = float(softplus_loss(anchor, positive, negative))
+        loss_expected = 3.1038371990146176
+        self.assertAlmostEqual(loss_computed, loss_expected, places = 1)

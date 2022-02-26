@@ -85,10 +85,6 @@ class SoftplusTripletLoss(nn.Module):
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
         return self.softplus(positive_distance - negative_distance)
 
-
-
-
-
 # Loss functions for batches of triplets
 # ==================================================================================================
 
