@@ -6,7 +6,12 @@ import unittest
 import torch
 import math
 
-from src.lib.loss_functions import distance_function, TripletLoss, SoftplusTripletLoss, BatchHardTripletLoss
+from src.lib.loss_functions import (
+    distance_function,
+    TripletLoss, SoftplusTripletLoss,
+    BatchHardTripletLoss, BatchAllTripletLoss
+)
+
 
 # Number of repetitions, when needed
 NUMBER_OF_REPETITIONS = 100
@@ -180,7 +185,7 @@ class TestBatchHardTripletLoss(unittest.TestCase):
         labels = torch.tensor([1, 1, 1, 2, 2, 2, 3, 3, 3])
 
         loss_computed = float(loss(points, labels))
-        loss_expected = 9.741091053890488
+        loss_expected = 9.741091053890488 # Manually computed loss
         self.assertAlmostEqual(loss_computed, loss_expected, places = 3)
 
     def test_basic_cases_gt_than_zero(self):
@@ -207,5 +212,61 @@ class TestBatchHardTripletLoss(unittest.TestCase):
         labels = torch.tensor([0, 0, 0, 1, 1, 1, 2, 2, 2])
 
         loss_computed = float(loss(points, labels))
-        loss_expected = 9.741091053890488
+        loss_expected = 9.741091053890488 # Manually computed loss
         self.assertAlmostEqual(loss_computed, loss_expected, places = 3)
+
+class TestBatchAllTripletLoss(unittest.TestCase):
+
+    def test_basic_cases(self):
+
+        # Define the loss function to test
+        loss = BatchAllTripletLoss(
+            margin = 1.0,
+            use_softplus = False,
+            use_gt_than_zero_mean = False
+        )
+
+        # Define some fixed data to test on
+        points = torch.tensor([
+            # 0-th class points
+            [0, 0], [2, 2], [9, -6],
+
+            # 1-th class points
+            [7, -4], [12, -4], [2, -9],
+
+            # 2-th class points
+            [1, -11], [4, -11], [-1, 2]
+        ])
+
+        labels = torch.tensor([1, 1, 1, 2, 2, 2, 3, 3, 3])
+
+        loss_computed = float(loss(points, labels))
+        loss_expected = 2.6339713808044256
+        self.assertAlmostEqual(loss_computed, loss_expected, places = 3)
+
+    def test_basic_cases_gt_than_zero(self):
+
+        # Define the loss function to test
+        loss = BatchAllTripletLoss(
+            margin = 1.0,
+            use_softplus = False,
+            use_gt_than_zero_mean = True
+        )
+
+        # Define some fixed data to test on
+        points = torch.tensor([
+            # 0-th class points
+            [0, 0], [2, 2], [9, -6],
+
+            # 1-th class points
+            [7, -4], [12, -4], [2, -9],
+
+            # 2-th class points
+            [1, -11], [4, -11], [-1, 2]
+        ])
+
+        labels = torch.tensor([0, 0, 0, 1, 1, 1, 2, 2, 2])
+
+        loss_computed = float(loss(points, labels))
+        loss_expected = 4.515379509950444
+        self.assertAlmostEqual(loss_computed, loss_expected, places = 5)
