@@ -362,7 +362,7 @@ class BatchAllTripletLoss(nn.Module):
                     self.pairwise_distances[self.__resort_dict_idx(anchor_idx, positive_idx)],
                     self.pairwise_distances[self.__resort_dict_idx(anchor_idx, negative_idx)]
                 )
-                for positive_idx in self.list_of_classes[anchor_label]
+                for positive_idx in self.list_of_classes[anchor_label] if positive_idx != anchor_idx
                 for negative_idx in self.list_of_negatives[anchor_label]
             ])
 
