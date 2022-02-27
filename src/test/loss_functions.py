@@ -177,11 +177,11 @@ class TestBatchHardTripletLoss(unittest.TestCase):
             [1, -11], [4, -11], [-1, 2]
         ])
 
-        labels = torch.tensor([0, 0, 0, 1, 1, 1, 2, 2, 2])
+        labels = torch.tensor([1, 1, 1, 2, 2, 2, 3, 3, 3])
 
         loss_computed = float(loss(points, labels))
         loss_expected = 9.741091053890488
-        self.assertAlmostEqual(loss_computed, loss_expected)
+        self.assertAlmostEqual(loss_computed, loss_expected, places = 3)
 
     def test_basic_cases_gt_than_zero(self):
 
@@ -208,4 +208,4 @@ class TestBatchHardTripletLoss(unittest.TestCase):
 
         loss_computed = float(loss(points, labels))
         loss_expected = 9.741091053890488
-        self.assertAlmostEqual(loss_computed, loss_expected)
+        self.assertAlmostEqual(loss_computed, loss_expected, places = 3)

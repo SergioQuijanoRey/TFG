@@ -264,7 +264,7 @@ class BatchHardTripletLoss(nn.Module):
             # Ahora nos aprovechamos del segundo pre-computo realizado
             negative_distances = [
                 distance_function(embedding, embeddings[negative])
-                for negative in self.list_of_negatives
+                for negative in self.list_of_negatives[img_label]
             ]
 
             # Tenemos una lista de tensores de un unico elemento (el valor
