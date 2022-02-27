@@ -6,7 +6,7 @@ import unittest
 import torch
 import math
 
-from src.lib.loss_functions import distance_function, TripletLoss, SoftplusTripletLoss
+from src.lib.loss_functions import distance_function, TripletLoss, SoftplusTripletLoss, BatchHardTripletLoss
 
 # Number of repetitions, when needed
 NUMBER_OF_REPETITIONS = 100
@@ -153,3 +153,59 @@ class TestSoftplusTripletLoss(unittest.TestCase):
         loss_computed = float(softplus_loss(anchor, positive, negative))
         loss_expected = 3.1038371990146176
         self.assertAlmostEqual(loss_computed, loss_expected, places = 1)
+
+class TestBatchHardTripletLoss(unittest.TestCase):
+
+    def test_basic_cases(self):
+
+        # Define the loss function to test
+        loss = BatchHardTripletLoss(
+            margin = 1.0,
+            use_softplus = False,
+            use_gt_than_zero_mean = False
+        )
+
+        # Define some fixed data to test on
+        points = torch.tensor([
+            # 0-th class points
+            [0, 0], [2, 2], [9, -6],
+
+            # 1-th class points
+            [7, -4], [12, -4], [2, -9],
+
+            # 2-th class points
+            [1, -11], [4, -11], [-1, 2]
+        ])
+
+        labels = torch.tensor([0, 0, 0, 1, 1, 1, 2, 2, 2])
+
+        loss_computed = float(loss(points, labels))
+        loss_expected = 9.741091053890488
+        self.assertAlmostEqual(loss_computed, loss_expected)
+
+    def test_basic_cases_gt_than_zero(self):
+
+        # Define the loss function to test
+        loss = BatchHardTripletLoss(
+            margin = 1.0,
+            use_softplus = False,
+            use_gt_than_zero_mean = True
+        )
+
+        # Define some fixed data to test on
+        points = torch.tensor([
+            # 0-th class points
+            [0, 0], [2, 2], [9, -6],
+
+            # 1-th class points
+            [7, -4], [12, -4], [2, -9],
+
+            # 2-th class points
+            [1, -11], [4, -11], [-1, 2]
+        ])
+
+        labels = torch.tensor([0, 0, 0, 1, 1, 1, 2, 2, 2])
+
+        loss_computed = float(loss(points, labels))
+        loss_expected = 9.741091053890488
+        self.assertAlmostEqual(loss_computed, loss_expected)
