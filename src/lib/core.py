@@ -200,7 +200,6 @@ def train_model_offline(
     # Return the training hist
     return training_history
 
-
 def train_model_online(
     net: nn.Module,
     path: str,
