@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tfg"
+version = "0.1.0"
+description = ""
+authors = ["Sergio <sergiquijano@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "3.8.12"
+jupyter = "^1.0.0"
+numpy = "^1.22.2"
+matplotlib = "^3.5.1"
+pandas = "^1.4.1"
+
+[tool.poetry.dev-dependencies]
+python = "3.8.12"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
