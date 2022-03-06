@@ -53,7 +53,7 @@ class TestBasicLossFunction(unittest.TestCase):
 
         dist_computed = distance_function(first, second)
         dist_expect = math.sqrt(2.0)
-        self.assertAlmostEquals(dist_computed, dist_expect)
+        self.assertAlmostEqual(dist_computed, dist_expect)
 
         # Second basic example
         first = torch.tensor([1.0, 1.0])
@@ -61,7 +61,7 @@ class TestBasicLossFunction(unittest.TestCase):
 
         dist_computed = distance_function(first, second)
         dist_expect = math.sqrt(2.0)
-        self.assertAlmostEquals(dist_computed, dist_expect)
+        self.assertAlmostEqual(dist_computed, dist_expect)
 
         # Third basic example
         first = torch.tensor([1.0, 1.0])
@@ -69,7 +69,7 @@ class TestBasicLossFunction(unittest.TestCase):
 
         dist_computed = distance_function(first, second)
         dist_expect = math.sqrt(26)
-        self.assertAlmostEquals(dist_computed, dist_expect)
+        self.assertAlmostEqual(dist_computed, dist_expect)
 
 class TestTripletLoss(unittest.TestCase):
 
