@@ -28,10 +28,11 @@ class TestCustomSampler(unittest.TestCase):
         return dataset
 
 
-    def test_sampling_is_p_correct(self):
+    def test_sampling_is_P_correct(self):
         """
-        Test that the sampling we are doing respect the P-K philosophy relative to P. That's to say,
-        check That every batch has exactly P classes
+        Test that the sampling we are doing respect the P-K philosophy relative to P.
+
+        That's to say, check That every batch has exactly P classes
         """
         self.assertEqual(1, 2-1)
 
@@ -44,14 +45,13 @@ class TestCustomSampler(unittest.TestCase):
             train_loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size = BATCH_SIZE,
-                #shuffle = True,
                 num_workers = NUM_WORKERS,
                 pin_memory = True,
-                # TODO -- using magic numbers
                 sampler = CustomSampler(P, 16, dataset)
             )
 
-            for img_batch, label_batch in train_loader:
+            # Check the condition for every batch
+            for _, label_batch in train_loader:
 
                 # Transform tensor of labels to list of int labels
                 label_batch = [int(label) for label in label_batch]
@@ -61,4 +61,40 @@ class TestCustomSampler(unittest.TestCase):
 
                 # Assert we have exactly the number of expected labels
                 self.assertEqual(len(unique_labels_in_batch), P)
+
+
+    def test_sampling_is_K_correct(self):
+        """
+        Test that the sampling we are doing respect the P-K philosophy relative to K.
+
+        That's to say, check that every batch has exactly K elements for each class
+        """
+        self.assertEqual(1, 2-1)
+
+        # Dataset is going to be the same for all checks
+        dataset = self.__load_dataset()
+
+        for K in range(1, 10):
+
+            # Create dataloader with K images per classes. P is arbitrary
+            train_loader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size = BATCH_SIZE,
+                num_workers = NUM_WORKERS,
+                pin_memory = True,
+                sampler = CustomSampler(3, K, dataset)
+            )
+
+            # Check the condition for every batch
+            for _, label_batch in train_loader:
+
+                # Transform tensor of labels to list of int labels
+                label_batch = [int(label) for label in label_batch]
+
+                # Transform prev list to set to get unique labels
+                unique_labels_in_batch = set(label_batch)
+
+                # Assert we have exactly the number of expected elements for each class
+                for label in unique_labels_in_batch:
+                    self.assertEqual(label_batch.count(label), K)
 
