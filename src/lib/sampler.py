@@ -5,7 +5,7 @@ Module where custom samplers go
 import torch
 import random
 
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 
 class CustomSampler(torch.utils.data.Sampler):
     """
@@ -32,16 +32,16 @@ class CustomSampler(torch.utils.data.Sampler):
         # Also, this list is not freezed, we remove elements of it as we add them
         # to the index sequence
         # At each new epoch, this list is generated again
-        self.list_of_classes = None
+        self.list_of_classes: Optional[List[List[int]]] = None
 
         # We are going to build a list of indexes that we iter sequentially
         # Each epoch we generate a new random sequence respecting P - K sampling
-        self.index_list = None
+        self.index_list: Optional[List[int]] = None
 
     def __iter__(self) -> Iterator:
 
         # Generate random index list
-        self.index_list = self.__generate_index_sequence()
+        self.index_list = self.generate_index_sequence()
 
         # Return iterator to that index list
         return iter(self.index_list)
@@ -56,7 +56,7 @@ class CustomSampler(torch.utils.data.Sampler):
 
         return len(self.dataset)
 
-    def __generate_index_sequence(self) -> List[int]:
+    def generate_index_sequence(self) -> List[int]:
         """
         Generates the sequence of indixes that we are going to return
         We have to make that sequence such that P-K sampling is done when getting
@@ -86,11 +86,11 @@ class CustomSampler(torch.utils.data.Sampler):
             list_of_indixes = list(list_of_indixes) + list(self.__new_batch(curr_classes))
 
             # Check for classes that has less than self.K images available
-            available_classes = self.__clean_list_of_classes(available_classes)
+            available_classes = self.clean_list_of_classes(available_classes)
 
         return list_of_indixes
 
-    def __clean_list_of_classes(self, class_list: List[int]) -> List[int]:
+    def clean_list_of_classes(self, class_list: List[int]) -> List[int]:
         return [curr_class for curr_class in class_list if len(self.list_of_classes[curr_class]) >= self.K]
 
     def __new_batch(self, classes: List[int]) -> List[int]:
