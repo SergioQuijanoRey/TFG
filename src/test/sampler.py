@@ -42,16 +42,22 @@ class TestCustomSampler(unittest.TestCase):
         for P in range(1, 10):
 
             # Create dataloader with P classes. K is arbitrary
-            train_loader = torch.utils.data.DataLoader(
+            loader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size = BATCH_SIZE,
+                batch_size = P * 16,
                 num_workers = NUM_WORKERS,
                 pin_memory = True,
                 sampler = CustomSampler(P, 16, dataset)
             )
 
             # Check the condition for every batch
-            for _, label_batch in train_loader:
+            for _, label_batch in loader:
+
+                # We dont care about not full batches
+                if len(label_batch) < P * 16:
+                    print("Skipping not full batch")
+                    continue
+
 
                 # Transform tensor of labels to list of int labels
                 label_batch = [int(label) for label in label_batch]
@@ -77,16 +83,21 @@ class TestCustomSampler(unittest.TestCase):
         for K in range(1, 10):
 
             # Create dataloader with K images per classes. P is arbitrary
-            train_loader = torch.utils.data.DataLoader(
+            loader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size = BATCH_SIZE,
+                batch_size = 3 * K,
                 num_workers = NUM_WORKERS,
                 pin_memory = True,
                 sampler = CustomSampler(3, K, dataset)
             )
 
             # Check the condition for every batch
-            for _, label_batch in train_loader:
+            for _, label_batch in loader:
+
+                # We dont care about not full batches
+                if len(label_batch) < 3 * K:
+                    print("Skipping not full batch")
+                    continue
 
                 # Transform tensor of labels to list of int labels
                 label_batch = [int(label) for label in label_batch]
