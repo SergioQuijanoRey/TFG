@@ -1,42 +1,13 @@
 import unittest
-import torch
-
-import torchvision
-import torchvision.datasets as datasets
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-
 import torchvision
-import torchvision.datasets as datasets
-
-# Para poder usar ResNet18 preentrenado
-import torchvision.models as models
 import torchvision.transforms as transforms
-
-from torch.utils.data import Dataset, DataLoader
-
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-from datetime import datetime
-from pprint import pprint
-import gc
-import functools
-import math
-import seaborn as sns
-
-# Todas las piezas concretas que usamos de sklearn
-from sklearn.metrics import roc_auc_score, accuracy_score, silhouette_score
-from sklearn.model_selection import ShuffleSplit
-
-from typing import List
 
 from src.lib.sampler import CustomSampler
 
-# Global parameters
+# Parameters for this tests
+#===================================================================================================
 DATA_PATH = "data"
 ONLINE_BATCH_SIZE = 32
 NUM_WORKERS = 1
