@@ -10,16 +10,8 @@
 
 ## Pre-requisites
 
-Using poetry works fine through the command line, but `pyproject.toml` does not reflect all packages installed.
+This project is configured via `poetry`. You can install it and learn more [here](https://python-poetry.org/). With `poetry` installed, all the packages and their versions are described in `pyproject.toml` file.
 
-In order to install pytorch, I had to follow next steps:
-
-1. Install python3.8.12 on my system (Arch Linux)
-2. Change poetry env to python3.8.12
-    - `which python3.8.12`
-    - Use that ouput (`<path>`) and then `poetry env use <path>`
-3. Install pytorch using pip inside local env:
-    - Go to [official website](https://pytorch.org/get-started/locally/) to see which comamnd I have to execute
-    - Then, run ` poetry pip3 install torch==1.10.2+cpu torchvision==0.11.3+cpu torchaudio==0.10.2+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html` as offial docs suggest
-    - This is a problem because the execution of such command does not reflect on pyproject.toml
-
+1. Install all the dependencies: `poetry install`
+2. Run all the unit tests: `poetry run python -m unittest src/test/*.py`
+3. Run the notebook: `poetry run jupyter notebook`
