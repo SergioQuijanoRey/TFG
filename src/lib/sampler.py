@@ -7,16 +7,17 @@ import random
 
 from typing import Iterator, List, Optional
 
+# TODO -- BUG -- unit tests for this class are not passing (see lib/test/sampler.py)
 class CustomSampler(torch.utils.data.Sampler):
     """
-    Custom dataloader that implements the sampling explained in the reference paper
+    Custom sampler that implements the sampling explained in the reference paper
 
     In this sampling, in order to generate each minibatch, the following is done:
         1. Sample randomly P classes from all available classes
         2. For each class, sample randomly K elements
 
     Also, in the paper, they suggest that P and K should be chosen such as
-    P * K \approx 3 * n ; beign n an integer. That suggestion comes from experimentation
+    P * K \\approx 3 * n ; beign n an integer. That suggestion comes from experimentation
 
     Used this tutorial to code this class:
     https://www.scottcondron.com/jupyter/visualisation/audio/2020/12/02/dataloaders-samplers-collate.html
@@ -32,10 +33,12 @@ class CustomSampler(torch.utils.data.Sampler):
         # Also, this list is not freezed, we remove elements of it as we add them
         # to the index sequence
         # At each new epoch, this list is generated again
+        # TODO -- this should be "private", thats `_list_of_classes`
         self.list_of_classes: Optional[List[List[int]]] = None
 
         # We are going to build a list of indexes that we iter sequentially
         # Each epoch we generate a new random sequence respecting P - K sampling
+        # TODO -- this should be private, thats `_index_list`
         self.index_list: Optional[List[int]] = None
 
     def __iter__(self) -> Iterator:
