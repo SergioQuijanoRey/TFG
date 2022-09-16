@@ -62,9 +62,9 @@ class CustomSampler(torch.utils.data.Sampler):
 
     def generate_index_sequence(self) -> List[int]:
         """
-        Generates the sequence of indixes that we are going to return
-        We have to make that sequence such that P-K sampling is done when getting
-        P*K minibatches
+        Generates the sequence of indixes that we are going to return in __iter__
+        We have to make that sequence such that P-K sampling is done when getting minibatches of
+        size P*K (each minibatch has P random classes, K random elements for each class)
         """
 
         # Index list
