@@ -130,6 +130,7 @@ class TestCustomSampler(unittest.TestCase):
         # Check that list of classes has all classes pre-computed
         self.assertEqual(len(sampler.list_of_classes), 10)
 
+    # TODO -- what was 'the cleaning mechanism'??
     def test_clean_available_classes(self):
         """Check that the cleaning mechanism for available classes works fine"""
 
@@ -196,3 +197,34 @@ class TestCustomSampler(unittest.TestCase):
         self.assertIn(7, cleaned_list_of_classes)
         self.assertIn(8, cleaned_list_of_classes)
         self.assertIn(9, cleaned_list_of_classes)
+
+
+    # TODO -- BUG -- this test is failing
+    def test_all_elements_are_returned(self):
+        """
+        Check that the sampler returns all elements of the dataset
+
+        With this test, I am looking if the sampler lefts behind some elements when P, K doesn't
+        fit well the dataset size
+
+        """
+
+        # Create a dataset
+        dataset = self.__load_dataset()
+
+        # Create a sampler with certain values of P, K
+        P, K = 3, 16
+        sampler = CustomSampler(P, K, dataset)
+
+        # Check that all elements are in the dataset
+        sampled_elements = [element for element in sampler]
+        self.assertEqual(len(sampled_elements), len(dataset))
+
+
+        # Repeat for other values of P, K
+        P, K = 5, 32
+        sampler = CustomSampler(P, K, dataset)
+
+        sampled_elements = [element for element in sampler]
+        self.assertEqual(len(sampled_elements), len(dataset))
+

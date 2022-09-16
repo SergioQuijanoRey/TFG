@@ -8,6 +8,8 @@ import random
 from typing import Iterator, List, Optional
 
 # TODO -- BUG -- unit tests for this class are not passing (see lib/test/sampler.py)
+# TODO -- see https://kevinmusgrave.github.io/pytorch-metric-learning/samplers/#hierarchicalsampler
+#         because I think there is an implementation of what I want to do with this class
 class CustomSampler(torch.utils.data.Sampler):
     """
     Custom sampler that implements the sampling explained in the reference paper
@@ -63,12 +65,15 @@ class CustomSampler(torch.utils.data.Sampler):
     def generate_index_sequence(self) -> List[int]:
         """
         Generates the sequence of indixes that we are going to return in __iter__
+
         We have to make that sequence such that P-K sampling is done when getting minibatches of
         size P*K (each minibatch has P random classes, K random elements for each class)
         """
 
-        # Index list
-        list_of_indixes = []
+        # Index list that we are going to return
+        # Is a flat list but verifying that each minibatch of size P*K has been constructed the
+        # way we specified before
+        list_of_indixes: List[int] = []
 
         # Re-generate the list of indixes splitted by class
         self.list_of_classes = None
@@ -77,6 +82,7 @@ class CustomSampler(torch.utils.data.Sampler):
         # Classes that we work with
         # Some classes will we deleted as they are left with less than self.K
         # images
+        # TODO -- hardcoded value 10 that should be calculated from `self.dataset`
         available_classes = list(range(10))
 
         for _ in range(int(len(self.dataset) / (self.P * self.K))):
@@ -94,9 +100,11 @@ class CustomSampler(torch.utils.data.Sampler):
 
         return list_of_indixes
 
+    # TODO -- document what this method does, and what's used for
     def clean_list_of_classes(self, class_list: List[int]) -> List[int]:
         return [curr_class for curr_class in class_list if len(self.list_of_classes[curr_class]) >= self.K]
 
+    # TODO -- document what this method does, and what's used for
     def __new_batch(self, classes: List[int]) -> List[int]:
         batch = []
 
@@ -114,7 +122,6 @@ class CustomSampler(torch.utils.data.Sampler):
                 batch.append(curr_idx)
 
         return batch
-
 
     def __precompute_list_of_classes(self) -> List[List[int]]:
         """
