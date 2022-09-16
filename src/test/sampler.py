@@ -29,6 +29,7 @@ class TestCustomSampler(unittest.TestCase):
         return dataset
 
 
+    # TODO -- BUG -- this test is failing
     def test_sampling_is_P_correct(self):
         """
         Test that the sampling we are doing respect the P-K philosophy relative to P.
@@ -69,13 +70,13 @@ class TestCustomSampler(unittest.TestCase):
                 self.assertEqual(len(unique_labels_in_batch), P)
 
 
+    # TODO -- BUG -- this test is failing
     def test_sampling_is_K_correct(self):
         """
         Test that the sampling we are doing respect the P-K philosophy relative to K.
 
         That's to say, check that every batch has exactly K elements for each class
         """
-        self.assertEqual(1, 2-1)
 
         # Dataset is going to be the same for all checks
         dataset = self.__load_dataset()
