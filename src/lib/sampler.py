@@ -52,9 +52,10 @@ class CustomSampler(torch.utils.data.Sampler):
 
     def __len__(self) -> int:
         """
-        Len of each given sample. As we are choosing P classes, and for each
-        class K images, len is always P * K
-        TODO -- deprecated docs
+        Len of the __iter__ generated in this class.
+
+        As we are sampling all elements of the dataset, the len is the same as the len of the given
+        dataset
         """
 
         return len(self.dataset)
