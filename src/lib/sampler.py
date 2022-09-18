@@ -67,6 +67,8 @@ class CustomSampler(torch.utils.data.Sampler):
         Thus, this inequality holds:
             self.__len__() <= self.dataset.__len()__
 
+        # TODO -- add two methods, for lower and upper boundaries in __len__
+                  This way, if this exception is raised from pytorch, we can fix it somehow
         """
 
         # Raising an error if `self.len` is None to avoid problems with pytorch implementations
