@@ -53,8 +53,6 @@ class TestCustomSampler(unittest.TestCase):
 
         return dataset
 
-
-    # TODO -- BUG -- this test is failing
     def test_sampling_is_P_correct(self):
         """
         Test that the sampling we are doing respect the P-K philosophy relative to P.
@@ -95,7 +93,6 @@ class TestCustomSampler(unittest.TestCase):
                 self.assertEqual(len(unique_labels_in_batch), P, msg = "This batch doesn't contain exactly P classes")
 
 
-    # TODO -- BUG -- this test is failing
     def test_sampling_is_K_correct(self):
         """
         Test that the sampling we are doing respect the P-K philosophy relative to K.
