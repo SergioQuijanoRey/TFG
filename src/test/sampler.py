@@ -16,9 +16,14 @@ NUM_WORKERS = 1
 class TestCustomSampler(unittest.TestCase):
 
     def __load_dataset(self):
+        """
+        Aux function to load MNIST into a torch.Dataset
+        """
+
         transform = transforms.Compose([
             transforms.ToTensor(),
         ])
+
         dataset = torchvision.datasets.MNIST(
             root = DATA_PATH,
             train = True,
@@ -36,7 +41,6 @@ class TestCustomSampler(unittest.TestCase):
 
         That's to say, check That every batch has exactly P classes
         """
-        self.assertEqual(1, 2-1)
 
         # Dataset is going to be the same for all checks
         dataset = self.__load_dataset()
@@ -44,6 +48,7 @@ class TestCustomSampler(unittest.TestCase):
         for P in range(1, 4):
 
             # Create dataloader with P classes. K is arbitrary
+            # In this dataloader we specify our custom sampler
             loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size = P * 16,
@@ -67,7 +72,7 @@ class TestCustomSampler(unittest.TestCase):
                 unique_labels_in_batch = set(label_batch)
 
                 # Assert we have exactly the number of expected labels
-                self.assertEqual(len(unique_labels_in_batch), P)
+                self.assertEqual(len(unique_labels_in_batch), P, msg = "This batch doesn't contain exactly P classes")
 
 
     # TODO -- BUG -- this test is failing
@@ -84,6 +89,7 @@ class TestCustomSampler(unittest.TestCase):
         for K in range(1, 4):
 
             # Create dataloader with K images per classes. P is arbitrary
+            # In this dataloader we specify our custom sampler
             loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size = 3 * K,
@@ -110,13 +116,14 @@ class TestCustomSampler(unittest.TestCase):
                 # Use counter to not repeat computations for each class
                 counter = Counter(label_batch)
                 for label in unique_labels_in_batch:
-                    self.assertEqual(counter[label], K)
+                    self.assertEqual(counter[label], K, msg = "In this batch there is one class with not exactly K elements associated")
 
     def test_list_of_classes_has_all_classes(self):
         """
         Check that the precomputation for list_of_classes generates a list of list with all 10 classes
         precomputed properly
         """
+
         # Create dataset and then directly a sampler (without dataloader)
         dataset = self.__load_dataset()
         P, K = 3, 16
@@ -200,13 +207,16 @@ class TestCustomSampler(unittest.TestCase):
 
 
     # TODO -- BUG -- this test is failing
+    # TODO -- I think expecting all elements to be returned always is incorrect
+    #         If len(dataset) % (P * K) != 0 then this can fail
+    #         If the sampler returns a last batch with all elements remaining, then prev tests will
+    #         fail (like P, K tests)
     def test_all_elements_are_returned(self):
         """
         Check that the sampler returns all elements of the dataset
 
         With this test, I am looking if the sampler lefts behind some elements when P, K doesn't
         fit well the dataset size
-
         """
 
         # Create a dataset
@@ -220,11 +230,13 @@ class TestCustomSampler(unittest.TestCase):
         sampled_elements = [element for element in sampler]
         self.assertEqual(len(sampled_elements), len(dataset))
 
-
         # Repeat for other values of P, K
         P, K = 5, 32
         sampler = CustomSampler(P, K, dataset)
 
         sampled_elements = [element for element in sampler]
-        self.assertEqual(len(sampled_elements), len(dataset))
-
+        self.assertEqual(
+            len(sampled_elements),
+            len(dataset),
+            msg = "Some elements of the dataset were not returned when using the custom sampler"
+        )
