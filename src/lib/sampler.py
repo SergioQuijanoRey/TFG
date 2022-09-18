@@ -72,7 +72,7 @@ class CustomSampler(torch.utils.data.Sampler):
         # Raising an error if `self.len` is None to avoid problems with pytorch implementations
         # If this problem arises, we will take care of it later
         if self.len is None:
-            raise Error("CustomSampler.__len__ has not been computed yet!")
+            raise Exception("CustomSampler.__len__ has not been computed yet!")
 
         return self.len
 

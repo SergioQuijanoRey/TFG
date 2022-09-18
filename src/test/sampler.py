@@ -223,11 +223,6 @@ class TestCustomSampler(unittest.TestCase):
         self.assertIn(9, cleaned_list_of_classes)
 
 
-    # TODO -- BUG -- this test is failing
-    # TODO -- I think expecting all elements to be returned always is incorrect
-    #         If len(dataset) % (P * K) != 0 then this can fail
-    #         If the sampler returns a last batch with all elements remaining, then prev tests will
-    #         fail (like P, K tests)
     def test_len_computation_is_correct(self):
         """
         Due to P-K sampling, not all elements of the dataset are sampled
@@ -263,9 +258,39 @@ class TestCustomSampler(unittest.TestCase):
             msg = "Len of returned elements of the sampler is not equal to CustomSampler.__len__ computation"
         )
 
-    # TODO -- implement
     def test_sampler_len_is_less_than_dataset_len(self):
         """
         Check that sampler len is less or equal than dataset len
+
+        As we explain in CustomSampler.__len__ docs, this inequality has to hold because some
+        elements of the dataset can be not sampled
         """
-        pass
+
+        # Create a dataset
+        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+
+        # Create a sampler with certain values of P, K
+        P, K = 3, 32
+        sampler = CustomSampler(P, K, dataset)
+
+        # Check that CustomSampler.__len__ computation is correct
+        # We need to sample elements to trigger len computation
+        sampled_elements = [element for element in sampler]
+        self.assertLessEqual(
+            len(sampler),
+            len(dataset),
+            msg = "Len of sampler has to be less or equal to len of dataset"
+        )
+
+        # Repeat for other values of P, K
+        P, K = 3, 16
+        sampler = CustomSampler(P, K, dataset)
+
+        # We need to sample elements to trigger len computation
+        sampled_elements = [element for element in sampler]
+        self.assertLessEqual(
+            len(sampler),
+            len(dataset),
+            msg = "Len of sampler has to be less or equal to len of dataset"
+        )
+
