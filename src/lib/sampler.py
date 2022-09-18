@@ -8,8 +8,6 @@ import random
 from typing import Iterator, List, Optional
 
 # TODO -- BUG -- unit tests for this class are not passing (see lib/test/sampler.py)
-# TODO -- see https://kevinmusgrave.github.io/pytorch-metric-learning/samplers/#hierarchicalsampler
-#         because I think there is an implementation of what I want to do with this class
 class CustomSampler(torch.utils.data.Sampler):
     """
     Custom sampler that implements the sampling explained in the reference paper
@@ -46,6 +44,10 @@ class CustomSampler(torch.utils.data.Sampler):
         # TODO -- this should be private, thats `_index_list`
         self.index_list: Optional[List[int]] = None
 
+        # Because of P-K sampling, with random choices, each sampling has a different size
+        # Thus, this value is changed every time we generate a new sampling
+        self.len: Optional[int] = None
+
     def __iter__(self) -> Iterator:
 
         # Generate random index list
@@ -59,11 +61,20 @@ class CustomSampler(torch.utils.data.Sampler):
         """
         Len of the __iter__ generated in this class.
 
-        As we are sampling all elements of the dataset, the len is the same as the len of the given
-        dataset
+        As we are doing P-K sampling with random choices, thus some elements of the dataset are
+        going to not be sampled. This method computes how many elements are going to be sampled
+
+        Thus, this inequality holds:
+            self.__len__() <= self.dataset.__len()__
+
         """
 
-        return len(self.dataset)
+        # Raising an error if `self.len` is None to avoid problems with pytorch implementations
+        # If this problem arises, we will take care of it later
+        if self.len is None:
+            raise Error("CustomSampler.__len__ has not been computed yet!")
+
+        return self.len
 
     def generate_index_sequence(self) -> List[int]:
         """
@@ -103,6 +114,9 @@ class CustomSampler(torch.utils.data.Sampler):
 
             # Check for classes that has less than self.K images available
             available_classes = self.remove_empty_classes(available_classes)
+
+        # Before returning the list, change `self.len`
+        self.len = len(list_of_indixes)
 
         return list_of_indixes
 

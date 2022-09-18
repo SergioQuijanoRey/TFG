@@ -228,32 +228,44 @@ class TestCustomSampler(unittest.TestCase):
     #         If len(dataset) % (P * K) != 0 then this can fail
     #         If the sampler returns a last batch with all elements remaining, then prev tests will
     #         fail (like P, K tests)
-    def test_all_elements_are_returned(self):
+    def test_len_computation_is_correct(self):
         """
-        Check that the sampler returns all elements of the dataset
+        Due to P-K sampling, not all elements of the dataset are sampled
 
-        With this test, I am looking if the sampler lefts behind some elements when P, K doesn't
-        fit well the dataset size
+        With this test, I am looking that CustomSampler.__len__ computes how many elements are
+        sampled properly
+
         """
 
         # Create a dataset
         dataset = self.__load_dataset(DATASET_PERCENTAGE)
 
         # Create a sampler with certain values of P, K
-        P, K = 3, 16
+        P, K = 3, 32
         sampler = CustomSampler(P, K, dataset)
 
-        # Check that all elements are in the dataset
+        # Check that CustomSampler.__len__ computation is correct
         sampled_elements = [element for element in sampler]
-        self.assertEqual(len(sampled_elements), len(dataset))
+        self.assertEqual(
+            len(sampled_elements),
+            len(sampler),
+            msg = "Len of returned elements of the sampler is not equal to CustomSampler.__len__ computation"
+        )
 
         # Repeat for other values of P, K
-        P, K = 5, 32
+        P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
         sampled_elements = [element for element in sampler]
         self.assertEqual(
             len(sampled_elements),
-            len(dataset),
-            msg = "Some elements of the dataset were not returned when using the custom sampler"
+            len(sampler),
+            msg = "Len of returned elements of the sampler is not equal to CustomSampler.__len__ computation"
         )
+
+    # TODO -- implement
+    def test_sampler_len_is_less_than_dataset_len(self):
+        """
+        Check that sampler len is less or equal than dataset len
+        """
+        pass
