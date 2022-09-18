@@ -35,11 +35,14 @@ class CustomSampler(torch.utils.data.Sampler):
         # Also, this list is not freezed, we remove elements of it as we add them
         # to the index sequence
         # At each new epoch, this list is generated again
+        # `self.list_of_classes[4]` has all the indixes corresponding to elements with class 4
+        # Thus, `self.list_of_classes[4][0]` has the index of the first element with class 4
         # TODO -- this should be "private", thats `_list_of_classes`
         self.list_of_classes: Optional[List[List[int]]] = None
 
         # We are going to build a list of indexes that we iter sequentially
         # Each epoch we generate a new random sequence respecting P - K sampling
+        # This is the list that we return in __iter__ method
         # TODO -- this should be private, thats `_index_list`
         self.index_list: Optional[List[int]] = None
 
@@ -85,7 +88,10 @@ class CustomSampler(torch.utils.data.Sampler):
         # TODO -- hardcoded value 10 that should be calculated from `self.dataset`
         available_classes = list(range(10))
 
-        for _ in range(int(len(self.dataset) / (self.P * self.K))):
+        # Make minibatches while there are at least `self.P` classes with at least `self.K` elements
+        # each class
+        while len(available_classes) >= self.P:
+
             # Choose the P classes used in this iteration
             random.shuffle(available_classes)
             curr_classes = available_classes[:self.P]
@@ -96,16 +102,29 @@ class CustomSampler(torch.utils.data.Sampler):
             list_of_indixes = list(list_of_indixes) + list(self.__new_batch(curr_classes))
 
             # Check for classes that has less than self.K images available
-            available_classes = self.clean_list_of_classes(available_classes)
+            available_classes = self.remove_empty_classes(available_classes)
 
         return list_of_indixes
 
     # TODO -- document what this method does, and what's used for
-    def clean_list_of_classes(self, class_list: List[int]) -> List[int]:
+    def remove_empty_classes(self, class_list: List[int]) -> List[int]:
+        """
+        Remove classes from `self.list_of_classes` that have less than `self.K` elements
+        """
+
         return [curr_class for curr_class in class_list if len(self.list_of_classes[curr_class]) >= self.K]
 
     # TODO -- document what this method does, and what's used for
     def __new_batch(self, classes: List[int]) -> List[int]:
+        """
+        Given a list of `self.P` classes, picks `self.K` elements for each class. Thus, working the
+        K in P-K sampling (because P classes already picked)
+        """
+
+        # Check that `self.P` classes are picked
+        # TODO -- remove this in the future, because is checked in unit tests
+        assert self.P == len(classes), f"We have {len(classes)} classes, when P = {self.P}"
+
         batch = []
 
         for curr_class in classes:
@@ -131,10 +150,11 @@ class CustomSampler(torch.utils.data.Sampler):
         # TODO -- copied this from BaseTripletLoss, maybe refactor
         """
 
-        # Inicializamos la lista de listas
+        # Init list of lists
+        # TODO -- 10 value hardcoded
         class_positions = [[] for _ in range(10)]
 
-        # Recorremos el dataset y colocamos los indices donde corresponde
+        # We walk the dataset and assign each element to their position
         for idx, label in enumerate(self.labels):
             class_positions[label].append(idx)
 

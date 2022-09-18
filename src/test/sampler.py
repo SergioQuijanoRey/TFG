@@ -37,7 +37,6 @@ class TestCustomSampler(unittest.TestCase):
             transform = transform,
         )
 
-
         # Get a portion of the dataset if percentage is lower than 1
         if percentage < 1:
 
@@ -159,7 +158,7 @@ class TestCustomSampler(unittest.TestCase):
         self.assertEqual(len(sampler.list_of_classes), 10)
 
     # TODO -- what was 'the cleaning mechanism'??
-    def test_clean_available_classes(self):
+    def test_remove_empty_classes(self):
         """Check that the cleaning mechanism for available classes works fine"""
 
         # Create dataset and then directly a sampler (without dataloader)
@@ -184,7 +183,7 @@ class TestCustomSampler(unittest.TestCase):
         sampler.list_of_classes[9] = [1, 2, 3, 4]
 
         # Clean and check the list
-        cleaned_list_of_classes = sampler.clean_list_of_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        cleaned_list_of_classes = sampler.remove_empty_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         self.assertEqual(len(cleaned_list_of_classes), 10 - 3)
         self.assertIn(0, cleaned_list_of_classes)
         self.assertIn(1, cleaned_list_of_classes)
@@ -213,7 +212,7 @@ class TestCustomSampler(unittest.TestCase):
         sampler.list_of_classes[2] = [1]
 
         # Clean and check the list
-        cleaned_list_of_classes = sampler.clean_list_of_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        cleaned_list_of_classes = sampler.remove_empty_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         self.assertEqual(len(cleaned_list_of_classes), 10 - 2)
         self.assertIn(0, cleaned_list_of_classes)
         self.assertNotIn(1, cleaned_list_of_classes)
