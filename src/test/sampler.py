@@ -12,12 +12,18 @@ from src.lib.sampler import CustomSampler
 DATA_PATH = "data"
 BATCH_SIZE = 32
 NUM_WORKERS = 1
+DATASET_PERCENTAGE = 0.1
 
 class TestCustomSampler(unittest.TestCase):
 
-    def __load_dataset(self):
+    def __load_dataset(self, percentage: float = 1.0):
         """
         Aux function to load MNIST into a torch.Dataset
+
+        Parameters:
+        ===========
+        percentage: percentage of the dataset we want to get
+                    Use lower percentages for faster checks
         """
 
         transform = transforms.Compose([
@@ -31,6 +37,21 @@ class TestCustomSampler(unittest.TestCase):
             transform = transform,
         )
 
+
+        # Get a portion of the dataset if percentage is lower than 1
+        if percentage < 1:
+
+            # Subset class don't preserve targets, so we keep this targets to add them later
+            old_targets = dataset.targets
+
+            # We don't care about shuffling, this is only for speeding up some computations on
+            # unit tests, and they don't rely on shuffling
+            new_dataset_len = int(percentage * len(dataset))
+            dataset = torch.utils.data.Subset(dataset, range(0, new_dataset_len))
+
+            # Add the prev targets to the dataset manually
+            dataset.targets = old_targets[range(0, new_dataset_len)]
+
         return dataset
 
 
@@ -43,7 +64,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Dataset is going to be the same for all checks
-        dataset = self.__load_dataset()
+        dataset = self.__load_dataset(DATASET_PERCENTAGE)
 
         for P in range(1, 4):
 
@@ -84,7 +105,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Dataset is going to be the same for all checks
-        dataset = self.__load_dataset()
+        dataset = self.__load_dataset(DATASET_PERCENTAGE)
 
         for K in range(1, 4):
 
@@ -125,7 +146,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Create dataset and then directly a sampler (without dataloader)
-        dataset = self.__load_dataset()
+        dataset = self.__load_dataset(DATASET_PERCENTAGE)
         P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
@@ -142,7 +163,7 @@ class TestCustomSampler(unittest.TestCase):
         """Check that the cleaning mechanism for available classes works fine"""
 
         # Create dataset and then directly a sampler (without dataloader)
-        dataset = self.__load_dataset()
+        dataset = self.__load_dataset(DATASET_PERCENTAGE)
         P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
@@ -220,7 +241,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Create a dataset
-        dataset = self.__load_dataset()
+        dataset = self.__load_dataset(DATASET_PERCENTAGE)
 
         # Create a sampler with certain values of P, K
         P, K = 3, 16
