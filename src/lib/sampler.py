@@ -7,7 +7,6 @@ import random
 
 from typing import Iterator, List, Optional
 
-# TODO -- BUG -- unit tests for this class are not passing (see lib/test/sampler.py)
 class CustomSampler(torch.utils.data.Sampler):
     """
     Custom sampler that implements the sampling explained in the reference paper
@@ -47,6 +46,11 @@ class CustomSampler(torch.utils.data.Sampler):
         # Because of P-K sampling, with random choices, each sampling has a different size
         # Thus, this value is changed every time we generate a new sampling
         self.len: Optional[int] = None
+
+        # Some methods need to iterate over all possible values of classes
+        # So we should compute this list of classes
+        # We are assuming that targets are numeric values
+        self.classes: List[int] = self.__compute_list_of_classes(self.labels)
 
     def __iter__(self) -> Iterator:
 
@@ -95,11 +99,11 @@ class CustomSampler(torch.utils.data.Sampler):
         self.list_of_classes = None
         self.list_of_classes = self.__precompute_list_of_classes()
 
-        # Classes that we work with
-        # Some classes will we deleted as they are left with less than self.K
-        # images
-        # TODO -- hardcoded value 10 that should be calculated from `self.dataset`
-        available_classes = list(range(10))
+        # Classes that have more than `self.K` elements, so can be used for sampling
+        # We start with all classes and make an starting clean (because certain class can have
+        # less than `self.K` elements in the start)
+        available_classes = self.classes
+        available_classes = self.remove_empty_classes(available_classes)
 
         # Make minibatches while there are at least `self.P` classes with at least `self.K` elements
         # each class
@@ -122,15 +126,13 @@ class CustomSampler(torch.utils.data.Sampler):
 
         return list_of_indixes
 
-    # TODO -- document what this method does, and what's used for
     def remove_empty_classes(self, class_list: List[int]) -> List[int]:
         """
-        Remove classes from `self.list_of_classes` that have less than `self.K` elements
+        Remove classes from a given list of classes that have less than `self.K` elements
         """
 
         return [curr_class for curr_class in class_list if len(self.list_of_classes[curr_class]) >= self.K]
 
-    # TODO -- document what this method does, and what's used for
     def __new_batch(self, classes: List[int]) -> List[int]:
         """
         Given a list of `self.P` classes, picks `self.K` elements for each class. Thus, working the
@@ -163,15 +165,37 @@ class CustomSampler(torch.utils.data.Sampler):
         Computes a list containing list. Each list contains the positions of elements of given class
         ie. class_positions[i] contains all positions of elements of i-th class
 
+        We assume that class are numeric values. That's to say, string classes won't work
+
         # TODO -- copied this from BaseTripletLoss, maybe refactor
         """
 
         # Init list of lists
-        # TODO -- 10 value hardcoded
-        class_positions = [[] for _ in range(10)]
+        class_positions = [[] for _ in self.classes]
 
         # We walk the dataset and assign each element to their position
         for idx, label in enumerate(self.labels):
             class_positions[label].append(idx)
 
         return class_positions
+
+
+    def __compute_list_of_classes(self, labels: torch.Tensor) -> List[int]:
+        """
+        Given a tensor containing all labels, computes a list with the classes. That's to say,
+        a list with the unique values of the tensor
+
+        For example, given torch.Tensor([1, 1, 2, 3, 1, 4]), [1, 2, 3, 4] should be returned
+
+        We are also sorting the classes, but this is not need for most of the methods
+        """
+
+        # Use torch func to get the list of classes
+        unique_labels: torch.Tensor = torch.unique(labels)
+
+        # We want to work with vanilla python list
+        unique_labels: List[int] = list(unique_labels)
+
+        return unique_labels
+
+
