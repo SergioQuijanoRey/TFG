@@ -24,7 +24,7 @@ def save_model(net: nn.Module, folder_path: str, file_name: str) -> None:
     save_path = os.path.join(folder_path, file_name)
     torch.save(net.state_dict(), save_path)
 
-def load_model(model_path: str, model_class: Callable[nn.Module]) -> nn.Module:
+def load_model(model_path: str, model_class: Callable[..., nn.Module]) -> nn.Module:
     """
     Loads a model from disk and returns it
 
