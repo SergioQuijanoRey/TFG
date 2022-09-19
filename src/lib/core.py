@@ -200,6 +200,11 @@ def train_model_offline(
     # Return the training hist
     return training_history
 
+# TODO -- BUG -- this takes too long to train
+#                I think it's because of the metrics we compute to log info in the middle of the
+#                training
+# TODO -- also all the infrastructure around training, metrics, loggers is very complex and not
+#         easy to use
 def train_model_online(
     net: nn.Module,
     path: str,
