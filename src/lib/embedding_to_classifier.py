@@ -6,7 +6,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 import core
 
-
+# TODO -- trasnlate documentation to english
 class EmbeddingToClassifier:
     """
     Our models generate an embedding
