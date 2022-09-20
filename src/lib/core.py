@@ -205,6 +205,8 @@ def train_model_offline(
 #                training
 # TODO -- also all the infrastructure around training, metrics, loggers is very complex and not
 #         easy to use
+# TODO -- I suspect that the way we compute the iterations, that we pass to logger to see if log
+#         or not, is wrong
 def train_model_online(
     net: nn.Module,
     path: str,
@@ -292,8 +294,12 @@ def train_model_online(
 
             # Statistics -- important, we have to use the iteration given by current epoch and current
             # iteration counter in inner loop. Otherwise logs are going to be non-uniform over iterations
+            # TODO -- i think this is wrong
+            # TODO -- ISSUE -- #16
             curr_it = epoch * len(train_loader.dataset) + i * train_loader.batch_size
 
+            # TODO -- this is wrong, logger should decide wether or not to log, not this block of code
+            # TODO -- ISSUE -- #16
             #  if logger.should_log(curr_it) or current_seen_batches == 10:
             if current_seen_batches == 10:
                 # Log and return loss from training and validation

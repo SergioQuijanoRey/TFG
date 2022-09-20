@@ -102,7 +102,7 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     mean_loss: the mean of the loss over seen examples
     """
 
-    # Get device where we are training 
+    # Get device where we are training
     device = core.get_device()
 
     # Calculate loss in the given dataset
@@ -110,7 +110,7 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     for data in data_loader:
 
         # Calculate embeddings
-        # Put them together in one batch 
+        # Put them together in one batch
         batch = [net(item[None, ...].to(device)) for item in data]
 
         # Calculate loss
@@ -122,31 +122,26 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
 
 def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, loss_function, max_examples) -> float:
     """
-    Calculates mean loss over a data set, for a triplet-like loss
-    Online version
+    Calculates mean loss over a data set, for a triplet-like loss online version
 
-    Parameters:
-    ===========
-    net: the net we are using to calculate metrics
-    data_loader: wraps the dataset (training / validation set)
-    max_examples: in order to not have to iterate over the whole set (slow computation), it
-                  specifies max number of examples to see
-    loss_function: the loss function we're using to compute the metric. Has to be triplet-like loss
-    max_examples: max examples to evaluate in order to compute the metric
+    @param net: the net we are using to calculate metrics
+    @param data_loader: wraps the dataset (training / validation set)
+    @param max_examples: in order to not have to iterate over the whole set (slow computation), it
+                         specifies max number of examples to see
+    @param loss_function: the loss function we're using to compute the metric. Has to be triplet-like loss
+    @param max_examples: max examples to evaluate in order to compute the metric
 
-    Returns:
-    =========
-    mean_loss: the mean of the loss over seen examples
+    @returns mean_loss: the mean of the loss over seen examples
     """
 
-    # Get device where we are training 
+    # Get device where we are training
     device = core.get_device()
 
     # Calculate loss in the given dataset
     acumulated_loss = 0.0
     curr_examples = 0
     for data in data_loader:
-        
+
         # Unwrap the data
         imgs, labels = data
 
@@ -156,7 +151,7 @@ def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, 
         # Calculate loss
         acumulated_loss += loss_function(embeddings, labels)
 
-        # Update seen examples
+        # Update seen examplesmetrics
         curr_examples += imgs.size(0)
         if curr_examples >= max_examples:
             break
@@ -164,4 +159,3 @@ def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, 
 
     mean_loss = acumulated_loss / curr_examples
     return mean_loss
-
