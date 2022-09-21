@@ -7,23 +7,17 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-import matplotlib.pyplot as plt
-import numpy as np
-from datetime import datetime
 import os
 
-import board
 import filesystem
 from train_loggers import TrainLogger, SilentLogger
-import metrics
+from core import get_device
 
 # TODO -- BUG -- this takes too long to train
 #                I think it's because of the metrics we compute to log info in the middle of the
 #                training
 # TODO -- also all the infrastructure around training, metrics, loggers is very complex and not
 #         easy to use
-# TODO -- I suspect that the way we compute the iterations, that we pass to logger to see if log
-#         or not, is wrong
 def train_model_online(
     net: nn.Module,
     path: str,
@@ -118,7 +112,6 @@ def train_model_online(
             # Update the number counter for seen elements
             how_may_elements_seen += len(labels)
             epoch_iteration += len(labels)
-            print(f"TODO -- {len(labels) = }") # TODO -- delete this debugging print
 
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):
