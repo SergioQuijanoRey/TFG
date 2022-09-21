@@ -147,7 +147,7 @@ def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, 
         # Calculate loss
         acumulated_loss += loss_function(embeddings, labels)
 
-        # Update seen examplesmetrics
+        # Update seen examples and check for break condition
         curr_examples += imgs.size(0)
         if curr_examples >= max_examples:
             break
