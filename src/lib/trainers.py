@@ -11,7 +11,7 @@ import os
 
 import filesystem
 from train_loggers import TrainLogger, SilentLogger
-from core import get_device
+from core import get_device, get_datetime_str
 
 def train_model_offline(
     net: nn.Module,
@@ -102,8 +102,8 @@ def train_model_offline(
             optimizer.step()
 
             # Update the number counter for seen elements
-            how_may_elements_seen += len(labels)
-            epoch_iteration += len(labels)
+            how_may_elements_seen += len(outputs)
+            epoch_iteration += len(outputs)
 
             if logger.should_log(how_may_elements_seen):
 
