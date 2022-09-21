@@ -88,18 +88,14 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     Calculates mean loss over a data set, for a triplet-like loss
     Offline version
 
-    Parameters:
-    ===========
-    net: the net we are using to calculate metrics
-    data_loader: wraps the dataset (training / validation set)
-    max_examples: in order to not have to iterate over the whole set (slow computation), it
-                  specifies max number of examples to see
-    loss_function: the loss function we're using to compute the metric. Has to be triplet-like loss
-    online: controls the use of minibatches
+    @param net: the net we are using to calculate metrics
+    @param data_loader: wraps the dataset (training / validation set)
+    @param max_examples: in order to not have to iterate over the whole set (slow computation), it
+                         specifies max number of examples to see
+    @param loss_function: the loss function we're using to compute the metric. Has to be triplet-like loss
+    @param online: controls the use of minibatches
 
-    Returns:
-    =========
-    mean_loss: the mean of the loss over seen examples
+    @returns mean_loss: the mean of the loss over seen examples
     """
 
     # Get device where we are training
