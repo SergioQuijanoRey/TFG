@@ -211,7 +211,7 @@ class TripletLoggerOnline(TrainLogger):
         self,
         net: nn.Module,
         iterations: int,
-        loss_func: Callable[torch.Tensor, float],
+        loss_func: Callable[[torch.Tensor], float],
         train_percentage: float = 1.0,
         validation_percentage: float = 1.0
     ):
