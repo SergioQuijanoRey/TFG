@@ -240,9 +240,10 @@ def train_model_online(
                          If its None, no snapshots are taken
     """
 
-    # Loss and optimizer
+    # Get parameters from the dic parameter
     lr = parameters["lr"]
     criterion = parameters["criterion"]
+    epochs = parameters["epochs"]
 
     # Use Adam as optimizer
     optimizer = optim.Adam(net.parameters(), lr = lr)
@@ -266,11 +267,20 @@ def train_model_online(
     training_history["val_loss"] = []
 
     # For controlling the logging
-    current_seen_batches = 0
+    # Loggers need to know how many single elements we have seen
+    # We have to compute it adding up every time a new batch is seen. Because of P-K sampling
+    # different epochs mean different number of elements seen
+    how_may_elements_seen = 0
 
     # Training the network
-    epochs = parameters["epochs"]
     for epoch in range(epochs):
+
+        # Logger needs to know the parameter `epoch_iteration`
+        # This, as `TrainLogger(ABC)` documentation says, it's the number of seen single elements
+        # in this epoch. Thus, it's not the same as `how_may_elements_seen`.
+        # And for the same reason as `how_may_elements_seen`, we have to compute it summing up
+        # manually
+        epoch_iteration = 0
 
         for i, data in enumerate(train_loader):
 
@@ -288,40 +298,35 @@ def train_model_online(
             loss.backward()
             optimizer.step()
 
-            # Update counter
-            current_seen_batches += 1
-            #  print(f"TODO -- current seen batches = {current_seen_batches}")
+            # Update the number counter for seen elements
+            how_may_elements_seen += len(labels)
+            epoch_iteration += len(labels)
+            print(f"TODO -- {len(labels) = }") # TODO -- delete this debugging print
 
-            # Statistics -- important, we have to use the iteration given by current epoch and current
-            # iteration counter in inner loop. Otherwise logs are going to be non-uniform over iterations
-            # TODO -- i think this is wrong
-            # TODO -- ISSUE -- #16
-            curr_it = epoch * len(train_loader.dataset) + i * train_loader.batch_size
+            # Check if we should log, based on how many elements we have seen
+            if logger.should_log(how_may_elements_seen):
 
-            # TODO -- this is wrong, logger should decide wether or not to log, not this block of code
-            # TODO -- ISSUE -- #16
-            #  if logger.should_log(curr_it) or current_seen_batches == 10:
-            if current_seen_batches == 10:
                 # Log and return loss from training and validation
-                training_loss, validation_loss = logger.log_process(train_loader, validation_loader, epoch, i)
+                training_loss, validation_loss = logger.log_process(
+                    train_loader,
+                    validation_loader,
+                    epoch,
+                    epoch_iteration
+                )
 
                 # Save loss of training and validation sets
                 training_history["loss"].append(training_loss)
                 training_history["val_loss"].append(validation_loss)
             else:
-                print(f"[{epoch} / {curr_it}]")
+                print(f"[{epoch} / {epoch_iteration}]")
 
-            # Snapshots -- same as Statistics, we reuse current iteration calc
+            # Take a snapshot of the network, in case the notebook crashes or we get a timeout
             # TODO -- create a SnapshotTaker class as we have for logs -- snapshot_taker.should_log(i)
-            if snapshot_iterations is not None and curr_it % snapshot_iterations == 0:
-                # We take the snapshot
+            if snapshot_iterations is not None and how_may_elements_seen % snapshot_iterations == 0:
+
                 snapshot_name = "snapshot_" + name + "==" + get_datetime_str()
                 snapshot_folder = os.path.join(path, "snapshots")
                 filesystem.save_model(net, folder_path = snapshot_folder, file_name = snapshot_name)
-
-            # Re-start counter if hit 10
-            current_seen_batches = current_seen_batches % 10
-
 
     print("Finished training")
 
