@@ -254,6 +254,7 @@ def train_model_online(
                 # Save loss of training and validation sets
                 training_history["loss"].append(training_loss)
                 training_history["val_loss"].append(validation_loss)
+
             else:
                 print(f"[{epoch} / {epoch_iteration}]")
 
