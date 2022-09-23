@@ -13,6 +13,9 @@ import filesystem
 from train_loggers import TrainLogger, SilentLogger
 from core import get_device, get_datetime_str
 
+import logging
+file_logger = logging.getLogger("MAIN_LOGGER")
+
 def train_model_offline(
     net: nn.Module,
     path: str,
@@ -220,6 +223,8 @@ def train_model_online(
         # manually
         epoch_iteration = 0
 
+        file_logger.info(f"Started epoch {epoch}")
+
         for i, data in enumerate(train_loader):
 
             # Unwrap the data
@@ -231,6 +236,7 @@ def train_model_online(
             # Forward
             outputs = net(imgs.to(device))
             loss = criterion(outputs, labels.to(device))
+            file_logger.debug(f"Obtained loss in {i} iteration of epoch {epoch} is {loss}")
 
             # Backward + Optimize
             loss.backward()
@@ -240,8 +246,12 @@ def train_model_online(
             how_may_elements_seen += len(labels)
             epoch_iteration += len(labels)
 
+            file_logger.debug(f"In iteration {i} of epoch {epoch} {len(labels)} elements have been seen")
+
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):
+
+                file_logger.info("Started logging loss information")
 
                 # Log and return loss from training and validation
                 training_loss, validation_loss = logger.log_process(
@@ -262,14 +272,18 @@ def train_model_online(
             # TODO -- create a SnapshotTaker class as we have for logs -- snapshot_taker.should_log(i)
             if snapshot_iterations is not None and how_may_elements_seen % snapshot_iterations == 0:
 
+                file_logger.info("Saving a snapshot of the model")
+
                 snapshot_name = "snapshot_" + name + "==" + get_datetime_str()
                 snapshot_folder = os.path.join(path, "snapshots")
                 filesystem.save_model(net, folder_path = snapshot_folder, file_name = snapshot_name)
 
     print("Finished training")
+    file_logger.info("Finished training")
 
 
     # Save the model -- use name + date stamp to save the model
+    file_logger.info("Saving the trained model in disk")
     date = get_datetime_str()
     name = name + "==" + date
     filesystem.save_model(net = net, folder_path = path, file_name = name)
