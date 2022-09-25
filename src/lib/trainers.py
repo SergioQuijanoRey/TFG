@@ -16,6 +16,8 @@ from core import get_device, get_datetime_str
 import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
 
+import wandb
+
 def train_model_offline(
     net: nn.Module,
     path: str,
@@ -247,6 +249,7 @@ def train_model_online(
             epoch_iteration += len(labels)
 
             file_logger.debug(f"In iteration {i} of epoch {epoch} {len(labels)} elements have been seen")
+            wandb.log({"Pytorch training loss": loss})
 
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):

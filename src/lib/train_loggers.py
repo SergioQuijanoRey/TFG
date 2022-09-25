@@ -11,6 +11,8 @@ import core
 import board
 import metrics
 
+import wandb
+
 class TrainLogger(ABC):
     """
     TrainLogger logs data from the trainning process
@@ -284,6 +286,11 @@ class TripletLoggerOnline(TrainLogger):
         print(f"\tTraining loss: {mean_train_loss}")
         print(f"\tValidation loss: {mean_val_loss}")
         print("")
+
+        wandb.log({
+            "training loss": mean_train_loss,
+            "validation loss": mean_val_loss
+        })
 
         # Devolvemos las funciones de perdida
         return mean_train_loss, mean_val_loss
