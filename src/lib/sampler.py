@@ -168,6 +168,7 @@ class CustomSampler(torch.utils.data.Sampler):
         We assume that class are numeric values. That's to say, string classes won't work
 
         # TODO -- copied this from BaseTripletLoss, maybe refactor
+        # TODO -- REFACTOR -- also used in the notebook, refactor this!
         """
 
         # Init list of lists

@@ -1,45 +1,62 @@
-from abc import ABC, abstractmethod # Abstrac classes
+from abc import ABC, abstractmethod
 
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
 
-from typing import Tuple
+from typing import Tuple, Callable
 
 import core
 import board
 import metrics
 
 class TrainLogger(ABC):
-    """TrainLogger logs data from the trainning process"""
+    """
+    TrainLogger logs data from the trainning process
+
+    This abstract class acts as an interface for classes that want to be used as loggers for
+    the training process
+    """
 
     @abstractmethod
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> None:
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
         """
         Logs an iteration of training process. This log can be just printing to terminal or saving
         scalars to a tensorboard
 
-        Parameters:
-        ============
-        train_loader: dataloader for training data
-        validation_loader: dataloader for validation data
-        loss: computed loss in training function
-        epoch, iteration: in order to have more logging capabilities
+        @param train_loader: dataloader for training data
+        @param validation_loader: dataloader for validation data
+        @param loss: computed loss in training function
+        @param epoch: the epoch where we are at the moment
+        @param epoch_iteration: how many single elements have been seen in this epoch
+
+        @returns training_loss: for the learning curves
+        @returns validation_loss: for the learning curves
         """
         pass
 
     @abstractmethod
     def should_log(self, iteration: int) -> bool:
-        """Decides wether or not we should log data in this training iteration"""
+        """
+        Decides wether or not we should log data in this training iteration
+
+        Iterations refer to how many SINGLE ELEMENTS we have seen
+        It DOES NOT refer to:
+            - How many batches we have seen
+            - How many epochs the net has been trained
+
+        @param iteration should be a multiple of the batch size. Otherwise can happen that we
+               never log
+        """
         pass
 
 
 class ClassificationLogger(TrainLogger):
     """
     Logger for a classifaction problem
-
     """
+
     def __init__(self, net: nn.Module, iterations, loss_func, training_perc: float = 1.0, validation_perc: float = 1.0):
         """
         Initializes the logger
@@ -63,7 +80,7 @@ class ClassificationLogger(TrainLogger):
         self.name = core.get_datetime_str()
         self.tensorboardwriter = board.get_writer(name = self.name)
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> None:
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> None:
 
         # For more performance
         with torch.no_grad():
@@ -89,7 +106,7 @@ class ClassificationLogger(TrainLogger):
         # Output to the user
         # We don't care about epochs starting in 0, but with iterations is weird
         # ie. epoch 0 it 199 instead of epoch 0 it 200
-        print(f"[{epoch} / {iteration}]")
+        print(f"[{epoch} / {epoch_iteration}]")
         print(f"Training loss: {mean_train_loss}")
         print(f"Validation loss: {mean_val_loss}")
         print(f"Training acc: {mean_train_acc}")
@@ -97,7 +114,7 @@ class ClassificationLogger(TrainLogger):
         print("")
 
         # Sending this metrics to tensorboard
-        curr_it = iteration * train_loader.batch_size + epoch * len(train_loader.dataset) # The current iteration taking in count
+        curr_it = epoch_iteration * train_loader.batch_size + epoch * len(train_loader.dataset) # The current iteration taking in count
                                                                 # that we reset iterations at the end
                                                                 # of each epoch
 
@@ -131,15 +148,17 @@ class SilentLogger(TrainLogger):
     """Logger that does not log data"""
 
     def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> None:
+        # This code should never be triggered, because of `should_log`, but just in case just pass
         pass
 
-    def should_log(self, iteration: int) -> bool:
+    def should_log(self, epoch_iteration: int) -> bool:
         # Always return false in order to never log
         return False
 
+# TODO -- check if I can use same logger for offline and online triplet training
 class TripletLoggerOffline(TrainLogger):
     """
-    Custom logger for triplet training
+    Custom logger for offline triplet training
     """
 
     def __init__(self, net: nn.Module, iterations, loss_func):
@@ -156,7 +175,7 @@ class TripletLoggerOffline(TrainLogger):
         self.loss_func = loss_func
         self.net = net
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> Tuple[float, float]:
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
 
         # Seleccionamos la funcion de perdida
         metric =  metrics.calculate_mean_triplet_loss_offline
@@ -180,7 +199,7 @@ class TripletLoggerOffline(TrainLogger):
         self.net.train()
 
         # Mostramos las metricas obtenidas
-        print(f"[{epoch} / {iteration}]")
+        print(f"[{epoch} / {epoch_iteration}]")
         print(f"\tTraining loss: {mean_train_loss}")
         print(f"\tValidation loss: {mean_val_loss}")
         print("")
@@ -195,21 +214,31 @@ class TripletLoggerOffline(TrainLogger):
         return False
 
 
-
+# TODO -- check if I can use same logger for offline and online triplet training
+# TODO -- ISSUE -- #16
 class TripletLoggerOnline(TrainLogger):
     """
-    Custom logger for triplet training
+    Custom logger for online triplet training
     """
 
-    def __init__(self, net: nn.Module, iterations, loss_func, train_percentage = 1.0, validation_percentage = 1.0):
+    def __init__(
+        self,
+        net: nn.Module,
+        iterations: int,
+        loss_func: Callable[[torch.Tensor], float],
+        train_percentage: float = 1.0,
+        validation_percentage: float = 1.0
+    ):
         """
         Initializes the logger
 
-        Parameters:
-        ===========
-        net: the net we are testing
-        iterations: how many iterations we have to wait to log again
-        loss_func: the loss func we are using to train <- Should be some triplet-like loss
+        @param net: the net we are testing
+        @param iterations: how many iterations we have to wait to log again
+        @param loss_func: the loss func we are using to train <- Should be some triplet-like loss
+        @param train_percentage: percentage of the training set we want to use. Less than 1 can be
+                                 used for faster computations
+        @param validation_percentage: percentage of the training set we want to use. Less than 1 can
+                                      be used for faster computations
         """
         self.iterations = iterations
         self.loss_func = loss_func
@@ -218,13 +247,16 @@ class TripletLoggerOnline(TrainLogger):
         self.train_percentage = train_percentage
         self.validation_percentage = validation_percentage
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> Tuple[float, float]:
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
 
-        # Este log puede ser muy lento asi que mostramos este mensaje
-        # en primer lugar para tener nocion de lo que tarda el logger
-        print(f"[{epoch} / {iteration}]")
+        # This log can be slow so we print this beforehand to have a notion on how slow it is
+        print(f"[{epoch} / {epoch_iteration}]")
 
-        # Seleccionamos la funcion de perdida
+        # We are interested in mean triplet loss
+        # TODO -- we should be using some of the functions in `lib/loss_functions.py` instead of
+        #         using `lib/metrics.py`, which I think should be deprecated
+        # TODO -- also, we can pass in `__init__` the metric or metrics we want to track
+        # TODO -- ISSUE -- #16
         metric =  metrics.calculate_mean_triplet_loss_online
 
         # Calculamos el numero maximo de ejemplos que evaluar
