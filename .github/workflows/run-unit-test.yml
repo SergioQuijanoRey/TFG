@@ -1,0 +1,32 @@
+# Github action for installing dependencies using poetry, and running unit tests
+
+name: Install dependencies and run unit tests
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install poetry package manager
+      run: pip install poetry
+    - name: Install dependencies using poetry
+      run: |
+        poetry install
+    - name: Test with unitttest module
+      run: |
+        poetry run python -m unittest src/test/*.py
