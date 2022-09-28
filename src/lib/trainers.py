@@ -227,7 +227,7 @@ def train_model_online(
 
         file_logger.info(f"Started epoch {epoch}")
 
-        for i, data in enumerate(train_loader):
+        for i, data in enumerate(train_loader, 0):
 
             # Unwrap the data
             imgs, labels = data
@@ -238,7 +238,7 @@ def train_model_online(
             # Forward
             outputs = net(imgs.to(device))
             loss = criterion(outputs, labels.to(device))
-            file_logger.debug(f"Obtained loss in {i} iteration of epoch {epoch} is {loss}")
+            file_logger.debug(f"Obtained running loss at {i} iteration of epoch {epoch} is {loss}")
 
             # Backward + Optimize
             loss.backward()
@@ -249,7 +249,7 @@ def train_model_online(
             epoch_iteration += len(labels)
 
             file_logger.debug(f"In iteration {i} of epoch {epoch} {len(labels)} elements have been seen")
-            wandb.log({"Pytorch training loss": loss})
+            wandb.log({"Running loss": loss})
 
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):
