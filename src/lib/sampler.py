@@ -7,6 +7,9 @@ import random
 
 from typing import Iterator, List, Dict, Optional
 
+import logging
+file_logger = logging.getLogger("MAIN_LOGGER")
+
 class CustomSampler(torch.utils.data.Sampler):
     """
     Custom sampler that implements the sampling explained in the reference paper
@@ -109,6 +112,14 @@ class CustomSampler(torch.utils.data.Sampler):
         available_classes = self.classes
         available_classes = self.remove_empty_classes(available_classes)
 
+        # Log and do some debugging
+        # If first clean lets us with less than `self.P` classes, we have a problem
+        file_logger.debug(f"After first cleaning, there are {len(available_classes)} available_classes")
+        if len(available_classes) < self.P:
+            err_msg = f"After first cleaning, we have less than `self.P` = {self.P} classes"
+            file_logger.error(err_msg)
+            raise Exception(err_msg)
+
         # Make minibatches while there are at least `self.P` classes with at least `self.K` elements
         # each class
         while len(available_classes) >= self.P:
@@ -128,6 +139,15 @@ class CustomSampler(torch.utils.data.Sampler):
         # Before returning the list, change `self.len`
         self.len = len(list_of_indixes)
 
+        # Log some info about the process
+        file_logger.debug(f"Generated `list_of_indixes` is {list_of_indixes}")
+
+        # Make some debugging
+        if self.len == 0:
+            err_msg = "CustomSampler.generate_index_sequence has produced and empty sequence of index to iterate"
+            file_logger.error(err_msg)
+            raise Exception(err_msg)
+
         return list_of_indixes
 
     def remove_empty_classes(self, class_list: List[int]) -> List[int]:
@@ -135,7 +155,16 @@ class CustomSampler(torch.utils.data.Sampler):
         Remove classes from a given list of classes that have less than `self.K` elements
         """
 
-        return [curr_class for curr_class in class_list if len(self.dict_of_classes[curr_class]) >= self.K]
+        return [
+            curr_class for curr_class in class_list
+            if
+                # We remove classes that have less than self.K elements
+                # But some classes could not be in the dict, so check first if they're stored
+                # in the dict first, to avouid `KeyError 0`
+                self.dict_of_classes.get(curr_class) is not None and
+                len(self.dict_of_classes[curr_class]) >= self.K
+        ]
+
 
     def __new_batch(self, classes: List[int]) -> List[int]:
         """
