@@ -28,6 +28,7 @@ class CustomSampler(torch.utils.data.Sampler):
         self.dataset = dataset
         self.labels = self.dataset.targets
 
+
         # We precomputate this list of lists to speed things up
         # Also, this list is not freezed, we remove elements of it as we add them
         # to the index sequence
@@ -50,7 +51,11 @@ class CustomSampler(torch.utils.data.Sampler):
         # Some methods need to iterate over all possible values of classes
         # So we should compute this list of classes
         # We are assuming that targets are numeric values
-        self.classes: List[int] = self.__compute_list_of_classes(self.labels)
+        self.classes: List[int] = self.__compute_list_of_classes(
+            # This if else expression makes sure that the method gets a torch.Tensor
+            # Depending on the dataset, we can have self.labels to be a List[int]
+            torch.Tensor(self.labels) if type(self.labels) is list else self.labels
+        )
 
     def __iter__(self) -> Iterator:
 
@@ -196,6 +201,11 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # We want to work with vanilla python list
         unique_labels: List[int] = list(unique_labels)
+
+        # Even though we make the annotation that `unique_labels` is `List[int]`, it can be a
+        # `List[torch.Tensor]`, so with this check we make sure that we have a `List[int]`
+        if type(unique_labels[0]) is torch.Tensor:
+            unique_labels = [int(x) for x in unique_labels]
 
         return unique_labels
 
