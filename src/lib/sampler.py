@@ -180,6 +180,10 @@ class CustomSampler(torch.utils.data.Sampler):
         class_positions = [[] for _ in self.classes]
 
         # We walk the dataset and assign each element to their position
+        # TODO -- BUG -- we get `IndexError: list index out of range`
+        # TODO -- BUG -- the maximum int value for the labels is 5748. But there are many classes
+        #                with less than K images (in fact, there are a lot of classes with only one
+        #                image), so the len of class_positions is much smaller, 4038
         for idx, label in enumerate(self.labels):
             class_positions[label].append(idx)
 
