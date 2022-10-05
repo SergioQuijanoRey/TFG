@@ -5,6 +5,8 @@ Module for displaying visualizations that are not included in tensorboard
 import matplotlib.pyplot as plt
 import numpy as np
 from typing import Tuple, List
+from collections import Counter
+import torch
 
 def is_black_and_white(img: np.ndarray) -> bool:
     """Checks if a given image is in color or in black & white format"""
@@ -138,4 +140,46 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
     plt.subplots_adjust(top = 0.5, bottom=0.2, hspace=0.5, wspace=0.5)
 
     # Mostramos la composicion y espero en caso de estar en local
+    plt.show()
+
+
+def plot_how_many_images_per_class(dataset: torch.utils.data.Dataset, cut: int, fig_size: (int, int) = (15, 15)):
+    """
+    Bar plot, where we show how many classes have certain number of images
+
+    This is useful to see, for example, how many classes have less than K images associated, and
+    thus, are going to be problematic in P-K sampling
+
+    Using this function I've seen that most of the LFW classes have only one image associated
+
+    @param dataset: the dataset that we're exploring
+    @param cut: where we want to stop plotting
+           i.e. if cut is 30, classes that have more or equal than 30 images
+           associated are not represented in the plot
+    """
+
+    # First we count how many images has each class
+    how_many_images_per_class = Counter(dataset.targets)
+
+    # Now we count how many classes have certain count
+    # For example, how many classes have count of 1 image, of 2 images, ...
+    how_many_clases_have_certain_count = Counter(how_many_images_per_class.values())
+
+    # Get labels and values for the plot
+    # Note that we're sorting the labels, because the labels indicate number
+    # of images per class and we want that in increasing order
+    labels, values = zip(*sorted(how_many_clases_have_certain_count.items()))
+
+    # Filter using the cut value
+    labels, values = labels[:cut], values[:cut]
+
+    # Plot the distribution
+    indexes = np.arange(len(labels))
+    width = 3
+
+    plt.figure(figsize=fig_size)
+    plt.bar(indexes, values, width)
+    plt.xticks(indexes + width * 0.5, labels)
+    plt.xlabel("Images per class")
+    plt.ylabel("Number of classes having that number of images")
     plt.show()
