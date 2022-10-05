@@ -62,7 +62,7 @@ class TestCustomSampler(unittest.TestCase):
 
         return dataset
 
-    def __load_LFW_dataset(self, percentage: float = 1.0):
+    def __load_LFW_dataset(self):
         """
         Aux function to load LFW into a torch.Dataset
 
@@ -83,19 +83,8 @@ class TestCustomSampler(unittest.TestCase):
             transform = transform,
         )
 
-        # Get a portion of the dataset if percentage is lower than 1
-        if percentage < 1:
-
-            # Subset class don't preserve targets, so we keep this targets to add them later
-            old_targets = dataset.targets
-
-            # We don't care about shuffling, this is only for speeding up some computations on
-            # unit tests, and they don't rely on shuffling
-            new_dataset_len = int(percentage * len(dataset))
-            dataset = torch.utils.data.Subset(dataset, range(0, new_dataset_len))
-
-            # Add the prev targets to the dataset manually
-            dataset.targets = old_targets[0:new_dataset_len]
+        # For this dataset, we have so many classes with only one image that we must use the whole
+        # dataset. So make percentage always be one
 
         return dataset
 
@@ -109,7 +98,7 @@ class TestCustomSampler(unittest.TestCase):
         if dataset == "MNIST":
             return self.__load_MNIST_dataset(DATASET_PERCENTAGE)
         elif dataset == "LFW":
-            return self.__load_LFW_dataset(DATASET_PERCENTAGE)
+            return self.__load_LFW_dataset()
         else:
             raise Exception("Bad `dataset` parameter given!")
 
@@ -224,7 +213,7 @@ class TestCustomSampler(unittest.TestCase):
         sampler.generate_index_sequence()
 
         # Check that list of classes has all classes pre-computed
-        self.assertEqual(len(sampler.list_of_classes), 10)
+        self.assertEqual(len(sampler.dict_of_classes), 10)
 
     def test_list_of_classes_has_all_classes(self):
 
@@ -243,19 +232,19 @@ class TestCustomSampler(unittest.TestCase):
 
         # Now manually create list of classes
         # This classes should survive cleanning
-        sampler.list_of_classes = [[] for _ in range(10)]
-        sampler.list_of_classes[0] = list(range(80))
-        sampler.list_of_classes[1] = list(range(80))
-        sampler.list_of_classes[2] = list(range(80))
-        sampler.list_of_classes[5] = list(range(80))
-        sampler.list_of_classes[6] = list(range(80))
-        sampler.list_of_classes[7] = list(range(80))
-        sampler.list_of_classes[8] = list(range(80))
+        sampler.dict_of_classes = [[] for _ in range(10)]
+        sampler.dict_of_classes[0] = list(range(80))
+        sampler.dict_of_classes[1] = list(range(80))
+        sampler.dict_of_classes[2] = list(range(80))
+        sampler.dict_of_classes[5] = list(range(80))
+        sampler.dict_of_classes[6] = list(range(80))
+        sampler.dict_of_classes[7] = list(range(80))
+        sampler.dict_of_classes[8] = list(range(80))
 
         # This classes should not survive cleaning
-        sampler.list_of_classes[3] = [1, 2, 3]
-        sampler.list_of_classes[4] = [1]
-        sampler.list_of_classes[9] = [1, 2, 3, 4]
+        sampler.dict_of_classes[3] = [1, 2, 3]
+        sampler.dict_of_classes[4] = [1]
+        sampler.dict_of_classes[9] = [1, 2, 3, 4]
 
         # Clean and check the list
         cleaned_list_of_classes = sampler.remove_empty_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -273,17 +262,17 @@ class TestCustomSampler(unittest.TestCase):
 
         # Repeat the process with other list of classes
         # This classes should survive cleanning
-        sampler.list_of_classes[0] = list(range(80))
-        sampler.list_of_classes[3] = list(range(80))
-        sampler.list_of_classes[4] = list(range(80))
-        sampler.list_of_classes[5] = list(range(80))
-        sampler.list_of_classes[6] = list(range(80))
-        sampler.list_of_classes[7] = list(range(80))
-        sampler.list_of_classes[8] = list(range(80))
-        sampler.list_of_classes[9] = list(range(80))
+        sampler.dict_of_classes[0] = list(range(80))
+        sampler.dict_of_classes[3] = list(range(80))
+        sampler.dict_of_classes[4] = list(range(80))
+        sampler.dict_of_classes[5] = list(range(80))
+        sampler.dict_of_classes[6] = list(range(80))
+        sampler.dict_of_classes[7] = list(range(80))
+        sampler.dict_of_classes[8] = list(range(80))
+        sampler.dict_of_classes[9] = list(range(80))
 
         # This classes should not survive cleaning
-        sampler.list_of_classes[1] = [1, 2, 3]
+        sampler.dict_of_classes[1] = [1, 2, 3]
         sampler.list_of_classes[2] = [1]
 
         # Clean and check the list
@@ -320,7 +309,7 @@ class TestCustomSampler(unittest.TestCase):
         dataset = self.__get_dataset(dataset_selection)
 
         # Create a sampler with certain values of P, K
-        P, K = 3, 32
+        P, K = 3, 32 if dataset_selection == "MNIST" else 2
         sampler = CustomSampler(P, K, dataset)
 
         # Check that CustomSampler.__len__ computation is correct
@@ -332,7 +321,7 @@ class TestCustomSampler(unittest.TestCase):
         )
 
         # Repeat for other values of P, K
-        P, K = 3, 16
+        P, K = 3, 16 if dataset_selection == "MNIST" else 3
         sampler = CustomSampler(P, K, dataset)
 
         sampled_elements = [element for element in sampler]
