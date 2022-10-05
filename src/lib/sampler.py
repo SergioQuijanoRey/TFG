@@ -165,10 +165,12 @@ class CustomSampler(torch.utils.data.Sampler):
 
         return batch
 
-    def __precompute_list_of_classes(self) -> List[List[int]]:
+    def __precompute_list_of_classes(self) -> Dict[int, List[int]]:
         """
-        Computes a list containing list. Each list contains the positions of elements of given class
-        ie. class_positions[i] contains all positions of elements of i-th class
+        Computes a dict containing lists of indixes. Each key of the dict is an int associated to
+        the class label. At that position we store a list containing all the indixees associated
+        to that class. That's to say, class_positions[i] contains all positions of elements of i-th
+        class
 
         We assume that class are numeric values. That's to say, string classes won't work
 
