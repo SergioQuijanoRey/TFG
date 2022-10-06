@@ -6,7 +6,17 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from typing import List, Tuple, Dict
-import src.lib.utils as utils
+
+# utils import depend on enviroment (local or remote), so we can do two try-except blocks
+# for dealing with that
+try:
+    import utils
+except Exception as e:
+    pass
+try:
+    import src.lib.utils as utils
+except Exception as e:
+    pass
 
 # Bases for more complex loss functions
 # ==================================================================================================

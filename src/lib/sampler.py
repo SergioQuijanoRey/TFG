@@ -4,7 +4,17 @@ Module where custom samplers go
 
 import torch
 import random
-import src.lib.utils as utils
+
+# utils import depend on enviroment (local or remote), so we can do two try-except blocks
+# for dealing with that
+try:
+    import utils
+except Exception as e:
+    pass
+try:
+    import src.lib.utils as utils
+except Exception as e:
+    pass
 
 from typing import Iterator, List, Dict, Optional
 
