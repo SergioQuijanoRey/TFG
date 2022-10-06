@@ -144,8 +144,8 @@ class TestCustomSampler(unittest.TestCase):
     def test_sampling_is_P_correct(self):
 
         # Test for the two datasets
-        self.__test_sampling_is_P_correct(self, dataset_selection = "MNIST")
-        self.__test_sampling_is_P_correct(self, dataset_selection = "LFW")
+        self.__test_sampling_is_P_correct(dataset_selection = "MNIST")
+        self.__test_sampling_is_P_correct(dataset_selection = "LFW")
 
 
     def __test_sampling_is_K_correct(self, dataset_selection: str = "MNIST"):
