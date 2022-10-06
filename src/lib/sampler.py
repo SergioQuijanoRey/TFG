@@ -4,6 +4,7 @@ Module where custom samplers go
 
 import torch
 import random
+import src.lib.utils as utils
 
 from typing import Iterator, List, Dict, Optional
 
@@ -104,7 +105,7 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # Re-generate the list of indixes splitted by class
         self.dict_of_classes = None
-        self.dict_of_classes = self.__precompute_dict_of_classes()
+        self.dict_of_classes = utils.precompute_dict_of_classes(self.labels)
 
         # Classes that have more than `self.K` elements, so can be used for sampling
         # We start with all classes and make an starting clean (because certain class can have
@@ -193,37 +194,6 @@ class CustomSampler(torch.utils.data.Sampler):
 
         return batch
 
-    def __precompute_dict_of_classes(self) -> Dict[int, List[int]]:
-        """
-        Computes a dict containing lists of indixes. Each key of the dict is an int associated to
-        the class label. At that position we store a list containing all the indixees associated
-        to that class. That's to say, class_positions[i] contains all positions of elements of i-th
-        class
-
-        We assume that class are numeric values. That's to say, string classes won't work
-
-        # TODO -- copied this from BaseTripletLoss, maybe refactor
-        # TODO -- REFACTOR -- also used in the notebook, refactor this!
-        """
-
-        # Init the dict we're going to return
-        class_positions = dict()
-
-        # We walk the dataset and assign each element to their position
-        for idx, label in enumerate(self.labels):
-
-            # Check if this label has no elements yet
-            # In this case, create a list with that index, so later we can append to that list
-            if class_positions.get(label) is None:
-                class_positions[label] = [idx]
-                continue
-
-            # Append the element to this position
-            class_positions[label].append(idx)
-
-        return class_positions
-
-
     def __compute_dict_of_classes(self, labels: torch.Tensor) -> List[int]:
         """
         Given a tensor containing all labels, computes a list with the classes. That's to say,
@@ -232,6 +202,9 @@ class CustomSampler(torch.utils.data.Sampler):
         For example, given torch.Tensor([1, 1, 2, 3, 1, 4]), [1, 2, 3, 4] should be returned
 
         We are also sorting the classes, but this is not need for most of the methods
+
+        TODO -- maybe is repeated in BaseTripletLoss, so might need a refactor. Not quite sure
+                about this
         """
 
         # Use torch func to get the list of classes

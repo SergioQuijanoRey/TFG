@@ -150,28 +150,33 @@ class BatchBaseTripletLoss(nn.Module):
         return class_positions
 
     # TODO -- BUG -- this method assumes that there are only ten classes, which is not always true
-    def precompute_negative_class(self, dict_of_classes: Dict[int, List[int]]) -> List[List[int]]:
+    def precompute_negative_class(self, dict_of_classes: Dict[int, List[int]]) -> Dict[int, List[int]]:
         """
-        Computes a list of lists. Each list contains the positions of elements that are negative
-        to the corresponding class
-        ie. list_of_negatives[i] contains all elements whose class is not i-th class
+        Computes a dictionary `dict_of_negatives`. Each key i has associated a list with all the
+        indixes of elements of other class.
 
-        @param dict_of_classes precomputed dict of positions of classes
-               This list is computed using utils.precompute_list_of_classes
-               For efficiency purpose
+        For example, `dict_of_negatives[4]` has all the indixes of elements whose class is not 4
+
+        @param dict_of_classes precomputed dict of positions of classes, computed using `utils.precompute_dict_of_classes`
+        @returns `dict_of_negatives` a dict as described before
         """
 
         # Inicializamos la lista
-        list_of_negatives = [None] * 10
+        dict_of_negatives = dict()
 
-        for label in range(10):
-            list_of_negatives[label] = [
-                idx
-                for current_list in skip_i(dict_of_classes, label)
-                for idx in current_list
-            ]
+        # Iterate over all classes present in the dataset
+        # The labels are enconded as the keys of `dict_of_classes`
+        for label in dict_of_classes.keys():
 
-        return list_of_negatives
+            dict_of_negatives[label] = []
+            for other_label in dict_of_classes.keys():
+
+                if other_label == label:
+                    continue
+
+                dict_of_negatives[label] = dict_of_negatives[label] + dict_of_classes[other_label]
+
+        return dict_of_negatives
 
     def precompute_pairwise_distances(self, embeddings: torch.Tensor, distance_function) -> Dict[Tuple[int, int], float]:
         """
@@ -244,7 +249,7 @@ class BatchHardTripletLoss(nn.Module):
         loss = 0
 
         # Pre-computamos la separacion en positivos y negativos
-        self.dict_of_classes = utils.precompute_dict_of_classes(labels)
+        self.dict_of_classes = utils.precompute_dict_of_classes([int(label) for label in labels])
 
         # Pre-computamos la lista de negativos de cada clase
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
@@ -260,13 +265,13 @@ class BatchHardTripletLoss(nn.Module):
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
                 distance_function(embedding, embeddings[positive])
-                for positive in self.dict_of_classes[img_label]
+                for positive in self.dict_of_classes[int(img_label)]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
             negative_distances = [
                 distance_function(embedding, embeddings[negative])
-                for negative in self.list_of_negatives[img_label]
+                for negative in self.list_of_negatives[int(img_label)]
             ]
 
             # Tenemos una lista de tensores de un unico elemento (el valor
@@ -276,8 +281,8 @@ class BatchHardTripletLoss(nn.Module):
             negative_distances = torch.tensor(negative_distances)
 
             # Calculamos la funcion de perdida
-            positives = self.dict_of_classes[img_label]
-            negatives = self.list_of_negatives[img_label]
+            positives = self.dict_of_classes[int(img_label)]
+            negatives = self.list_of_negatives[int(img_label)]
 
             worst_positive_idx = positives[torch.argmax(positive_distances)]
             worst_negative_idx = negatives[torch.argmin(negative_distances)]
@@ -334,7 +339,8 @@ class BatchAllTripletLoss(nn.Module):
         # Notar que el pre-computo debe realizarse por cada llamada a forward,
         # con el minibatch correspondiente. Por tanto, nos beneficia usar minibatches
         # grandes
-        self.list_of_classes = None
+        # TODO -- deprecated docs!
+        self.dict_of_classes: Dict[int, List[int]] = None
 
         # Si queremos usar self.list_of_classes para calcular todos los
         # negativos de una clase, necesitamos dos for que vamos a repetir
@@ -346,8 +352,8 @@ class BatchAllTripletLoss(nn.Module):
         loss = 0
 
         # Precomputations to speed up calculations
-        self.list_of_classes = self.precomputations.precompute_list_of_classes(labels)
-        self.list_of_negatives = self.precomputations.precompute_negative_class(self.list_of_classes)
+        self.dict_of_classes = utils.precompute_dict_of_classes([int(label) for label in labels])
+        self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
         self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings, distance_function)
 
         # For computing the mean
@@ -364,8 +370,8 @@ class BatchAllTripletLoss(nn.Module):
                     self.pairwise_distances[self.__resort_dict_idx(anchor_idx, positive_idx)],
                     self.pairwise_distances[self.__resort_dict_idx(anchor_idx, negative_idx)]
                 )
-                for positive_idx in self.list_of_classes[anchor_label] if positive_idx != anchor_idx
-                for negative_idx in self.list_of_negatives[anchor_label]
+                for positive_idx in self.dict_of_classes[int(anchor_label)] if positive_idx != anchor_idx
+                for negative_idx in self.list_of_negatives[int(anchor_label)]
             ])
 
             # Accumulate loss
