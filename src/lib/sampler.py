@@ -64,7 +64,7 @@ class CustomSampler(torch.utils.data.Sampler):
         # Some methods need to iterate over all possible values of classes
         # So we should compute this list of classes
         # We are assuming that targets are numeric values
-        self.classes: List[int] = self.__compute_dict_of_classes(
+        self.classes: List[int] = self.__compute_list_with_unique_classes(
             # This if else expression makes sure that the method gets a torch.Tensor
             # Depending on the dataset, we can have self.labels to be a List[int]
             torch.Tensor(self.labels) if type(self.labels) is list else self.labels
@@ -204,7 +204,7 @@ class CustomSampler(torch.utils.data.Sampler):
 
         return batch
 
-    def __compute_dict_of_classes(self, labels: torch.Tensor) -> List[int]:
+    def __compute_list_with_unique_classes(self, labels: torch.Tensor) -> List[int]:
         """
         Given a tensor containing all labels, computes a list with the classes. That's to say,
         a list with the unique values of the tensor

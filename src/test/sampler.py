@@ -230,9 +230,9 @@ class TestCustomSampler(unittest.TestCase):
         P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
-        # Now manually create list of classes
+        # Now manually create a dict of classes
         # This classes should survive cleanning
-        sampler.dict_of_classes = [[] for _ in range(10)]
+        sampler.dict_of_classes = dict()
         sampler.dict_of_classes[0] = list(range(80))
         sampler.dict_of_classes[1] = list(range(80))
         sampler.dict_of_classes[2] = list(range(80))
@@ -273,7 +273,7 @@ class TestCustomSampler(unittest.TestCase):
 
         # This classes should not survive cleaning
         sampler.dict_of_classes[1] = [1, 2, 3]
-        sampler.list_of_classes[2] = [1]
+        sampler.dict_of_classes[2] = [1]
 
         # Clean and check the list
         cleaned_list_of_classes = sampler.remove_empty_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
