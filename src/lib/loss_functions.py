@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from typing import List, Tuple, Dict
+import src.lib.utils as utils
 
 # Bases for more complex loss functions
 # ==================================================================================================
@@ -148,14 +149,15 @@ class BatchBaseTripletLoss(nn.Module):
 
         return class_positions
 
-    def precompute_negative_class(self, list_of_classes: List[List[int]]) -> List[List[int]]:
+    # TODO -- BUG -- this method assumes that there are only ten classes, which is not always true
+    def precompute_negative_class(self, dict_of_classes: Dict[int, List[int]]) -> List[List[int]]:
         """
         Computes a list of lists. Each list contains the positions of elements that are negative
         to the corresponding class
         ie. list_of_negatives[i] contains all elements whose class is not i-th class
 
-        @param list_of_classes precomputed list of positions of classes
-               This list is computed using precompute_list_of_classes
+        @param dict_of_classes precomputed dict of positions of classes
+               This list is computed using utils.precompute_list_of_classes
                For efficiency purpose
         """
 
@@ -165,7 +167,7 @@ class BatchBaseTripletLoss(nn.Module):
         for label in range(10):
             list_of_negatives[label] = [
                 idx
-                for current_list in skip_i(list_of_classes, label)
+                for current_list in skip_i(dict_of_classes, label)
                 for idx in current_list
             ]
 
@@ -230,7 +232,7 @@ class BatchHardTripletLoss(nn.Module):
         # Notar que el pre-computo debe realizarse por cada llamada a forward,
         # con el minibatch correspondiente. Por tanto, nos beneficia usar minibatches
         # grandes
-        self.list_of_classes = None
+        self.dict_of_classes = None
 
         # Si queremos usar self.list_of_classes para calcular todos los
         # negativos de una clase, necesitamos dos for que vamos a repetir
@@ -242,10 +244,10 @@ class BatchHardTripletLoss(nn.Module):
         loss = 0
 
         # Pre-computamos la separacion en positivos y negativos
-        self.list_of_classes = self.precomputations.precompute_list_of_classes(labels)
+        self.dict_of_classes = utils.precompute_dict_of_classes(labels)
 
         # Pre-computamos la lista de negativos de cada clase
-        self.list_of_negatives = self.precomputations.precompute_negative_class(self.list_of_classes)
+        self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
 
         # Count non zero losses in order to compute the > 0 mean
         non_zero_losses = 0
@@ -258,7 +260,7 @@ class BatchHardTripletLoss(nn.Module):
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
                 distance_function(embedding, embeddings[positive])
-                for positive in self.list_of_classes[img_label]
+                for positive in self.dict_of_classes[img_label]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
@@ -274,7 +276,7 @@ class BatchHardTripletLoss(nn.Module):
             negative_distances = torch.tensor(negative_distances)
 
             # Calculamos la funcion de perdida
-            positives = self.list_of_classes[img_label]
+            positives = self.dict_of_classes[img_label]
             negatives = self.list_of_negatives[img_label]
 
             worst_positive_idx = positives[torch.argmax(positive_distances)]
