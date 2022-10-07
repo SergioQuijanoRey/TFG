@@ -1,7 +1,9 @@
 import torch
+import torchvision
 import numpy as np
 from tqdm import tqdm
 from collections import Counter
+from typing import Callable
 
 
 # utils import depend on enviroment (local or remote), so we can do two try-except blocks
@@ -32,7 +34,12 @@ class AugmentatedDataset(torch.utils.data.Dataset):
     images
     """
 
-    def __init__(self, base_dataset: torch.utils.data.Dataset, min_number_of_images: int):
+    def __init__(
+        self,
+        base_dataset: torch.utils.data.Dataset,
+        min_number_of_images: int,
+        transform_generator: Callable
+    ):
 
         super(AugmentatedDataset, self).__init__()
 
@@ -41,12 +48,14 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         # for large enough datasets
         self.base_dataset = base_dataset
 
+        # We are going to use this function to get random transformations for each image
+        self.transform_generator = transform_generator
+
         # Create new images (with associated labels)
         self.new_images, self.new_targets = self.__augmentate_base_dataset(min_number_of_images)
 
         # Now we can create the targets list
         self.targets = self.base_dataset.targets + self.new_targets
-
 
     def __getitem__(self, index: int):
 
@@ -105,16 +114,16 @@ class AugmentatedDataset(torch.utils.data.Dataset):
 
                 # Select a random image of the class
                 img_idx = int(np.random.choice(len(dict_of_classes[small_class]), size = 1))
-                img = self.base_dataset[img_idx]
+                img, _ = self.base_dataset[img_idx]
+
+                # Create a new random transformation using the transform generator
+                transform = self.transform_generator()
 
                 # Create a new random img
-                # TODO -- implement data augmentation
-                new_img = img
+                new_img = transform(img)
 
                 # Add that img to the new lists
                 new_images.append(new_img)
                 new_targets.append(small_class)
-
-
 
         return new_images, new_targets
