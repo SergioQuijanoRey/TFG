@@ -38,7 +38,7 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         self,
         base_dataset: torch.utils.data.Dataset,
         min_number_of_images: int,
-        transform_generator: Callable
+        transform
     ):
 
         super(AugmentatedDataset, self).__init__()
@@ -48,8 +48,11 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         # for large enough datasets
         self.base_dataset = base_dataset
 
-        # We are going to use this function to get random transformations for each image
-        self.transform_generator = transform_generator
+        # A transformation that is random
+        # That's to say, each time is called on an image, the transformation performed is different
+        # This way we can use a single "value" instead of having to use a generator or something
+        # similar that would make things slow
+        self.transform = transform
 
         # Create new images (with associated labels)
         self.new_images, self.new_targets = self.__augmentate_base_dataset(min_number_of_images)
@@ -114,13 +117,11 @@ class AugmentatedDataset(torch.utils.data.Dataset):
 
                 # Select a random image of the class
                 img_idx = int(np.random.choice(len(dict_of_classes[small_class]), size = 1))
+                img_idx = dict_of_classes[small_class][img_idx]
                 img, _ = self.base_dataset[img_idx]
 
-                # Create a new random transformation using the transform generator
-                transform = self.transform_generator()
-
                 # Create a new random img
-                new_img = transform(img)
+                new_img = self.transform(img)
 
                 # Add that img to the new lists
                 new_images.append(new_img)
