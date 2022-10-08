@@ -48,6 +48,8 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         # for large enough datasets
         self.base_dataset = base_dataset
 
+        self.min_number_of_images = min_number_of_images
+
         # A transformation that is random
         # That's to say, each time is called on an image, the transformation performed is different
         # This way we can use a single "value" instead of having to use a generator or something
@@ -55,7 +57,7 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         self.transform = transform
 
         # Create new images (with associated labels)
-        self.new_images, self.new_targets = self.__augmentate_base_dataset(min_number_of_images)
+        self.new_images, self.new_targets = self.__augmentate_base_dataset(self.min_number_of_images)
 
         # Now we can create the targets list
         self.targets = self.base_dataset.targets + self.new_targets
