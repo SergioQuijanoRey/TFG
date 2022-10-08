@@ -222,8 +222,13 @@ class TestCustomSampler(unittest.TestCase):
     def __test_list_of_classes_has_all_classes(self, dataset_selection: str = "MNIST"):
         """
         Check that the precomputation for list_of_classes generates a list of list with all 10 classes
-        precomputed properly
+        precomputed properly. We have to know that the dataset has 10 classes. Thus, LFW dataset
+        can't be used
         """
+
+        # Check that we're not using LFW dataset
+        if dataset_selection == "LFW":
+            raise Exception("This test can only be run on MNIST dataset")
 
         # Create dataset and then directly a sampler (without dataloader)
         dataset = self.__get_dataset(dataset_selection)
@@ -242,7 +247,9 @@ class TestCustomSampler(unittest.TestCase):
 
         # Test for the two datasets
         self.__test_list_of_classes_has_all_classes(dataset_selection = "MNIST")
-        self.__test_list_of_classes_has_all_classes(dataset_selection = "LFW")
+
+        # This test can only be runned in MNIST dataset
+        #  self.__test_list_of_classes_has_all_classes(dataset_selection = "LFW")
 
     # TODO -- what was 'the cleaning mechanism'??
     def __test_remove_empty_classes(self, dataset_selection: str = "MNIST"):
