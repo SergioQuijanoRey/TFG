@@ -4,8 +4,10 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from collections import Counter
+from functools import lru_cache
 
 from src.lib.sampler import CustomSampler
+from src.lib.data_augmentation import LazyAugmentatedDataset
 
 # Parameters for this tests
 #===================================================================================================
@@ -25,6 +27,8 @@ class TestCustomSampler(unittest.TestCase):
            for each dataset
     """
 
+    # Cache so we don't download many times the same dataset
+    @lru_cache(maxsize = 32)
     def __load_MNIST_dataset(self, percentage: float = 1.0):
         """
         Aux function to load MNIST into a torch.Dataset
@@ -62,14 +66,15 @@ class TestCustomSampler(unittest.TestCase):
 
         return dataset
 
-    def __load_LFW_dataset(self):
+    # Cache so we don't download many times the same dataset
+    @lru_cache(maxsize = 32)
+    def __load_LFW_dataset(self, percentage: float = 1.0):
         """
         Aux function to load LFW into a torch.Dataset
 
-        Parameters:
-        ===========
-        percentage: percentage of the dataset we want to get
-                    Use lower percentages for faster checks
+        Some tests use K = 32, which lefts our dataset with almost no class with that many images
+        associated. So we perform data augmentation to have at least 32 images per class, so tests
+        won't fail because that property of the LFW dataset
         """
 
         transform = transforms.Compose([
@@ -83,8 +88,26 @@ class TestCustomSampler(unittest.TestCase):
             transform = transform,
         )
 
-        # For this dataset, we have so many classes with only one image that we must use the whole
-        # dataset. So make percentage always be one
+        # Get a portion of the dataset if percentage is lower than 1
+        if percentage < 1:
+
+            # Subset class don't preserve targets, so we keep this targets to add them later
+            old_targets = dataset.targets
+
+            # We don't care about shuffling, this is only for speeding up some computations on
+            # unit tests, and they don't rely on shuffling
+            new_dataset_len = int(percentage * len(dataset))
+            dataset = torch.utils.data.Subset(dataset, range(0, new_dataset_len))
+
+            # Add the prev targets to the dataset manually
+            dataset.targets = old_targets[0:new_dataset_len]
+
+        # Perform data augmentation to have at least 32 images per class
+        dataset = LazyAugmentatedDataset(
+            base_dataset = dataset,
+            min_number_of_images = 48,
+            transform = lambda x: x
+        )
 
         return dataset
 
@@ -98,7 +121,7 @@ class TestCustomSampler(unittest.TestCase):
         if dataset == "MNIST":
             return self.__load_MNIST_dataset(DATASET_PERCENTAGE)
         elif dataset == "LFW":
-            return self.__load_LFW_dataset()
+            return self.__load_LFW_dataset(DATASET_PERCENTAGE)
         else:
             raise Exception("Bad `dataset` parameter given!")
 

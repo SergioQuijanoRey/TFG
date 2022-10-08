@@ -4,6 +4,8 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from collections import Counter
+from functools import lru_cache
+
 
 import src.lib.data_augmentation as data_augmentation
 
@@ -20,6 +22,8 @@ class TestDataAugmentation(unittest.TestCase):
            for each type of dataset augmentation
     """
 
+    # Cache so we don't download many times the same dataset
+    @lru_cache(maxsize = 32)
     def __load_LFW_dataset(self, percentage: float = 1.0):
         """
         Aux function to load LFW into a torch.Dataset
