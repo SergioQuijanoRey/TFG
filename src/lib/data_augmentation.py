@@ -18,13 +18,8 @@ except Exception as e:
     pass
 
 
-
 import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
-
-# TODO -- TEST -- augmentate_dataset with min_number_of_images = 1 should do nothing
-# TODO -- TEST -- check that original dataset is not modified
-# TODO -- TEST -- how many images have at least K images should be 100%
 
 class AugmentatedDataset(torch.utils.data.Dataset):
     """
