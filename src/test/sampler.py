@@ -332,7 +332,7 @@ class TestCustomSampler(unittest.TestCase):
         dataset = self.__get_dataset(dataset_selection)
 
         # Create a sampler with certain values of P, K
-        P, K = 3, 32 if dataset_selection == "MNIST" else 2
+        P, K = 3, 32
         sampler = CustomSampler(P, K, dataset)
 
         # Check that CustomSampler.__len__ computation is correct
@@ -344,7 +344,7 @@ class TestCustomSampler(unittest.TestCase):
         )
 
         # Repeat for other values of P, K
-        P, K = 3, 16 if dataset_selection == "MNIST" else 3
+        P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
         sampled_elements = [element for element in sampler]
