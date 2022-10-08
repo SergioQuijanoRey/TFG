@@ -4,7 +4,6 @@ Module to put utilities code
 
 from typing import List, Dict
 
-
 def precompute_dict_of_classes(labels: List[int]) -> Dict[int, List[int]]:
     """
     Computes a dict containing lists of indixes. Each key of the dict is an int associated to
@@ -20,6 +19,9 @@ def precompute_dict_of_classes(labels: List[int]) -> Dict[int, List[int]]:
 
     # We walk the dataset and assign each element to their position
     for idx, label in enumerate(labels):
+
+        # TODO -- should not be using int(...) to cast torch.Tensor to int
+        idx, label = int(idx), int(label)
 
         # Check if this label has no elements yet
         # In this case, create a list with that index, so later we can append to that list
