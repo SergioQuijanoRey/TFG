@@ -127,7 +127,7 @@ class CustomSampler(torch.utils.data.Sampler):
         # If first clean lets us with less than `self.P` classes, we have a problem
         file_logger.debug(f"After first cleaning, there are {len(available_classes)} available_classes")
         if len(available_classes) < self.P:
-            err_msg = f"After first cleaning, we have less than `self.P` = {self.P} classes"
+            err_msg = f"After first cleaning, we have {len(available_classes)}, less than `self.P` = {self.P}"
             file_logger.error(err_msg)
             raise Exception(err_msg)
 
