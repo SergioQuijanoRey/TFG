@@ -4,6 +4,7 @@ Different loss functions used in the project
 
 import torch
 import torch.nn as nn
+import wandb
 from torch.autograd import Variable
 from typing import List, Tuple, Dict
 
@@ -159,7 +160,6 @@ class BatchBaseTripletLoss(nn.Module):
 
         return class_positions
 
-    # TODO -- BUG -- this method assumes that there are only ten classes, which is not always true
     def precompute_negative_class(self, dict_of_classes: Dict[int, List[int]]) -> Dict[int, List[int]]:
         """
         Computes a dictionary `dict_of_negatives`. Each key i has associated a list with all the
@@ -306,6 +306,10 @@ class BatchHardTripletLoss(nn.Module):
             if curr_loss > 0:
                 non_zero_losses += 1
 
+        # Keep track of active triplets
+        wandb.log({"Non zero losses": non_zero_losses})
+        wandb.log({"Non zero losses (%)": non_zero_losses / len(labels) * 100.0})
+
         # Return the mean of the loss
         # Compute the mean depending on self.use_gt_than_zero_mean
         mean = None
@@ -370,6 +374,9 @@ class BatchAllTripletLoss(nn.Module):
         # We have to instantiate the var using this syntax so backpropagation can be done properly
         summands_used = Variable(torch.tensor(0.0), requires_grad = True)
 
+        # For logging purposes, see how many summands in total are seen
+        seen_summands = 0
+
         # Iterate over all elements, that act as anchors
         for [anchor_idx, _], anchor_label in zip(enumerate(embeddings), labels):
 
@@ -392,6 +399,15 @@ class BatchAllTripletLoss(nn.Module):
                 summands_used = summands_used + torch.count_nonzero(losses)
             else:
                 summands_used = summands_used + len(losses)
+
+            # In both cases, the seen summands are the same
+            # Again, this is used for logging purposes
+            seen_summands += len(losses)
+
+
+        # Keep track of active triplets
+        wandb.log({"Non zero losses": summands_used})
+        wandb.log({"Non zero losses (%)": summands_used / seen_summands * 100.0})
 
         # Return the mean of the loss
         # Summands used depend on self.use_gt_than_zero_mean
