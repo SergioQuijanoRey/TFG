@@ -179,7 +179,7 @@ def calculate_mean_loss_function_online(
 
 # TODO -- TEST -- write tests for this function
 def compute_cluster_sizes(
-        data_loader: torch.utils.data.Dataloader,
+        data_loader: torch.utils.data.DataLoader,
         max_examples: int
     ) -> Dict[str, float]:
     """
