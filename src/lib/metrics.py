@@ -199,24 +199,30 @@ def compute_cluster_sizes(
     device = core.get_device()
     net.to(device)
 
-    # We need information about the dataset
-    # For this metric, the way we sample the data should not be important
-    dataset = data_loader.dataset
-
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
-    embeddings = [
-        net(
-            # .to(device) because we need to have data in proper memory
-            # .unsqueeze(0) because the net is expecting batches of images
-            img.unsqueeze(0).to(device)
-        )
-        for indx, (img, _) in enumerate(dataset)
-        if indx < max_examples
-    ]
+    embeddings: torch.Tensor = torch.tensor([]).to(device)
+    targets: torch.Tensor = torch.tensor([]).to(device)
+    seen_examples = 0
+
+    for imgs, labels in data_loader:
+        imgs, labels = imgs.to(device), labels.to(device)
+
+        # Doing this cat is like doing .append() on a python list, but on torch.Tensor, which is
+        # much faster. But more important, we can do ".append" in GPU mem without complex conversions
+        targets = torch.cat((targets, labels), 0)
+        embeddings = torch.cat((embeddings, net(imgs)), 0)
+
+        seen_examples += len(labels)
+        if seen_examples >= max_examples:
+            break
+
+    # Convert gpu torch.tensor to cpu numpy array
+    targets = targets.cpu().numpy()
+    embeddings = embeddings.cpu()
 
     # Pre-compute dict of classes for efficiency
-    dict_of_classes = utils.precompute_dict_of_classes(dataset.targets[:max_examples])
+    dict_of_classes = utils.precompute_dict_of_classes(targets)
 
     # Dict having all the pairwise distances of elements of the same class
     class_distances = {label: [] for label in dict_of_classes.keys()}
@@ -236,12 +242,16 @@ def compute_cluster_sizes(
                 class_distances[curr_class].append(distance)
 
 
+    # Some classes can have only one element, and thus no class distance
+    # We don't consider this classes
+    class_distances = {
+        label: class_distances[label]
+        for label in class_distances.keys()
+        if len(class_distances[label]) > 0
+    }
+
     # With intra-cluster distances, we can compute cluster sizes
-    cluster_sizes = [
-        max(distance)
-        for distance in class_distances[curr_class]
-        for curr_class in dict_of_classes.keys()
-    ]
+    cluster_sizes = [max(class_distance) for class_distance in class_distances.values()]
 
     # Now, we can compute the three metrics about cluster disntances
     metrics = {
