@@ -5,9 +5,11 @@ from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
 
-from typing import Callable
+from typing import Callable, Dict
 
 import core
+import utils
+import loss_functions
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
     """
@@ -174,3 +176,64 @@ def calculate_mean_loss_function_online(
     mean_loss = acumulated_loss / denominator
 
     return mean_loss
+
+# TODO -- TEST -- write tests for this function
+def compute_cluster_sizes(
+        data_loader: torch.utils.data.Dataloader,
+        max_examples: int
+    ) -> Dict[str, float]:
+    """
+    Computes metrics about cluster sizes
+    This information will be:
+
+    1. Max cluster distance over all clusters
+    2. Min cluster distance over all clusters
+    3. SDev of cluster distances
+
+    Given a cluster, its distance is defined as the max distance between two points of that cluster
+
+    """
+
+    # We need information about the dataset
+    # For this metric, the way we sample the data should not be important
+    dataset = data_loader.dataset
+
+    # Get the portion of the dataset we're interested in
+    dataset = dataset[:max_examples]
+
+    # Pre-compute dict of classes for efficiency
+    dict_of_classes = utils.precompute_dict_of_classes(dataset.targets)
+
+    # Dict having all the pairwise distances of elements of the same class
+    class_distances = {label: [] for label in dict_of_classes.keys()}
+
+    # Compute intra-cluster distances
+    # TODO -- move to other aux function
+    for curr_class in dict_of_classes.keys():
+        for first_indx in dict_of_classes[curr_class]:
+            for second_indx in dict_of_classes[curr_class]:
+
+                # We don't want the distance of an element with itself
+                if first_indx == second_indx:
+                    continue
+
+                # Get the distance and append to the list
+                distance = loss_functions.distance_function(dataset[first_indx], dataset[second_indx])
+                class_distances[curr_class].append(distance)
+
+
+    # With intra-cluster distances, we can compute cluster sizes
+    cluster_sizes = [
+        max(distance)
+        for distance in class_distances[curr_class]
+        for curr_class in dict_of_classes.keys()
+    ]
+
+    # Now, we can compute the three metrics about cluster disntances
+    metrics = {
+        "min": min(cluster_sizes),
+        "max": max(cluster_sizes),
+        "sd": np.std(cluster_sizes),
+    }
+
+    return metrics
