@@ -163,6 +163,7 @@ class BatchBaseTripletLoss(nn.Module):
 
         return class_positions
 
+    # TODO -- move to utils module
     def precompute_negative_class(self, dict_of_classes: Dict[int, List[int]]) -> Dict[int, List[int]]:
         """
         Computes a dictionary `dict_of_negatives`. Each key i has associated a list with all the
