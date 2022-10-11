@@ -45,7 +45,7 @@ def test_model_online(model: nn.Module, test_loader: torch.utils.data.DataLoader
     test_loader: pytorch data loader wrapping test data
     loss_function: loss funct used to evaluate the model
     """
-    metric = metrics.calculate_mean_triplet_loss_online
+    metric = metrics.calculate_mean_loss_function_online
     test_loss = metric(model, test_loader, loss_function, 1.0)
     print(f"Test Loss: {test_loss}")
 
