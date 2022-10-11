@@ -177,6 +177,9 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index: int):
 
+        if type(index) is not int:
+            raise TypeError(f"Index should be an integer, got {type(index)} type instead")
+
         # If the index is from the original dataset, return from that
         if index < len(self.base_dataset):
             return self.base_dataset.__getitem__(index)
