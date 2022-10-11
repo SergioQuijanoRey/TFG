@@ -8,6 +8,9 @@ import wandb
 from torch.autograd import Variable
 from typing import List, Tuple, Dict
 
+import logging
+file_logger = logging.getLogger("MAIN_LOGGER")
+
 # utils import depend on enviroment (local or remote), so we can do two try-except blocks
 # for dealing with that
 try:
@@ -307,8 +310,13 @@ class BatchHardTripletLoss(nn.Module):
                 non_zero_losses += 1
 
         # Keep track of active triplets
-        wandb.log({"Non zero losses": non_zero_losses})
-        wandb.log({"Non zero losses (%)": non_zero_losses / len(labels) * 100.0})
+        # Try is because before this we must have executed `wandb.init`
+        try:
+            wandb.log({"Non zero losses": non_zero_losses})
+            wandb.log({"Non zero losses (%)": non_zero_losses / len(labels) * 100.0})
+        except Exception as e:
+            file_logger.error("Wandb log called when wandb init was not executed")
+            file_logger.error(e)
 
         # Return the mean of the loss
         # Compute the mean depending on self.use_gt_than_zero_mean
@@ -406,8 +414,13 @@ class BatchAllTripletLoss(nn.Module):
 
 
         # Keep track of active triplets
-        wandb.log({"Non zero losses": summands_used})
-        wandb.log({"Non zero losses (%)": summands_used / seen_summands * 100.0})
+        # Try is because before this we must have executed `wandb.init`
+        try:
+            wandb.log({"Non zero losses": summands_used})
+            wandb.log({"Non zero losses (%)": summands_used / seen_summands * 100.0})
+        except Exception as e:
+            file_logger.error("Wandb log called when wandb init was not executed")
+            file_logger.error(e)
 
         # Return the mean of the loss
         # Summands used depend on self.use_gt_than_zero_mean
