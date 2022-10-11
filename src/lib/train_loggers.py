@@ -53,6 +53,17 @@ class TrainLogger(ABC):
         """
         pass
 
+class SilentLogger(TrainLogger):
+    """Logger that does not log data"""
+
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> None:
+        # This code should never be triggered, because of `should_log`, but just in case just pass
+        pass
+
+    def should_log(self, epoch_iteration: int) -> bool:
+        # Always return false in order to never log
+        return False
+
 
 class ClassificationLogger(TrainLogger):
     """
@@ -146,17 +157,6 @@ class ClassificationLogger(TrainLogger):
 
         return False
 
-class SilentLogger(TrainLogger):
-    """Logger that does not log data"""
-
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> None:
-        # This code should never be triggered, because of `should_log`, but just in case just pass
-        pass
-
-    def should_log(self, epoch_iteration: int) -> bool:
-        # Always return false in order to never log
-        return False
-
 # TODO -- check if I can use same logger for offline and online triplet training
 class TripletLoggerOffline(TrainLogger):
     """
@@ -216,8 +216,6 @@ class TripletLoggerOffline(TrainLogger):
         return False
 
 
-# TODO -- check if I can use same logger for offline and online triplet training
-# TODO -- ISSUE -- #16
 class TripletLoggerOnline(TrainLogger):
     """
     Custom logger for online triplet training
@@ -229,7 +227,8 @@ class TripletLoggerOnline(TrainLogger):
         iterations: int,
         loss_func: Callable[[torch.Tensor], float],
         train_percentage: float = 1.0,
-        validation_percentage: float = 1.0
+        validation_percentage: float = 1.0,
+        greater_than_zero: bool = False
     ):
         """
         Initializes the logger
@@ -241,10 +240,13 @@ class TripletLoggerOnline(TrainLogger):
                                  used for faster computations
         @param validation_percentage: percentage of the training set we want to use. Less than 1 can
                                       be used for faster computations
+        @param greater_than_zero: choose if we want to use only greater than zero values for
+                                  computing the loss                                                                 the mean loss
         """
         self.iterations = iterations
         self.loss_func = loss_func
         self.net = net
+        self.greater_than_zero = greater_than_zero
 
         self.train_percentage = train_percentage
         self.validation_percentage = validation_percentage
@@ -255,16 +257,11 @@ class TripletLoggerOnline(TrainLogger):
         print(f"[{epoch} / {epoch_iteration}]")
 
         # We are interested in mean triplet loss
-        # TODO -- we should be using some of the functions in `lib/loss_functions.py` instead of
-        #         using `lib/metrics.py`, which I think should be deprecated
-        # TODO -- also, we can pass in `__init__` the metric or metrics we want to track
-        # TODO -- ISSUE -- #16
-        metric =  metrics.calculate_mean_triplet_loss_online
+        metric =  metrics.calculate_mean_loss_function_online
 
         # Calculamos el numero maximo de ejemplos que evaluar
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
         validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
-
 
         # Empezamos calculando las metricas que queremos mostrar
         # Para tener mas eficiencia en inferencia
@@ -274,10 +271,10 @@ class TripletLoggerOnline(TrainLogger):
             self.net.eval()
 
             # Funcion de perdida en entrenamiento
-            mean_train_loss = metric(self.net, train_loader, self.loss_func, train_max_examples)
+            mean_train_loss = metric(self.net, train_loader, self.loss_func, train_max_examples, self.greater_than_zero)
 
             # Funcion de perdida en validacion
-            mean_val_loss = metric(self.net, validation_loader, self.loss_func, validation_max_examples)
+            mean_val_loss = metric(self.net, validation_loader, self.loss_func, validation_max_examples, self.greater_than_zero)
 
         # Volvemos a poner la red en modo entrenamiento
         self.net.train()

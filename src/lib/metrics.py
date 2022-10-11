@@ -5,6 +5,8 @@ from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
 
+from typing import Callable
+
 import core
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
@@ -116,9 +118,16 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     mean_loss = acumulated_loss / len(data_loader.dataset)
     return mean_loss
 
-def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, loss_function, max_examples) -> float:
+def calculate_mean_loss_function_online(
+    net: nn.Module,
+    data_loader: DataLoader,
+    loss_function: Callable,
+    max_examples: int,
+    greater_than_zero: bool = False
+) -> float:
     """
     Calculates mean loss over a data set, for a triplet-like loss online version
+    The loss function is determined as a parameter of the function
 
     @param net: the net we are using to calculate metrics
     @param data_loader: wraps the dataset (training / validation set)
@@ -126,6 +135,8 @@ def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, 
                          specifies max number of examples to see
     @param loss_function: the loss function we're using to compute the metric. Has to be triplet-like loss
     @param max_examples: max examples to evaluate in order to compute the metric
+    @param greater_than_zero: choose if we want to use only greater than zero values for computing
+                              the mean loss
 
     @returns mean_loss: the mean of the loss over seen examples
     """
@@ -136,6 +147,7 @@ def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, 
     # Calculate loss in the given dataset
     acumulated_loss = 0.0
     curr_examples = 0
+    gt_than_zero_examples = 0
     for data in data_loader:
 
         # Unwrap the data
@@ -145,13 +157,20 @@ def calculate_mean_triplet_loss_online(net: nn.Module, data_loader: DataLoader, 
         embeddings = net(imgs.to(device))
 
         # Calculate loss
-        acumulated_loss += loss_function(embeddings, labels)
+        current_loss = loss_function(embeddings, labels)
+        acumulated_loss += current_loss
 
         # Update seen examples and check for break condition
         curr_examples += imgs.size(0)
         if curr_examples >= max_examples:
             break
 
+        if current_loss > 0:
+            gt_than_zero_examples += imgs.size(0)
 
-    mean_loss = acumulated_loss / curr_examples
+
+    # Compute mean loss in function of gt_than_zero_examples
+    denominator = gt_than_zero_examples if greater_than_zero else curr_examples
+    mean_loss = acumulated_loss / denominator
+
     return mean_loss
