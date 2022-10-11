@@ -180,6 +180,7 @@ def calculate_mean_loss_function_online(
 # TODO -- TEST -- write tests for this function
 def compute_cluster_sizes(
         data_loader: torch.utils.data.DataLoader,
+        net: torch.nn.Module,
         max_examples: int
     ) -> Dict[str, float]:
     """
@@ -194,15 +195,28 @@ def compute_cluster_sizes(
 
     """
 
+    # Move network to proper device
+    device = core.get_device()
+    net.to(device)
+
     # We need information about the dataset
     # For this metric, the way we sample the data should not be important
     dataset = data_loader.dataset
 
     # Get the portion of the dataset we're interested in
-    dataset = dataset[:max_examples]
+    # Also, use this step to compute the embeddings of the images
+    embeddings = [
+        net(
+            # .to(device) because we need to have data in proper memory
+            # .unsqueeze(0) because the net is expecting batches of images
+            img.unsqueeze(0).to(device)
+        )
+        for indx, (img, _) in enumerate(dataset)
+        if indx < max_examples
+    ]
 
     # Pre-compute dict of classes for efficiency
-    dict_of_classes = utils.precompute_dict_of_classes(dataset.targets)
+    dict_of_classes = utils.precompute_dict_of_classes(dataset.targets[:max_examples])
 
     # Dict having all the pairwise distances of elements of the same class
     class_distances = {label: [] for label in dict_of_classes.keys()}
@@ -218,7 +232,7 @@ def compute_cluster_sizes(
                     continue
 
                 # Get the distance and append to the list
-                distance = loss_functions.distance_function(dataset[first_indx], dataset[second_indx])
+                distance = loss_functions.distance_function(embeddings[first_indx], embeddings[second_indx])
                 class_distances[curr_class].append(distance)
 
 

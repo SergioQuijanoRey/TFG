@@ -370,7 +370,7 @@ class IntraClusterLogger(TrainLogger):
         self.net = net
         self.iterations = iterations
         self.train_percentage = train_percentage
-        self.validation_perc = validation_percentage
+        self.validation_percentage = validation_percentage
 
 
     def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
@@ -389,8 +389,8 @@ class IntraClusterLogger(TrainLogger):
             self.net.eval()
 
             # Get the two metrics
-            train_metrics = metrics.compute_cluster_sizes(train_loader, train_max_examples)
-            validation_metrics = metrics.compute_cluster_sizes(validation_loader, validation_max_examples)
+            train_metrics = metrics.compute_cluster_sizes(train_loader, self.net, train_max_examples)
+            validation_metrics = metrics.compute_cluster_sizes(validation_loader, self.net, validation_max_examples)
 
 
         # Get the network in training mode again
@@ -410,8 +410,6 @@ class IntraClusterLogger(TrainLogger):
             "Validation Max Cluster Distance": validation_metrics["max"],
             "Validation SD Cluster Distance":  validation_metrics["sd"],
         })
-
-
 
 
     # TODO -- this method is repeated multiple times
