@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
 
-from typing import Tuple, Callable
+from typing import List, Tuple, Callable
 
 import core
 import board
@@ -64,6 +64,42 @@ class SilentLogger(TrainLogger):
         # Always return false in order to never log
         return False
 
+# TODO -- TEST -- write some unit tests for this class
+class CompoundLogger(TrainLogger):
+    """
+    Class that takes a list of loggers, and compount them in one single logger
+
+    This logger calls should_log on each base logger. If one logger should log, it will log with
+    its `log_process` method
+    """
+
+    def __init__(self, loggers: List[TrainLogger]):
+        self.loggers = loggers
+
+        # When a logger wants to log at certain iteration, `CompoundLogger.log_process` has to call
+        # that method on that particular logger. So we need this attribute to keep track of which
+        # loggers want to log at this iteration
+        self.logger_should_log: List[bool] = None
+
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+
+        # TODO -- this break the return type that we've annotated
+        ret_values = []
+
+        for indx, logger in enumerate(self.loggers):
+            if self.logger_should_log[indx] is True:
+                ret_val = logger.log_process(train_loader, validation_loader, epoch, epoch_iteration)
+                ret_values.append(ret_val)
+
+        return ret_values
+
+    def should_log(self, iteration: int) -> bool:
+
+        # Compute the list of loggers that want to log
+        self.logger_should_log = [logger.should_log(iteration) for logger in self.loggers]
+
+        # Now, we can tell if there's at least one logger that wants to log
+        return any(self.logger_should_log)
 
 class ClassificationLogger(TrainLogger):
     """
@@ -241,7 +277,7 @@ class TripletLoggerOnline(TrainLogger):
         @param validation_percentage: percentage of the training set we want to use. Less than 1 can
                                       be used for faster computations
         @param greater_than_zero: choose if we want to use only greater than zero values for
-                                  computing the loss                                                                 the mean loss
+                                  computing the mean loss
         """
         self.iterations = iterations
         self.loss_func = loss_func
@@ -298,3 +334,90 @@ class TripletLoggerOnline(TrainLogger):
 
         return False
 
+
+
+class IntraClusterLogger(TrainLogger):
+    """
+    Logger that logs information about intra cluster information
+    This information will be:
+
+    1. Max cluster distance over all clusters
+    2. Min cluster distance over all clusters
+    3. SDev of cluster distances
+
+    Given a cluster, its distance is defined as the max distance between two points of that cluster
+
+    """
+
+    def __init__(
+        self,
+        net: nn.Module,
+        iterations: int,
+        train_percentage: float = 1.0,
+        validation_percentage: float = 1.0,
+    ):
+        """
+        Initializes the logger
+
+        @param net: the net we are testing
+        @param iterations: how many iterations we have to wait to log again
+        @param train_percentage: percentage of the training set we want to use. Less than 1 can be
+                                 used for faster computations
+        @param validation_percentage: percentage of the training set we want to use. Less than 1 can
+                                      be used for faster computations
+        """
+
+        self.net = net
+        self.iterations = iterations
+        self.train_percentage = train_percentage
+        self.validation_perc = validation_percentage
+
+
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+
+        # This log can be slow so we print this beforehand to have a notion on how slow it is
+        print(f"[{epoch} / {epoch_iteration}]")
+
+        # Compute the maximun number of examples to use in the metrics
+        train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
+        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+
+        # Compute the metrics faster
+        with torch.no_grad():
+
+            # Compute the metrics faster
+            self.net.eval()
+
+            # Get the two metrics
+            train_metrics = metrics.compute_cluster_sizes(train_loader, train_max_examples)
+            validation_metrics = metrics.compute_cluster_sizes(validation_loader, validation_max_examples)
+
+
+        # Get the network in training mode again
+        self.net.train()
+
+        # Show obtained metrics
+        print(f"\tTraining cluster distances: {train_metrics}")
+        print(f"\tValidation cluster distances: {validation_metrics}")
+        print("")
+
+        wandb.log({
+            "Train Min Cluster Distance": train_metrics["min"],
+            "Train Max Cluster Distance": train_metrics["max"],
+            "Train SD Cluster Distance":  train_metrics["sd"],
+
+            "Validation Min Cluster Distance": validation_metrics["min"],
+            "Validation Max Cluster Distance": validation_metrics["max"],
+            "Validation SD Cluster Distance":  validation_metrics["sd"],
+        })
+
+
+
+
+    # TODO -- this method is repeated multiple times
+    # TODO -- REFACTOR -- Create base class that does this by default and use it
+    def should_log(self, iteration: int) -> bool:
+        if iteration % self.iterations == 0:
+            return True
+
+        return False
