@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch import mean, nn
 import numpy as np
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Tuple
 
 import src.lib.core as core
 import src.lib.utils as utils
@@ -176,30 +176,19 @@ def calculate_mean_loss_function_online(
 
     return mean_loss
 
-# TODO -- TEST -- write tests for this function
-def compute_cluster_sizes_metrics(
-        data_loader: torch.utils.data.DataLoader,
-        net: torch.nn.Module,
-        max_examples: int
-    ) -> Dict[str, float]:
+def __get_portion_of_dataset_and_embed(
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int
+) -> Tuple[torch.Tensor, np.ndarray]:
     """
-    Computes metrics about cluster sizes
-    This information will be:
-
-    1. Max cluster distance over all clusters
-    2. Min cluster distance over all clusters
-    3. SDev of cluster distances
-
-    Given a cluster, its distance is defined as the max distance between two points of that cluster
-
+    This aux function gets a portion of a dataset. At the same time, it gets the embedding of the
+    images we're intereseted in, through given net
     """
 
-    # Move network to proper device
+    # Get memory device we are using
     device = core.get_device()
-    net.to(device)
 
-    # Get the portion of the dataset we're interested in
-    # Also, use this step to compute the embeddings of the images
     embeddings: torch.Tensor = torch.tensor([]).to(device)
     targets: torch.Tensor = torch.tensor([]).to(device)
     seen_examples = 0
@@ -219,6 +208,34 @@ def compute_cluster_sizes_metrics(
     # Convert gpu torch.tensor to cpu numpy array
     targets = targets.cpu().numpy()
     embeddings = embeddings.cpu()
+
+    return embeddings, targets
+
+def compute_cluster_sizes_metrics(
+        data_loader: torch.utils.data.DataLoader,
+        net: torch.nn.Module,
+        max_examples: int
+    ) -> Dict[str, float]:
+    """
+    Computes metrics about cluster sizes
+    This information will be:
+
+    1. Max cluster distance over all clusters
+    2. Min cluster distance over all clusters
+    2. Mean cluster distance over all clusters
+    4. SDev of cluster distances
+
+    Given a cluster, its distance is defined as the max distance between two points of that cluster
+
+    """
+
+    # Move network to proper device
+    device = core.get_device()
+    net.to(device)
+
+    # Get the portion of the dataset we're interested in
+    # Also, use this step to compute the embeddings of the images
+    embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
 
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)
@@ -273,3 +290,102 @@ def compute_intracluster_distances(
     }
 
     return class_distances
+
+def compute_intercluster_metrics(
+        data_loader: torch.utils.data.DataLoader,
+        net: torch.nn.Module,
+        max_examples: int
+    ) -> Dict[str, float]:
+    """
+    Computes metrics about intercluster metrics
+    This information will be:
+
+    1. Max intercluster distance over all clusters
+    2. Min intercluster distance over all clusters
+    3. Mean intercluster distance
+    4. SDev of intercluster distances#33
+
+    Given two clusters, its distance is defined as the min distance between two points, one from
+    each cluster
+    """
+
+    # Move network to proper device
+    device = core.get_device()
+    net.to(device)
+
+    # Get the portion of the dataset we're interested in
+    # Also, use this step to compute the embeddings of the images
+    embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
+
+    # Pre-compute dict of classes for efficiency
+    dict_of_classes = utils.precompute_dict_of_classes(targets)
+
+    # Precompute pairwise distances for efficiency
+    distances = __compute_pairwise_distances(embeddings)
+
+    # Now compute inter distances
+    intercluster_distances: Dict[Tuple[int, int], float] = compute_intercluster_distances(distances, dict_of_classes)
+
+    # Flatten prev dict, indexed by two indixes
+    flatten_intercluster_distances = [distance for distance in intercluster_distances.values()]
+
+    # Now we can easily return the metrics
+    metrics = {
+        "min": min(flatten_intercluster_distances),
+        "max": max(flatten_intercluster_distances),
+        "mean": np.mean(flatten_intercluster_distances),
+        "sd": np.std(flatten_intercluster_distances),
+    }
+
+    return metrics
+
+def compute_intercluster_distances(
+    distances: torch.Tensor,
+    dict_of_classes: Dict[int, List[int]]
+) -> Dict[Tuple[int, int], float]:
+    """
+    Computes the intercluster distances of a given set of embedding clusters
+
+    As D(cluster_a, cluster_b) = D(cluster_b, cluster_a), we only compute these distances for a < b
+    Also, we are not interested in case a = b
+    """
+
+    # Generate the list of pairs of clusters we are going to explore
+    cluster_pairs = [
+        (first, second)
+        for first in dict_of_classes.keys()
+        for second in dict_of_classes.keys()
+        if first < second
+    ]
+
+    # For each cluster pair, compute its intercluster distance
+    intercluster_distance = dict()
+    for (first_cluster, second_cluster) in cluster_pairs:
+
+        intercluster_distances = [
+            distances[first_indx, second_indx]
+            for first_indx in dict_of_classes[first_cluster]
+            for second_indx in dict_of_classes[second_cluster]
+        ]
+
+        intercluster_distance[(first_cluster, second_cluster)] = min(intercluster_distances)
+
+    return intercluster_distance
+
+def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, int], float]:
+    """
+    Computes the pairwise distance of elements in the embeddings set. Only for elements indexed a, b
+    such that a < b
+    """
+
+    # Use BatchBaseTripletLoss class for doing the computation
+    base_loss = loss_functions.BatchBaseTripletLoss()
+    distances = base_loss.precompute_pairwise_distances(
+        embeddings,
+        distance_function = loss_functions.distance_function
+    )
+
+    # Prev dict has elements [a, a] with distance 0. We are not interested in those
+    distances = {index: distances[index] for index in distances.keys() if index[0] != index[1]}
+
+    return distances
