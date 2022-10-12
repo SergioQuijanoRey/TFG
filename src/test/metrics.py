@@ -155,3 +155,40 @@ class TestComputeInterclusterDistances(unittest.TestCase):
         self.assertAlmostEqual(intercluster_distances[0, 1], 1.1)
         self.assertAlmostEqual(intercluster_distances[0, 2], 0.5)
         self.assertAlmostEqual(intercluster_distances[1, 2], 0.102)
+
+class TestComputeInterclusterMetrics(unittest.TestCase):
+
+    def __generate_basic_dataset(self) -> torch.utils.data.Dataset:
+        targets = torch.Tensor([0, 0, 1, 1, 2, 2])
+        images = torch.Tensor([
+            # Class 0 images
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 0, 2],
+
+            # Class 1 images
+            [1, 0, 0],
+            [3, 1, 0],
+            [10, 0, 0],
+        ])
+
+        return torch.utils.data.TensorDataset(images, targets)
+
+
+    def test_basic_case(self):
+
+        # Get the data into a dataloader
+        dataset = self.__generate_basic_dataset()
+        dataloader = torch.utils.data.DataLoader(dataset)
+
+        # Identity net for not mutating the mock data
+        net = torch.nn.Identity()
+
+        # Get the metrics
+        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
+
+        # Make some checks on the metrics
+        self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = 4)
+        self.assertAlmostEqual(intercluster_metrics["max"], 3.1623, places = 4)
+        self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = 4)
+

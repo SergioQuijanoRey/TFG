@@ -331,10 +331,10 @@ def compute_intercluster_metrics(
 
     # Now we can easily return the metrics
     metrics = {
-        "min": min(flatten_intercluster_distances),
-        "max": max(flatten_intercluster_distances),
-        "mean": np.mean(flatten_intercluster_distances),
-        "sd": np.std(flatten_intercluster_distances),
+        "min": float(min(flatten_intercluster_distances)),
+        "max": float(max(flatten_intercluster_distances)),
+        "mean": float(np.mean(flatten_intercluster_distances)),
+        "sd": float(np.std(flatten_intercluster_distances)),
     }
 
     return metrics
