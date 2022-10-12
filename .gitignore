@@ -1,0 +1,10 @@
+/src/.ipynb_checkpoints/
+/src/__pycache__/
+/src/lib/.ipynb_checkpoints/
+/src/lib/__pycache__/
+/src/test/__pycache__/
+/src/tmp/
+/src/wandb/
+/src/lib/__init__.py
+/src/data/
+/data/
