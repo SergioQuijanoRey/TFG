@@ -403,10 +403,12 @@ class IntraClusterLogger(TrainLogger):
         wandb.log({
             "Train Min Cluster Distance": train_metrics["min"],
             "Train Max Cluster Distance": train_metrics["max"],
+            "Train Mean Cluster Distance": train_metrics["mean"],
             "Train SD Cluster Distance":  train_metrics["sd"],
 
             "Validation Min Cluster Distance": validation_metrics["min"],
             "Validation Max Cluster Distance": validation_metrics["max"],
+            "Validation Mean Cluster Distance": validation_metrics["mean"],
             "Validation SD Cluster Distance":  validation_metrics["sd"],
         })
 
