@@ -183,7 +183,7 @@ def calculate_mean_loss_function_online(
     return mean_loss
 
 # TODO -- TEST -- write tests for this function
-def compute_cluster_sizes(
+def compute_cluster_sizes_metrics(
         data_loader: torch.utils.data.DataLoader,
         net: torch.nn.Module,
         max_examples: int
@@ -227,7 +227,7 @@ def compute_cluster_sizes(
     embeddings = embeddings.cpu()
 
     # Pre-compute dict of classes for efficiency
-    dict_of_classes = utils.precompute_dict_of_classes(targets.numpy())
+    dict_of_classes = utils.precompute_dict_of_classes(targets)
 
     # Dict having all the pairwise distances of elements of the same class
     class_distances = compute_intracluster_distances(dict_of_classes, embeddings)
@@ -238,7 +238,7 @@ def compute_cluster_sizes(
     metrics = {
         "min": min(cluster_sizes),
         "max": max(cluster_sizes),
-        "mean": mean(cluster_sizes),
+        "mean": np.mean(cluster_sizes),
         "sd": np.std(cluster_sizes),
     }
 
@@ -279,4 +279,3 @@ def compute_intracluster_distances(
     }
 
     return class_distances
-

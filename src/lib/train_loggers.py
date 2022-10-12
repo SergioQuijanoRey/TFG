@@ -393,8 +393,8 @@ class IntraClusterLogger(TrainLogger):
             self.net.eval()
 
             # Get the two metrics
-            train_metrics = metrics.compute_cluster_sizes(train_loader, self.net, train_max_examples)
-            validation_metrics = metrics.compute_cluster_sizes(validation_loader, self.net, validation_max_examples)
+            train_metrics = metrics.compute_cluster_sizes_metrics(train_loader, self.net, train_max_examples)
+            validation_metrics = metrics.compute_cluster_sizes_metrics(validation_loader, self.net, validation_max_examples)
 
 
         # Get the network in training mode again
