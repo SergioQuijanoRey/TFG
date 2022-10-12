@@ -154,7 +154,7 @@ class ClassificationLogger(TrainLogger):
         # Output to the user
         # We don't care about epochs starting in 0, but with iterations is weird
         # ie. epoch 0 it 199 instead of epoch 0 it 200
-        print(f"[{epoch} / {epoch_iteration}]")
+        print(f"[{epoch} / {epoch_iteration}] <-- ")
         print(f"Training loss: {mean_train_loss}")
         print(f"Validation loss: {mean_val_loss}")
         print(f"Training acc: {mean_train_acc}")
@@ -289,7 +289,7 @@ class TripletLoggerOnline(TrainLogger):
     def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
-        print(f"[{epoch} / {epoch_iteration}]")
+        print(f"[{epoch} / {epoch_iteration}] <-- ")
 
         # We are interested in mean triplet loss
         metric =  metrics.calculate_mean_loss_function_online
@@ -334,7 +334,6 @@ class TripletLoggerOnline(TrainLogger):
         return False
 
 
-
 class IntraClusterLogger(TrainLogger):
     """
     Logger that logs information about intra cluster information
@@ -343,6 +342,7 @@ class IntraClusterLogger(TrainLogger):
     1. Max cluster distance over all clusters
     2. Min cluster distance over all clusters
     3. SDev of cluster distances
+    4. Mean of cluster distances
 
     Given a cluster, its distance is defined as the max distance between two points of that cluster
 
@@ -375,7 +375,7 @@ class IntraClusterLogger(TrainLogger):
     def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
-        print(f"[{epoch} / {epoch_iteration}]")
+        print(f"[{epoch} / {epoch_iteration}] <-- ")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
@@ -410,6 +410,93 @@ class IntraClusterLogger(TrainLogger):
             "Validation Max Cluster Distance": validation_metrics["max"],
             "Validation Mean Cluster Distance": validation_metrics["mean"],
             "Validation SD Cluster Distance":  validation_metrics["sd"],
+        })
+
+
+    # TODO -- this method is repeated multiple times
+    # TODO -- REFACTOR -- Create base class that does this by default and use it
+    def should_log(self, iteration: int) -> bool:
+        if iteration % self.iterations == 0:
+            return True
+
+        return False
+
+class InterClusterLogger(TrainLogger):
+    """
+    Logger that logs information about inter cluster information
+    This information will be:
+
+    1. Max intercluster distance over all clusters
+    2. Min intercluster distance over all clusters
+    3. SDev of intercluster distances
+    4. Mean of intercluster distances
+
+    Given two clusters, their intercluster distance is the minimun distance between two points, one
+    from each of the clusters
+    """
+
+    def __init__(
+        self,
+        net: nn.Module,
+        iterations: int,
+        train_percentage: float = 1.0,
+        validation_percentage: float = 1.0,
+    ):
+        """
+        Initializes the logger
+
+        @param net: the net we are testing
+        @param iterations: how many iterations we have to wait to log again
+        @param train_percentage: percentage of the training set we want to use. Less than 1 can be
+                                 used for faster computations
+        @param validation_percentage: percentage of the training set we want to use. Less than 1 can
+                                      be used for faster computations
+        """
+
+        self.net = net
+        self.iterations = iterations
+        self.train_percentage = train_percentage
+        self.validation_percentage = validation_percentage
+
+
+    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+
+        # This log can be slow so we print this beforehand to have a notion on how slow it is
+        print(f"[{epoch} / {epoch_iteration}] <-- ")
+
+        # Compute the maximun number of examples to use in the metrics
+        train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
+        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+
+        # Compute the metrics faster
+        with torch.no_grad():
+
+            # Compute the metrics faster
+            self.net.eval()
+
+            # Get the two metrics
+            train_metrics = metrics.compute_intercluster_metrics(train_loader, self.net, train_max_examples)
+            validation_metrics = metrics.compute_intercluster_metrics(validation_loader, self.net, validation_max_examples)
+
+
+        # Get the network in training mode again
+        self.net.train()
+
+        # Show obtained metrics
+        print(f"\tTraining intercluster distances: {train_metrics}")
+        print(f"\tValidation intercluster distances: {validation_metrics}")
+        print("")
+
+        wandb.log({
+            "Train Min Intercluster Distance": train_metrics["min"],
+            "Train Max intercluster Distance": train_metrics["max"],
+            "Train Mean Intercluster Distance": train_metrics["mean"],
+            "Train SD Intercluster Distance":  train_metrics["sd"],
+
+            "Validation Min Intercluster Distance": validation_metrics["min"],
+            "Validation Max Intercluster Distance": validation_metrics["max"],
+            "Validation Mean Intercluster Distance": validation_metrics["mean"],
+            "Validation SD Intercluster Distance":  validation_metrics["sd"],
         })
 
 
