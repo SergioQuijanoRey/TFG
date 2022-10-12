@@ -107,8 +107,7 @@ class TestComputeClusterSizesMetrics(unittest.TestCase):
 
         dataset = self.__generate_basic_dataset()
         dataloader = torch.utils.data.DataLoader(dataset)
-        net = lambda x: x
-        net.to = lambda x: x
+        net = torch.nn.Identity()
 
         # cluter_sizes =  2.0 9.0
         cluster_metrics = metrics.compute_cluster_sizes_metrics(dataloader, net, 6)
