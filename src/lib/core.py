@@ -8,10 +8,17 @@ import numpy as np
 from datetime import datetime
 import os
 
-import board
-import filesystem
-from train_loggers import TrainLogger, SilentLogger
-import metrics
+try:
+    import board
+    import filesystem
+    from train_loggers import TrainLogger, SilentLogger
+    import metrics
+except:
+    import src.lib.board as board
+    import src.lib.filesystem as filesystem
+    import src.lib.metrics as metrics
+    from src.lib.train_loggers import TrainLogger, SilentLogger
+
 
 def imshow(img):
     img = img / 2 + 0.5     # unnormalize

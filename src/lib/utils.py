@@ -2,9 +2,10 @@
 Module to put utilities code
 """
 
-from typing import List, Dict
+from typing import List, Dict, Union
+import numpy as np
 
-def precompute_dict_of_classes(labels: List[int]) -> Dict[int, List[int]]:
+def precompute_dict_of_classes(labels: Union[List[int], np.ndarray]) -> Dict[int, List[int]]:
     """
     Computes a dict containing lists of indixes. Each key of the dict is an int associated to
     the class label. At that position we store a list containing all the indixes associated

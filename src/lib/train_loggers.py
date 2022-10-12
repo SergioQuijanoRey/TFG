@@ -4,14 +4,18 @@ import torch
 from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
-
+import wandb
 from typing import List, Tuple, Callable
 
-import core
-import board
-import metrics
+try:
+    import core
+    import board
+    import metrics
+except:
+    import src.lib.core as core
+    import src.lib.board as board
+    import src.lib.metrics as metrics
 
-import wandb
 
 class TrainLogger(ABC):
     """
