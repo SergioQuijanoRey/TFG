@@ -231,6 +231,7 @@ def compute_cluster_sizes_metrics(
 
     # Dict having all the pairwise distances of elements of the same class
     class_distances = compute_intracluster_distances(dict_of_classes, embeddings)
+
     # With intra-cluster distances, we can compute cluster sizes
     cluster_sizes = [max(class_distance) for class_distance in class_distances.values()]
 
@@ -255,7 +256,6 @@ def compute_intracluster_distances(
     class_distances = {label: [] for label in dict_of_classes.keys()}
 
     # Compute intra-cluster distances
-    # TODO -- move to other aux function
     for curr_class in dict_of_classes.keys():
         for first_indx in dict_of_classes[curr_class]:
             for second_indx in dict_of_classes[curr_class]:
