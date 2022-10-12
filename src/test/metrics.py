@@ -101,15 +101,13 @@ class TestComputeClusterSizesMetrics(unittest.TestCase):
         dataset = torch.utils.data.TensorDataset(images, targets)
         return dataset
 
-
-
     def test_basic_case(self):
 
         dataset = self.__generate_basic_dataset()
         dataloader = torch.utils.data.DataLoader(dataset)
         net = torch.nn.Identity()
 
-        # cluter_sizes =  2.0 9.0
+        # Compute the cluster metrics
         cluster_metrics = metrics.compute_cluster_sizes_metrics(dataloader, net, 6)
 
         # Make some checks
