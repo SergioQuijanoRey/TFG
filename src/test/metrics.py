@@ -81,3 +81,41 @@ class TestComputeIntraclusterDistances(unittest.TestCase):
         self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0)
         self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979)
         self.assertAlmostEqual(intra_cluster_distances[2][0], 7.0710678118654755)
+
+class TestComputeClusterSizesMetrics(unittest.TestCase):
+
+    def __generate_basic_dataset(self) -> torch.utils.data.Dataset:
+        targets = torch.Tensor([0, 0, 0, 1, 1, 1])
+        images = torch.Tensor([
+            # Class 0 images
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 0, 2],
+
+            # Class 1 images
+            [1, 0, 0],
+            [3, 1, 0],
+            [10, 0, 0],
+        ])
+
+        dataset = torch.utils.data.TensorDataset(images, targets)
+        return dataset
+
+
+
+    def test_basic_case(self):
+
+        dataset = self.__generate_basic_dataset()
+        dataloader = torch.utils.data.DataLoader(dataset)
+        net = lambda x: x
+        net.to = lambda x: x
+
+        # cluter_sizes =  2.0 9.0
+        cluster_metrics = metrics.compute_cluster_sizes_metrics(dataloader, net, 6)
+
+        # Make some checks
+        self.assertAlmostEqual(cluster_metrics["min"], 2.0)
+        self.assertAlmostEqual(cluster_metrics["max"], 9.0)
+        self.assertAlmostEqual(cluster_metrics["mean"], 5.5)
+        self.assertAlmostEqual(cluster_metrics["sd"], 3.5)
+
