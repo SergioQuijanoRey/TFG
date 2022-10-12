@@ -4,17 +4,11 @@ import torch
 from torch.utils.data import DataLoader
 from torch import mean, nn
 import numpy as np
-
 from typing import Callable, Dict, List
 
-try:
-    import core
-    import utils
-    import loss_functions
-except:
-    import src.lib.core as core
-    import src.lib.utils as utils
-    import src.lib.loss_functions as loss_functions
+import src.lib.core as core
+import src.lib.utils as utils
+import src.lib.loss_functions as loss_functions
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
     """

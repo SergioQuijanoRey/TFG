@@ -11,16 +11,7 @@ from typing import List, Tuple, Dict
 import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
 
-# utils import depend on enviroment (local or remote), so we can do two try-except blocks
-# for dealing with that
-try:
-    import utils
-except Exception as e:
-    pass
-try:
-    import src.lib.utils as utils
-except Exception as e:
-    pass
+import src.lib.utils as utils
 
 # Bases for more complex loss functions
 # ==================================================================================================

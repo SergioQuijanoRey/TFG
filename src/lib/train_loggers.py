@@ -7,14 +7,9 @@ import numpy as np
 import wandb
 from typing import List, Tuple, Callable
 
-try:
-    import core
-    import board
-    import metrics
-except:
-    import src.lib.core as core
-    import src.lib.board as board
-    import src.lib.metrics as metrics
+import src.lib.core as core
+import src.lib.board as board
+import src.lib.metrics as metrics
 
 
 class TrainLogger(ABC):

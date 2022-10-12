@@ -6,12 +6,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-
 import os
 
-import filesystem
-from train_loggers import TrainLogger, SilentLogger
-from core import get_device, get_datetime_str
+import src.lib.filesystem as filesystem
+from src.lib.train_loggers import TrainLogger, SilentLogger
+from src.lib.core import get_device, get_datetime_str
 
 import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
