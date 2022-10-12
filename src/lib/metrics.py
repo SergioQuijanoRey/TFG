@@ -2,14 +2,19 @@
 
 import torch
 from torch.utils.data import DataLoader
-from torch import nn
+from torch import mean, nn
 import numpy as np
 
-from typing import Callable, Dict
+from typing import Callable, Dict, List
 
-import core
-import utils
-import loss_functions
+try:
+    import core
+    import utils
+    import loss_functions
+except:
+    import src.lib.core as core
+    import src.lib.utils as utils
+    import src.lib.loss_functions as loss_functions
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
     """
@@ -222,9 +227,31 @@ def compute_cluster_sizes(
     embeddings = embeddings.cpu()
 
     # Pre-compute dict of classes for efficiency
-    dict_of_classes = utils.precompute_dict_of_classes(targets)
+    dict_of_classes = utils.precompute_dict_of_classes(targets.numpy())
 
     # Dict having all the pairwise distances of elements of the same class
+    class_distances = compute_intracluster_distances(dict_of_classes, embeddings)
+    # With intra-cluster distances, we can compute cluster sizes
+    cluster_sizes = [max(class_distance) for class_distance in class_distances.values()]
+
+    # Now, we can compute the three metrics about cluster disntances
+    metrics = {
+        "min": min(cluster_sizes),
+        "max": max(cluster_sizes),
+        "mean": mean(cluster_sizes),
+        "sd": np.std(cluster_sizes),
+    }
+
+    return metrics
+
+def compute_intracluster_distances(
+    dict_of_classes: Dict[int, List[int]],
+    elements: torch.Tensor
+) -> Dict[int, List[float]]:
+    """
+    Aux function that computes, for each cluster, all the distance between two points of that cluster
+    """
+
     class_distances = {label: [] for label in dict_of_classes.keys()}
 
     # Compute intra-cluster distances
@@ -234,13 +261,14 @@ def compute_cluster_sizes(
             for second_indx in dict_of_classes[curr_class]:
 
                 # We don't want the distance of an element with itself
-                if first_indx == second_indx:
+                # Also, as d(a, b) = d(b, a), we only compute distance for a < b
+                # We skip if a > b or a == b, thus, when a >= b
+                if first_indx >= second_indx:
                     continue
 
                 # Get the distance and append to the list
-                distance = loss_functions.distance_function(embeddings[first_indx], embeddings[second_indx])
-                class_distances[curr_class].append(distance)
-
+                distance = loss_functions.distance_function(elements[first_indx], elements[second_indx])
+                class_distances[curr_class].append(float(distance))
 
     # Some classes can have only one element, and thus no class distance
     # We don't consider this classes
@@ -250,14 +278,5 @@ def compute_cluster_sizes(
         if len(class_distances[label]) > 0
     }
 
-    # With intra-cluster distances, we can compute cluster sizes
-    cluster_sizes = [max(class_distance) for class_distance in class_distances.values()]
+    return class_distances
 
-    # Now, we can compute the three metrics about cluster disntances
-    metrics = {
-        "min": min(cluster_sizes),
-        "max": max(cluster_sizes),
-        "sd": np.std(cluster_sizes),
-    }
-
-    return metrics
