@@ -156,6 +156,60 @@ class TestComputeInterclusterDistances(unittest.TestCase):
         self.assertAlmostEqual(intercluster_distances[0, 2], 0.5)
         self.assertAlmostEqual(intercluster_distances[1, 2], 0.102)
 
+    def test_single_element_clusters(self):
+        # Basic data for the test
+        dict_of_classes = {
+            0: [0],
+            1: [1],
+            2: [2],
+            3: [3],
+            4: [4],
+            5: [5],
+        }
+
+        # This distances correspond to the `TestComputeInterclusterMetrics.__generate_basic_dataset`
+        # but having each image its own cluster (single element clusters)
+        # I have a problem in `TestComputeInterclusterMetrics.test_single_element_clusters`, so
+        # this test is helping me debug this problem
+        distances = {
+            (0, 1): 0,
+            (0, 2): 2,
+            (0, 3): 1,
+            (0, 4): 3.1622776601683795,
+            (0, 5): 10,
+
+            (1, 2): 1.0,
+            (1, 3): 1.4142135623730951,
+            (1, 4): 3.3166247903554,
+            (1, 5): 10.04987562112089,
+
+            (2, 3): 2.23606797749979,
+            (2, 4): 3.7416573867739413,
+            (2, 5): 10.198039027185569,
+
+            (3, 4): 2.23606797749979,
+            (3, 5): 9.0,
+
+            (4, 5): 7.0710678118654755,
+        }
+
+        # Compute the intercluster distances
+        intercluster_distances = metrics.compute_intercluster_distances(distances, dict_of_classes)
+
+        # Check that the i-j cluster distance is the distance between the single elements of each
+        # one of that cluster, that's to say, between points i-j
+        for first_cluster in range(5):
+            for second_cluster in range(5):
+
+                if first_cluster >= second_cluster:
+                    continue
+
+                self.assertAlmostEqual(
+                    intercluster_distances[first_cluster, second_cluster],
+                    distances[first_cluster, second_cluster],
+                    "Cluster distance should be the same as point distance, for single-element clusters"
+                )
+
 class TestComputeInterclusterMetrics(unittest.TestCase):
 
     def __generate_basic_dataset(self) -> torch.utils.data.Dataset:
@@ -192,3 +246,26 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         self.assertAlmostEqual(intercluster_metrics["max"], 3.1623, places = 4)
         self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = 4)
 
+    def test_single_element_clusters(self):
+        # Get the basic dataset
+        dataset = self.__generate_basic_dataset()
+
+        # Change the labels of the dataset
+        # Each element is in its own cluster
+        dataset.targets = torch.Tensor([0, 1, 2, 3, 4, 5, 6])
+
+        # Wrap dataset into a dataloader
+        dataloader = torch.utils.data.DataLoader(dataset)
+
+        # Identity network
+        net = torch.nn.Identity()
+
+        # Get the metrics
+        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
+
+        # Make some checks about the obtained metrics
+
+        self.assertAlmostEqual(intercluster_metrics["mean"], 4.495059454322822)
+        self.assertAlmostEqual(intercluster_metrics["min"], 1.0)
+        self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569)
+        self.assertAlmostEqual(intercluster_metrics["sd"], 3.653927510536194)
