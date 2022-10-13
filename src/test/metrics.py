@@ -247,12 +247,24 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = 4)
 
     def test_single_element_clusters(self):
-        # Get the basic dataset
-        dataset = self.__generate_basic_dataset()
 
-        # Change the labels of the dataset
-        # Each element is in its own cluster
-        dataset.targets = torch.Tensor([0, 1, 2, 3, 4, 5, 6])
+        # Get the same data as in __generate_basic_dataset, but changing the labels
+        # We cannot get the dataset and change `dataset.targets` because in TensorDataset
+        # this doesn't work
+        targets = torch.Tensor([0, 1, 2, 3, 4, 5])
+        images = torch.Tensor([
+            # Class 0 images
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 0, 2],
+
+            # Class 1 images
+            [1, 0, 0],
+            [3, 1, 0],
+            [10, 0, 0],
+        ])
+
+        dataset = torch.utils.data.TensorDataset(images, targets)
 
         # Wrap dataset into a dataloader
         dataloader = torch.utils.data.DataLoader(dataset)
@@ -264,8 +276,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
 
         # Make some checks about the obtained metrics
-
         self.assertAlmostEqual(intercluster_metrics["mean"], 4.495059454322822)
         self.assertAlmostEqual(intercluster_metrics["min"], 1.0)
         self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569)
-        self.assertAlmostEqual(intercluster_metrics["sd"], 3.653927510536194)
+        self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045)
