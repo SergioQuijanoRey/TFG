@@ -256,7 +256,7 @@ def train_model_online(
                 file_logger.info("Started logging loss information")
 
                 # Log and return loss from training and validation
-                training_loss, validation_loss = logger.log_process(
+                logger_metircs = logger.log_process(
                     train_loader,
                     validation_loader,
                     epoch,
@@ -264,6 +264,7 @@ def train_model_online(
                 )
 
                 # Save loss of training and validation sets
+                # TODO -- fix
                 training_history["loss"].append(training_loss)
                 training_history["val_loss"].append(validation_loss)
 
