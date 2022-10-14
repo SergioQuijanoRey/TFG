@@ -2,7 +2,7 @@
 Module to put utilities code
 """
 
-from typing import List, Dict, Union
+from typing import Tuple, List, Dict, Union
 import numpy as np
 
 def precompute_dict_of_classes(labels: Union[List[int], np.ndarray]) -> Dict[int, List[int]]:
@@ -34,3 +34,14 @@ def precompute_dict_of_classes(labels: Union[List[int], np.ndarray]) -> Dict[int
         class_positions[label].append(idx)
 
     return class_positions
+
+def rearrange_indx(first: int, second: int) -> Tuple[int, int]:
+    """
+    Given two indixes, returns them in a tuple, such that the first element of the tuple is
+    less or equal than the second element of the tuple
+    """
+    if first < second:
+        return (first, second)
+
+    return (second, first)
+

@@ -363,7 +363,9 @@ def compute_intercluster_distances(
     for (first_cluster, second_cluster) in cluster_pairs:
 
         intercluster_distances = [
-            distances[(first_indx, second_indx)]
+            # Distances have only indixes (first, second) such that first < second
+            # So we rearrange them for assuring this condition
+            distances[utils.rearrange_indx(first_indx, second_indx)]
             for first_indx in dict_of_classes[first_cluster]
             for second_indx in dict_of_classes[second_cluster]
         ]

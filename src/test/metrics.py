@@ -216,7 +216,7 @@ class TestComputeInterclusterDistances(unittest.TestCase):
                 )
 
 # Portion of the LFW dataset that we're going to use to test metrics.compute_intercluster_metrics()
-DATASET_PORTION = 0.01
+DATASET_PORTION = 0.001
 
 class TestComputeInterclusterMetrics(unittest.TestCase):
 
