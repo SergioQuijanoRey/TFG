@@ -1,8 +1,13 @@
 import unittest
 import torch
+import torchvision
+import torchvision.transforms as transforms
 
 import src.lib.metrics as metrics
 import src.lib.utils as utils
+import src.lib.data_augmentation as data_augmentation
+import src.lib.models as models
+import src.lib.sampler as sampler
 
 class TestComputeIntraclusterDistances(unittest.TestCase):
 
@@ -210,6 +215,9 @@ class TestComputeInterclusterDistances(unittest.TestCase):
                     "Cluster distance should be the same as point distance, for single-element clusters"
                 )
 
+# Portion of the LFW dataset that we're going to use to test metrics.compute_intercluster_metrics()
+DATASET_PORTION = 0.01
+
 class TestComputeInterclusterMetrics(unittest.TestCase):
 
     def __generate_basic_dataset(self) -> torch.utils.data.Dataset:
@@ -280,3 +288,65 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         self.assertAlmostEqual(intercluster_metrics["min"], 1.0)
         self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569)
         self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045)
+
+    def test_lfw_dataset_works(self):
+        """
+        I had problems running `compute_intercluster_metrics` for a portion of the LFW dataset. So
+        in this test we're simply try to compute the values without any crash
+        """
+
+        # Load the dataset
+        transform = transforms.Compose([
+            transforms.Resize((250, 250)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                 (0.5, 0.5, 0.5),
+                 (0.5, 0.5, 0.5)
+             ),
+        ])
+        dataset = torchvision.datasets.LFWPeople(
+            root = "./data",
+            split = "train",
+            download = True,
+            transform = transform,
+        )
+
+
+        # Apply data augmentation for having at least 4 images per class
+        augmented_dataset = data_augmentation.LazyAugmentatedDataset(
+            base_dataset = dataset,
+            min_number_of_images = 4,
+
+            # Remember that the trasformation has to be random type
+            # Otherwise, we could end with a lot of repeated images
+            transform = transforms.Compose([
+                transforms.RandomResizedCrop(size=(250, 250)),
+                transforms.RandomRotation(degrees=(0, 180)),
+                transforms.RandomAutocontrast(),
+                ])
+
+        )
+
+        # Now put a loader in front of the augmented dataset
+        dataloader = torch.utils.data.DataLoader(
+            augmented_dataset,
+            batch_size = 3 * 4,
+            num_workers = 1,
+            pin_memory = True,
+            sampler = sampler.CustomSampler(3, 4, augmented_dataset)
+        )
+
+        # Network that we're using in LFW dataset notebook
+        net = models.LFWResNet18(5)
+        net = torch.nn.Identity()
+
+        # Get the metrics for a 1/5 of the training dataset
+        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, int(len(augmented_dataset) * DATASET_PORTION))
+
+        # To check that the metrics were computed, just make some basic checks
+        # All entries should be floats. Moreover, all should be greater than zero
+        # So that is enough for our test
+        self.assertGreater(intercluster_metrics["mean"], 0.0)
+        self.assertGreater(intercluster_metrics["min"], 0.0)
+        self.assertGreater(intercluster_metrics["max"], 0.0)
+        self.assertGreater(intercluster_metrics["sd"], 0.0)
