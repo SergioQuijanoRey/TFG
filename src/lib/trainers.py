@@ -2,20 +2,22 @@
 Code for different types of training
 """
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
-import os
-
-import src.lib.filesystem as filesystem
-from src.lib.train_loggers import TrainLogger, SilentLogger
-from src.lib.core import get_device, get_datetime_str
 
 import logging
-file_logger = logging.getLogger("MAIN_LOGGER")
+import os
+from typing import List, Dict
 
+import torch.nn as nn
+import torch.optim as optim
 import wandb
+from torch.utils.data import DataLoader
+
+import src.lib.filesystem as filesystem
+from src.lib.core import get_device, get_datetime_str
+from src.lib.train_loggers import TrainLogger, SilentLogger
+
+
+file_logger = logging.getLogger("MAIN_LOGGER")
 
 def train_model_offline(
     net: nn.Module,
@@ -158,7 +160,7 @@ def train_model_online(
     name: str = "Model",
     logger: TrainLogger = None,
     snapshot_iterations: int = None
-) -> dict:
+) -> Dict[str, List[float]]:
     """
     Trains and saves a neural net
 
@@ -203,10 +205,8 @@ def train_model_online(
     print(f"==> Training on device {device}")
     print("")
 
-    # Dict where we are going to save the training history
+    # Dict where we are going to save the values of the metrics returned by the logger
     training_history = dict()
-    training_history["loss"] = []
-    training_history["val_loss"] = []
 
     # For controlling the logging
     # Loggers need to know how many single elements we have seen
@@ -256,17 +256,23 @@ def train_model_online(
                 file_logger.info("Started logging loss information")
 
                 # Log and return loss from training and validation
-                logger_metircs = logger.log_process(
+                logger_metrics = logger.log_process(
                     train_loader,
                     validation_loader,
                     epoch,
                     epoch_iteration
                 )
 
-                # Save loss of training and validation sets
-                # TODO -- fix
-                training_history["loss"].append(training_loss)
-                training_history["val_loss"].append(validation_loss)
+                # Save the metrics returned by the logger
+                for metric_key, metric_value in logger_metrics.items():
+
+                    # Check if this is the first time we access this metric
+                    # In that case, create at this key a list with that element
+                    if training_history.get(metric_key) is None:
+                        training_history[metric_key] = [metric_value]
+
+                    # Oterwise, append to the existing list
+                    training_history[metric_key].append(metric_value)
 
             else:
                 print(f"[{epoch} / {epoch_iteration}]")
