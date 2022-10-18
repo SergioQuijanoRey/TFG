@@ -5,7 +5,7 @@ Code for different types of training
 
 import logging
 import os
-from typing import List, Dict
+from typing import List, Dict, Union
 
 import torch.nn as nn
 import torch.optim as optim
@@ -15,6 +15,7 @@ from torch.utils.data import DataLoader
 import src.lib.filesystem as filesystem
 from src.lib.core import get_device, get_datetime_str
 from src.lib.train_loggers import TrainLogger, SilentLogger
+
 
 file_logger = logging.getLogger("MAIN_LOGGER")
 
@@ -150,10 +151,10 @@ def train_model_online(
     path: str,
     parameters: dict,
     train_loader: DataLoader,
-    validation_loader: DataLoader = None,
+    validation_loader: DataLoader,
+    logger: TrainLogger,
     name: str = "Model",
-    logger: TrainLogger = None,
-    snapshot_iterations: int = None
+    snapshot_iterations: Union[int, None] = None
 ) -> Dict[str, List[float]]:
     """
     Trains and saves a neural net
@@ -173,7 +174,7 @@ def train_model_online(
                        This MUST NOT be in the form of triplets: (anchor, positive, negative)
     name: name of the model, in order to save it
     train_logger: to log data about trainning process
-                  Default logger is silent logger
+                  A `SilentLogger` can always be used
     snapshot_iterations: at how many iterations we want to take an snapshot of the model
                          If its None, no snapshots are taken
     """
@@ -189,11 +190,6 @@ def train_model_online(
     # Select proper device and move the net to that device
     device = get_device()
     net.to(device)
-
-    # Check if no logger is given
-    if logger is None:
-        print("==> No logger given, using Silent Logger")
-        logger = SilentLogger()
 
     # Printing where we're training
     print(f"==> Training on device {device}")
@@ -283,7 +279,6 @@ def train_model_online(
 
     print("Finished training")
     file_logger.info("Finished training")
-
 
     # Save the model -- use name + date stamp to save the model
     file_logger.info("Saving the trained model in disk")
