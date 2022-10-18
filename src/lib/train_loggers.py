@@ -7,6 +7,9 @@ import numpy as np
 import wandb
 from typing import List, Tuple, Callable, Dict
 
+import logging
+file_logger = logging.getLogger("MAIN_LOGGER")
+
 import src.lib.core as core
 import src.lib.board as board
 import src.lib.metrics as metrics
@@ -101,15 +104,27 @@ class CompoundLogger(TrainLogger):
             if self.logger_should_log[indx] is True:
 
                 # Get the returned dict of this logger
-                ret_val = logger.log_process(train_loader, validation_loader, epoch, epoch_iteration)
+                ret_val = logger.log_process(
+                    train_loader,
+                    validation_loader,
+                    epoch,
+                    epoch_iteration
+                )
 
                 # Check that there is no repeated key
                 for key in ret_val.keys():
                     if key in ret_values.keys():
+
+                        # Log some extra information before raising the exception
+                        file_logger.error((f"Two loggers return a value with the same key, {key}"))
+                        file_logger.error((f"key was: {key}"))
+                        file_logger.error((f"ret_values.keys() = {ret_values.keys()}"))
+
                         raise Exception(f"Two loggers return a value with the same key, {key}")
 
                 # Merge the dict returned by the current logger to our global dict
-                ret_values = ret_values | ret_val
+                # Google Colab does not support expression `ret_values | ret_val`
+                ret_values = {**ret_values, **ret_val}
 
         return ret_values
 
@@ -460,15 +475,28 @@ class IntraClusterLogger(TrainLogger):
             "Train Min Cluster Distance": train_metrics["min"],
             "Train Max Cluster Distance": train_metrics["max"],
             "Train Mean Cluster Distance": train_metrics["mean"],
-            "Train SD Cluster Distance":  train_metrics["sd"],
+            "Train SD Cluster Distance": train_metrics["sd"],
 
             "Validation Min Cluster Distance": validation_metrics["min"],
             "Validation Max Cluster Distance": validation_metrics["max"],
             "Validation Mean Cluster Distance": validation_metrics["mean"],
-            "Validation SD Cluster Distance":  validation_metrics["sd"],
+            "Validation SD Cluster Distance": validation_metrics["sd"],
         })
 
-        return train_metrics
+        # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
+        # names for the keys
+        renamed_metrics = {
+            "Train Min Cluster Distance": train_metrics["min"],
+            "Train Max Cluster Distance": train_metrics["max"],
+            "Train Mean Cluster Distance": train_metrics["mean"],
+            "Train SD Cluster Distance": train_metrics["sd"],
+
+            "Validation Min Cluster Distance": validation_metrics["min"],
+            "Validation Max Cluster Distance": validation_metrics["max"],
+            "Validation Mean Cluster Distance": validation_metrics["mean"],
+            "Validation SD Cluster Distance": validation_metrics["sd"],
+        }
+        return renamed_metrics
 
 
     # TODO -- this method is repeated multiple times
@@ -561,7 +589,21 @@ class InterClusterLogger(TrainLogger):
             "Validation SD Intercluster Distance": validation_metrics["sd"],
         })
 
-        return train_metrics
+        # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
+        # names for the keys
+        renamed_metrics = {
+            "Train Min Intercluster Distance": train_metrics["min"],
+            "Train Max intercluster Distance": train_metrics["max"],
+            "Train Mean Intercluster Distance": train_metrics["mean"],
+            "Train SD Intercluster Distance": train_metrics["sd"],
+
+            "Validation Min Intercluster Distance": validation_metrics["min"],
+            "Validation Max Intercluster Distance": validation_metrics["max"],
+            "Validation Mean Intercluster Distance": validation_metrics["mean"],
+            "Validation SD Intercluster Distance": validation_metrics["sd"],
+        }
+
+        return renamed_metrics
 
     # TODO -- this method is repeated multiple times
     # TODO -- REFACTOR -- Create base class that does this by default and use it
