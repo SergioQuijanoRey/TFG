@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
 import wandb
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Dict
 
 import src.lib.core as core
 import src.lib.board as board
@@ -21,7 +21,13 @@ class TrainLogger(ABC):
     """
 
     @abstractmethod
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
         """
         Logs an iteration of training process. This log can be just printing to terminal or saving
         scalars to a tensorboard
@@ -32,8 +38,7 @@ class TrainLogger(ABC):
         @param epoch: the epoch where we are at the moment
         @param epoch_iteration: how many single elements have been seen in this epoch
 
-        @returns training_loss: for the learning curves
-        @returns validation_loss: for the learning curves
+        @returns metrics: a dict containing "name of the metric" -> value of the metric
         """
         pass
 
@@ -80,15 +85,31 @@ class CompoundLogger(TrainLogger):
         # loggers want to log at this iteration
         self.logger_should_log: List[bool] = None
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
 
         # TODO -- this break the return type that we've annotated
-        ret_values = []
+        ret_values: Dict[str, float] = dict()
 
+        # Iterate over all the loggers that want to log
         for indx, logger in enumerate(self.loggers):
             if self.logger_should_log[indx] is True:
+
+                # Get the returned dict of this logger
                 ret_val = logger.log_process(train_loader, validation_loader, epoch, epoch_iteration)
-                ret_values.append(ret_val)
+
+                # Check that there is no repeated key
+                for key in ret_val.keys():
+                    if key in ret_values.keys():
+                        raise Exception(f"Two loggers return a value with the same key, {key}")
+
+                # Merge the dict returned by the current logger to our global dict
+                ret_values = ret_values | ret_val
 
         return ret_values
 
@@ -100,6 +121,7 @@ class CompoundLogger(TrainLogger):
         # Now, we can tell if there's at least one logger that wants to log
         return any(self.logger_should_log)
 
+# TODO -- remove this class because we're not using it
 class ClassificationLogger(TrainLogger):
     """
     Logger for a classifaction problem
@@ -128,7 +150,13 @@ class ClassificationLogger(TrainLogger):
         self.name = core.get_datetime_str()
         self.tensorboardwriter = board.get_writer(name = self.name)
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> None:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
 
         # For more performance
         with torch.no_grad():
@@ -186,6 +214,10 @@ class ClassificationLogger(TrainLogger):
         )
         self.tensorboardwriter.flush() # Make sure that writer writes to disk
 
+        # TODO -- this return is wrong, return the actual metrics
+        return dict()
+
+
     def should_log(self, iteration: int) -> bool:
         if iteration % self.iterations == 0:
             return True
@@ -212,7 +244,13 @@ class TripletLoggerOffline(TrainLogger):
         self.loss_func = loss_func
         self.net = net
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
 
         # Seleccionamos la funcion de perdida
         metric =  metrics.calculate_mean_triplet_loss_offline
@@ -242,7 +280,11 @@ class TripletLoggerOffline(TrainLogger):
         print("")
 
         # Devolvemos las funciones de perdida
-        return mean_train_loss, mean_val_loss
+        return {
+            "mean train loss": mean_train_loss,
+            "mean validation loss": mean_val_loss,
+        }
+
 
     def should_log(self, iteration: int) -> bool:
         if iteration % self.iterations == 0 and iteration != 0:
@@ -286,13 +328,19 @@ class TripletLoggerOnline(TrainLogger):
         self.train_percentage = train_percentage
         self.validation_percentage = validation_percentage
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- ")
 
         # We are interested in mean triplet loss
-        metric =  metrics.calculate_mean_loss_function_online
+        metric = metrics.calculate_mean_loss_function_online
 
         # Calculamos el numero maximo de ejemplos que evaluar
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
@@ -325,7 +373,10 @@ class TripletLoggerOnline(TrainLogger):
         })
 
         # Devolvemos las funciones de perdida
-        return mean_train_loss, mean_val_loss
+        return {
+            "mean train loss": mean_train_loss,
+            "mean validation loss": mean_val_loss,
+        }
 
     def should_log(self, iteration: int) -> bool:
         if iteration % self.iterations == 0:
@@ -371,8 +422,13 @@ class IntraClusterLogger(TrainLogger):
         self.train_percentage = train_percentage
         self.validation_percentage = validation_percentage
 
-
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- ")
@@ -411,6 +467,8 @@ class IntraClusterLogger(TrainLogger):
             "Validation Mean Cluster Distance": validation_metrics["mean"],
             "Validation SD Cluster Distance":  validation_metrics["sd"],
         })
+
+        return train_metrics
 
 
     # TODO -- this method is repeated multiple times
@@ -458,8 +516,13 @@ class InterClusterLogger(TrainLogger):
         self.train_percentage = train_percentage
         self.validation_percentage = validation_percentage
 
-
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, epoch_iteration: int) -> Tuple[float, float]:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- ")
@@ -478,7 +541,6 @@ class InterClusterLogger(TrainLogger):
             train_metrics = metrics.compute_intercluster_metrics(train_loader, self.net, train_max_examples)
             validation_metrics = metrics.compute_intercluster_metrics(validation_loader, self.net, validation_max_examples)
 
-
         # Get the network in training mode again
         self.net.train()
 
@@ -491,18 +553,20 @@ class InterClusterLogger(TrainLogger):
             "Train Min Intercluster Distance": train_metrics["min"],
             "Train Max intercluster Distance": train_metrics["max"],
             "Train Mean Intercluster Distance": train_metrics["mean"],
-            "Train SD Intercluster Distance":  train_metrics["sd"],
+            "Train SD Intercluster Distance": train_metrics["sd"],
 
             "Validation Min Intercluster Distance": validation_metrics["min"],
             "Validation Max Intercluster Distance": validation_metrics["max"],
             "Validation Mean Intercluster Distance": validation_metrics["mean"],
-            "Validation SD Intercluster Distance":  validation_metrics["sd"],
+            "Validation SD Intercluster Distance": validation_metrics["sd"],
         })
 
+        return train_metrics
 
     # TODO -- this method is repeated multiple times
     # TODO -- REFACTOR -- Create base class that does this by default and use it
     def should_log(self, iteration: int) -> bool:
+
         if iteration % self.iterations == 0:
             return True
 
