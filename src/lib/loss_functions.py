@@ -2,16 +2,19 @@
 Different loss functions used in the project
 """
 
+import itertools as it
+import logging
+from typing import List, Tuple, Dict
+
 import torch
 import torch.nn as nn
 import wandb
 from torch.autograd import Variable
-from typing import List, Tuple, Dict
-
-import logging
-file_logger = logging.getLogger("MAIN_LOGGER")
 
 import src.lib.utils as utils
+
+
+file_logger = logging.getLogger("MAIN_LOGGER")
 
 # Bases for more complex loss functions
 # ==================================================================================================
@@ -35,7 +38,11 @@ class TripletLoss(nn.Module):
         super(TripletLoss, self).__init__()
         self.margin = margin
 
-    def forward(self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor) -> float:
+    def forward(
+        self, anchor: torch.Tensor,
+        positive: torch.Tensor,
+        negative: torch.Tensor
+    ) -> float:
 
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
@@ -59,7 +66,8 @@ class TripletLoss(nn.Module):
 
 class SoftplusTripletLoss(nn.Module):
     """
-    Slight modification of the basic loss function that acts as the base for all batch loss functions
+    Slight modification of the basic loss function that acts as the base for all batch loss
+    functions
     Instead of using [• + m]_+, use softplus ln(1 + exp(•))
 
     This loss function is thought for single triplets. If you want to calculate the loss of a batch
@@ -70,7 +78,12 @@ class SoftplusTripletLoss(nn.Module):
         super(SoftplusTripletLoss, self).__init__()
         self.softplus = nn.Softplus(beta = 1, threshold = 1)
 
-    def forward(self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor) -> float:
+    def forward(
+        self,
+        anchor: torch.Tensor,
+        positive: torch.Tensor,
+        negative: torch.Tensor
+    ) -> float:
 
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
@@ -120,7 +133,6 @@ class MeanTripletBatchTripletLoss(nn.Module):
 # Copiamos esto de https://stackoverflow.com/a/22279947
 # Lo necesitamos para saltarnos el elemento de una lista de
 # forma eficiente
-import itertools as it
 def skip_i(iterable, i):
     itr = iter(iterable)
     return it.chain(it.islice(itr, 0, i), it.islice(itr, 1, None))
@@ -155,14 +167,18 @@ class BatchBaseTripletLoss(nn.Module):
         return class_positions
 
     # TODO -- move to utils module
-    def precompute_negative_class(self, dict_of_classes: Dict[int, List[int]]) -> Dict[int, List[int]]:
+    def precompute_negative_class(
+        self,
+        dict_of_classes: Dict[int, List[int]]
+    ) -> Dict[int, List[int]]:
         """
         Computes a dictionary `dict_of_negatives`. Each key i has associated a list with all the
         indixes of elements of other class.
 
         For example, `dict_of_negatives[4]` has all the indixes of elements whose class is not 4
 
-        @param dict_of_classes precomputed dict of positions of classes, computed using `utils.precompute_dict_of_classes`
+        @param dict_of_classes precomputed dict of positions of classes, computed using
+               `utils.precompute_dict_of_classes`
         @returns `dict_of_negatives` a dict as described before
         """
 
@@ -183,7 +199,11 @@ class BatchBaseTripletLoss(nn.Module):
 
         return dict_of_negatives
 
-    def precompute_pairwise_distances(self, embeddings: torch.Tensor, distance_function) -> Dict[Tuple[int, int], float]:
+    def precompute_pairwise_distances(
+        self,
+        embeddings: torch.Tensor,
+        distance_function
+    ) -> Dict[Tuple[int, int], float]:
         """
         Given a batch of embeddings and a distance function, precomputes all the pairwise distances.
         @return distances, dict of distances where distances[i][j] = distance(x_i, x_j)
@@ -210,9 +230,9 @@ class BatchHardTripletLoss(nn.Module):
     Implementation of Batch Hard Triplet Loss
     This loss function expects a batch of images, and not a batch of triplets
 
-    Large minibatches are encouraged, as we are computing, for each img in the minibatch, its hardest
-    positive and negative. So having a large minibatch makes more likely that a non-trivial positive
-    and negative get found in the minibatch
+    Large minibatches are encouraged, as we are computing, for each img in the minibatch,
+    its hardest positive and negative. So having a large minibatch makes more likely that a
+    non-trivial positive and negative get found in the minibatch
 
     In this class we pre-compute all pairwise distances. In this case is worth the overhead because
     we need to constantly compute all positive all negative distances.
