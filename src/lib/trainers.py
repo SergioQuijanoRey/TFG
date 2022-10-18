@@ -16,7 +16,6 @@ import src.lib.filesystem as filesystem
 from src.lib.core import get_device, get_datetime_str
 from src.lib.train_loggers import TrainLogger, SilentLogger
 
-
 file_logger = logging.getLogger("MAIN_LOGGER")
 
 def train_model_offline(
@@ -146,11 +145,6 @@ def train_model_offline(
     # Return the training hist
     return training_history
 
-# TODO -- BUG -- this takes too long to train
-#                I think it's because of the metrics we compute to log info in the middle of the
-#                training
-# TODO -- also all the infrastructure around training, metrics, loggers is very complex and not
-#         easy to use
 def train_model_online(
     net: nn.Module,
     path: str,
