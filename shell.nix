@@ -21,8 +21,6 @@ mkShell {
         python310Packages.tqdm
     ];
 
-    # I want to use zsh as my dev shell
     shellHook = ''
-        zsh
     '';
 }
