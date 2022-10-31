@@ -6,10 +6,12 @@ mkShell {
         zsh
         starship
 
-        python310
-        jupyter
+        # Build tool
+        just
 
         # Python packages
+        python310
+        jupyter
         python310Packages.jupyterlab
         python310Packages.pytorch
         python310Packages.torchvision
