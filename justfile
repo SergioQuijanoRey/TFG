@@ -1,6 +1,6 @@
 current_notebook := "LFW Notebook.ipynb"
 
-
+# Default command that list all the available commands
 default:
 	@just --list
 
