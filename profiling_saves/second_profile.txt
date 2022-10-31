@@ -1,0 +1,708 @@
+Mon Oct 31 18:50:26 2022    profiling_saves/second_profile.stat
+
+         125222734 function calls (125180456 primitive calls) in 947.719 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      2/1    0.000    0.000  947.719  947.719 {built-in method builtins.exec}
+        1    0.004    0.004  947.719  947.719 <string>:1(<module>)
+        1    0.117    0.117  947.715  947.715 /content/src/lib/trainers.py:149(train_model_online)
+        2    0.000    0.000  724.922  362.461 /content/src/lib/train_loggers.py:91(log_process)
+ 21422215  311.811    0.000  495.784    0.000 /content/src/lib/loss_functions.py:22(distance_function)
+        2   10.999    5.499  493.707  246.853 /content/src/lib/train_loggers.py:547(log_process)
+        4    0.126    0.031  482.679  120.670 /content/src/lib/metrics.py:294(compute_intercluster_metrics)
+38732/332    0.213    0.000  349.153    1.052 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1124(_call_impl)
+      108   11.225    0.104  337.934    3.129 /content/src/lib/loss_functions.py:272(forward)
+        4    0.319    0.080  308.100   77.025 /content/src/lib/metrics.py:377(__compute_pairwise_distances)
+        4   17.132    4.283  298.528   74.632 /content/src/lib/loss_functions.py:202(precompute_pairwise_distances)
+    21600   18.220    0.001  263.159    0.012 /content/src/lib/loss_functions.py:298(<listcomp>)
+        2    0.000    0.000  184.509   92.254 /content/src/lib/train_loggers.py:346(log_process)
+        4    0.010    0.002  184.492   46.123 /content/src/lib/metrics.py:122(calculate_mean_loss_function_online)
+ 21422215  103.463    0.000  103.463    0.000 {method 'sum' of 'torch._C._TensorBase' objects}
+        8    0.011    0.001   90.626   11.328 /content/src/lib/metrics.py:179(__get_portion_of_dataset_and_embed)
+ 21425315   80.539    0.000   80.539    0.000 {method 'sqrt' of 'torch._C._TensorBase' objects}
+      225    0.009    0.000   77.840    0.346 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:676(__next__)
+     2033   77.789    0.038   77.789    0.038 {method 'acquire' of '_thread.lock' objects}
+      225    0.004    0.000   77.693    0.345 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1329(_next_data)
+      210    0.002    0.000   77.669    0.370 /usr/lib/python3.7/threading.py:264(wait)
+      227    0.002    0.000   77.529    0.342 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1296(_get_data)
+      227    0.001    0.000   77.524    0.342 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1150(_try_get_data)
+      227    0.004    0.000   77.523    0.342 /usr/lib/python3.7/queue.py:153(get)
+        4    4.632    1.158   63.158   15.789 /content/src/lib/metrics.py:342(compute_intercluster_distances)
+    43278   53.421    0.001   53.421    0.001 {built-in method torch.tensor}
+  4831860   53.300    0.000   53.300    0.000 {built-in method builtins.min}
+        2    0.003    0.001   46.706   23.353 /content/src/lib/train_loggers.py:440(log_process)
+        4    0.000    0.000   46.692   11.673 /content/src/lib/metrics.py:214(compute_cluster_sizes_metrics)
+    11928    0.092    0.000   37.536    0.003 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:713(__iter__)
+    11928   37.377    0.003   37.377    0.003 {method 'unbind' of 'torch._C._TensorBase' objects}
+       16    0.000    0.000   36.292    2.268 {built-in method numpy.core._multiarray_umath.implement_array_function}
+       24   25.749    1.073   36.271    1.511 {built-in method numpy.asanyarray}
+     2000   25.820    0.013   25.827    0.013 {method 'to' of 'torch._C._TensorBase' objects}
+      272    0.002    0.000   25.472    0.094 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:261(wrapper)
+      272    0.001    0.000   25.470    0.094 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:227(wrapper)
+      272    0.001    0.000   25.468    0.094 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1415(log)
+      272    0.003    0.000   25.467    0.094 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1379(_log)
+      272    0.004    0.000   25.459    0.094 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1262(_partial_history_callback)
+      272    0.012    0.000   25.454    0.094 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface.py:531(publish_partial_history)
+      574    0.002    0.000   25.367    0.044 /usr/local/lib/python3.7/dist-packages/wandb/util.py:913(json_dumps_safer_history)
+      574    0.003    0.000   25.365    0.044 /usr/lib/python3.7/json/__init__.py:183(dumps)
+      574    0.002    0.000   25.361    0.044 /usr/lib/python3.7/json/encoder.py:182(encode)
+      574    0.005    0.000   25.359    0.044 /usr/lib/python3.7/json/encoder.py:204(iterencode)
+     3227   25.357    0.008   25.357    0.008 {method 'item' of 'torch._C._TensorBase' objects}
+       54    0.001    0.000   25.354    0.470 /usr/local/lib/python3.7/dist-packages/wandb/util.py:877(default)
+       54    0.001    0.000   25.353    0.469 /usr/local/lib/python3.7/dist-packages/wandb/util.py:673(json_friendly)
+        8    0.000    0.000   18.237    2.280 <__array_function__ internals>:2(mean)
+        8    0.001    0.000   18.237    2.280 /usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py:3322(mean)
+        8    0.000    0.000   18.236    2.280 /usr/local/lib/python3.7/dist-packages/numpy/core/_methods.py:162(_mean)
+        8    0.000    0.000   18.054    2.257 <__array_function__ internals>:2(std)
+        8    0.000    0.000   18.054    2.257 /usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py:3449(std)
+        8    0.002    0.000   18.054    2.257 /usr/local/lib/python3.7/dist-packages/numpy/core/_methods.py:260(_std)
+        8    0.011    0.001   18.052    2.257 /usr/local/lib/python3.7/dist-packages/numpy/core/_methods.py:195(_var)
+  4831851   15.344    0.000   17.503    0.000 /content/src/lib/metrics.py:368(<listcomp>)
+     3378   14.814    0.004   14.814    0.004 {built-in method builtins.max}
+      224    0.004    0.000   11.213    0.050 /content/src/lib/models.py:144(forward)
+      224    0.001    0.000   11.207    0.050 /usr/local/lib/python3.7/dist-packages/torchvision/models/resnet.py:284(forward)
+      224    0.021    0.000   11.207    0.050 /usr/local/lib/python3.7/dist-packages/torchvision/models/resnet.py:266(_forward_impl)
+  9663702    3.559    0.000   10.521    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:753(__array__)
+       14    0.001    0.000    9.750    0.696 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1431(_shutdown_workers)
+       13    0.000    0.000    9.634    0.741 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1509(__del__)
+       26    0.000    0.000    9.598    0.369 /usr/lib/python3.7/multiprocessing/process.py:133(join)
+       26    0.001    0.000    9.598    0.369 /usr/lib/python3.7/multiprocessing/popen_fork.py:41(wait)
+       26    0.001    0.000    9.510    0.366 /usr/lib/python3.7/multiprocessing/connection.py:907(wait)
+       26    0.001    0.000    9.507    0.366 /usr/lib/python3.7/selectors.py:402(select)
+       26    9.505    0.366    9.506    0.366 {method 'poll' of 'select.poll' objects}
+     4480    0.021    0.000    9.437    0.002 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/conv.py:456(forward)
+     4480    0.020    0.000    9.405    0.002 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/conv.py:448(_conv_forward)
+     4480    9.385    0.002    9.385    0.002 {built-in method torch.conv2d}
+        4    9.254    2.313    9.254    2.313 /content/src/lib/metrics.py:391(<dictcomp>)
+  9663710    6.176    0.000    6.176    0.000 {method 'numpy' of 'torch._C._TensorBase' objects}
+       13    0.000    0.000    4.630    0.356 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:431(__iter__)
+       13    0.000    0.000    4.630    0.356 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:385(_get_iterator)
+       13    0.008    0.001    4.630    0.356 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1037(__init__)
+    21600    0.057    0.000    4.430    0.000 /content/src/lib/loss_functions.py:41(forward)
+        9    0.000    0.000    4.271    0.475 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:823(to)
+    621/9    0.012    0.000    4.271    0.475 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:577(_apply)
+     1594    0.001    0.000    4.242    0.003 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:921(convert)
+       50    0.001    0.000    3.905    0.078 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:340(backward)
+       50    0.001    0.000    3.905    0.078 /usr/local/lib/python3.7/dist-packages/torch/autograd/__init__.py:85(backward)
+       50    3.892    0.078    3.892    0.078 {method 'run_backward' of 'torch._C._EngineBase' objects}
+    21600    0.301    0.000    3.189    0.000 /content/src/lib/loss_functions.py:292(<listcomp>)
+       26    0.007    0.000    2.426    0.093 /usr/lib/python3.7/multiprocessing/process.py:101(start)
+       26    0.000    0.000    2.418    0.093 /usr/lib/python3.7/multiprocessing/context.py:221(_Popen)
+       26    0.001    0.000    2.417    0.093 /usr/lib/python3.7/multiprocessing/context.py:274(_Popen)
+       26    0.001    0.000    2.416    0.093 /usr/lib/python3.7/multiprocessing/popen_fork.py:16(__init__)
+       26    0.009    0.000    2.324    0.089 /usr/lib/python3.7/multiprocessing/popen_fork.py:67(_launch)
+        4    2.272    0.568    2.273    0.568 /content/src/lib/metrics.py:355(<listcomp>)
+       26    2.241    0.086    2.247    0.086 {built-in method posix.fork}
+ 16936931    2.159    0.000    2.159    0.000 /content/src/lib/utils.py:38(rearrange_indx)
+      276    0.004    0.000    2.121    0.008 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1378(_try_put_index)
+       13    0.001    0.000    2.082    0.160 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1117(_reset)
+     1055    0.002    0.000    2.069    0.002 {built-in method builtins.next}
+      276    0.000    0.000    2.062    0.007 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:670(_next_index)
+      298    0.021    0.000    2.062    0.007 /usr/local/lib/python3.7/dist-packages/torch/utils/data/sampler.py:234(__iter__)
+ 1568/896    0.019    0.000    2.050    0.002 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/container.py:137(forward)
+        7    0.002    0.000    2.026    0.289 /content/src/lib/sampler.py:63(__iter__)
+     1792    0.158    0.000    2.024    0.001 /usr/local/lib/python3.7/dist-packages/torchvision/models/resnet.py:89(forward)
+        7    0.063    0.009    2.023    0.289 /content/src/lib/sampler.py:93(generate_index_sequence)
+      108    1.147    0.011    1.150    0.011 /content/src/lib/loss_functions.py:170(precompute_negative_class)
+    21600    0.741    0.000    1.118    0.000 /content/src/lib/loss_functions.py:56(loss_from_distances)
+     4480    0.058    0.000    1.023    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/batchnorm.py:134(forward)
+        4    0.262    0.066    0.994    0.248 /content/src/lib/metrics.py:259(compute_intracluster_distances)
+      350    0.290    0.001    0.943    0.003 /usr/lib/python3.7/random.py:264(shuffle)
+     4480    0.032    0.000    0.843    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/functional.py:2407(batch_norm)
+  9695528    0.794    0.000    0.794    0.000 {built-in method torch._C._has_torch_function_unary}
+     4480    0.792    0.000    0.792    0.000 {built-in method torch.batch_norm}
+   750476    0.535    0.000    0.743    0.000 /usr/lib/python3.7/random.py:224(_randbelow)
+        4    0.658    0.165    0.658    0.165 /content/src/lib/metrics.py:330(<listcomp>)
+        1    0.002    0.002    0.589    0.589 /content/src/lib/filesystem.py:12(save_model)
+        1    0.000    0.000    0.585    0.585 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:333(save)
+      357    0.001    0.000    0.573    0.002 /content/src/lib/sampler.py:154(remove_empty_classes)
+      357    0.390    0.001    0.573    0.002 /content/src/lib/sampler.py:160(<listcomp>)
+    21600    0.499    0.000    0.499    0.000 {built-in method torch.argmax}
+    21600    0.377    0.000    0.377    0.000 {built-in method torch.relu}
+        1    0.000    0.000    0.354    0.354 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:228(_open_file_like)
+        1    0.000    0.000    0.354    0.354 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:210(__init__)
+        1    0.354    0.354    0.354    0.354 {built-in method io.open}
+       50    0.001    0.000    0.338    0.007 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:108(wrapper)
+       50    0.001    0.000    0.332    0.007 /usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py:24(decorate_context)
+       50    0.010    0.000    0.329    0.007 /usr/local/lib/python3.7/dist-packages/torch/optim/adam.py:105(step)
+      350    0.122    0.000    0.318    0.001 /content/src/lib/sampler.py:170(__new_batch)
+       50    0.000    0.000    0.298    0.006 /usr/local/lib/python3.7/dist-packages/torch/optim/adam.py:176(adam)
+       50    0.092    0.002    0.297    0.006 /usr/local/lib/python3.7/dist-packages/torch/optim/adam.py:229(_single_tensor_adam)
+      108    0.224    0.002    0.224    0.002 /content/src/lib/loss_functions.py:277(<listcomp>)
+        1    0.157    0.157    0.206    0.206 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:528(_save)
+       50    0.012    0.000    0.185    0.004 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:216(zero_grad)
+    70000    0.030    0.000    0.180    0.000 /usr/lib/python3.7/random.py:218(randint)
+    21600    0.170    0.000    0.170    0.000 {built-in method torch.argmin}
+     3808    0.012    0.000    0.165    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/activation.py:97(forward)
+      123    0.130    0.001    0.160    0.001 /content/src/lib/utils.py:8(precompute_dict_of_classes)
+      104    0.001    0.000    0.155    0.001 /usr/lib/python3.7/threading.py:534(wait)
+     3808    0.007    0.000    0.152    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/functional.py:1446(relu)
+  1114110    0.151    0.000    0.151    0.000 {method 'getrandbits' of '_random.Random' objects}
+    70000    0.062    0.000    0.150    0.000 /usr/lib/python3.7/random.py:174(randrange)
+     3038    0.150    0.000    0.150    0.000 {method 'zero_' of 'torch._C._TensorBase' objects}
+   842573    0.148    0.000    0.148    0.000 {method 'get' of 'dict' objects}
+     3808    0.143    0.000    0.143    0.000 {built-in method torch.relu_}
+    69076    0.133    0.000    0.133    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1194(__getattr__)
+     7200    0.128    0.000    0.128    0.000 {method 'add_' of 'torch._C._TensorBase' objects}
+      603    0.001    0.000    0.125    0.000 /usr/lib/python3.7/threading.py:1050(_wait_for_tstate_lock)
+       13    0.000    0.000    0.123    0.009 /usr/lib/python3.7/threading.py:1012(join)
+    51034    0.121    0.000    0.121    0.000 {built-in method torch._C._get_tracing_state}
+       75    0.001    0.000    0.120    0.002 {built-in method builtins.print}
+      150    0.001    0.000    0.119    0.001 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/redirect.py:639(write)
+      224    0.001    0.000    0.116    0.001 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/linear.py:113(forward)
+      224    0.114    0.001    0.114    0.001 {built-in method torch._C._nn.linear}
+       91    0.001    0.000    0.102    0.001 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:77(is_available)
+       96    0.101    0.001    0.101    0.001 {built-in method torch._C._cuda_getDeviceCount}
+       21    0.000    0.000    0.101    0.005 /content/src/lib/core.py:78(get_device)
+       52    0.001    0.000    0.100    0.002 /usr/lib/python3.7/threading.py:834(start)
+       26    0.001    0.000    0.091    0.003 /usr/lib/python3.7/multiprocessing/util.py:433(_flush_std_streams)
+      650    0.003    0.000    0.090    0.000 /usr/local/lib/python3.7/dist-packages/torch/_ops.py:138(__call__)
+       52    0.002    0.000    0.090    0.002 /usr/local/lib/python3.7/dist-packages/ipykernel/iostream.py:337(flush)
+      422    0.008    0.000    0.090    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface_sock.py:49(_publish)
+      113    0.001    0.000    0.086    0.001 /usr/lib/python3.7/multiprocessing/popen_fork.py:25(poll)
+       87    0.085    0.001    0.085    0.001 {built-in method posix.waitpid}
+      311    0.003    0.000    0.084    0.000 /usr/local/lib/python3.7/dist-packages/ipykernel/iostream.py:197(schedule)
+      422    0.003    0.000    0.080    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/sock_client.py:218(send_record_publish)
+      311    0.078    0.000    0.078    0.000 /usr/local/lib/python3.7/dist-packages/zmq/sugar/socket.py:543(send)
+      311    0.004    0.000    0.078    0.000 /usr/lib/python3.7/multiprocessing/queues.py:80(put)
+      422    0.001    0.000    0.074    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/sock_client.py:154(send_server_request)
+      422    0.010    0.000    0.073    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/sock_client.py:145(_send_message)
+794140/794116    0.066    0.000    0.071    0.000 {built-in method builtins.len}
+       91    0.064    0.001    0.064    0.001 {built-in method posix.close}
+      119    0.001    0.000    0.063    0.001 /usr/lib/python3.7/logging/__init__.py:1491(_log)
+      114    0.001    0.000    0.061    0.001 /usr/lib/python3.7/logging/__init__.py:1356(debug)
+      272    0.002    0.000    0.061    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface_shared.py:81(_publish_partial_history)
+      150    0.002    0.000    0.061    0.000 /usr/local/lib/python3.7/dist-packages/ipykernel/iostream.py:386(write)
+   750476    0.058    0.000    0.058    0.000 {method 'bit_length' of 'int' objects}
+       39    0.002    0.000    0.057    0.001 /usr/lib/python3.7/multiprocessing/queues.py:155(_start_thread)
+      150    0.000    0.000    0.057    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1907(<lambda>)
+      150    0.001    0.000    0.056    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1288(_console_raw_callback)
+      150    0.005    0.000    0.055    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface.py:614(publish_output_raw)
+      422    0.002    0.000    0.055    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/sock_client.py:121(_sendall_with_error_handle)
+      224    0.001    0.000    0.053    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/pooling.py:1178(forward)
+     6200    0.053    0.000    0.053    0.000 {method 'mul_' of 'torch._C._TensorBase' objects}
+      422    0.053    0.000    0.053    0.000 {method 'send' of '_socket.socket' objects}
+      224    0.004    0.000    0.052    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/functional.py:1200(adaptive_avg_pool2d)
+      325    0.004    0.000    0.051    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/profiler.py:449(__exit__)
+      325    0.003    0.000    0.051    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/profiler.py:436(__init__)
+      119    0.001    0.000    0.050    0.000 /usr/lib/python3.7/logging/__init__.py:1516(handle)
+      119    0.001    0.000    0.049    0.000 /usr/lib/python3.7/logging/__init__.py:1570(callHandlers)
+      325    0.049    0.000    0.049    0.000 {built-in method torch.zeros}
+      119    0.001    0.000    0.048    0.000 /usr/lib/python3.7/logging/__init__.py:881(handle)
+      119    0.001    0.000    0.047    0.000 /usr/lib/python3.7/logging/__init__.py:1118(emit)
+      325    0.047    0.000    0.047    0.000 {built-in method torch._ops.profiler._record_function_exit}
+      325    0.005    0.000    0.046    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/profiler.py:445(__enter__)
+      119    0.001    0.000    0.046    0.000 /usr/lib/python3.7/logging/__init__.py:1013(emit)
+      224    0.044    0.000    0.044    0.000 {built-in method torch._C._nn.adaptive_avg_pool2d}
+      224    0.001    0.000    0.043    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1398(_process_data)
+      150    0.001    0.000    0.043    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface_shared.py:72(_publish_output_raw)
+     3100    0.043    0.000    0.043    0.000 {method 'addcmul_' of 'torch._C._TensorBase' objects}
+      224    0.003    0.000    0.040    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/pooling.py:161(forward)
+      325    0.040    0.000    0.040    0.000 {built-in method torch._ops.profiler._record_function_enter}
+      119    0.002    0.000    0.039    0.000 /usr/lib/python3.7/logging/__init__.py:1002(flush)
+      224    0.001    0.000    0.038    0.000 /usr/local/lib/python3.7/dist-packages/torch/_jit_internal.py:413(fn)
+      224    0.001    0.000    0.037    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/functional.py:760(_max_pool2d)
+      119    0.036    0.000    0.036    0.000 {method 'flush' of '_io.TextIOWrapper' objects}
+      224    0.036    0.000    0.036    0.000 {built-in method torch.max_pool2d}
+      122    0.001    0.000    0.034    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:109(cpu)
+      232    0.034    0.000    0.034    0.000 {built-in method torch.cat}
+       39    0.002    0.000    0.033    0.001 /usr/lib/python3.7/multiprocessing/context.py:99(Queue)
+      122    0.033    0.000    0.033    0.000 {method 'copy_' of 'torch._C.StorageBase' objects}
+       39    0.002    0.000    0.030    0.001 /usr/lib/python3.7/multiprocessing/queues.py:36(__init__)
+    16836    0.028    0.000    0.028    0.000 {method 'dim' of 'torch._C._TensorBase' objects}
+   216779    0.027    0.000    0.027    0.000 {method 'append' of 'list' objects}
+     3100    0.026    0.000    0.026    0.000 {method 'addcdiv_' of 'torch._C._TensorBase' objects}
+     1044    0.019    0.000    0.024    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1210(__setattr__)
+      150    0.000    0.000    0.023    0.000 /usr/local/lib/python3.7/dist-packages/ipykernel/iostream.py:323(_schedule_flush)
+      182    0.009    0.000    0.021    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:50(__init__)
+    23560    0.017    0.000    0.021    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:1071(grad)
+       13    0.000    0.000    0.019    0.001 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:621(__init__)
+     4480    0.010    0.000    0.018    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/batchnorm.py:405(_check_input_dim)
+       19    0.018    0.001    0.018    0.001 {method 'random_' of 'torch._C._TensorBase' objects}
+       91    0.001    0.000    0.017    0.000 /usr/lib/python3.7/multiprocessing/context.py:64(Lock)
+      590    0.003    0.000    0.016    0.000 /usr/lib/python3.7/threading.py:335(notify)
+       91    0.000    0.000    0.016    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:161(__init__)
+    24006    0.005    0.000    0.015    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/sampler.py:117(__iter__)
+        1    0.001    0.001    0.014    0.014 {method 'dump' of '_pickle.Pickler' objects}
+    13529    0.014    0.000    0.014    0.000 {built-in method builtins.iter}
+15438/14092    0.006    0.000    0.014    0.000 {built-in method builtins.isinstance}
+        1    0.012    0.012    0.012    0.012 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:258(__exit__)
+      511    0.012    0.000    0.012    0.000 {method 'release' of '_thread.lock' objects}
+        1    0.000    0.000    0.012    0.012 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:263(_open_zipfile_writer)
+        1    0.012    0.012    0.012    0.012 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:254(__init__)
+      272    0.001    0.000    0.011    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/data_types/utils.py:32(history_dict_to_json)
+       50    0.001    0.000    0.011    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/__init__.py:30(_make_grads)
+       50    0.000    0.000    0.010    0.000 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:84(_cuda_graph_capture_health_check)
+      302    0.003    0.000    0.010    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/data_types/utils.py:60(val_to_json)
+       50    0.010    0.000    0.010    0.000 {built-in method torch.ones_like}
+      272    0.004    0.000    0.010    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface_shared.py:115(_make_request)
+   828/12    0.002    0.000    0.010    0.001 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1820(train)
+      122    0.000    0.000    0.009    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:175(__reduce_ex__)
+      122    0.001    0.000    0.009    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:207(_reduce_ex_internal)
+      182    0.001    0.000    0.009    0.000 /usr/local/lib/python3.7/dist-packages/joblib/externals/loky/backend/__init__.py:7(_make_name)
+       50    0.002    0.000    0.008    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/graphs.py:18(is_current_stream_capturing)
+     1116    0.008    0.000    0.008    0.000 {method 'CopyFrom' of 'google.protobuf.pyext._message.CMessage' objects}
+     4480    0.005    0.000    0.008    0.000 /usr/local/lib/python3.7/dist-packages/torch/backends/__init__.py:31(__get__)
+      119    0.000    0.000    0.008    0.000 /usr/lib/python3.7/logging/__init__.py:1476(makeRecord)
+     1054    0.001    0.000    0.008    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:581(compute_should_use_set_data)
+      119    0.004    0.000    0.008    0.000 /usr/lib/python3.7/logging/__init__.py:282(__init__)
+       65    0.007    0.000    0.007    0.000 {built-in method posix.pipe}
+    17/14    0.000    0.000    0.007    0.001 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:191(_lazy_init)
+      182    0.001    0.000    0.007    0.000 /usr/lib/python3.7/tempfile.py:292(__next__)
+       50    0.007    0.000    0.007    0.000 {built-in method torch._C._cuda_isCurrentStreamCapturing}
+     1568    0.004    0.000    0.007    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/container.py:129(__iter__)
+      590    0.004    0.000    0.007    0.000 /usr/lib/python3.7/threading.py:1092(is_alive)
+      122    0.007    0.000    0.007    0.000 {method 'stride' of 'torch._C._TensorBase' objects}
+     2220    0.002    0.000    0.006    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py:226(__init__)
+       39    0.001    0.000    0.006    0.000 /usr/lib/python3.7/multiprocessing/connection.py:506(Pipe)
+     1054    0.006    0.000    0.006    0.000 {built-in method torch._has_compatible_shallow_copy_type}
+     1110    0.001    0.000    0.006    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py:135(__exit__)
+       24    0.006    0.000    0.006    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+       28    0.006    0.000    0.006    0.000 /usr/lib/python3.7/logging/__init__.py:221(_releaseLock)
+        6    0.006    0.001    0.006    0.001 {method 'tolist' of 'torch._C._TensorBase' objects}
+      150    0.001    0.000    0.006    0.000 /usr/local/lib/python3.7/dist-packages/google/protobuf/internal/well_known_types.py:197(GetCurrentTime)
+        6    0.000    0.000    0.005    0.001 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1842(eval)
+      422    0.005    0.000    0.005    0.000 {method 'SerializeToString' of 'google.protobuf.pyext._message.CMessage' objects}
+      119    0.000    0.000    0.005    0.000 /usr/lib/python3.7/logging/__init__.py:858(format)
+      182    0.001    0.000    0.005    0.000 /usr/lib/python3.7/tempfile.py:295(<listcomp>)
+     2877    0.002    0.000    0.005    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1719(children)
+     1000    0.005    0.000    0.005    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/functional.py:2390(_verify_batch_size)
+        1    0.005    0.005    0.005    0.005 {built-in method torch._C._cuda_init}
+      119    0.001    0.000    0.005    0.000 /usr/lib/python3.7/logging/__init__.py:595(format)
+      150    0.002    0.000    0.005    0.000 /usr/local/lib/python3.7/dist-packages/google/protobuf/internal/well_known_types.py:245(FromDatetime)
+     3330    0.004    0.000    0.004    0.000 {built-in method torch.is_grad_enabled}
+     1512    0.004    0.000    0.004    0.000 {method 'size' of 'torch._C._TensorBase' objects}
+     1456    0.002    0.000    0.004    0.000 /usr/lib/python3.7/random.py:256(choice)
+       13    0.000    0.000    0.004    0.000 /usr/lib/python3.7/multiprocessing/context.py:89(Event)
+    19623    0.004    0.000    0.004    0.000 {method 'keys' of 'dict' objects}
+       54    0.000    0.000    0.004    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:655(__format__)
+       13    0.000    0.000    0.004    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:323(__init__)
+       52    0.002    0.000    0.004    0.000 /usr/lib/python3.7/threading.py:763(__init__)
+      224    0.004    0.000    0.004    0.000 {built-in method torch.flatten}
+      374    0.002    0.000    0.004    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:701(__len__)
+       52    0.004    0.000    0.004    0.000 {built-in method _thread.start_new_thread}
+     2684    0.002    0.000    0.004    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:538(persistent_id)
+      119    0.002    0.000    0.004    0.000 /usr/lib/python3.7/logging/__init__.py:1446(findCaller)
+       39    0.000    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/context.py:84(BoundedSemaphore)
+      224    0.003    0.000    0.003    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/utils.py:31(_list_with_default)
+      302    0.001    0.000    0.003    0.000 /usr/lib/python3.7/typing.py:715(__instancecheck__)
+       78    0.003    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/util.py:186(__init__)
+     1237    0.003    0.000    0.003    0.000 {built-in method builtins.hasattr}
+       39    0.000    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:144(__init__)
+       52    0.000    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/context.py:79(Semaphore)
+     4480    0.003    0.000    0.003    0.000 {built-in method torch._C._get_cudnn_enabled}
+     4480    0.003    0.000    0.003    0.000 {built-in method torch._C._has_torch_function_variadic}
+     2877    0.003    0.000    0.003    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1728(named_children)
+      221    0.001    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/util.py:171(register_after_fork)
+      339    0.000    0.000    0.003    0.000 <frozen importlib._bootstrap>:1009(_handle_fromlist)
+        6    0.003    0.000    0.003    0.000 {built-in method torch.randperm}
+       52    0.000    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:125(__init__)
+     1110    0.001    0.000    0.003    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py:131(__enter__)
+      272    0.001    0.000    0.003    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface_shared.py:186(_make_record)
+      195    0.003    0.000    0.003    0.000 /usr/lib/python3.7/threading.py:216(__init__)
+        5    0.000    0.000    0.003    0.001 /usr/lib/python3.7/logging/__init__.py:1368(info)
+       16    0.003    0.000    0.003    0.000 {method 'cpu' of 'torch._C._TensorBase' objects}
+     1044    0.002    0.000    0.003    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/parameter.py:9(__instancecheck__)
+      117    0.001    0.000    0.003    0.000 /usr/lib/python3.7/threading.py:499(__init__)
+      119    0.001    0.000    0.003    0.000 /usr/lib/python3.7/logging/__init__.py:528(formatTime)
+       65    0.001    0.000    0.003    0.000 /usr/lib/python3.7/multiprocessing/util.py:205(__call__)
+      302    0.001    0.000    0.003    0.000 /usr/lib/python3.7/typing.py:718(__subclasscheck__)
+       13    0.000    0.000    0.002    0.000 /usr/lib/python3.7/multiprocessing/context.py:74(Condition)
+     3038    0.002    0.000    0.002    0.000 {method 'requires_grad_' of 'torch._C._TensorBase' objects}
+      422    0.002    0.000    0.002    0.000 {method 'ByteSize' of 'google.protobuf.pyext._message.CMessage' objects}
+      694    0.001    0.000    0.002    0.000 /usr/lib/python3.7/threading.py:240(__enter__)
+       13    0.000    0.000    0.002    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:212(__init__)
+       39    0.000    0.000    0.002    0.000 /usr/lib/python3.7/multiprocessing/queues.py:131(close)
+      124    0.002    0.000    0.002    0.000 {built-in method torch.zeros_like}
+     1110    0.002    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py:126(__init__)
+      221    0.001    0.000    0.002    0.000 /usr/lib/python3.7/weakref.py:165(__setitem__)
+        4    0.001    0.000    0.002    0.001 /content/src/lib/metrics.py:247(<listcomp>)
+       26    0.002    0.000    0.002    0.000 /usr/lib/python3.7/selectors.py:347(__init__)
+        4    0.002    0.000    0.002    0.000 /content/src/lib/metrics.py:286(<dictcomp>)
+      172    0.002    0.000    0.002    0.000 {method 'detach' of 'torch._C._TensorBase' objects}
+     3410    0.001    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:731(__hash__)
+      150    0.002    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/google/protobuf/internal/enum_type_wrapper.py:108(__getattr__)
+      324    0.001    0.000    0.002    0.000 /usr/lib/python3.7/abc.py:137(__instancecheck__)
+     1191    0.002    0.000    0.002    0.000 {built-in method posix.getpid}
+     1594    0.002    0.000    0.002    0.000 {method 'is_floating_point' of 'torch._C._TensorBase' objects}
+      422    0.002    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/interface/interface_sock.py:45(_assign)
+      574    0.002    0.000    0.002    0.000 {method 'add' of 'google.protobuf.pyext._message.RepeatedCompositeContainer' objects}
+      272    0.001    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:626(__setattr__)
+       13    0.001    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:480(current_device)
+      658    0.002    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:377(get_full_typename)
+       13    0.000    0.000    0.002    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:660(_reset)
+       26    0.001    0.000    0.002    0.000 /usr/lib/python3.7/multiprocessing/process.py:72(__init__)
+        1    0.000    0.000    0.002    0.002 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:99(_check_capability)
+      334    0.000    0.000    0.002    0.000 {built-in method builtins.issubclass}
+        4    0.002    0.000    0.002    0.000 /content/src/lib/metrics.py:267(<dictcomp>)
+        3    0.000    0.000    0.002    0.001 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:349(get_device_properties)
+       50    0.001    0.000    0.002    0.000 /content/src/lib/train_loggers.py:131(should_log)
+        2    0.000    0.000    0.002    0.001 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:332(get_device_capability)
+        3    0.002    0.001    0.002    0.001 {built-in method torch.cuda._get_device_properties}
+       13    0.001    0.000    0.001    0.000 /usr/lib/python3.7/queue.py:33(__init__)
+       39    0.001    0.000    0.001    0.000 /usr/lib/python3.7/multiprocessing/queues.py:67(_after_fork)
+      694    0.001    0.000    0.001    0.000 {method '__enter__' of '_thread.lock' objects}
+     3100    0.001    0.000    0.001    0.000 {method 'conj' of 'torch._C._TensorBase' objects}
+      694    0.001    0.000    0.001    0.000 /usr/lib/python3.7/threading.py:243(__exit__)
+      324    0.001    0.000    0.001    0.000 {built-in method _abc._abc_instancecheck}
+      119    0.001    0.000    0.001    0.000 {built-in method time.localtime}
+      150    0.001    0.000    0.001    0.000 {method 'utctimetuple' of 'datetime.datetime' objects}
+      800    0.001    0.000    0.001    0.000 /usr/lib/python3.7/threading.py:255(_is_owned)
+  312/302    0.000    0.000    0.001    0.000 /usr/lib/python3.7/abc.py:141(__subclasscheck__)
+       26    0.001    0.000    0.001    0.000 /usr/lib/python3.7/multiprocessing/process.py:53(_cleanup)
+      272    0.001    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1237(_visualization_hack)
+      302    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:545(is_pandas_data_frame)
+        4    0.001    0.000    0.001    0.000 {built-in method posix.stat}
+        1    0.000    0.000    0.001    0.001 /content/src/lib/filesystem.py:46(create_dir_if_not_exists)
+        1    0.000    0.000    0.001    0.001 /usr/lib/python3.7/genericpath.py:39(isdir)
+      389    0.001    0.000    0.001    0.000 {method 'acquire' of '_multiprocessing.SemLock' objects}
+       19    0.001    0.000    0.001    0.000 {built-in method torch.empty}
+      871    0.001    0.000    0.001    0.000 {method 'append' of 'collections.deque' objects}
+      150    0.001    0.000    0.001    0.000 /usr/lib/python3.7/calendar.py:655(timegm)
+      119    0.001    0.000    0.001    0.000 {method 'write' of '_io.TextIOWrapper' objects}
+       26    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:568(_get_shared_seed)
+       39    0.000    0.000    0.001    0.000 /usr/lib/python3.7/multiprocessing/queues.py:197(_finalize_close)
+      119    0.001    0.000    0.001    0.000 /usr/lib/python3.7/posixpath.py:121(splitext)
+  312/302    0.001    0.000    0.001    0.000 {built-in method _abc._abc_subclasscheck}
+      324    0.001    0.000    0.001    0.000 {built-in method builtins.any}
+     1525    0.001    0.000    0.001    0.000 {built-in method builtins.getattr}
+      119    0.001    0.000    0.001    0.000 /usr/lib/python3.7/posixpath.py:144(basename)
+        1    0.000    0.000    0.001    0.001 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:213(__exit__)
+        1    0.001    0.001    0.001    0.001 {method 'close' of '_io.BufferedWriter' objects}
+     69/1    0.000    0.000    0.001    0.001 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1316(state_dict)
+     1637    0.001    0.000    0.001    0.000 {method 'values' of 'collections.OrderedDict' objects}
+      574    0.001    0.000    0.001    0.000 /usr/lib/python3.7/json/encoder.py:104(__init__)
+      122    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/_tensor.py:196(storage)
+       50    0.001    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/optim/adam.py:198(<listcomp>)
+       78    0.001    0.000    0.001    0.000 /usr/lib/python3.7/_weakrefset.py:81(add)
+       13    0.000    0.000    0.001    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:334(set)
+       26    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1405(_mark_worker_as_unavailable)
+      381    0.001    0.000    0.001    0.000 {built-in method _thread.allocate_lock}
+      422    0.001    0.000    0.001    0.000 {built-in method _struct.pack}
+      150    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/ipykernel/iostream.py:310(_is_master_process)
+      311    0.001    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/ipykernel/iostream.py:93(_event_pipe)
+    25/24    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/_utils/signal_handling.py:63(handler)
+     1663    0.001    0.000    0.001    0.000 {method 'add' of 'set' objects}
+       13    0.001    0.000    0.001    0.000 {built-in method torch._C._set_worker_pids}
+      119    0.000    0.000    0.001    0.000 /usr/lib/python3.7/posixpath.py:52(normcase)
+        1    0.000    0.000    0.001    0.001 /usr/local/lib/python3.7/dist-packages/torch/optim/adam.py:74(__init__)
+      314    0.000    0.000    0.001    0.000 <frozen importlib._bootstrap>:416(parent)
+        1    0.000    0.000    0.001    0.001 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:33(__init__)
+      180    0.001    0.000    0.001    0.000 {method 'is_complex' of 'torch._C._TensorBase' objects}
+      351    0.000    0.000    0.001    0.000 /usr/lib/python3.7/queue.py:208(_qsize)
+      197    0.001    0.000    0.001    0.000 /usr/lib/python3.7/threading.py:1225(current_thread)
+      119    0.000    0.000    0.001    0.000 /usr/lib/python3.7/logging/__init__.py:579(formatMessage)
+       39    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1112(<genexpr>)
+      227    0.000    0.000    0.001    0.000 /usr/lib/python3.7/queue.py:216(_get)
+        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap>:978(_find_and_load)
+       50    0.000    0.000    0.001    0.000 /content/src/lib/train_loggers.py:134(<listcomp>)
+      119    0.000    0.000    0.001    0.000 /usr/lib/python3.7/logging/__init__.py:573(usesTime)
+       69    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1279(_save_to_state_dict)
+       16    0.001    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/numpy/core/_methods.py:66(_count_reduce_items)
+        1    0.000    0.000    0.001    0.001 <frozen importlib._bootstrap>:948(_find_and_load_unlocked)
+       65    0.000    0.000    0.001    0.000 /usr/lib/python3.7/multiprocessing/queues.py:147(cancel_join_thread)
+       50    0.000    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py:82(clone)
+       78    0.001    0.000    0.001    0.000 /usr/lib/python3.7/multiprocessing/connection.py:117(__init__)
+      119    0.001    0.000    0.001    0.000 {built-in method time.strftime}
+       26    0.000    0.000    0.001    0.000 /usr/lib/python3.7/selectors.py:351(register)
+      799    0.001    0.000    0.001    0.000 {built-in method time.monotonic}
+     2562    0.001    0.000    0.001    0.000 /usr/local/lib/python3.7/dist-packages/torch/__init__.py:301(is_storage)
+      210    0.000    0.000    0.001    0.000 /usr/lib/python3.7/threading.py:252(_acquire_restore)
+      238    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:838(acquire)
+       25    0.000    0.000    0.000    0.000 {built-in method torch._C._error_if_any_worker_fails}
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:164(location_tag)
+      182    0.000    0.000    0.000    0.000 /usr/lib/python3.7/tempfile.py:281(rng)
+      302    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:525(is_pandas_data_frame_typename)
+      177    0.000    0.000    0.000    0.000 /usr/lib/python3.7/weakref.py:109(remove)
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/connection.py:173(close)
+       63    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1621(parameters)
+      221    0.000    0.000    0.000    0.000 /usr/lib/python3.7/weakref.py:336(__new__)
+       63    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1645(named_parameters)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:154(<lambda>)
+     3657    0.000    0.000    0.000    0.000 {built-in method builtins.id}
+       63    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1608(_named_members)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:620(size)
+      790    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/genericpath.py:121(_splitext)
+      224    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/utils.py:39(<listcomp>)
+      238    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:736(filter)
+     3100    0.000    0.000    0.000    0.000 {built-in method math.sqrt}
+      150    0.000    0.000    0.000    0.000 {built-in method utcnow}
+     2220    0.000    0.000    0.000    0.000 {built-in method torch._C._set_grad_enabled}
+     3036    0.000    0.000    0.000    0.000 {method 'items' of 'collections.OrderedDict' objects}
+      574    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/wandb_run.py:1388(<genexpr>)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:421(format)
+      707    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:507(is_set)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:234(register)
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/connection.py:360(_close)
+      210    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:249(_release_save)
+       54    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:780(maybe_compress_history)
+     1070    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:663(_load_unlocked)
+      238    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:845(release)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:448(__len__)
+       18    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:149(is_initialized)
+      244    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:366(__init__)
+      694    0.000    0.000    0.000    0.000 {method '__exit__' of '_thread.lock' objects}
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:513(set)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:296(notify_all)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:418(usesTime)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:117(getLevelName)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:722(exec_module)
+       13    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/_utils/signal_handling.py:47(_set_SIGCHLD_handler)
+      298    0.000    0.000    0.000    0.000 {method 'copy' of 'dict' objects}
+      266    0.000    0.000    0.000    0.000 {method 'release' of '_thread.RLock' objects}
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:225(ident)
+      391    0.000    0.000    0.000    0.000 {built-in method time.time}
+      357    0.000    0.000    0.000    0.000 {method 'rfind' of 'str' objects}
+     1044    0.000    0.000    0.000    0.000 {function _ParameterMeta.__instancecheck__ at 0x7f5d2190d290}
+      491    0.000    0.000    0.000    0.000 {built-in method __new__ of type object at 0xa99860}
+       54    0.000    0.000    0.000    0.000 {method '__format__' of 'float' objects}
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:1614(isEnabledFor)
+      221    0.000    0.000    0.000    0.000 /usr/lib/python3.7/weakref.py:341(__init__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:793(get_code)
+      122    0.000    0.000    0.000    0.000 {method '_storage' of 'torch._C._TensorBase' objects}
+      266    0.000    0.000    0.000    0.000 {method 'acquire' of '_thread.RLock' objects}
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:547(element_size)
+      302    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:533(is_plotly_typename)
+      244    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:299(__new__)
+      302    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:529(is_matplotlib_typename)
+      442    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/util.py:48(debug)
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:229(__enter__)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:270(notify)
+       52    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:1131(daemon)
+       13    0.000    0.000    0.000    0.000 {built-in method torch._C._cuda_getDevice}
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:122(_cuda_tag)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:117(_cpu_tag)
+        9    0.000    0.000    0.000    0.000 {built-in method torch._C._nn._parse_to}
+      362    0.000    0.000    0.000    0.000 {built-in method posix.fspath}
+      422    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/tracelog.py:203(log_message_send)
+       13    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:491(check_worker_number_rationality)
+   385/70    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1775(named_modules)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:360(getMessage)
+      321    0.000    0.000    0.000    0.000 {method 'rpartition' of 'str' objects}
+       14    0.000    0.000    0.000    0.000 {built-in method torch._C._cuda_isInBadFork}
+     1054    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/__future__.py:18(get_overwrite_module_params_on_conversion)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:209(__init__)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:728(_newname)
+        1    0.000    0.000    0.000    0.000 {method 'flush' of '_io.BufferedWriter' objects}
+      121    0.000    0.000    0.000    0.000 /usr/lib/python3.7/posixpath.py:41(_get_sep)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:882(_find_spec)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:1064(name)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/_utils.py:553(_element_size)
+       65    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:1116(daemon)
+     1113    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/_jit_internal.py:958(is_scripting)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:202(__exit__)
+      182    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:90(_make_methods)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:36(current_process)
+      177    0.000    0.000    0.000    0.000 {built-in method _weakref._remove_dead_weakref}
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:327(is_set)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:358(notify_all)
+       64    0.000    0.000    0.000    0.000 {method 'format' of 'str' objects}
+       18    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torchvision/datasets/lfw.py:90(__len__)
+      488    0.000    0.000    0.000    0.000 {method 'data_ptr' of 'torch._C.StorageBase' objects}
+      422    0.000    0.000    0.000    0.000 {built-in method builtins.ord}
+      318    0.000    0.000    0.000    0.000 {built-in method _thread.get_ident}
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:144(is_alive)
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:94(__enter__)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:270(add_param_group)
+      312    0.000    0.000    0.000    0.000 {method 'pop' of 'dict' objects}
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/_namedtensor_internals.py:10(check_serializing_named_tensor)
+       50    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:396(should_log)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:268(close)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1272(find_spec)
+      119    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:180(name)
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/_weakrefset.py:38(_remove)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1240(_get_spec)
+      366    0.000    0.000    0.000    0.000 {method 'nbytes' of 'torch._C.StorageBase' objects}
+      227    0.000    0.000    0.000    0.000 {method 'popleft' of 'collections.deque' objects}
+      104    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:90(_check_closed)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:29(size)
+      119    0.000    0.000    0.000    0.000 {built-in method sys._getframe}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1356(find_spec)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:914(get_data)
+       13    0.000    0.000    0.000    0.000 {built-in method torch._C._remove_worker_pids}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:523(_compile_bytecode)
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:232(__exit__)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:215(_fileobj_lookup)
+      119    0.000    0.000    0.000    0.000 {method 'find' of 'str' objects}
+      275    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
+      288    0.000    0.000    0.000    0.000 {method 'remove' of 'collections.deque' objects}
+        1    0.000    0.000    0.000    0.000 {built-in method marshal.loads}
+       28    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:212(_acquireLock)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/threading.py:977(_stop)
+       39    0.000    0.000    0.000    0.000 {method '__enter__' of '_multiprocessing.SemLock' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/signal.py:51(getsignal)
+       13    0.000    0.000    0.000    0.000 {built-in method posix.sched_getaffinity}
+       91    0.000    0.000    0.000    0.000 {method 'discard' of 'set' objects}
+       26    0.000    0.000    0.000    0.000 <string>:1(__new__)
+       50    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/autograd/__init__.py:77(_tensor_or_tensors_to_tuple)
+      122    0.000    0.000    0.000    0.000 {method 'has_names' of 'torch._C._TensorBase' objects}
+       54    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:495(is_tf_eager_tensor_typename)
+       52    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:85(<genexpr>)
+       50    0.000    0.000    0.000    0.000 {built-in method builtins.all}
+       26    0.000    0.000    0.000    0.000 {built-in method math.ceil}
+      150    0.000    0.000    0.000    0.000 {method 'toordinal' of 'datetime.date' objects}
+       54    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:505(is_pytorch_tensor_typename)
+        1    0.000    0.000    0.000    0.000 {method 'read' of '_io.FileIO' objects}
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:63(__init__)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:623(pickle_storage_type)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:275(_key_from_fd)
+       50    0.000    0.000    0.000    0.000 {method 'numel' of 'torch._C._TensorBase' objects}
+        6    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/sampler.py:110(num_samples)
+      182    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/context.py:196(get_start_method)
+      195    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/context.py:186(get_context)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/util.py:229(cancel)
+       78    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/context.py:232(get_context)
+       50    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:504(should_log)
+        6    0.000    0.000    0.000    0.000 {method 'manual_seed' of 'torch._C.Generator' objects}
+      122    0.000    0.000    0.000    0.000 {method 'data_ptr' of 'torch._C._TensorBase' objects}
+       54    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/util.py:489(is_tf_tensor_typename)
+        2    0.000    0.000    0.000    0.000 /usr/lib/python3.7/signal.py:25(_int_to_enum)
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/queue.py:205(_init)
+       52    0.000    0.000    0.000    0.000 {built-in method _imp.lock_held}
+       69    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py:1666(<lambda>)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:21(_fileobj_to_fd)
+        3    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:74(_path_stat)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/hooks.py:54(warn_if_has_hooks)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:211(_call_with_frames_removed)
+       26    0.000    0.000    0.000    0.000 {built-in method select.poll}
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/popen_fork.py:1(<module>)
+       56    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/connection.py:130(__del__)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/connection.py:923(<listcomp>)
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/signal.py:45(signal)
+       50    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:610(should_log)
+      130    0.000    0.000    0.000    0.000 {method 'setdefault' of 'dict' objects}
+       39    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:97(__exit__)
+       26    0.000    0.000    0.000    0.000 {built-in method posix.WIFSIGNALED}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:576(module_from_spec)
+       65    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/util.py:44(sub_debug)
+        2    0.000    0.000    0.000    0.000 /usr/lib/python3.7/enum.py:289(__call__)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:127(_check_cubins)
+       26    0.000    0.000    0.000    0.000 {method 'register' of 'select.poll' objects}
+      122    0.000    0.000    0.000    0.000 {method 'storage_offset' of 'torch._C._TensorBase' objects}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:93(_path_isfile)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:84(_path_is_mode_type)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:103(_hook_for_profile)
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/random.py:88(__init__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:504(_init_module_attrs)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:317(get_device_name)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1351(_get_spec)
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.__build_class__}
+        1    0.000    0.000    0.000    0.000 /content/src/lib/core.py:94(get_datetime_str)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/process.py:196(daemon)
+        3    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/_utils.py:7(_get_device_index)
+        2    0.000    0.000    0.000    0.000 /usr/lib/python3.7/posixpath.py:75(join)
+       26    0.000    0.000    0.000    0.000 {built-in method posix.WEXITSTATUS}
+        2    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:193(_is_path)
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/random.py:97(seed)
+       16    0.000    0.000    0.000    0.000 {built-in method numpy.core._multiarray_umath.normalize_axis_index}
+       39    0.000    0.000    0.000    0.000 {method 'clear' of 'collections.deque' objects}
+       13    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:392(multiprocessing_context)
+        2    0.000    0.000    0.000    0.000 /usr/lib/python3.7/signal.py:35(_enum_to_int)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:147(__enter__)
+       13    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:1133(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.sorted}
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:437(_untyped)
+        5    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:873(_find_spec_legacy)
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:271(cache_from_source)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/optim/optimizer.py:106(profile_hook_step)
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:403(cached)
+        6    0.000    0.000    0.000    0.000 /content/src/lib/data_augmentation.py:65(__len__)
+       26    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:446(_auto_collation)
+      122    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/storage.py:23(__init__)
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:56(_path_join)
+        5    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:454(device_count)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:157(_get_module_lock)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:369(_get_cached)
+        1    0.000    0.000    0.000    0.000 {function Random.seed at 0x7f5da5870290}
+       26    0.000    0.000    0.000    0.000 {method 'clear' of 'dict' objects}
+       13    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/utils/data/dataloader.py:450(_index_sampler)
+        2    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:461(get_arch_list)
+        1    0.000    0.000    0.000    0.000 {method 'strftime' of 'datetime.date' objects}
+        2    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:199(__init__)
+       39    0.000    0.000    0.000    0.000 {method 'release' of '_multiprocessing.SemLock' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/functools.py:37(update_wrapper)
+        1    0.000    0.000    0.000    0.000 {built-in method torch._C._log_api_usage_once}
+       13    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/synchronize.py:235(_make_methods)
+       26    0.000    0.000    0.000    0.000 {built-in method posix.WIFEXITED}
+        8    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:121(<genexpr>)
+       39    0.000    0.000    0.000    0.000 {method '__exit__' of '_multiprocessing.SemLock' objects}
+       13    0.000    0.000    0.000    0.000 {method '_is_mine' of '_multiprocessing.SemLock' objects}
+        8    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py:3317(_mean_dispatcher)
+        6    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:58(<listcomp>)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:574(spec_from_file_location)
+       13    0.000    0.000    0.000    0.000 {method 'locked' of '_thread.lock' objects}
+        8    0.000    0.000    0.000    0.000 {method 'values' of 'dict' objects}
+        3    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/_utils.py:503(_get_device_index)
+       12    0.000    0.000    0.000    0.000 /usr/lib/python3.7/_collections_abc.py:302(__subclasshook__)
+        2    0.000    0.000    0.000    0.000 /usr/lib/python3.7/enum.py:531(__new__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:438(_classify_pyc)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:151(__exit__)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:138(<listcomp>)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:951(path_stats)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:318(__exit__)
+        3    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:51(_r_long)
+        8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:855(__enter__)
+        6    0.000    0.000    0.000    0.000 {built-in method builtins.setattr}
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/import_hooks.py:21(new_func)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:314(_check_dill_version)
+        8    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py:3444(_std_dispatcher)
+       26    0.000    0.000    0.000    0.000 /usr/lib/python3.7/selectors.py:199(__enter__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:103(release)
+        1    0.000    0.000    0.000    0.000 {built-in method now}
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/multiprocessing/popen_fork.py:13(Popen)
+        2    0.000    0.000    0.000    0.000 /usr/lib/python3.7/logging/__init__.py:1600(getEffectiveLevel)
+        7    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:222(_verbose_message)
+        8    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:859(__exit__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:58(__init__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:78(acquire)
+        1    0.000    0.000    0.000    0.000 {built-in method _signal.signal}
+       10    0.000    0.000    0.000    0.000 {built-in method _imp.acquire_lock}
+       16    0.000    0.000    0.000    0.000 {method 'split' of 'str' objects}
+       14    0.000    0.000    0.000    0.000 {method 'rstrip' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:792(find_spec)
+        2    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:62(_path_split)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:471(_validate_timestamp_pyc)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:176(cb)
+        3    0.000    0.000    0.000    0.000 {method 'endswith' of 'str' objects}
+        2    0.000    0.000    0.000    0.000 {built-in method torch._C._cuda_getArchFlags}
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:60(get_calls)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/cuda/__init__.py:142(<listcomp>)
+        2    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/torch/serialization.py:202(__enter__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:369(__init__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:401(_check_name_wrapper)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:35(_new_module)
+        1    0.000    0.000    0.000    0.000 {method 'getvalue' of '_io.BytesIO' objects}
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.callable}
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.delattr}
+        1    0.000    0.000    0.000    0.000 {built-in method _signal.getsignal}
+       10    0.000    0.000    0.000    0.000 {built-in method _imp.release_lock}
+        1    0.000    0.000    0.000    0.000 {built-in method _imp.is_frozen}
+        1    0.000    0.000    0.000    0.000 {built-in method _imp._fix_co_filename}
+        1    0.000    0.000    0.000    0.000 {method 'update' of 'dict' objects}
+        4    0.000    0.000    0.000    0.000 /content/src/lib/loss_functions.py:151(__init__)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/wandb/sdk/lib/import_hooks.py:205(find_module)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/google/colab/_import_hooks/_pydrive.py:27(find_module)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/google/colab/_import_hooks/_cv2.py:66(find_module)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/google/colab/_import_hooks/_altair.py:25(find_module)
+        1    0.000    0.000    0.000    0.000 /usr/local/lib/python3.7/dist-packages/google/colab/_import_hooks/_bokeh.py:34(find_module)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        1    0.000    0.000    0.000    0.000 /usr/lib/python3.7/functools.py:67(wraps)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:884(__init__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:1203(_path_importer_cache)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:307(__init__)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:311(__enter__)
+        4    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:321(<genexpr>)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:143(__init__)
+        1    0.000    0.000    0.000    0.000 {built-in method _stat.S_ISDIR}
+        1    0.000    0.000    0.000    0.000 {method 'isdisjoint' of 'set' objects}
+        3    0.000    0.000    0.000    0.000 {built-in method from_bytes}
+        1    0.000    0.000    0.000    0.000 {built-in method torch._C._cuda_getCompiledVersion}
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:719(create_module)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:909(get_filename)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:424(has_location)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap>:719(find_spec)
+        1    0.000    0.000    0.000    0.000 <frozen importlib._bootstrap_external>:40(_relax_case)
