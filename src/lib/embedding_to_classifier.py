@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 
-import src.lib.core
+import src.lib.core as core
 
 # TODO -- trasnlate documentation to english
 class EmbeddingToClassifier:
