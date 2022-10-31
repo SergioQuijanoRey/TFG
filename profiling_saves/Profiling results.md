@@ -29,3 +29,26 @@
 - Using `snakeviz`, most of the time is spent in `train_loggers`. In the loggers:
     - Most of the time is spent in `compute_intercluster_metrics`. Inside that function, most of the time is spent in `metrics.py:__compute_pairwise_distances`
 - Loss function is used a lot, in different places. So optimizing this set of functions might be worth (even though there is a lot of pure pytorch tensor code)
+
+# Experiment
+
+- We run the training with `P = 100, K = 2` with lazy and non-lazy data augmentation, and compare training times
+- Note that we don't profile the training, we're only interested in training times
+- Non-lazy: 917.8408761024475 seconds
+- Lazy: 952.0073399543762 seconds
+- **Conclusion**: there is not a big difference (15.29 mins vs 15.86 mins)
+
+# Other conclusions
+
+- When using non-lazy data loading, GPU usage a little bit higher
+
+# Pros and cons
+
+| Method   | Pro or Con | Description                                                                                                                                                       |
+| :---     | :---       | :---                                                                                                                                                              |
+| Lazy     | Pro        | P-K values can be as big as we want, laziness makes low use of RAM                                                                                                |
+| Lazy     | Pro        | Every time we access to an augmented item, its created at runtime. So in different epochs we have different images. Thus, more augmentation than with lazy method |
+| Lazy     | Pro        | Is not much slower than the non-lazy, thus might seem like the preferred option given the advantages it has                                                       |
+| Non-lazy | Con        | P-K values are limited, because big values can cause that we ran out of RAM                                                                                       |
+| Non-lazy | Con        | In principle, it should be faster, but its not significantly faster                                                                                               |
+| Non-lazy | Pro        | Data augmentation caching can be extended to cache all P-K values, and not just the last P-K value                                                                |
