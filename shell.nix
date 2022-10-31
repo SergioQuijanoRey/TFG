@@ -19,6 +19,7 @@ mkShell {
         python310Packages.wandb
         python310Packages.scikit-learn
         python310Packages.tqdm
+        python310Packages.snakeviz
     ];
 
     shellHook = ''
