@@ -291,6 +291,7 @@ def compute_intracluster_distances(
 
     return class_distances
 
+# TODO -- PERF -- this takes too much time to compute
 def compute_intercluster_metrics(
         data_loader: torch.utils.data.DataLoader,
         net: torch.nn.Module,
@@ -320,6 +321,7 @@ def compute_intercluster_metrics(
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)
 
+    # TODO -- PERF -- this is where most of the time is spent
     # Precompute pairwise distances for efficiency
     distances = __compute_pairwise_distances(embeddings)
 

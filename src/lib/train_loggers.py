@@ -507,6 +507,8 @@ class IntraClusterLogger(TrainLogger):
 
         return False
 
+# TODO -- PERF -- this logger takes too much time, as we've seen in profile file:
+# profiling_saves/second_profile_filtered.txt
 class InterClusterLogger(TrainLogger):
     """
     Logger that logs information about inter cluster information

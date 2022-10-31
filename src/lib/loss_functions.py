@@ -19,6 +19,7 @@ file_logger = logging.getLogger("MAIN_LOGGER")
 # Bases for more complex loss functions
 # ==================================================================================================
 
+# TODO -- PERF -- most of the time is spent here. See if there is a way of speeding up this computation
 def distance_function(first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
     """
     Basic distance function. It's the base for all losses implemented in this module
