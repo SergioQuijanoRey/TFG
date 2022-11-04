@@ -322,6 +322,9 @@ def compute_intercluster_metrics(
     dict_of_classes = utils.precompute_dict_of_classes(targets)
 
     # TODO -- PERF -- this is where most of the time is spent
+    # As this relies in BatchBaseTripletLoss.precompute_pairwise_distances, we can optimize and
+    # benchmark that function, and thus this function will run faster
+    #
     # Precompute pairwise distances for efficiency
     distances = __compute_pairwise_distances(embeddings)
 
@@ -376,7 +379,6 @@ def compute_intercluster_distances(
 
     return intercluster_distance
 
-# TODO -- PERF -- this function is slow
 def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, int], float]:
     """
     Computes the pairwise distance of elements in the embeddings set. Only for elements indexed a, b
