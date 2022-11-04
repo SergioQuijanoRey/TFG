@@ -19,6 +19,13 @@ download REMOTE:
 # Runs all the benchmarks, using shell.nix
 benchmarks:
     #!/usr/bin/env zsh
+
+    # We need to add some paths to PYTHONPATH
+    # Otherwise, imports will not work properly
+    export PYTHONPATH=$PYTHONPATH:./
+    export PYTHONPATH=$PYTHONPATH:./src
+
+    # Iterate over all files and run the benchmarks
     for file in src/benchmarks/*.py
     do
         nix-shell --run "zsh -c 'python $file'"
