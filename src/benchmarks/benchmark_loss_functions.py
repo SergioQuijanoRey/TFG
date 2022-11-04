@@ -20,7 +20,7 @@ def benchmark_precompute_pairwise_distances():
     print("⌛ precompute_pairwise_distances")
 
     # Generate a fake dataset
-    num_vectors = 10_000
+    num_vectors = 1_000
     size_of_vectors = 5
     embeddings = torch.rand(num_vectors, size_of_vectors)
 
