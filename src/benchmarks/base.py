@@ -3,8 +3,8 @@ Functions that we're going to use in the benchmarks
 There is no standard way of doing benchmarks, so here we define the boilerplate code
 """
 
-import timeit
 from typing import Callable, List, Union
+import time
 
 import numpy as np
 
@@ -21,37 +21,49 @@ class BenchmarkResults:
 
     def __str__(self):
         indentation = "    "
-        msg =f"BenchmarkResults(\n{indentation}raw_resuls = {self.raw_results},\n{indentation}mean = {self.mean},\n{indentation}sd = {self.sd}\n)"
+        msg = f"BenchmarkResults(\n{indentation}raw_resuls = {self.raw_results},\n{indentation}mean = {self.mean},\n{indentation}sd = {self.sd}\n)"
 
         return msg
 
-
-def benchmark_function(
-        function: Union[Callable, str],
-        repeat: int = 5,
-        number: int = 10_000,
-        setup: Union[Callable, str] = "pass"
-) -> BenchmarkResults:
+class BenchmarkRunner:
     """
-    Given a function and some repetition parameters, runs a benchmark over that function
+    Runs a benchmark over a given function
 
-    @param function lambda function that we are going to benchmark or a string containing the code
-           to execute
-    @param repeat the number of experiments that we are going to launch
-    @param number the number of times the function is called in each experiment
-    @param setup lambda function or string containing setup code (ie. var instantiation)
-
-    @returns a BenchmarkResults object containing the raw results and some stats
+    We tried to use `timeit` functionality, but it was unusable
     """
 
-    # Create a timer that we are going to use to benchmark the function
-    timer = timeit.Timer(function, setup = setup)
+    def __init__(
+        self,
+        function: Callable,
+        number_runs_per_experiment: int = 10_000,
+        number_experiments: int = 5
+    ):
+        """
+        @param function: a lambda function that is going to be benchmarked
+        @param number_runs_per_experiment: the number of times that the function is called per
+               each experiment. The time is accumulated for each experiment
+        @param number_experiments: number of experiments that we are going to run
+        """
+        self.function = function
+        self.number_runs_per_experiment = number_runs_per_experiment
+        self.number_experiments = number_experiments
 
-    # Run the executions
-    results = timer.repeat(repeat = repeat, number = number)
+    def run(self) -> BenchmarkResults:
+        experiment_results: List[float] = []
 
-    # Compute some stats over the results
-    mean: float = np.mean(results)
-    sd: float = np.std(results)
+        for _ in range(self.number_experiments):
+            start = time.time()
 
-    return BenchmarkResults(results, mean, sd)
+            for _ in range(self.number_runs_per_experiment):
+                self.function()
+
+            end = time.time()
+
+            experiment_results.append(end - start)
+
+
+        # Now compute some metrics and build the BenchmarkResults object
+        mean = np.mean(experiment_results)
+        sd = np.std(experiment_results)
+
+        return BenchmarkResults(experiment_results, mean, sd)
