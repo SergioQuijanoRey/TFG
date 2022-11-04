@@ -337,7 +337,6 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         )
 
         # Network that we're using in LFW dataset notebook
-        net = models.LFWResNet18(5)
         net = torch.nn.Identity()
 
         # Get the metrics for a 1/5 of the training dataset
