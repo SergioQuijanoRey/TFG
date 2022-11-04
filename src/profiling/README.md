@@ -52,3 +52,18 @@
 | Non-lazy | Con        | P-K values are limited, because big values can cause that we ran out of RAM                                                                                       |
 | Non-lazy | Con        | In principle, it should be faster, but its not significantly faster                                                                                               |
 | Non-lazy | Pro        | Data augmentation caching can be extended to cache all P-K values, and not just the last P-K value                                                                |
+
+# Perf changes log
+
+> We are going to make some changes to the code in order to have better run times. So first we will write benchmarks for the functions that we are going to change. Then we make some changes and keep track of new benchmarks results and also the total run time for training loop
+
+- Benchmark entries in the following table are (mean, sd)
+- Training loop is done with following parameters:
+    - Lazy data augmentation
+    - P, K = 100, 2
+    - Embedding dimension = 5
+    - Training epochs = 1
+
+| compute_intercluster_metrics | precompute_pairwise_distances | Training loop | Change Description                                        |
+| :---                         | :---                          | :---          | :---                                                      |
+| 27.3141, 9.1206              | 39.1880, 0.3676               | 0             | No changes made. The project is as we started the process |
