@@ -15,3 +15,11 @@ upload_lib REMOTE:
 # Downloads the notebook from Google Colab
 download REMOTE:
 	rclone copy --progress "{{REMOTE}}:Colab Notebooks/{{current_notebook}}" src/ && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
+
+# Runs all the benchmarks, using shell.nix
+benchmarks:
+    #!/usr/bin/env zsh
+    for file in src/benchmarks/*.py
+    do
+        nix-shell --run "zsh -c 'python $file'"
+    done
