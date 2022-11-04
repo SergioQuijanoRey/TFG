@@ -376,6 +376,7 @@ def compute_intercluster_distances(
 
     return intercluster_distance
 
+# TODO -- PERF -- this function is slow
 def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, int], float]:
     """
     Computes the pairwise distance of elements in the embeddings set. Only for elements indexed a, b
