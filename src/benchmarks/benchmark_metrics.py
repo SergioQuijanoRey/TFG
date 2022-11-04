@@ -36,28 +36,13 @@ def __generate_dataloader() -> torch.utils.data.DataLoader:
         transform = transform,
     )
 
-    # Apply data augmentation for having at least 4 images per class
-    augmented_dataset = data_augmentation.LazyAugmentatedDataset(
-        base_dataset = dataset,
-        min_number_of_images = 4,
-
-        # Remember that the trasformation has to be random type
-        # Otherwise, we could end with a lot of repeated images
-        transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=(250, 250)),
-            transforms.RandomRotation(degrees=(0, 180)),
-            transforms.RandomAutocontrast(),
-        ])
-
-    )
-
     # Now put a loader in front of the augmented dataset
     dataloader = torch.utils.data.DataLoader(
-        augmented_dataset,
+        dataset,
         batch_size = 3 * 4,
         num_workers = 1,
         pin_memory = True,
-        sampler = sampler.CustomSampler(3, 4, augmented_dataset)
+        sampler = sampler.CustomSampler(2, 4, dataset)
     )
 
     return dataloader
