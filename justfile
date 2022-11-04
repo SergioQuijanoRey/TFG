@@ -18,6 +18,12 @@ upload_lib REMOTE:
 upload_benchmarks REMOTE:
     rclone sync --progress src/benchmarks/ "{{REMOTE}}:Colab Notebooks/benchmarks/" && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
 
+# Uploads both lib and benchmarks code
+upload_lib_benchmarks REMOTE:
+    just upload_lib "{{REMOTE}}"
+    just upload_benchmarks "{{REMOTE}}"
+
+
 
 # Downloads the notebook from Google Colab
 download REMOTE:
