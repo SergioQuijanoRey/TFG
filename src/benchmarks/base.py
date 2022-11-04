@@ -35,8 +35,8 @@ class BenchmarkRunner:
     def __init__(
         self,
         function: Callable,
-        number_runs_per_experiment: int = 10_000,
-        number_experiments: int = 5
+        number_experiments: int = 5,
+        number_runs_per_experiment: int = 10_000
     ):
         """
         @param function: a lambda function that is going to be benchmarked
