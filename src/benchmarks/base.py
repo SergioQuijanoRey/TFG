@@ -51,10 +51,13 @@ class BenchmarkRunner:
     def run(self) -> BenchmarkResults:
         experiment_results: List[float] = []
 
-        for _ in range(self.number_experiments):
+        for i in range(self.number_experiments):
+            print(f"\tRunning experiment {i}")
+
             start = time.time()
 
-            for _ in range(self.number_runs_per_experiment):
+            for j in range(self.number_runs_per_experiment):
+                print(f"\t\tRunning repetition {j}")
                 self.function()
 
             end = time.time()
