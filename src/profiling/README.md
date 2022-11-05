@@ -66,4 +66,4 @@
 
 | compute_intercluster_metrics | precompute_pairwise_distances | Training loop | Change Description                                        |
 | :---                         | :---                          | :---          | :---                                                      |
-| 27.3141, 9.1206              | 39.1880, 0.3676               | 0             | No changes made. The project is as we started the process |
+| 27.3141, 9.1206              | 39.1880, 0.3676               | 2341.9525             | No changes made. The project is as we started the process |
