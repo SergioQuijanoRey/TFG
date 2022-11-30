@@ -30,3 +30,10 @@
 1. [Página web del TFG en el grado de informática](https://grados.ugr.es/informatica/pages/infoacademica/tfggestion2)
 2. [PDF con las directrices del TFG](https://grados.ugr.es/informatica/pages/infoacademica/tfg/directrices/directricestfg/!)
 3. [Plantilla Latex para realizar la memoria](https://grados.ugr.es/informatica/pages/infoacademica/tfg/plantillas/plantilla_tfg_latex/!)
+
+# Otros
+
+- Por lo que he estado investigando, creo que la plantilla de la parte de matemáticas es mejor:
+    1. Incluye comandos para definir teoremas, proposiciones, definiciones...
+    2. Está mucho mejor estructurada
+- En el fichero `justfile` se describe todo el proceso de compilación y limpieza del proyecto. Para usar este archivo es necesario tener instalado [just](https://github.com/casey/just)
