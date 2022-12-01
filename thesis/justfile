@@ -14,7 +14,9 @@ default:
 
 # Compiles the latex document
 compile:
-    # We run pdflatex twice because the index needs this
+    # We run pdflatex this way so references work well
+    pdflatex "{{texfile}}"
+    bibtex "{{trim_end_match(texfile, '.tex')}}"
     pdflatex "{{texfile}}"
     pdflatex "{{texfile}}"
 
@@ -36,6 +38,8 @@ clean:
     {{trash}} *.lof || echo "All .lof files already removed"
     {{trash}} *.lol || echo "All .lol files already removed"
     {{trash}} *.lot || echo "All .lot files already removed"
+    {{trash}} *.bbl || echo "All .bbl files already removed"
+    {{trash}} *.blg || echo "All .blg files already removed"
 
 # Opens the generated PDF file
 view:
