@@ -5,19 +5,24 @@ texfile := "./libro.tex"
 # For example, "rm"
 trash := "trash"
 
+# PDF program
+pdf_program := "evince"
+
 # Shows all recepies available in this justfile
 default:
 	just --list
 
 # Compiles the latex document
 compile:
-	pdflatex "{{texfile}}"
+    # We run pdflatex twice because the index needs this
+    pdflatex "{{texfile}}"
+    pdflatex "{{texfile}}"
 
 # Compiles the project from zero
 clean_compile:
     # Remove all artifacts, including final PDF
     just clean
-    {{trash}} {{trim_end_match(texfile, ".tex")}}.pdf
+    {{trash}} {{trim_end_match(texfile, ".tex")}}.pdf || echo "PDF file already removed"
 
     # Now compile
     just compile
@@ -28,3 +33,10 @@ clean:
     {{trash}} *.aux || echo "All .aux files already removed"
     {{trash}} *.toc || echo "All .toc files already removed"
     {{trash}} *.out || echo "All .out files already removed"
+    {{trash}} *.lof || echo "All .lof files already removed"
+    {{trash}} *.lol || echo "All .lol files already removed"
+    {{trash}} *.lot || echo "All .lot files already removed"
+
+# Opens the generated PDF file
+view:
+    {{pdf_program}} {{trim_end_match(texfile, ".tex")}}.pdf &
