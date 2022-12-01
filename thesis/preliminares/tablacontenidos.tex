@@ -12,7 +12,10 @@
 
 % \manualmark
 % \markboth{\textsc{\contentsname}}{\textsc{\contentsname}}
-\tableofcontents 
+\tableofcontents
+
+% Sergio: modifico este archivo para que se incluyan en el indice las figuras, tablas y codigos
+
 
 %*******************************************************
 % List of Figures and of the Tables
@@ -20,22 +23,22 @@
 
     % *******************************************************
     %  List of Figures
-    % *******************************************************    
-    \phantomsection 
-    % \listoffigures
+    % *******************************************************
+    % \phantomsection
+    \listoffigures
 
     %*******************************************************
     % List of Tables
     %*******************************************************
-    \phantomsection 
-    % \listoftables
-    
+    % \phantomsection
+    \listoftables
+
     %*******************************************************
     % List of Listings
     % The package \usepackage{listings} is needed
-    %*******************************************************      
-	  % \phantomsection 
-    % \renewcommand{\lstlistlistingname}{Listados de código}
-    % \lstlistoflistings 
+    %*******************************************************
+      % \phantomsection
+    \renewcommand{\lstlistlistingname}{Listados de código}
+    \lstlistoflistings
 
 \cleardoublepage

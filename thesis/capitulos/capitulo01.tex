@@ -25,9 +25,9 @@ Este documento es una plantilla para la elaboración de un trabajo fin de Grado 
   \item Se recomienda que la extensión de la memoria sea entre 30 y 60 páginas, sin incluir posibles apéndices.
 \end{itemize}
 
-Para generar el pdf a partir de la plantilla basta compilar el fichero \texttt{libro.tex}. Es conveniente leer los comentarios contenidos en dicho fichero pues ayudarán a entender mejor como funciona la plantilla. 
+Para generar el pdf a partir de la plantilla basta compilar el fichero \texttt{libro.tex}. Es conveniente leer los comentarios contenidos en dicho fichero pues ayudarán a entender mejor como funciona la plantilla.
 
-La estructura de la plantilla es la siguiente\footnote{Los nombres de las carpetas no se han acentuado para evitar problemas en sistemas con Windows}: 
+La estructura de la plantilla es la siguiente\footnote{Los nombres de las carpetas no se han acentuado para evitar problemas en sistemas con Windows}:
 \begin{itemize}
   \item Carpeta \textbf{preliminares}: contiene los siguientes archivos
     \begin{description}
@@ -43,13 +43,13 @@ La estructura de la plantilla es la siguiente\footnote{Los nombres de las carpet
 
   \item Carpeta \textbf{apendices}: Para los apéndices (opcional)
   \item Carpeta \textbf{img}: Para incluir los ficheros de imagen que se usarán en el documento.
-  \item Carpeta \textbf{paquetes}: Incluye dos ficheros 
+  \item Carpeta \textbf{paquetes}: Incluye dos ficheros
     \begin{description}
-      \item[\texttt{hyperref.tex}] para la configuración de hipervínculos al generar el pdf (no es necesario editarlo) 
+      \item[\texttt{hyperref.tex}] para la configuración de hipervínculos al generar el pdf (no es necesario editarlo)
       \item[\texttt{comandos-entornos.tex}] donde se pueden añadir los comandos y entornos personalizados que precisemos para la elaboración del documento. Contiene algunos ejemplos
     \end{description}
-    
-  \item Fichero \texttt{library.bib}: Para incluir las referencias bibliográficas en formato \texttt{bibtex}. Son útiles las herramientas \href{https://www.doi2bib.org/}{doi2bib} y \href{https://www.ottobib.com/}{OttoBib} para generar de forma automática el código bibtex de una referencia a partir de su \textsc{doi} o su \textsc{isbn}. Para que una referencia aparezca en el pdf no basta con incluirla en el fichero \texttt{library.bib}, es necesario además \emph{citarla} en el documento usando el comando \verb+\cite+. Si queremos mostrar todos las referencias incluidas en el fichero \texttt{library.bib} podemos usar \verb+\cite{*}+ aunque esta opción no es la más adecuada. Se aconseja que los elementos de la bibliografía estén citados al menos una vez en el documento (y de esa forma aparecerán de forma automática en la lista de referencias).
+
+  \item Fichero \texttt{references.bib}: Para incluir las referencias bibliográficas en formato \texttt{bibtex}. Son útiles las herramientas \href{https://www.doi2bib.org/}{doi2bib} y \href{https://www.ottobib.com/}{OttoBib} para generar de forma automática el código bibtex de una referencia a partir de su \textsc{doi} o su \textsc{isbn}. Para que una referencia aparezca en el pdf no basta con incluirla en el fichero \texttt{library.bib}, es necesario además \emph{citarla} en el documento usando el comando \verb+\cite+. Si queremos mostrar todos las referencias incluidas en el fichero \texttt{library.bib} podemos usar \verb+\cite{*}+ aunque esta opción no es la más adecuada. Se aconseja que los elementos de la bibliografía estén citados al menos una vez en el documento (y de esa forma aparecerán de forma automática en la lista de referencias).
 
   \item Fichero \texttt{glosario.tex}: Para incluir un glosario en el trabajo (opcional). Si no queremos incluir un glosario deberemos borrar el comando \verb+\input{glosario.tex}+ del fichero \texttt{libro.tex} y posteriormente borrar el fichero \texttt{glosario.tex}
 
@@ -85,7 +85,7 @@ Listas descriptivas
   \item[termino1] descripción 1
   \item[termino2] descripción 2
 \end{description}
-  
+
 \subsection{Tablas y figuras}
 
 En la \autoref{tb:ejemplo-tabla} o la \autoref{fig:logo-ugr} podemos ver\ldots
@@ -95,8 +95,8 @@ En la \autoref{tb:ejemplo-tabla} o la \autoref{fig:logo-ugr} podemos ver\ldots
   \begin{tabular}{ccc} \toprule
     \multicolumn{2}{c}{Agrupados} \\ \cmidrule(r){1-2}
     cabecera & cabecera & cabecera          \\ \midrule
-    elemento & elemento & elemento          \\ 
-    elemento & elemento & elemento          \\ 
+    elemento & elemento & elemento          \\
+    elemento & elemento & elemento          \\
     elemento & elemento & elemento          \\ \bottomrule
   \end{tabular}
   \caption{Ejemplo de tabla}
@@ -136,7 +136,7 @@ Ejemplo de definición
 Ejemplo de observación
 \end{observacion}
 
-Y esto es una referencia al \autoref{thm:teorema}. 
+Y esto es una referencia al \autoref{thm:teorema}.
 
 Identidad Pitagórica~\eqref{eq:identidad-pitagorica}\index{Identidad pitagórica}
 \begin{equation}\label{eq:identidad-pitagorica}
@@ -151,7 +151,7 @@ La fórmula de Gauss-Bonnet\index{Gauss-Bonnet!fórmula} para una superficie com
 
 \section{Bibliografía e índice}
 
-Esto es un ejemplo de texto en un capítulo. Incluye varias citas tanto a libros~\cite{Euler1982, Euler1984, Euler1985} como a recursos online~\cite{EulerWiki} (páginas web). Ver el fichero \texttt{library.bib}. 
+Esto es un ejemplo de texto en un capítulo. Incluye varias citas tanto a libros~\cite{Euler1982, Euler1984, Euler1985} como a recursos online~\cite{EulerWiki} (páginas web). Ver el fichero \texttt{references.bib}.
 
 Además incluye varias entradas al índice alfabético mediante el comando \verb+\index+ \index{Leonard!Euler|textbf}
 
