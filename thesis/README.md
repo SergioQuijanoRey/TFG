@@ -37,3 +37,4 @@
     1. Incluye comandos para definir teoremas, proposiciones, definiciones...
     2. Está mucho mejor estructurada
 - En el fichero `justfile` se describe todo el proceso de compilación y limpieza del proyecto. Para usar este archivo es necesario tener instalado [just](https://github.com/casey/just)
+- En la propia plantilla recomiendan [doi2bib](https://www.doi2bib.org/) para referenciar papers
