@@ -8,7 +8,36 @@ Seguiremos en parte la notación del trabajo principal \cite{matematicas:princip
 
 A los vectores con tipografía en negrita, tal que $\mathbf{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $v_i$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$.
 
-Para denotar a los tensores (que introduciremos más adelante), usaremos la tipografía caligráfica. Por ejemplo $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$
+Para denotar a los tensores (que introduciremos más adelante), usaremos la tipografía caligráfica. Por ejemplo $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor (más adelante, en \customref{sec:deftensor}, veremos que significa esto) serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
+
+Al espacio de matrices de dimensiones $p, q$ lo denotaremos, como es usual, como $\matrices{p}{q}$.
+
+\subsection{Definición del producto tensorial} \label{sec:deftensor}
+
+\subsection{Otra forma de ver los tensores}
+
+% TODO -- especificar que es lo que hemos visto anteriormente
+Por lo visto anteriormente, tenemos una forma más concreta de entender los tensores.
+
+Podemos ver un tensor $\mathcal{A} \in \R^{M_1, \ldots, M_N}$ como un \textit{array} multidimensional. La siguiente notación será muy útil a lo largo de este trabajo:
+
+\begin{itemize}
+    \item Modos: cada una de las entradas $d_1, \ldots, d_N$ que podemos usar para indexar los elementos del tensor
+    \item Orden: el número de modos del tensor. En el caso de nuestro tensor $\mathcal{A}$, tenemos $N$ modos, y por tanto ese es su orden
+    \item Dimensión: el número de valores que puede tomar cada uno de los modos. Por lo tanto, si en el primer modo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que el modo $i$-ésimo tiene dimensión $M$.
+        \begin{itemize}
+            \item Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos
+            \item Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero en ocasiones se abusa del lenguaje
+        \end{itemize}
+\end{itemize}
+
+Ahora, respecto al \textbf{producto tensorial}, por los isomorfismos que hemos introducido previamente (TODO -- hay que desarrollar estos isomorfismos), podemos ver el producto tensorial entre dos tensores reales de una forma más sencilla.
+
+Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P, Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
+
+$$(A \otimes B)d_1, \ldots d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}$$
+
+Por tanto, es claro que en el caso de que tengamos dos tensores de orden 1, $u \in \R^{M_1}, v \in \R^{M_2}$, su producto tensorial se corresponde con la operación $u v^T \in \matrices{M_1}{M_2}$ donde $v^T$ indica la traspuesta de $u$.
 
 \newpage
 \section{Teoría de la medida}
