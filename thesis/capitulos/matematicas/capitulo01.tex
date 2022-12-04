@@ -6,17 +6,24 @@
 El objetivo de este trabajo, desde la perspectiva de las matemáticas, es analizar las redes neuronales profundas, basadas en convoluciones, y explicar por qué estas funcionan mejor que las redes neuronales no profundas, conocidas en la literatura como redes neuronales \textit{``shallow"}.
 
 % TODO -- aqui habria que introducir algunas referencias de trabajos que esten
-% analizando las redes neuronales pero que no tengan en cuenta estas particularidades
-Este mejor comportamiento es muy conocido en la práctica, pero pocos son los trabajos que han analizado formalmente esta diferencia entre ambos tipos de redes. Además, en la mayoría de trabajos de este tipo, no se han tenido en cuenta propiedades fundamentales de las redes profundas ni de las redes convolucionales. Sin embargo, el estudio que hacemos en este trabajo tiene en cuenta principalmente:
+% analizando las redes neuronales pero que no tengan en cuenta estas
+% particularidades. Por ejemplo, en la introduccion del paper de referencia
+% comentan muchos trabajos que estudian el depth efficiency pero para redes
+% muy concretas que no tienen nada que ver con las usadas en la practica
+Este mejor comportamiento es muy conocido en la práctica, pero pocos son los trabajos que han analizado formalmente esta diferencia entre ambos tipos de redes. Además, en la mayoría de trabajos de este tipo, no se han tenido en cuenta propiedades fundamentales de las redes profundas ni de las redes convolucionales. Además, suelen ser trabajos en los que se muestran ejemplos concretos de funciones implementables (de forma eficiente) con redes profundas pero no con redes no profundas, sin dar ningún tipo de información sobre cómo de frecuente ocurre esto. Sin embargo, el estudio que hacemos en este trabajo tiene en cuenta principalmente:
 
 \begin{itemize}
     \item La diferencia jerárquica entre ambos tipos de redes
     \item Propiedades fundamentales de las redes convolucionales. Esto es:
+        % TODO -- quizas habria que desarrollar que significan estas
+        % propiedades. En la introduccion del paper de referencia se explica
+        % mas o menos esto
         \begin{itemize}
             \item Compartición de los coeficientes en las convoluciones
             \item Localidad de la operación de convolución
             \item Uso de la operación de \textit{pooling}
         \end{itemize}
+    \item Un estudio de lo frecuente que es tener funciones que sean implementables (de forma eficiente) por redes profundas, pero no por redes no profundas
 \end{itemize}
 
 El desarrollo que hacemos en el presente trabajo puede resumirse en los siguientes objetivos:
@@ -28,10 +35,20 @@ El desarrollo que hacemos en el presente trabajo puede resumirse en los siguient
             \item Descomposición \textit{CP}, que equivale al uso de redes no profundas
             \item Descomposición \textit{HT}, que equivale al uso de redes profundas
         \end{enumerate}
-    \item Demostrar dos resultados centrales que nos muestran la superioridad de las redes profundas, en lo que se conoce como \textit{depth efficiency}, a través de las ya mencionadas descomposiciones tensoriales.
+
+    % TODO -- aqui quizas tendria que hablar mas sobre lo que dicen en concreto
+    % los dos resultados, aunque sea en un lenguaje sencillo y de forma resumida
+    \item Demostrar dos resultados centrales que nos muestran la superioridad de las redes profundas, en lo que se conoce como \textit{depth efficiency}, a través de las ya mencionadas descomposiciones tensoriales
 \end{enumerate}
 
-Nos basaremos principalmente en el trabajo \cite{matematicas:principal}
+Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas de las herramientas que usaremos serán:
+
+\begin{itemize}
+    \item Teoría básica sobre tensores
+    \item Teoría de la medida
+    \item Álgebra de matrices
+\end{itemize}
 
 
-\endinput
+\endinput(i.e. of functions that are efﬁciently realizable with a certain depth but
+cannot be efﬁciently realized with shallower depths),
