@@ -16,9 +16,10 @@ Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotarem
 
 Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
 
+% TODO -- tengo que referenciar o bien los videos que he seguido o un texto que haga un desarollo similar
 \subsection{Definición del producto tensorial} \label{sec:deftensor}
 
-Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$.
+Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa. Especificaremos esto en \customref{sec:cociente_prod_formal}
 
 Para la construcción del producto tensorial de espacios vectoriales, necesitaremos primero introducir conceptos previos que serán fundamentales en la construcción del objeto matemático que buscamos.
 
@@ -64,9 +65,106 @@ Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
     \}
 \end{equation}
 
+Un elemento de dicho espacio puede ser
 
+$$
+2 \left[ \begin{pmatrix}1 \\ 2\end{pmatrix} \ast \begin{pmatrix}3 \\ 2 \\ 1 \end{pmatrix} \right]
+- 3 \left[ \begin{pmatrix}1 \\ 0\end{pmatrix} \ast \begin{pmatrix}1 \\ 2 \\ 3 \end{pmatrix} \right]
+$$
 
-\subsubsection{Espacio cociente del producto formal}
+Notar que no sabemos cómo meter los escalares $2, -3$ en los elementos del producto formal.
+
+Por cómo hemos definido el producto formal de dos espacios vectoriales, tenemos que $dim(\R^2 \ast \R^3) = \infty$
+
+\subsubsection{Producto tensorial a partir del producto formal} \label{sec:cociente_prod_formal}
+
+Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que ciertas propiedades deseables no se cumplen, en general, en el producto formal:
+
+\begin{enumerate}
+    \item $c [v \ast w] = (cv) \ast w$
+    \item $c[v \ast w] = v \ast (cw)$
+    \item $(v_1 + v_2) \ast w = v_1 \ast w + v_2 \ast w$
+    \item $v \ast (w_1 + w_2) = v \ast w_1 + v \ast w_2$
+
+    Donde estamos tomando $v, v_1, v_2 \in \mathbb{V}, w, w_1, w_2 \in \mathbb{W}$
+\end{enumerate}
+
+Estas igualdades representan las propiedades que queremos que se cumplan, para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan una especie de asociatividad, mientras que 3 y 4 nos da la propiedad distributiva.
+
+Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir estas propiedades. Para ello definimos:
+
+\begin{equation}
+\begin{split}
+    I := span\{& \\
+               & (cv) \ast w - c(v \ast w), \\
+               & v \ast (cw) - c(v \ast w), \\
+               & (v_1 + v_2) \ast w - (v_1 \ast w + v_2 \ast w), \\
+               & v \ast (w_1 + w_2) - (v \ast w_1 + v \ast w_2), \\
+\}&
+\end{split}
+\end{equation}
+
+Con esto, ya podemos definir el producto tensorial:
+
+\begin{definicion}[Producto tensorial]
+    Dados dos espacios vectoriales $\mathbb{V}, \mathbb{W}$, se define su \textbf{producto tensorial} como:
+
+    $$\mathbb{V} \otimes \mathbb{W} := (\mathbb{V} \ast \mathbb{W}) / I$$
+
+    con lo que dados $v \in \mathbb{V}, w \in \mathbb{W}$, tenemos que
+
+    $$v \otimes w = v \ast w + I$$
+\end{definicion}
+
+A partir de esta definición, son directas las siguientes propiedades:
+
+% TODO -- creo que falta la distributividad respecto (v1 * v2) * w
+\begin{proposicion}
+    Sean $v, v_1, v_2 \in \mathbb{V}, w \in \mathbb{W}$, entonces son ciertas:
+    \begin{enumerate}
+        \item $c [v \otimes w] = (cv) \otimes w$
+        \item $c[v \otimes w] = v \otimes (cw)$
+        \item $v \otimes (w_1 + w_2) = v \otimes w_1 + v \otimes w_2$
+    \end{enumerate}
+\end{proposicion}
+
+\begin{proof} $\newline \newline$
+    1.
+
+    \begin{equation}
+    \begin{split}
+        (cv) \otimes w &\eqtext{def} (cv) \ast w + I = \ldots \ \text{usando que} \quad a + I = a + i + I, \quad \forall i \in I \\
+        \ldots &= (cv) \ast w + (c(v \ast w) - cv \ast w) + I = \ldots \\
+        \ldots &= \cancel{(cv) \ast w} + c(v \ast w) - \cancel{cv \ast w} + I = \ldots \\
+        \ldots &= c(v \ast w) + I = c (v \otimes w) \\
+    \end{split}
+    \end{equation}
+
+    $\customqed$
+    $\newline$
+    2. TODO
+    $\newline$
+    3. TODO
+\end{proof}
+
+También sabemos que por ser $\mathbb{V} \ast \mathbb{W}$ un espacio vectorial, y al definir el producto tensorial como un cociente, $\mathbb{V} \otimes \mathbb{W}$ es también un espacio vectorial.
+
+Ahora, enunciamos un importante teorema que nos ayudará a entender la naturaleza del producto vectorial:
+
+\begin{teorema}[Base del espacio vectorial \textit{producto tensorial}]
+    Sean $\mathbb{B}_{\mathbb{V}} = \{v_1, \ldots, v_n\}$, $\mathbb{B}_{\mathbb{W}} = \{w_1, \ldots, w_m\}$ bases de $\mathbb{V}, \mathbb{W}$ respectivamente, entonces:
+
+    $$\mathbb{B}_{\mathbb{V} \otimes \mathbb{W}} := \{v_i \otimes w_j / i \in \deltaset{n}, j \in \deltaset{m}\}$$
+
+    es una base del espacio vectorial $\mathbb{V} \otimes \mathbb{W}$, y por lo tanto:
+
+    $$dim(\mathbb{V} \otimes \mathbb{W}) = dim(\mathbb{V}) \cdot dim(\mathbb{W})$$
+\end{teorema}
+
+\begin{proof} $\newline$
+    % En el video esta la prueba, pero no la tengo copiada
+    TODO -- escribir esta prueba
+\end{proof}
 
 \subsubsection{Espacio cociente del producto formal}
 
