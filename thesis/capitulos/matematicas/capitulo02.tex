@@ -6,13 +6,69 @@
 
 Seguiremos en parte la notación del trabajo principal \cite{matematicas:principal}, aunque introducimos pequeños cambios.
 
-A los vectores con tipografía en negrita, tal que $\mathbf{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $v_i$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$.
+Denotaremos a los vectores con tipografía en negrita, tal que $\mathbf{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $v_i$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$.
 
 Para denotar a los tensores (que introduciremos más adelante), usaremos la tipografía caligráfica. Por ejemplo $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor (más adelante, en \customref{sec:deftensor}, veremos que significa esto) serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
 
 Al espacio de matrices de dimensiones $p, q$ lo denotaremos, como es usual, como $\matrices{p}{q}$.
 
+Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\mathbf{v}_1, \ldots, \mathbf{v}_N$, denotaremos su producto tensorial $\mathbf{v}_1 \otimes \ldots \otimes {v}_N$ como $\otimes_{i = 1}^N \mathbf{v}_i$.
+
+Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
+
 \subsection{Definición del producto tensorial} \label{sec:deftensor}
+
+Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$.
+
+Para la construcción del producto tensorial de espacios vectoriales, necesitaremos primero introducir conceptos previos que serán fundamentales en la construcción del objeto matemático que buscamos.
+
+\subsubsection{Producto formal de dos espacios vectoriales}
+
+% TODO -- la notacion span es americana, buscar la española en los apuntes de
+% geometria I
+\begin{definicion}[Producto formal de dos espacios vectoriales]
+    Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales reales. Se define su \textbf{producto formal} como:
+
+    \begin{equation}
+        \mathbb{V} \ast \mathbb{W} := span_{\mathbb{R}} \{v \ast w / v \in \mathbb{V}, w \in \mathbb{W} \}
+    \end{equation}
+
+    Donde $span$ denota el conjunto formado por todas las combinaciones lineales finitas de los elementos del conjunto, es decir,
+
+    \begin{equation}
+        span_{\mathbb{R}}(A) := \{ \sum_{k = 1}^n \alpha_i a_i / n \in \N, \alpha_i \in \R, a_i \in A \}
+    \end{equation}
+
+    Hay que tener en cuenta que en $v \ast w$, $\ast$ es un símbolo con el que no sabemos operar. Por tanto, ahora mismo no sabemos simplificar muchas expresiones en este espacio.
+\end{definicion}
+
+Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar tomando combinaciones lineales finitas, $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial.
+
+Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
+
+\underline{\textbf{Ejemplo}:} Sea $\Omega := R^2 \ast R^3$. Entonces tenemos que:
+
+\begin{equation}
+    \Omega = span \{
+        \begin{pmatrix}
+            a \\
+            b
+        \end{pmatrix}
+        \ast
+        \begin{pmatrix}
+            x \\
+            y \\
+            z
+        \end{pmatrix}
+        / a, b, x, y, z \in \R
+    \}
+\end{equation}
+
+
+
+\subsubsection{Espacio cociente del producto formal}
+
+\subsubsection{Espacio cociente del producto formal}
 
 \subsection{Otra forma de ver los tensores}
 
@@ -37,9 +93,81 @@ Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P, Q$ respectivamente.
 
 $$(A \otimes B)d_1, \ldots d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}$$
 
-Por tanto, es claro que en el caso de que tengamos dos tensores de orden 1, $u \in \R^{M_1}, v \in \R^{M_2}$, su producto tensorial se corresponde con la operación $u v^T \in \matrices{M_1}{M_2}$ donde $v^T$ indica la traspuesta de $u$.
+\subsection{Descomposición CANDECOMP/PARAFAC}
+
+Como ya se ha comentado en \customref{ch:introduccion}, las descomposiciones tensoriales van a ser fundamentales en este estudio. Así que empezamos con la descomposición mas sencilla de las dos. Comenzamos con la siguiente propiedad:
+
+\begin{proposicion}[Producto tensorial de dos vectores]
+    Sean $\mathbf{v} \in R^{N_1}, \mathbf{w} \in \R^{N_2}$ dos vectores. Entonces su producto tensorial puede expresarse como:
+
+    $$\mathbf{v} \otimes \mathbf{w} = \mathbf{v} \mathbf{w}^T \in \matrices{N_1}{N_2}$$
+
+    Además, esta matriz es de rango uno.
+\end{proposicion}
+
+% TODO -- probar esta proposicion, que la tengo en las notas a mano
+\demostracion
+
+TODO -- hay que probarlo!
+
+$\customqed$
+
+Con esto, podemos definir el siguiente tipo de tensores:
+
+\begin{definicion}[Tensores elementales]
+    Un tensor $\mathcal{A}$ se dice que es \textbf{elemental} (o también se le puede llamar puro) cuando es de la forma $\mathcal{A} = \otimes_{i = 1}^N \mathbf{v}^{(i)}$ con $\mathbf{v}^{(i)} \in \R^{N_i},\ \forall i \in \deltaset{N}$.
+\end{definicion}
+
+Esto nos da las herramientas necesarias para probar la descomposición buscada:
+
+\begin{proposicion}[Descomposición \textit{CP}]
+    Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores elementales, es decir:
+
+    \begin{equation} \label{eq:cp_decomp}
+        \mathcal{A} = \sum_{i = 1}^Z \mathbf{v}_z^{(1)} \otimes \ldots \mathbf{v}_z^{(N)},\qquad
+        \mathbf{v}_z^{(i)} \in \R^{M_i}, \forall z \in \deltaset{Z}, \forall i \in \deltaset{N}
+    \end{equation}
+
+\end{proposicion}
+
+A la descomposición anterior se le llama \textbf{descomposición \textit{CANDECOMP/PARAFAC}}, o abreviadamente, \textbf{descomposición \textit{CP}}
+
+\demostracion
+
+TODO -- hay que demostrarlo
+
+$\customqed$
+
+A partir de esto, hay que tener en cuenta las siguientes observaciones:
+
+\begin{enumerate}
+    % TODO -- colocar el valor real de $Z$
+    \item En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. Esto motivará la definición que haremos más adelante de \textit{rango CP}.
+    \item Todos los sumandos tienen el mismo número de vectores con los que hacemos el producto tensorial. Además, este número es el orden del tensor que estamos descomponiendo
+\end{enumerate}
+
+Con esto, hemos motivado la siguiente definición:
+
+\begin{definicion}[Rango \textit{CP}]
+    Dado un tensor $\mathcal{A}$, se define su rango \textit{CP} como el mínimo valor de $Z$ para el cual la ecuación \eqref{eq:cp_decomp} se mantiene
+\end{definicion}
+
+Una propiedad interesante es la siguiente:
+
+\begin{proposicion}[]
+    Para un tensor de orden dos (que podemos ver como una matriz, por los isomorfismos previamente introducidos), su rango \textit{CP} coincide con el rango matricial usual
+\end{proposicion}
+
+\demostracion
+
+TODO -- hay que demostrarlo
+
+$\customqed$
+
+% TODO -- aqui igual deberia hablar de tensores simetricos y descomposiciones simetricas CP
 
 \newpage
 \section{Teoría de la medida}
 
 \endinput
+

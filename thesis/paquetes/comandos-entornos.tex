@@ -10,7 +10,7 @@
 
 % TEOREMAS Y ENTORNOS ASOCIADOS
 
-% \newtheorem{theorem}{Theorem}[chapter]
+% \newtheorem{theorem}{Theorem}[chapter]:
 \newtheorem*{teorema*}{Teorema}
 \newtheorem{teorema}{Teorema}[chapter]
 \newtheorem{proposicion}{Proposición}[chapter]
@@ -34,3 +34,9 @@
 
 % Espacio de matrices pxq
 \newcommand{\matrices}[2]{\mathbb{M}_{#1 \times #2}}
+
+% Demostracion despues de un teorema
+\newcommand{\demostracion}{\underline{\textbf{Demostración}:}}
+
+% Un mejor simbolo para QED
+\newcommand{\customqed}{\hfill\blacksquare}
