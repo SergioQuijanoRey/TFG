@@ -40,5 +40,10 @@
 \newcommand{\customqed}{\hfill\blacksquare}
 \renewcommand{\qedsymbol}{$\customqed$}
 
-% Igualdades con explicaciones encima
-\newcommand{\eqtext}[1]{\ensuremath{\stackrel{\text{#1}}{=}}}
+% Elementos con explicaciones encima:
+
+    % Igualdades
+    \newcommand{\eqtext}[1]{\ensuremath{\stackrel{\text{#1}}{=}}}
+
+    % Implicaciones
+    \newcommand{\impliestext}[1]{\ensuremath{\stackrel{\text{#1}}{\implies}}}

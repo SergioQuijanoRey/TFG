@@ -47,7 +47,9 @@ Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar toma
 
 Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
 
-\underline{\textbf{Ejemplo}:} Sea $\Omega := R^2 \ast R^3$. Entonces tenemos que:
+\begin{ejemplo} \label{ej:prod_formal}
+
+Sea $\Omega := R^2 \ast R^3$. Entonces tenemos que:
 
 \begin{equation}
     \Omega = span \{
@@ -75,6 +77,8 @@ $$
 Notar que no sabemos cómo meter los escalares $2, -3$ en los elementos del producto formal.
 
 Por cómo hemos definido el producto formal de dos espacios vectoriales, tenemos que $dim(\R^2 \ast \R^3) = \infty$
+
+\end{ejemplo}
 
 \subsubsection{Producto tensorial a partir del producto formal} \label{sec:cociente_prod_formal}
 
@@ -119,11 +123,11 @@ Con esto, ya podemos definir el producto tensorial:
 A partir de esta definición, son directas las siguientes propiedades:
 
 % TODO -- creo que falta la distributividad respecto (v1 * v2) * w
-\begin{proposicion}
-    Sean $v, v_1, v_2 \in \mathbb{V}, w \in \mathbb{W}$, entonces son ciertas:
+\begin{proposicion} \label{prop:tensores_propiedades}
+    Sean $v, v_1, v_2 \in \mathbb{V}, w \in \mathbb{W}, \lambda \in \R$, entonces son ciertas:
     \begin{enumerate}
-        \item $c [v \otimes w] = (cv) \otimes w$
-        \item $c[v \otimes w] = v \otimes (cw)$
+        \item $\lambda [v \otimes w] = (\lambda v) \otimes w$
+        \item $\lambda [v \otimes w] = v \otimes (\lambda w)$
         \item $v \otimes (w_1 + w_2) = v \otimes w_1 + v \otimes w_2$
     \end{enumerate}
 \end{proposicion}
@@ -151,7 +155,7 @@ También sabemos que por ser $\mathbb{V} \ast \mathbb{W}$ un espacio vectorial, 
 
 Ahora, enunciamos un importante teorema que nos ayudará a entender la naturaleza del producto vectorial:
 
-\begin{teorema}[Base del espacio vectorial \textit{producto tensorial}]
+\begin{teorema}[Base del espacio vectorial \textit{producto tensorial}] \label{th:base_prod_tensorial}
     Sean $\mathbb{B}_{\mathbb{V}} = \{v_1, \ldots, v_n\}$, $\mathbb{B}_{\mathbb{W}} = \{w_1, \ldots, w_m\}$ bases de $\mathbb{V}, \mathbb{W}$ respectivamente, entonces:
 
     $$\mathbb{B}_{\mathbb{V} \otimes \mathbb{W}} := \{v_i \otimes w_j / i \in \deltaset{n}, j \in \deltaset{m}\}$$
@@ -165,6 +169,105 @@ Ahora, enunciamos un importante teorema que nos ayudará a entender la naturalez
     % En el video esta la prueba, pero no la tengo copiada
     TODO -- escribir esta prueba
 \end{proof}
+
+Una consecuencia inmediata es que todo tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se escribe de la forma:
+
+\begin{equation}
+    \gamma = \sum_{\substack{v_i \in \mathbb{V}\\ w_i \in \mathbb{W}\\ i \in \deltaset{n}}} c_{v_i, w_i} \cdot v_i \otimes w_i, \qquad c_{v_i, w_i} \in \R
+\end{equation}
+
+La expresión anterior motiva la siguiente definición:
+
+\begin{definicion}[Tensor puro]
+    Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $v \in \mathbb{V}, w \in \mathbb{W}$ tales que $\gamma = v \otimes w$
+\end{definicion}
+
+\begin{ejemplo}
+    Sea $\Omega := \R^2 \otimes \R^3$.
+
+    En primer lugar, sabemos que $dim(\Omega) = 2 \cdot 6$. Por ser un espacio vectorial real, de dimensión $6$, sabemos que $\Omega \cong \R^6$.
+
+    Ahora, consideramos las bases usuales de $\R^2, \R^3$, y usando el teorema \ref{th:base_prod_tensorial}, construimos una base, que podríamos considerar la base usual para el producto tensorial:
+
+    \begin{equation}
+    \begin{split}
+    \mathbb{B}_{\Omega} = \{& \\
+        & \begin{pmatrix}1 \\ 0 \end{pmatrix} \otimes \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix}1 \\ 0 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix},
+        \begin{pmatrix}1 \\ 0 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}, \\
+        & \begin{pmatrix}0 \\ 1 \end{pmatrix} \otimes \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix}0 \\ 1 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix},
+        \begin{pmatrix}0 \\ 1 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \\
+    & \}
+    \end{split}
+    \end{equation}
+
+    Ahora, retomamos una operación del \ref{ej:prod_formal} (solo que esta vez con el producto tensorial, y no con el producto formal):
+
+    $$
+    2 \left[ \begin{pmatrix}1 \\ 2\end{pmatrix} \otimes \begin{pmatrix}3 \\ 2 \\ 1 \end{pmatrix} \right]
+    - 3 \left[ \begin{pmatrix}1 \\ 0\end{pmatrix} \otimes \begin{pmatrix}1 \\ 2 \\ 3 \end{pmatrix} \right]
+    $$
+
+    % TODO -- desarrollar esta expresion
+    Tenemos distintas formas para desarrollar esta expresión, por ejemplo:
+
+    TODO -- desarrollar algo esta expresión
+
+\end{ejemplo}
+
+A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes de hacer el producto tensorial, siendo uno de los dos espacios un cierto $\R^N$. Empezamos con el siguiente ejemplo:
+
+\begin{ejemplo}
+    Sea $\mathbb{V}$ un espacio vectorial real y considero $\Omega := \R \otimes \mathbb{V}$.
+
+    Comienzo considerando un tensor de la forma $\gamma = a(x \otimes u) + b(y \otimes v)$ con $a, b \in \R, x, y \in \R, u, v \in \mathbb{V}$. Usando las propiedades de los tensores (\ref{prop:tensores_propiedades}), desarrollo esta expresión:
+
+    \begin{equation}
+    \begin{split}
+        a(x \otimes u) + b(y \otimes v) &\eqtext{2.} \\
+        = & x \otimes (au) + y \otimes (bv) \eqtext{2} \ldots \text{ usando que }  x,y \in \R \ldots \\
+        \ldots = & 1 \otimes ((ax) u) + 1 \otimes ((by) v) \eqtext{3.} \\
+        = & 1 \otimes ((ax)u + (by) v) = \\
+        = & 1 \otimes w \quad \text{con } w := (ax)u + (by), \quad \text{luego }w \in \mathbb{V}
+    \end{split}
+    \end{equation}
+
+    Esto nos deja el siguiente resultado, que acabamos de probar:
+
+    \begin{proposicion}
+        Sea $\gamma \in \R \otimes \mathbb{V}$ con $\mathbb{V}$ un espacio vectorial real. Entonces:
+
+        \begin{equation}
+            \gamma \text{  tensor puro} \implies \exists v \in \mathbb{V}: \gamma = 1 \otimes v
+        \end{equation}
+    \end{proposicion}
+
+    Buscamos extender este resultado para un tensor cualquiera del espacio $\R \otimes \mathbb{V}$:
+
+    \begin{proposicion}
+        Sea $\gamma \in \R \otimes \mathbb{V}$. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$
+    \end{proposicion}
+    \begin{proof}
+        Usando \ref{th:base_prod_tensorial}, podemos expresar:
+
+        \begin{equation}
+            \gamma = \sum_{\substack{v_i \in \mathbb{V}\\ w_i \in \mathbb{W}\\ i \in \deltaset{n}}} c_{v_i, w_i} \cdot v_i \otimes w_i, \qquad c_{v_i, w_i} \in \R
+        \end{equation}
+
+        Usando ahora la proposición anterior en los tensores puros de la sumatoria, queda:
+
+        \begin{equation}
+        \begin{split}
+            \gamma &= \sum_{\substack{w_i \in \mathbb{W}\\ i \in \deltaset{n}}} c_{w_i} \cdot 1 \otimes w_i \eqtext{2.} \\
+            & = \sum_{\substack{w_i \in \mathbb{W}\\ i \in \deltaset{n}}} 1 \otimes (c_{w_i} \cdot w_i) \eqtext{3.} \\
+            & = 1 \otimes ( \sum_{\substack{w_i \in \mathbb{W} \\ i \in \deltaset{n}}} c_{w_i} \cdot v_i ) = \\
+            & = 1 \otimes w \qquad \text{con } w := \sum_{\substack{w_i \in \mathbb{W}\\ i \in \deltaset{n}}} c_{w_i} w_i \implies w \in \mathbb{V}
+        \end{split}
+        \end{equation}
+
+    \end{proof}
+\end{ejemplo}
 
 \subsubsection{Espacio cociente del producto formal}
 
@@ -214,8 +317,9 @@ $\customqed$
 
 Con esto, podemos definir el siguiente tipo de tensores:
 
-\begin{definicion}[Tensores elementales]
-    Un tensor $\mathcal{A}$ se dice que es \textbf{elemental} (o también se le puede llamar puro) cuando es de la forma $\mathcal{A} = \otimes_{i = 1}^N \mathbf{v}^{(i)}$ con $\mathbf{v}^{(i)} \in \R^{N_i},\ \forall i \in \deltaset{N}$.
+% TODO -- esta definicion esta repetida de lo que ya teniamos
+\begin{definicion}[Tensores puros]
+    Un tensor $\mathcal{A}$ se dice que es \textbf{puro} (o también \textbf{elemental}) cuando es de la forma $\mathcal{A} = \otimes_{i = 1}^N \mathbf{v}^{(i)}$ con $\mathbf{v}^{(i)} \in \R^{N_i},\ \forall i \in \deltaset{N}$.
 \end{definicion}
 
 Esto nos da las herramientas necesarias para probar la descomposición buscada:
