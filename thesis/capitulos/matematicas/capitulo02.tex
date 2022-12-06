@@ -182,6 +182,38 @@ La expresión anterior motiva la siguiente definición:
     Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $v \in \mathbb{V}, w \in \mathbb{W}$ tales que $\gamma = v \otimes w$
 \end{definicion}
 
+Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $v \otimes \vv{0_w} = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
+
+\begin{proposicion}
+    Sean $\mathbb{V}, \mathbb{W}$ espacios vectoriales sobre $\R$. Sean $v \in \mathbb{V}, w \in \mathbb{W}$. Entonces se verifica:
+
+    \begin{enumerate}
+        \item $v \otimes \vv{0_\mathbb{W}} = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+        \item $\vv{0_{\mathbb{V}}} \otimes w = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+    \end{enumerate}
+\end{proposicion}
+\begin{proof}
+    Empezamos con la primera igualdad. Sabemos que en un espacio vectorial (como es el caso del producto tensorial) se verifica que:
+
+    \begin{equation} \label{eq:dem_tensor_cero}
+        \vv{v} + \vv{w} = \vv{w} \then \vv{v} = \vv{0}
+    \end{equation}
+
+    Veamos esto ahora con nuestro primer candidato a cero del espacio vectorial producto tensorial:
+
+    \begin{equation}
+    \begin{split}
+        v \otimes \vv{0_\mathbb{W}} + v \otimes w \eqtext{3.} v \otimes (\vv{0_\mathbb{W}} + w) = v \otimes (w)
+    \end{split}
+    \end{equation}
+
+    La demostración para $\vv{0_{\mathbb{V}}} \otimes w = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$ es completamente análoga.
+
+
+\end{proof}
+
+Con esto podemos pasar a ver algunos ejemplos:
+
 \begin{ejemplo}
     Sea $\Omega := \R^2 \otimes \R^3$.
 
@@ -265,6 +297,34 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
             & = 1 \otimes w \qquad \text{con } w := \sum_{\substack{w_i \in \mathbb{W}\\ i \in \deltaset{n}}} c_{w_i} w_i \implies w \in \mathbb{V}
         \end{split}
         \end{equation}
+
+    \end{proof}
+
+
+    Con esto, podemos pasar al siguiente resultado que nos permitirá ver de una forma mucho más clara en que espacio nos encontramos:
+
+    \begin{proposicion}
+        $\R \otimes \mathbb{V} \isomorfismo{\text{vec}} \mathbb{V}$
+    \end{proposicion}
+    \begin{proof}
+        Basta con considerar
+
+        \begin{equation}
+        \begin{split}
+            \phi: \R \otimes \mathbb{V} &\to \mathbb{V} \\
+            v = 1 \otimes w \in \mathbb{V} &\mapsto w
+        \end{split}
+        \end{equation}
+
+        Veamos, aunque sea prácticamente inmediato, que $\phi$ es biyectiva y lineal:
+
+        Inyectividad: $\phi(1 \otimes w_1) = \phi(1 \otimes w_2) \underset{def.\ \phi}{\iif} w_1 = w_2$
+
+        Sobreyectividad: $w \in \mathbb{V} \then \phi(1 \otimes w) = w$
+
+        Linealidad 1. $\phi(1 \otimes w_1 + 1 \otimes w_2) \eqtext{3.} \phi(1 \otimes (w_1 + w_2)) = w_1 + w_2$
+
+        Linealidad 2. $\phi(\lambda (1 \otimes w)) \eqtext{2.} \phi(1 \otimes (\lambda w)) = \lambda w$
 
     \end{proof}
 \end{ejemplo}
