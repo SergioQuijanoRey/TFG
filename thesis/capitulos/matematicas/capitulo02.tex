@@ -168,7 +168,11 @@ Ahora, enunciamos un importante teorema que nos ayudará a entender la naturalez
 \begin{proof} $\newline$
     % En el video esta la prueba, pero no la tengo copiada
     TODO -- escribir esta prueba
+    TODO -- en la página 20 de mis notas tengo apuntada la prueba de que es un sistema de generadores. Falta ver la independencia
+
 \end{proof}
+
+Notar que podríamos haber usado este teorema como forma de definir el producto tensorial de dos espacios vectoriales. Sin embargo, limitaríamos esta construcción a espacios vectoriales que admitiesen una base.
 
 Una consecuencia inmediata es que todo tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se escribe de la forma:
 
@@ -209,6 +213,7 @@ Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se a
 
     La demostración para $\vv{0_{\mathbb{V}}} \otimes w = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$ es completamente análoga.
 
+    % TODO -- en la pagina 18 de mis apuntes veo otra forma de demostrar esto, usando las propiedades 1, 2 en vez de usando la 3
 
 \end{proof}
 
@@ -265,17 +270,17 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
     \end{split}
     \end{equation}
 
-    Esto nos deja el siguiente resultado, que acabamos de probar:
+    Esto sirve como prueba del siguiente resultado:
 
     \begin{proposicion}
         Sea $\gamma \in \R \otimes \mathbb{V}$ con $\mathbb{V}$ un espacio vectorial real. Entonces:
 
         \begin{equation}
-            \gamma \text{  tensor puro} \implies \exists v \in \mathbb{V}: \gamma = 1 \otimes v
+            \gamma \text{ tensor puro} \implies \exists v \in \mathbb{V}: \gamma = 1 \otimes v
         \end{equation}
     \end{proposicion}
 
-    Buscamos extender este resultado para un tensor cualquiera del espacio $\R \otimes \mathbb{V}$:
+    Buscamos extender este resultado para un tensor cualquiera (no necesariamente puro) del espacio $\R \otimes \mathbb{V}$:
 
     \begin{proposicion}
         Sea $\gamma \in \R \otimes \mathbb{V}$. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$
@@ -329,7 +334,64 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
     \end{proof}
 \end{ejemplo}
 
-\subsubsection{Espacio cociente del producto formal}
+\begin{ejemplo}
+    Consideramos ahora el espacio $\Omega := \R^2 \otimes R^2$. Por tanto, sabemos que los tensores puros de este espacio son de la forma:
+
+    $$\begin{pmatrix} a \\ b \end{pmatrix} \otimes \begin{pmatrix} c \\ d \end{pmatrix}$$
+
+    Tomando ahora la base usual de $\R^2$, cualquier tensor de $\gamma \in \Omega$ se puede expresar como:
+
+    \begin{equation}
+    \begin{split}
+        \gamma &= \lambda_{11} \vectordd{1}{0} \otimes \vectordd{1}{0} + \lambda_{12} \vectordd{1}{0} \otimes \vectordd{0}{1} + \ldots \\
+        \ldots &+ \lambda_{21} \vectordd{0}{1} \otimes \vectordd{1}{0} + \lambda_{22} \vectordd{0}{1} \otimes \vectordd{0}{1}
+    \end{split}
+    \end{equation}
+
+    De nuevo, sabemos que $\R^2 \otimes \R^2 \cong \R^4$. La expresión anterior, sin embargo, nos invita a considerar el espacio $\Omega$ como $\R^2 \otimes \R^2 \cong \R^4 \cong \matrices{2}{2}$, con lo que con un adecuado isomorfismo, podemos expresar:
+
+    $$\gamma = \begin{bmatrix}
+        \lambda_{11} & \lambda_{12} \\
+        \lambda_{21} & \lambda_{22}
+    \end{bmatrix}$$
+
+    Para ello basta con considerar el isomorfismo:
+
+    \begin{equation}
+        \phi: \R \otimes \mathbb{V} \to \mathbb{V}
+    \end{equation}
+
+    de forma que:
+
+    $$\phi(\vectordd{1}{0} \otimes \vectordd{1}{0}) = \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix}$$
+    $$\phi(\vectordd{1}{0} \otimes \vectordd{0}{1}) = \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix}$$
+    $$\phi(\vectordd{0}{1} \otimes \vectordd{1}{0}) = \begin{bmatrix} 0 & 0 \\ 1 & 0 \end{bmatrix}$$
+    $$\phi(\vectordd{0}{1} \otimes \vectordd{0}{1}) = \begin{bmatrix} 0 & 0 \\ 0 & 1 \end{bmatrix}$$
+
+    A partir de este isomorfismo, podemos dar cierto significado al producto de tensores puros:
+
+    \begin{equation}
+    \begin{split}
+        \gamma &:= \vectordd{a}{b} \otimes \vectordd{c}{d} = \left( a \cdot \vectordd{1}{0} + b \cdot \vectordd{0}{1} \right) \otimes \left( c \cdot \vectordd{1}{0} + d \cdot \vectordd{0}{1} \right) = \ldots \\
+        \ldots &= ac \vectordd{1}{0} \otimes \vectordd{1}{0} + ad \vectordd{1}{0} \otimes \vectordd{0}{1} + bc \vectordd{0}{1} \otimes \vectordd{1}{0} + bd \vectordd{0}{1} \otimes \vectordd{0}{1} \underset{\phi}{\cong} \ldots \\
+        \ldots & \underset{\phi}{\cong} \begin{bmatrix} ac & ad \\ bc & bd \end{bmatrix}
+    \end{split}
+    \end{equation}
+
+    Es decir:
+
+    \begin{equation}
+    \begin{split}
+        \phi\lefg( \vectordd{a}{b} \otimes \vectordd{c}{d} \right) & = \begin{bmatrix} ac & ad \\ bc & bd \end{bmatrix} = \\
+        & = \vectordd{a}{d} \begin{pmatrix} c & d \end{pmatrix}
+    \end{split}
+    \end{equation}
+
+
+
+
+
+\end{ejemplo}
 
 \subsection{Otra forma de ver los tensores}
 
@@ -438,4 +500,3 @@ $\customqed$
 \section{Teoría de la medida}
 
 \endinput
-
