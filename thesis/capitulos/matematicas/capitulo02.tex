@@ -183,8 +183,10 @@ Una consecuencia inmediata es que todo tensor $\gamma \in \mathbb{V} \otimes \ma
 La expresión anterior motiva la siguiente definición:
 
 \begin{definicion}[Tensor puro]
-    Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $v \in \mathbb{V}, w \in \mathbb{W}$ tales que $\gamma = v \otimes w$
+    Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $v \in \mathbb{V}, w \in \mathbb{W}$ tales que $\gamma = v \otimes w$.
 \end{definicion}
+
+Otra consecuencia del \customref{th:base_prod_tensorial} es que, en general, $v \otimes w \neq w \otimes v$, en el caso en el que tengan sentido las dos operaciones.
 
 Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $v \otimes \vv{0_w} = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
 
@@ -382,18 +384,57 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
 
     \begin{equation}
     \begin{split}
-        \phi\lefg( \vectordd{a}{b} \otimes \vectordd{c}{d} \right) & = \begin{bmatrix} ac & ad \\ bc & bd \end{bmatrix} = \\
+        \phi\left( \vectordd{a}{b} \otimes \vectordd{c}{d} \right) & = \begin{bmatrix} ac & ad \\ bc & bd \end{bmatrix} = \\
         & = \vectordd{a}{d} \begin{pmatrix} c & d \end{pmatrix}
     \end{split}
     \end{equation}
 
+    O lo que es lo mismo:
 
+    \begin{equation}
+    \begin{split}
+        \phi(v \otimes w) = v w^T
+    \end{split}
+    \end{equation}
 
+    Esto coincide con la forma de definir los tensores que se hace en \cite{matematicas:principal}, y que introducimos en \customref{sec:otra_forma_tensores}.
+\end{ejemplo}
+
+Veamos ahora un ejemplo que nos clarifique la naturaleza del espacio $\R^N \otimes \mathbb{V}$:
+
+\begin{ejemplo}
+    Sea ahora $\Omega := \R^N \otimes \mathbb{V}$, con $N$ un natural cualquiera y $\mathbb{V}$ un espacio vectorial real. Consideramos su base usual:
+
+    $$\mathbb{B}_{\R^N} := \left\{\vectorn{1}{0}{0}, \vectorn{0}{1}{0}, \ldots, \vectorn{0}{0}{1} \right\} = \left\{e_1, e_2, \ldots, e_N \right\}$$
+
+    Ahora, veamos cómo podemos manipular un tensor cualquiera del espacio $\Omega$:
+
+    \begin{equation}
+    \begin{split}
+        v \otimes w &= (\lambda_1 e_1 + \lambda_2 e_2 + \ldots \lambda_N e_N) \otimes w \eqtext{3.} \ldots \\
+        \ldots &= \lambda_1 e_1 \otimes w + \lambda_2 e_2 \otimes w+ \ldots \lambda_N e_N \otimes w \eqtext{1., 2.} \ldots \\
+        \ldots &= e_1 \otimes \lambda_1 w + e_2 \otimes \lambda_2 w + \ldots e_N \otimes \lambda_N w = \ldots \\
+        \ldots &= e_1 \otimes w_1 + e_2 \otimes w_2 + \ldots e_N \otimes w_N \text{   con   } w_i \in \mathbb{V}
+    \end{split}
+    \end{equation}
+
+    Por lo tanto, tenemos que $\forall v \in \R^N$, $\forall w \in \mathbb{V}$, $\exists w_1, \ldots w_N \in \mathbb{V}$ tal que:
+
+    $$v \otimes w = e_1 \otimes w_1 + e_2 \otimes w_2 + \ldots + e_N \otimes w_N$$
+
+    Luego, como hemos hecho en un ejemplo anterior, podemos definir el siguiente isomorfimso:
+
+    \begin{equation}
+    \begin{split}
+        \phi: \R^N \otimes \mathbb{V} &\to \mathbb{V}^N \\
+        v \otimes w = e_1 \otimes w_1 + e_2 \otimes w_2 + \ldots + e_N \otimes w_N &\mapsto \vectorn{w_1}{w_2}{w_N}
+    \end{split}
+    \end{equation}
 
 
 \end{ejemplo}
 
-\subsection{Otra forma de ver los tensores}
+\subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
 
 % TODO -- especificar que es lo que hemos visto anteriormente
 Por lo visto anteriormente, tenemos una forma más concreta de entender los tensores.
