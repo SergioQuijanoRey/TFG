@@ -3,7 +3,7 @@ Functions that we're going to use in the benchmarks
 There is no standard way of doing benchmarks, so here we define the boilerplate code
 """
 
-from typing import Callable, List, Union
+from typing import Callable, List
 import time
 
 import numpy as np

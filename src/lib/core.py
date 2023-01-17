@@ -1,17 +1,11 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
 
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
-import os
 
-import src.lib.board as board
-import src.lib.filesystem as filesystem
 import src.lib.metrics as metrics
-from src.lib.train_loggers import TrainLogger, SilentLogger
 
 
 def imshow(img):

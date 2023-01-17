@@ -3,7 +3,6 @@ Module to do specific operations with tensorboard
 """
 
 import os
-import torch
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 

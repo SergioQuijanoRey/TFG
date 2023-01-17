@@ -3,9 +3,8 @@ from abc import ABC, abstractmethod
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
-import numpy as np
 import wandb
-from typing import List, Tuple, Callable, Dict
+from typing import List, Callable, Dict
 
 import logging
 file_logger = logging.getLogger("MAIN_LOGGER")

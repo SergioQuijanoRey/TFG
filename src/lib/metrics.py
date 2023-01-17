@@ -2,7 +2,7 @@
 
 import torch
 from torch.utils.data import DataLoader
-from torch import mean, nn
+from torch import nn
 import numpy as np
 from typing import Callable, Dict, List, Tuple
 

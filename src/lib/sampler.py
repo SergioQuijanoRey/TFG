@@ -220,5 +220,3 @@ class CustomSampler(torch.utils.data.Sampler):
             unique_labels = [int(x) for x in unique_labels]
 
         return unique_labels
-
-
