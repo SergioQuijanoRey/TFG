@@ -69,12 +69,13 @@
         - P, K = 100, 2
         - Embedding dimension = 5
         - Training epochs = 1
+        - `PROFILE_TRAINING = False`
     - We use the notebook defined in `./src/LFW Notebook.ipynb`. This have some pro's and con's
         - Main pro is that we benchmark with the same pipeline that we use for normal training
         - Main con is that we clutter the training notebook and that we have to run two notebooks each iteration
     - We only have the total time. No repetitions are made, so we don't have mean, sd information
 
-| `compute_intercluster_metrics` | `precompute_pairwise_distances` | Training loop | Change Description                                        | Git commit                               |
-| :---                           | :---                            | :---          | :---                                                      | :---                                     |
-| 27.3141, 9.1206                | 39.1880, 0.3676                 | 2341.9525     | No changes made. The project is as we started the process | e7d5342a16d466aff904891168eb6a834561fb2d |
-| 16.007167243957518, 2.412567442775856 | 37.02204704284668,  0.5623256616776479 | No changes made. Just running the same benchmarks a few months after |  |
+| `compute_intercluster_metrics` | `precompute_pairwise_distances` | Training loop | Change Description                                                   | Git commit                               |
+| :---                           | :---                            | :---          | :---                                                                 | :---                                     |
+| 27.3141, 9.1206                | 39.1880, 0.3676                 | 2341.9525     | No changes made. The project is as we started the process            | e7d5342a16d466aff904891168eb6a834561fb2d |
+| 16.0072, 2.4126                | 37.0220, 0.5623                 | 939.52497     | No changes made. Just running the same benchmarks a few months after |                                          |
