@@ -89,10 +89,9 @@ class SoftplusTripletLoss(nn.Module):
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
 
-        # Usamos Relu para que el error sea cero cuando la resta de las distancias
-        # este por debajo del margen. Si esta por encima del margen, devolvemos la
-        # identidad de dicho error. Es decir, aplicamos Relu a la formula que
-        # tenemos debajo
+        # We use ReLU so the error will be zero when positive - negative is bellow certain margin
+        # If it is above that margin, we return the identity of that error
+        # That's what ReLU does
         return self.loss_from_distances(distance_positive, distance_negative)
 
     def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
