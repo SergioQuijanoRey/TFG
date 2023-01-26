@@ -78,4 +78,4 @@
 | `compute_intercluster_metrics` | `precompute_pairwise_distances` | Training loop | Change Description                                                   | Git commit                               |
 | :---                           | :---                            | :---          | :---                                                                 | :---                                     |
 | 27.3141, 9.1206                | 39.1880, 0.3676                 | 2341.9525     | No changes made. The project is as we started the process            | e7d5342a16d466aff904891168eb6a834561fb2d |
-| 16.0072, 2.4126                | 37.0220, 0.5623                 | 939.52497     | No changes made. Just running the same benchmarks a few months after |                                          |
+| 16.0072, 2.4126                | 37.0220, 0.5623                 | 939.52497     | No changes made. Just running the same benchmarks a few months after | d14c3fb9397e4f2d3c2513d8c6790bba916bb417 |
