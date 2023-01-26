@@ -1,4 +1,4 @@
-current_notebook := "LFW Notebook.ipynb"
+CURRENT_NOTEBOOK := "LFW Notebook.ipynb"
 
 # Default command that list all the available commands
 default:
@@ -8,7 +8,7 @@ default:
 upload_all REMOTE:
     just upload_lib "{{REMOTE}}"
     just upload_benchmarks "{{REMOTE}}"
-    rclone copy "src/{{current_notebook}}" "{{REMOTE}}:Colab Notebooks" && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
+    rclone copy "src/{{CURRENT_NOTEBOOK}}" "{{REMOTE}}:Colab Notebooks" && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
 
 # Uploads just lib code
 upload_lib REMOTE:
@@ -23,11 +23,9 @@ upload_lib_benchmarks REMOTE:
     just upload_lib "{{REMOTE}}"
     just upload_benchmarks "{{REMOTE}}"
 
-
-
 # Downloads the notebook from Google Colab
 download REMOTE:
-	rclone copy --progress "{{REMOTE}}:Colab Notebooks/{{current_notebook}}" src/ && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
+	rclone copy --progress "{{REMOTE}}:Colab Notebooks/{{CURRENT_NOTEBOOK}}" src/ && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
 
 # Runs all the benchmarks, using shell.nix
 benchmarks:
@@ -43,3 +41,14 @@ benchmarks:
     do
         nix-shell --run "zsh -c 'python $file'"
     done
+
+# Runs all the tests
+tests:
+    python -m unittest src/test/*.py && notify-send "🟢 All tests passed" || notify-send -u critical "🔴 Some tests failed"
+
+# Run all the linters configured for the project
+lint:
+    ruff src/lib || echo "Lib is not clean"
+    ruff src/benchmarks || echo "Benchmarks are not clean"
+    ruff src/tests || echo "Tests are not clean"
+
