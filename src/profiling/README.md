@@ -67,7 +67,7 @@
         - P, K = 100, 2
         - Embedding dimension = 5
         - Training epochs = 1
-    - We use the notebook defined in `./src/LFW Notebook.ipynb`
+    - We use the notebook defined in `./src/Benchmarking notebook.ipynb`
     - We only have the total time. No repetitions are made, so we don't have mean, sd information
 
 | compute_intercluster_metrics | precompute_pairwise_distances | Training loop | Change Description                                        |
