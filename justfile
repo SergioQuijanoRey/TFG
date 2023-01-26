@@ -14,9 +14,13 @@ upload_all REMOTE:
 upload_lib REMOTE:
 	rclone sync --progress src/lib/ "{{REMOTE}}:Colab Notebooks/lib/" && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
 
-# Uploads just benchmarks code
+# Uploads just benchmarks code and the benchmarking notebook
 upload_benchmarks REMOTE:
+    # Upload the benchmarking code in .py files
     rclone sync --progress src/benchmarks/ "{{REMOTE}}:Colab Notebooks/benchmarks/" && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
+
+    # Now upload the notebook that wraps that .py code to run it in Google Colab
+    rclone copy "src/Benchmarking notebook.ipynb" "{{REMOTE}}:Colab Notebooks/" && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
 
 # Uploads both lib and benchmarks code
 upload_lib_benchmarks REMOTE:
