@@ -1,6 +1,6 @@
 # Github action for installing dependencies using poetry, and running unit tests
 
-name: Install dependencies and run unit tests
+name: Install dependencies and run unit tests using enviroment declared in poetry
 
 on:
   push:
