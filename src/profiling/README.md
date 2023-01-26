@@ -22,7 +22,7 @@
 
 # Second profiling
 
-> Profiling done with non-lazy data augmentation, `P = 100, K = 2`. Using smaller batch size, otherwise we ran out of RAM in Google Colab
+> Profiling done with non-lazy data augmentation, `P = 100, K = 2`. Using smaller batch size (P is now half the size), otherwise we ran out of RAM in Google Colab
 
 - Same structure as first profiling, but with name `second_...`
 - This time, it tooks 947.719 second to train. Its much more, but it can be because of different P-K values
@@ -37,6 +37,7 @@
 - Non-lazy: 917.8408761024475 seconds
 - Lazy: 952.0073399543762 seconds
 - **Conclusion**: there is not a big difference (15.29 mins vs 15.86 mins)
+    - TODO: we could use a statistical hypothesis test for saying that the difference is not relevant, but might a little too much for this
 
 # Other conclusions
 
@@ -55,15 +56,20 @@
 
 # Perf changes log
 
-> We are going to make some changes to the code in order to have better run times. So first we will write benchmarks for the functions that we are going to change. Then we make some changes and keep track of new benchmarks results and also the total run time for training loop
+> We are going to make some changes to the code in order to have better run times. So first we will write benchmarks for the functions that we are going to change. Then we make some changes and keep track of new benchmarks results and also the total run time for training loop.
 
-- Benchmark entries in the following table are (mean, sd)
-- Training loop is done with following parameters:
-    - Lazy data augmentation
-    - P, K = 100, 2
-    - Embedding dimension = 5
-    - Training epochs = 1
+- About the two benchmarks we're running:
+    - Benchmark entries in the following table are (mean, sd)
+    - The benchmarks we're running are defined in `./src/benchmarks/{benchmark_loss_functions, benchmark_metrics}.py`
+- About the training loop:
+    - We use the following parameters:
+        - Lazy data augmentation
+        - P, K = 100, 2
+        - Embedding dimension = 5
+        - Training epochs = 1
+    - We use the notebook defined in `./src/LFW Notebook.ipynb`
+    - We only have the total time. No repetitions are made, so we don't have mean, sd information
 
 | compute_intercluster_metrics | precompute_pairwise_distances | Training loop | Change Description                                        |
 | :---                         | :---                          | :---          | :---                                                      |
-| 27.3141, 9.1206              | 39.1880, 0.3676               | 2341.9525             | No changes made. The project is as we started the process |
+| 27.3141, 9.1206              | 39.1880, 0.3676               | 2341.9525     | No changes made. The project is as we started the process |
