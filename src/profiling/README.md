@@ -70,6 +70,7 @@
         - Embedding dimension = 5
         - Training epochs = 1
         - `PROFILE_TRAINING = False`
+        - GPU enviroment activated
     - We use the notebook defined in `./src/LFW Notebook.ipynb`. This have some pro's and con's
         - Main pro is that we benchmark with the same pipeline that we use for normal training
         - Main con is that we clutter the training notebook and that we have to run two notebooks each iteration
