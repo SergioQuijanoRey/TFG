@@ -30,6 +30,8 @@ class BenchmarkRunner:
     Runs a benchmark over a given function
 
     We tried to use `timeit` functionality, but it was unusable
+
+    So this class tries to replicate some of their basic functionality
     """
 
     def __init__(
