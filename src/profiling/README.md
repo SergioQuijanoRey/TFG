@@ -70,6 +70,6 @@
     - We use the notebook defined in `./src/Benchmarking notebook.ipynb`
     - We only have the total time. No repetitions are made, so we don't have mean, sd information
 
-| compute_intercluster_metrics | precompute_pairwise_distances | Training loop | Change Description                                        |
-| :---                         | :---                          | :---          | :---                                                      |
-| 27.3141, 9.1206              | 39.1880, 0.3676               | 2341.9525     | No changes made. The project is as we started the process |
+| `compute_intercluster_metrics` | `precompute_pairwise_distances` | Training loop | Change Description                                        | Git commit                               |
+| :---                           | :---                            | :---          | :---                                                      | :---                                     |
+| 27.3141, 9.1206                | 39.1880, 0.3676                 | 2341.9525     | No changes made. The project is as we started the process | e7d5342a16d466aff904891168eb6a834561fb2d |
