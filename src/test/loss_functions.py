@@ -270,13 +270,13 @@ class TestBatchAllTripletLoss(unittest.TestCase):
         # Define some fixed data to test on
         points = torch.tensor([
             # 0-th class points
-            [0, 0], [2, 2], [9, -6],
+            [0.0, 0.0], [2.0, 2.0], [9.0, -6.0],
 
             # 1-th class points
-            [7, -4], [12, -4], [2, -9],
+            [7.0, -4.0], [12.0, -4.0], [2.0, -9.0],
 
             # 2-th class points
-            [1, -11], [4, -11], [-1, 2]
+            [1.0, -11.0], [4.0, -11.0], [-1.0, 2.0]
         ])
 
         labels = torch.tensor([1, 1, 1, 2, 2, 2, 3, 3, 3])
@@ -297,13 +297,13 @@ class TestBatchAllTripletLoss(unittest.TestCase):
         # Define some fixed data to test on
         points = torch.tensor([
             # 0-th class points
-            [0, 0], [2, 2], [9, -6],
+            [0, 0], [2.0, 2.0], [9.0, -6.0],
 
             # 1-th class points
-            [7, -4], [12, -4], [2, -9],
+            [7.0, -4.0], [12.0, -4.0], [2.0, -9.0],
 
             # 2-th class points
-            [1, -11], [4, -11], [-1, 2]
+            [1, -11], [4.0, -11.0], [-1.0, 2.0]
         ])
 
         labels = torch.tensor([0, 0, 0, 1, 1, 1, 2, 2, 2])
