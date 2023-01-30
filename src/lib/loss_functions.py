@@ -4,7 +4,7 @@ Different loss functions used in the project
 
 import itertools as it
 import logging
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Callable
 
 import torch
 import torch.nn as nn
@@ -19,12 +19,12 @@ file_logger = logging.getLogger("MAIN_LOGGER")
 # Bases for more complex loss functions
 # ==================================================================================================
 
-# TODO -- PERF -- most of the time is spent here. See if there is a way of speeding up this computation
 def distance_function(first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
     """
     Basic distance function. It's the base for all losses implemented in this module
     """
     return ((first - second) * (first - second)).sum().sqrt()
+
 
 
 class TripletLoss(nn.Module):
@@ -200,31 +200,35 @@ class BatchBaseTripletLoss(nn.Module):
         return dict_of_negatives
 
     # TODO -- PERF -- this function is slow
+    # TODO -- distance_function is always euclidean distance, remove that param
+    # TODO -- TEST .. test that now, using cdist, we got what we want
     def precompute_pairwise_distances(
         self,
         embeddings: torch.Tensor,
-        distance_function
+        distance_function: Callable
     ) -> Dict[Tuple[int, int], float]:
         """
         Given a batch of embeddings and a distance function, precomputes all the pairwise distances.
+        @param embeddings torch.Tensor having a matrix with the embeddings
+               Must be a row matrix, that's to say, each vector is a row
+               of this matrix
         @return distances, dict of distances where distances[i][j] = distance(x_i, x_j)
                 Only half of the matrix is computed, distances[i][j] where i <= j
         """
 
-        distances = dict()
+        # Use pytorch function to compute all pairwise distances
+        distances = torch.cdist(embeddings, embeddings, p = 2)
 
-        for first_idx, first in enumerate(embeddings):
-            for second_idx, second in enumerate(embeddings):
-
-                # Only half of the matrix is computed
-                if first_idx > second_idx:
-                    continue
-
-                # Store this distance
-                distances[first_idx, second_idx] = distance_function(first, second)
+        # TODO -- DESIGN -- This might make this function slower
+        # Convert the tensor to a dictionary
+        distances = {
+            (first, second): distances[first][second]
+            for first in range(len(distances))
+            for second in range(len(distances))
+            if first <= second
+        }
 
         return distances
-
 
 class BatchHardTripletLoss(nn.Module):
     """
