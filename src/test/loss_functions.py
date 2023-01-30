@@ -9,9 +9,9 @@ import math
 from src.lib.loss_functions import (
     distance_function,
     TripletLoss, SoftplusTripletLoss,
-    BatchHardTripletLoss, BatchAllTripletLoss
+    BatchHardTripletLoss, BatchAllTripletLoss,
+    BatchBaseTripletLoss
 )
-
 
 # Number of repetitions, when needed
 NUMBER_OF_REPETITIONS = 100
@@ -70,6 +70,47 @@ class TestBasicLossFunction(unittest.TestCase):
         dist_computed = distance_function(first, second)
         dist_expect = math.sqrt(26)
         self.assertAlmostEqual(dist_computed, dist_expect)
+
+class TestBatchBaseTripletLoss(unittest.TestCase):
+    """Tests about the base class for all batch triplet loss variants"""
+
+    def test_precompute_pairwise_distances_basic(self):
+        embeddings = torch.Tensor([
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ])
+
+        computed_dict = BatchBaseTripletLoss().precompute_pairwise_distances(
+            embeddings,
+
+            # TODO -- Lambda Distance function does nothing in this function
+            distance_function = lambda x: x
+        )
+
+        expected_dict = {
+            (0, 0): 0.0,
+            (0, 1): 1.0,
+            (0, 2): 1.0,
+            (0, 3): 1.0,
+            (1, 1): 0.0,
+            (1, 2): 1.0,
+            (1, 3): 1.0,
+            (2, 2): 0.0,
+            (2, 3): 1.0,
+            (3, 3): 0.0,
+        }
+
+        # Check that computed_dict has all values of expected_dict
+        for key, expected_val in expected_dict:
+            computed_val = computed_dict.get(key)
+            self.assertAlmostEqual(expected_val, computed_val)
+
+        # Check that expected_dict has all values of computed_val
+        for key, computed_val in computed_dict:
+            expected_val = expected_dict.get(key)
+            self.assertAlmostEqual(expected_val, computed_val)
 
 class TestTripletLoss(unittest.TestCase):
 
