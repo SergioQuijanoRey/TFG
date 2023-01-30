@@ -6,8 +6,11 @@ import torchvision.transforms as transforms
 import src.lib.metrics as metrics
 import src.lib.utils as utils
 import src.lib.data_augmentation as data_augmentation
-import src.lib.models as models
 import src.lib.sampler as sampler
+import src.lib.models as models
+
+# Precision that we want in certain tests
+PLACES = 4
 
 class TestComputeIntraclusterDistances(unittest.TestCase):
 
@@ -30,14 +33,14 @@ class TestComputeIntraclusterDistances(unittest.TestCase):
         intra_cluster_distances = metrics.compute_intracluster_distances(dict_of_classes, images)
 
         # Distances corresponding to the first cluster
-        self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0)
-        self.assertAlmostEqual(intra_cluster_distances[0][1], 2.0)
-        self.assertAlmostEqual(intra_cluster_distances[0][2], 1.0)
+        self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[0][1], 2.0, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[0][2], 1.0, places = PLACES)
 
         # Distances corresponding to the second cluster
-        self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979)
-        self.assertAlmostEqual(intra_cluster_distances[1][1], 9.0)
-        self.assertAlmostEqual(intra_cluster_distances[1][2], 7.0710678118654755)
+        self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[1][1], 9.0, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[1][2], 7.0710678118654755, places = PLACES)
 
     def test_clusters_with_one_element_produce_no_distance(self):
         targets = [0, 1, 2, 3, 4, 5]
@@ -83,9 +86,21 @@ class TestComputeIntraclusterDistances(unittest.TestCase):
 
         # Some checks
         self.assertEqual(len(intra_cluster_distances), 3)
-        self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0)
-        self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979)
-        self.assertAlmostEqual(intra_cluster_distances[2][0], 7.0710678118654755)
+        self.assertAlmostEqual(
+            intra_cluster_distances[0][0],
+            1.0,
+            places = PLACES
+        )
+        self.assertAlmostEqual(
+            intra_cluster_distances[1][0],
+            2.23606797749979,
+            places = PLACES
+        )
+        self.assertAlmostEqual(
+            intra_cluster_distances[2][0],
+            7.0710678118654755,
+            places = PLACES
+        )
 
 class TestComputeClusterSizesMetrics(unittest.TestCase):
 
@@ -116,10 +131,10 @@ class TestComputeClusterSizesMetrics(unittest.TestCase):
         cluster_metrics = metrics.compute_cluster_sizes_metrics(dataloader, net, 6)
 
         # Make some checks
-        self.assertAlmostEqual(cluster_metrics["min"], 2.0)
-        self.assertAlmostEqual(cluster_metrics["max"], 9.0)
-        self.assertAlmostEqual(cluster_metrics["mean"], 5.5)
-        self.assertAlmostEqual(cluster_metrics["sd"], 3.5)
+        self.assertAlmostEqual(cluster_metrics["min"], 2.0, places = PLACES)
+        self.assertAlmostEqual(cluster_metrics["max"], 9.0, places = PLACES)
+        self.assertAlmostEqual(cluster_metrics["mean"], 5.5, places = PLACES)
+        self.assertAlmostEqual(cluster_metrics["sd"], 3.5, places = PLACES)
 
 class TestComputeInterclusterDistances(unittest.TestCase):
 
@@ -157,9 +172,9 @@ class TestComputeInterclusterDistances(unittest.TestCase):
         intercluster_distances = metrics.compute_intercluster_distances(distances, dict_of_classes)
 
         # Make some checks on the returned data
-        self.assertAlmostEqual(intercluster_distances[0, 1], 1.1)
-        self.assertAlmostEqual(intercluster_distances[0, 2], 0.5)
-        self.assertAlmostEqual(intercluster_distances[1, 2], 0.102)
+        self.assertAlmostEqual(intercluster_distances[0, 1], 1.1, places = PLACES)
+        self.assertAlmostEqual(intercluster_distances[0, 2], 0.5, places = PLACES)
+        self.assertAlmostEqual(intercluster_distances[1, 2], 0.102, places = PLACES)
 
     def test_single_element_clusters(self):
         # Basic data for the test
@@ -250,9 +265,9 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
 
         # Make some checks on the metrics
-        self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = 4)
-        self.assertAlmostEqual(intercluster_metrics["max"], 3.1623, places = 4)
-        self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = 4)
+        self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = PLACES)
+        self.assertAlmostEqual(intercluster_metrics["max"], 3.1623, places = PLACES)
+        self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = PLACES)
 
     def test_single_element_clusters(self):
 
@@ -284,10 +299,10 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
 
         # Make some checks about the obtained metrics
-        self.assertAlmostEqual(intercluster_metrics["mean"], 4.495059454322822)
-        self.assertAlmostEqual(intercluster_metrics["min"], 1.0)
-        self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569)
-        self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045)
+        self.assertAlmostEqual(intercluster_metrics["mean"], 4.495059454322822, places = PLACES)
+        self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = PLACES)
+        self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569, places = PLACES)
+        self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045, places = PLACES)
 
     def test_lfw_dataset_works(self):
         """
@@ -337,7 +352,34 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         )
 
         # Network that we're using in LFW dataset notebook
-        net = torch.nn.Identity()
+        # We cannot use identity, because now we're expecting that the outputs
+        # of the network are vectors of size the embedding dimension
+        # This way, we have a matrix of embedding vectors
+        #
+        # Using identity would produce nxnx3 (3 channels) outputs, making
+        # `loss_functions.precompute_dict_of_classes` fail
+
+        class RandomNet(torch.nn.Module):
+            """
+            Random net so we can run this tests with random embeddings
+            """
+
+            def __init__(self, embedding_dimension: int):
+
+                super(RandomNet, self).__init__()
+
+                # Dimension del embedding que la red va a calcular
+                self.embedding_dimension = embedding_dimension
+
+            def forward(self, x: torch.Tensor) -> torch.Tensor:
+                # Get the batch size so we return the same number of vectors as
+                # number of given images
+                batch_size = x.shape[0]
+
+                # Random values with the embedding_dimension specified in __init__
+                return torch.rand([batch_size, self.embedding_dimension])
+
+        net = RandomNet(embedding_dimension = 4)
 
         # Get the metrics for a 1/5 of the training dataset
         intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, int(len(augmented_dataset) * DATASET_PORTION))
