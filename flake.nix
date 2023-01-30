@@ -1,7 +1,7 @@
 {
     description = "Flake to handle some tasks and dependencies for this project";
     inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+        nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
         utils.url = "github:numtide/flake-utils";
     };
 
@@ -19,8 +19,8 @@
             jupyterlab
 
             # Machine/Deep learning libraries
-            pytorch
-            torchvision
+            torch-bin
+            torchvision-bin
             scikit-learn
 
             # Visualizations
@@ -42,6 +42,9 @@
             pyls-flake8
             mypy
             isort
+
+            # Debugger used in nvim-dap
+            debugpy
         ];
         custom_python_env = pkgs.${python}.withPackages custom_python_packages;
 
