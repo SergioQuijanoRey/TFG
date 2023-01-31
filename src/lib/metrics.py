@@ -266,8 +266,11 @@ def compute_intracluster_distances(
 
     class_distances = {label: [] for label in dict_of_classes.keys()}
 
+    # Precompute all pairwise distances
+    base = loss_functions.BatchBaseTripletLoss()
+    pairwise_distances = base.precompute_pairwise_distances(elements)
+
     # Compute intra-cluster distances
-    # TODO -- PERF -- precompute pairwise distances
     for curr_class in dict_of_classes.keys():
         for first_indx in dict_of_classes[curr_class]:
             for second_indx in dict_of_classes[curr_class]:
@@ -278,9 +281,10 @@ def compute_intracluster_distances(
                 if first_indx >= second_indx:
                     continue
 
-                # Get the distance and append to the list
-                distance = loss_functions.distance_function(elements[first_indx], elements[second_indx])
-                class_distances[curr_class].append(float(distance))
+                # Use the precomputation of all pairwise distances
+                class_distances[curr_class].append(
+                    float(pairwise_distances[(first_indx, second_indx)])
+                )
 
     # Some classes can have only one element, and thus no class distance
     # We don't consider this classes
