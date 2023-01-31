@@ -56,3 +56,8 @@ lint:
     ruff src/benchmarks || echo "Benchmarks are not clean"
     ruff src/tests || echo "Tests are not clean"
 
+# Run type checks using mypy
+type_lint:
+    mypy src/lib || echo "Lib is not well typed"
+    mypy src/benchmarks || echo "Benchmarks are not well typed"
+    mypy src/tests || echo "Tests are not well typed"
