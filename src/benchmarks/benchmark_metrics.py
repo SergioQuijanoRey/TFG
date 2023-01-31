@@ -13,6 +13,8 @@ import sampler
 import data_augmentation
 import metrics
 import sampler
+import models
+import core
 
 
 def main():
@@ -57,7 +59,8 @@ def benchmark_compute_intercluster_metrics():
 
     print("⌛ compute_intercluster_metrics")
 
-    net = nn.Identity()
+    device = core.get_device()
+    net = models.RandomNet(embedding_dimension = 4).to(device)
     data_loader = __generate_dataloader(P = 4, K = 4)
     max_examples = 1_000
 

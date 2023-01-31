@@ -199,7 +199,7 @@ def __get_portion_of_dataset_and_embed(
         # Doing this cat is like doing .append() on a python list, but on torch.Tensor, which is
         # much faster. But more important, we can do ".append" in GPU mem without complex conversions
         targets = torch.cat((targets, labels), 0)
-        embeddings = torch.cat((embeddings, net(imgs)), 0)
+        embeddings = torch.cat((embeddings, net(imgs).to(device)), 0)
 
         seen_examples += len(labels)
         if seen_examples >= max_examples:
