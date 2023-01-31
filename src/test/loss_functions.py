@@ -74,6 +74,31 @@ class TestBasicLossFunction(unittest.TestCase):
 class TestBatchBaseTripletLoss(unittest.TestCase):
     """Tests about the base class for all batch triplet loss variants"""
 
+    def assertAlmostEqualDict(
+        self,
+        expected_dict,
+        computed_dict,
+        err_msg = "Expected dict is not the same as computed dict"
+    ):
+        """Aux function to check that two dicts are almost the same"""
+
+        # Check that computed_dict has all values of expected_dict
+        for key, expected_val in expected_dict.items():
+            computed_val = computed_dict.get(key)
+
+            if computed_val is None:
+                raise Exception(f"Computed dict has no entry for key {key}")
+
+            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
+
+        # Check that expected_dict has all values of computed_val
+        for key, computed_val in computed_dict.items():
+            expected_val = expected_dict.get(key)
+            if expected_val is None:
+                raise Exception(f"Computed dict has an extra key {key}")
+
+            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
+
     def test_precompute_pairwise_distances_basic(self):
         embeddings = torch.Tensor([
             [0.0, 0.0, 0.0],
@@ -88,6 +113,12 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
             # TODO -- Lambda Distance function does nothing in this function
             distance_function = lambda x: x
         )
+
+        # Convert torch floats to python floats
+        computed_dict = {
+            key: float(value)
+            for key, value in computed_dict.items()
+        }
 
         expected_dict = {
             (0, 0): 0.0,
@@ -109,25 +140,8 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
 
         Computed dict was {computed_dict}"""
 
-        # Check that computed_dict has all values of expected_dict
-        for key, expected_val in expected_dict.items():
-            computed_val = computed_dict.get(key)
-            computed_val = float(computed_val)
-
-            if computed_val is None:
-                raise Exception(f"Computed dict has no entry for key {key}")
-
-            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
-
-        # Check that expected_dict has all values of computed_val
-        for key, computed_val in computed_dict.items():
-            computed_val = float(computed_val)
-
-            expected_val = expected_dict.get(key)
-            if expected_val is None:
-                raise Exception(f"Computed dict has an extra key {key}")
-
-            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
+        # Check the condition
+        self.assertAlmostEqualDict(expected_dict, computed_dict, err_msg)
 
 class TestTripletLoss(unittest.TestCase):
 
