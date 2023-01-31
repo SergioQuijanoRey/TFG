@@ -303,15 +303,15 @@ class BatchHardTripletLoss(nn.Module):
             # Calculamos las distancias a positivos y negativos
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
-                self.pairwise_distances[(embedding_indx, embeddings[positive])]
-                for positive in self.dict_of_classes[int(img_label)]
+                self.pairwise_distances[self.__resort_dict_idx(embedding_indx, positive_indx)]
+                for positive_indx in self.dict_of_classes[int(img_label)]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
-            # TODO -- perf -- this list comprehension is slow
+            # TODO -- PERF -- this list comprehension is slow
             negative_distances = [
-                self.pairwise_distances[(embedding_indx, embeddings[negative])]
-                for negative in self.list_of_negatives[int(img_label)]
+                self.pairwise_distances[self.__resort_dict_idx(embedding_indx, negative_indx)]
+                for negative_indx in self.list_of_negatives[int(img_label)]
             ]
 
             # Tenemos una lista de tensores de un unico elemento (el valor
@@ -355,6 +355,13 @@ class BatchHardTripletLoss(nn.Module):
 
         return mean
 
+    def __resort_dict_idx(self, first: int, second: int) -> Tuple[int, int]:
+        """Our dict containing pre-computed distances only has entries indexed by [i, j] where i <= j"""
+
+        if first > second:
+            return second, first
+
+        return first, second
 
 class BatchAllTripletLoss(nn.Module):
     """
