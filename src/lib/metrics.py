@@ -267,6 +267,7 @@ def compute_intracluster_distances(
     class_distances = {label: [] for label in dict_of_classes.keys()}
 
     # Compute intra-cluster distances
+    # TODO -- PERF -- precompute pairwise distances
     for curr_class in dict_of_classes.keys():
         for first_indx in dict_of_classes[curr_class]:
             for second_indx in dict_of_classes[curr_class]:
@@ -304,7 +305,7 @@ def compute_intercluster_metrics(
     1. Max intercluster distance over all clusters
     2. Min intercluster distance over all clusters
     3. Mean intercluster distance
-    4. SDev of intercluster distances#33
+    4. SDev of intercluster distances
 
     Given two clusters, its distance is defined as the min distance between two points, one from
     each cluster

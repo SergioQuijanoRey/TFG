@@ -200,21 +200,21 @@ class BatchBaseTripletLoss(nn.Module):
         return dict_of_negatives
 
     # TODO -- PERF -- this function is slow
-    # TODO -- distance_function is always euclidean distance, remove that param
-    # TODO -- TEST .. test that now, using cdist, we got what we want
-    # TODO -- TYPE -- Dict[Tuple[int, int], torch.Tensor containing a single float]
     def precompute_pairwise_distances(
         self,
         embeddings: torch.Tensor,
-        distance_function: Callable
-    ) -> Dict[Tuple[int, int], float]:
+    ) -> Dict[Tuple[int, int], torch.FloatTensor]:
         """
-        Given a batch of embeddings and a distance function, precomputes all the pairwise distances.
+        Given a batch of embeddings, precomputes all the pairwise distances.
+        We are using the euclidean distance
+
         @param embeddings torch.Tensor having a matrix with the embeddings
                Must be a row matrix, that's to say, each vector is a row
                of this matrix
-        @return distances, dict of distances where distances[i][j] = distance(x_i, x_j)
-                Only half of the matrix is computed, distances[i][j] where i <= j
+        @return distances, dict of distances where:
+                    distances[(i, j)] = distance(x_i, x_j)
+                Only half of the matrix is computed:
+                    distances[(i, j)] where i <= j
         """
 
         # Use pytorch function to compute all pairwise distances
@@ -231,6 +231,7 @@ class BatchBaseTripletLoss(nn.Module):
 
         return distances
 
+# TODO -- precompute all pairwise distances
 class BatchHardTripletLoss(nn.Module):
     """
     Implementation of Batch Hard Triplet Loss
@@ -258,6 +259,7 @@ class BatchHardTripletLoss(nn.Module):
         self.use_gt_than_zero_mean = use_gt_than_zero_mean
 
         # Class to access shared code across all Batch Triplet Loss functions
+        # TODO -- don't understand this semantics (????)
         self.precomputations = BatchBaseTripletLoss()
 
         # Pre-computamos una lista de listas en la que accedemos a los
@@ -275,6 +277,7 @@ class BatchHardTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
+    # TODO -- PERF -- Precompute pairwise distances
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
         loss = 0
