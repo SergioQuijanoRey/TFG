@@ -202,6 +202,7 @@ class BatchBaseTripletLoss(nn.Module):
     # TODO -- PERF -- this function is slow
     # TODO -- distance_function is always euclidean distance, remove that param
     # TODO -- TEST .. test that now, using cdist, we got what we want
+    # TODO -- TYPE -- Dict[Tuple[int, int], torch.Tensor containing a single float]
     def precompute_pairwise_distances(
         self,
         embeddings: torch.Tensor,
