@@ -259,7 +259,6 @@ class BatchHardTripletLoss(nn.Module):
         self.use_gt_than_zero_mean = use_gt_than_zero_mean
 
         # Class to access shared code across all Batch Triplet Loss functions
-        # TODO -- don't understand this semantics (????)
         self.precomputations = BatchBaseTripletLoss()
 
         # Pre-computamos una lista de listas en la que accedemos a los
@@ -277,7 +276,10 @@ class BatchHardTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
-    # TODO -- PERF -- Precompute pairwise distances
+
+        # Precompute all pairwise distances to speed up computation
+        self.pairwise_distances = None
+
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
         loss = 0
@@ -288,24 +290,27 @@ class BatchHardTripletLoss(nn.Module):
         # Pre-computamos la lista de negativos de cada clase
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
 
+        # Precompute all pairwise distances
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings)
+
         # Count non zero losses in order to compute the > 0 mean
         non_zero_losses = 0
 
         # Iteramos sobre todas los embeddings de las imagenes del dataset
         # TODO -- try to use pre-computed pairwise distances and see if it speeds up the calculation
-        for embedding, img_label in zip(embeddings, labels):
+        for embedding_indx, (embedding, img_label) in enumerate(zip(embeddings, labels)):
 
             # Calculamos las distancias a positivos y negativos
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
-                distance_function(embedding, embeddings[positive])
+                self.pairwise_distances[(embedding_indx, embeddings[positive])]
                 for positive in self.dict_of_classes[int(img_label)]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
             # TODO -- perf -- this list comprehension is slow
             negative_distances = [
-                distance_function(embedding, embeddings[negative])
+                self.pairwise_distances[(embedding_indx, embeddings[negative])]
                 for negative in self.list_of_negatives[int(img_label)]
             ]
 
@@ -390,6 +395,9 @@ class BatchAllTripletLoss(nn.Module):
         # negativos de una clase, necesitamos dos for que vamos a repetir
         # demasiadas veces
         self.list_of_negatives = None
+
+        # Precompute all pairwise distances to speed up computation
+        self.pairwise_distances = None
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
