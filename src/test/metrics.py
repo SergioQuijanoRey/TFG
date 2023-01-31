@@ -358,28 +358,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         #
         # Using identity would produce nxnx3 (3 channels) outputs, making
         # `loss_functions.precompute_dict_of_classes` fail
-
-        class RandomNet(torch.nn.Module):
-            """
-            Random net so we can run this tests with random embeddings
-            """
-
-            def __init__(self, embedding_dimension: int):
-
-                super(RandomNet, self).__init__()
-
-                # Dimension del embedding que la red va a calcular
-                self.embedding_dimension = embedding_dimension
-
-            def forward(self, x: torch.Tensor) -> torch.Tensor:
-                # Get the batch size so we return the same number of vectors as
-                # number of given images
-                batch_size = x.shape[0]
-
-                # Random values with the embedding_dimension specified in __init__
-                return torch.rand([batch_size, self.embedding_dimension])
-
-        net = RandomNet(embedding_dimension = 4)
+        net = models.RandomNet(embedding_dimension = 4)
 
         # Get the metrics for a 1/5 of the training dataset
         intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, int(len(augmented_dataset) * DATASET_PORTION))
