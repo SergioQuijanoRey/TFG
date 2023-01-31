@@ -387,10 +387,7 @@ def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, in
 
     # Use BatchBaseTripletLoss class for doing the computation
     base_loss = loss_functions.BatchBaseTripletLoss()
-    distances = base_loss.precompute_pairwise_distances(
-        embeddings,
-        distance_function = loss_functions.distance_function
-    )
+    distances = base_loss.precompute_pairwise_distances(embeddings)
 
     # Prev dict has elements [a, a] with distance 0. We are not interested in those
     distances = {index: distances[index] for index in distances.keys() if index[0] != index[1]}

@@ -122,10 +122,7 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
         ])
 
         computed_dict = BatchBaseTripletLoss().precompute_pairwise_distances(
-            embeddings,
-
-            # TODO -- Lambda Distance function does nothing in this function
-            distance_function = lambda x: x
+            embeddings
         )
 
         # Convert torch floats to python floats
@@ -166,10 +163,7 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
         ])
 
         computed_dict = BatchBaseTripletLoss().precompute_pairwise_distances(
-            embeddings,
-
-            # TODO -- Lambda Distance function does nothing in this function
-            distance_function = lambda x: x
+            embeddings
         )
 
         # Convert torch floats to python floats

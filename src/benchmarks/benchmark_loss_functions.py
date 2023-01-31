@@ -26,7 +26,7 @@ def benchmark_precompute_pairwise_distances():
 
     # Generate the function that we want to benchmark
     triplet_loss = loss_functions.BatchBaseTripletLoss()
-    bench_function = lambda: triplet_loss.precompute_pairwise_distances(embeddings, loss_functions.distance_function)
+    bench_function = lambda: triplet_loss.precompute_pairwise_distances(embeddings)
 
     # Run the benchmarks
     benchmark_runner = base.BenchmarkRunner(

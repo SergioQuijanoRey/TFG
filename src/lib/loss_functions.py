@@ -395,7 +395,7 @@ class BatchAllTripletLoss(nn.Module):
         # Precomputations to speed up calculations
         self.dict_of_classes = utils.precompute_dict_of_classes([int(label) for label in labels])
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
-        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings, distance_function)
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings)
 
         # For computing the mean
         # We have to instantiate the var using this syntax so backpropagation can be done properly
