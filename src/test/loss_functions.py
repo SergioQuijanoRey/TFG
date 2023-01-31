@@ -95,22 +95,39 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
             (0, 2): 1.0,
             (0, 3): 1.0,
             (1, 1): 0.0,
-            (1, 2): 1.0,
-            (1, 3): 1.0,
+            (1, 2): 1.4142135381698608,
+            (1, 3): 1.4142135381698608,
             (2, 2): 0.0,
-            (2, 3): 1.0,
-            (3, 3): 0.0,
+            (2, 3): 1.4142135381698608,
+            (3, 3): 0.0
         }
 
+        err_msg = f"""
+        precompute_pairwise_distances is not working properly
+
+        Expected dict was {expected_dict}
+
+        Computed dict was {computed_dict}"""
+
         # Check that computed_dict has all values of expected_dict
-        for key, expected_val in expected_dict:
+        for key, expected_val in expected_dict.items():
             computed_val = computed_dict.get(key)
-            self.assertAlmostEqual(expected_val, computed_val)
+            computed_val = float(computed_val)
+
+            if computed_val is None:
+                raise Exception(f"Computed dict has no entry for key {key}")
+
+            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
 
         # Check that expected_dict has all values of computed_val
-        for key, computed_val in computed_dict:
+        for key, computed_val in computed_dict.items():
+            computed_val = float(computed_val)
+
             expected_val = expected_dict.get(key)
-            self.assertAlmostEqual(expected_val, computed_val)
+            if expected_val is None:
+                raise Exception(f"Computed dict has an extra key {key}")
+
+            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
 
 class TestTripletLoss(unittest.TestCase):
 
