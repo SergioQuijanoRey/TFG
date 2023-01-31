@@ -16,6 +16,9 @@ from src.lib.loss_functions import (
 # Number of repetitions, when needed
 NUMBER_OF_REPETITIONS = 100
 
+# Decimal places for float comparisons
+DECIMAL_PLACES = 4
+
 class TestBasicLossFunction(unittest.TestCase):
     """Tests about basic distance function"""
 
@@ -78,7 +81,8 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
         self,
         expected_dict,
         computed_dict,
-        err_msg = "Expected dict is not the same as computed dict"
+        err_msg = "Expected dict is not the same as computed dict",
+        decimal_places = 8
     ):
         """Aux function to check that two dicts are almost the same"""
 
@@ -89,7 +93,12 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
             if computed_val is None:
                 raise Exception(f"Computed dict has no entry for key {key}")
 
-            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
+            self.assertAlmostEqual(
+                expected_val,
+                computed_val,
+                msg = err_msg,
+                places = decimal_places
+            )
 
         # Check that expected_dict has all values of computed_val
         for key, computed_val in computed_dict.items():
@@ -97,7 +106,12 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
             if expected_val is None:
                 raise Exception(f"Computed dict has an extra key {key}")
 
-            self.assertAlmostEqual(expected_val, computed_val, msg = err_msg)
+            self.assertAlmostEqual(
+                expected_val,
+                computed_val,
+                msg = err_msg,
+                places = decimal_places
+            )
 
     def test_precompute_pairwise_distances_basic(self):
         embeddings = torch.Tensor([
@@ -142,6 +156,55 @@ class TestBatchBaseTripletLoss(unittest.TestCase):
 
         # Check the condition
         self.assertAlmostEqualDict(expected_dict, computed_dict, err_msg)
+
+    def test_precompute_pairwise_distances_not_so_basic(self):
+        embeddings = torch.Tensor([
+            [0.0, 0.0, 0.0],
+            [1.0, 2.0, 3.0],
+            [7.0, 6.0, 5.0],
+            [3.0, 3.0, 1.0],
+        ])
+
+        computed_dict = BatchBaseTripletLoss().precompute_pairwise_distances(
+            embeddings,
+
+            # TODO -- Lambda Distance function does nothing in this function
+            distance_function = lambda x: x
+        )
+
+        # Convert torch floats to python floats
+        computed_dict = {
+            key: float(value)
+            for key, value in computed_dict.items()
+        }
+
+        expected_dict = {
+            (0, 0): 0.0,
+            (0, 1): 3.7416573867739413,
+            (0, 2): 10.488088481701515,
+            (0, 3): 4.358898943540674,
+            (1, 1): 0.0,
+            (1, 2): 7.483314773547883,
+            (1, 3): 3.0,
+            (2, 2): 0.0,
+            (2, 3): 6.4031242374328485,
+            (3, 3): 0.0
+        }
+
+        err_msg = f"""
+        precompute_pairwise_distances is not working properly
+
+        Expected dict was {expected_dict}
+
+        Computed dict was {computed_dict}"""
+
+        # Check the condition
+        self.assertAlmostEqualDict(
+            expected_dict,
+            computed_dict,
+            err_msg,
+            decimal_places = DECIMAL_PLACES
+        )
 
 class TestTripletLoss(unittest.TestCase):
 
