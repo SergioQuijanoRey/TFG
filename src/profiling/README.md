@@ -136,6 +136,9 @@ Now, looking at the filtered file, sorted by `cumtime`, we see:
 
 So, next steps could be:
 
-2. Maybe, remove dict comprehension from `__compute_pairwise_distances`.
+1. Optimize `calculate_mean_loss_function_online`
+2. Optimize `__get_portion_of_dataset_and_embed`
+    - This way, we're optimizing both `compute_cluster_sizes_metrics` and `compute_intercluster_metrics`
+3. Maybe, remove dict comprehension from `__compute_pairwise_distances`.
     - It takes 1.524 seconds out of 1.526 seconds of total cumtime
     - 1.526 seconds of cumtime mean very little in the whole 2632 seconds of training cumtime
