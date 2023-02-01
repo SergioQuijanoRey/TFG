@@ -82,3 +82,60 @@
 | 16.0072, 2.4126                | 37.0220, 0.5623                 | 939.52497     | No changes made. Just running the same benchmarks a few months after                                                                                                                                                                                                                           | d14c3fb9397e4f2d3c2513d8c6790bba916bb417 |
 | 3.2480, 0.9302                 | 12.0495, 0.6669                 | 734.7535      | In `precompute_pairwise_distances`, use cdist to compute the distance matrix in a tensor way. Then convert the tensor to a dict. The last step might slow down computations. Had to change `benchmark_compute_intercluster_metrics`: `nn.Identity -> RandomNet` so the benchmarks run properly | cc8176f3c6add706573ba5627b3801851f009868 |
 | 2.5528, 1.6093                 | 12.7482, 1.4838                 | 625.8930      | Use `precompute_pairwise_distances` in Batch Losses. `compute_intracluster_distances` now use precomputations.                                                                                                                                                                                 | 70e4a569660f145f30ac598c3a56f33f747c09a9 |
+
+# Third profiling
+
+- At this point, we have optimized a lot the critical parts of the code, identified in the first two profiles. So now seems reasonable to make a second profile and search for the (potentially new) critical parts of the code
+- Parameters used in the profiling:
+    - P = 100
+    - K = 2
+    - Training Epochs = 1
+    - Model = LFWResNet
+    - Embedding Dimension = 1
+    - Hard Batch Triplet Loss
+    - Lazy Data Augmentation
+- The *Wandb* log can be seen [here]()
+- Same file structure as the first two profiles
+
+## Conclusions
+
+> Conclusions after looking at the third profiling data
+
+We can have a global view of the results in the following image:
+
+![Global view of the profiling graph](./imgs/third_profile_global.png)
+
+**Most of the training time is spent in the logging**
+
+The log process view is the following:
+
+![View of the log process function](./imgs/third_profile_log_process.png)
+
+The following functions are taking a lot of time (one for each different logger that we are using):
+
+- `calculate_mean_loss_function_online`
+    - Most of the time is spent in `dataloader.__next__`
+- `compute_cluster_sizes_metrics`
+    - Most of the time is spent in `__get_portion_of_dataset_and_embed`, and very little in `compute_intracluster_distances`
+    - Then, for `__get_portion_of_dataset_and_embed`, most of the time is spent in `dataloader.__next__`
+- `compute_inter_cluster_metrics`
+    - Most of the time is spent in `__get_portion_of_dataset_and_embed`, but is not as big portion as in the previous function
+    - It is followed by `__compute_pairwise_distances`
+        - Most of the time of this function is due to dict comprehension
+
+Now, looking at the filtered file, sorted by `cumtime`, we see:
+
+- Most of the time, after `train_model_online`, is spent in `log_process`, as we knew from the previous exploration
+- Followed by `calculate_mean_loss_function_online` and `__get_portion_of_dataset_and_embed`, as we also knew
+- Followed by `compute_cluster_sizes_metrics`
+- The `dictcomp` in `loss_functions.py:225` takes only 1.526 seconds of `total cumtime`
+    - Thus, **we will keep the dict comprehension**
+    - The cost is low
+    - The abstraction layer that it adds is very helpful
+- However, `precompute_pairwise_distances` takes 1.526 seconds of total cumtime. 1.524 seconds come from the dict comprehension
+
+So, next steps could be:
+
+2. Maybe, remove dict comprehension from `__compute_pairwise_distances`.
+    - It takes 1.524 seconds out of 1.526 seconds of total cumtime
+    - 1.526 seconds of cumtime mean very little in the whole 2632 seconds of training cumtime
