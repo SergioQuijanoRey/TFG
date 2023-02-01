@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from torch import nn
 import numpy as np
 from typing import Callable, Dict, List, Tuple
+import itertools
 
 import src.lib.core as core
 import src.lib.utils as utils
@@ -120,6 +121,7 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     return mean_loss
 
 # TODO -- PERF -- this function is taking a lot of time
+# TODO -- PERF -- but most of the time is spent getting the data
 def calculate_mean_loss_function_online(
     net: nn.Module,
     data_loader: DataLoader,
@@ -185,31 +187,40 @@ def __get_portion_of_dataset_and_embed(
 ) -> Tuple[torch.Tensor, np.ndarray]:
     """
     This aux function gets a portion of a dataset. At the same time, it gets the embedding of the
-    images we're intereseted in, through given net
+    images we're interested in, through given net
+
+    We are getting the first `max_examples` elements of the data. No random
+    sampling or other technique is done
     """
 
     # Get memory device we are using
     device = core.get_device()
 
-    embeddings: torch.Tensor = torch.tensor([]).to(device)
-    targets: torch.Tensor = torch.tensor([]).to(device)
-    seen_examples = 0
+    # Get all the batches in the data loader
+    # This is the most slow part of the function
+    elements = [
+        (imgs.to(device), labels.to(device))
+        for (index, (imgs, labels)) in enumerate(data_loader)
+        if index < max_examples
+    ]
 
-    for imgs, labels in data_loader:
-        imgs, labels = imgs.to(device), labels.to(device)
+    # Now, split previous list of pairs to a pair of lists
+    imgs, targets = zip(*elements)
 
-        # Doing this cat is like doing .append() on a python list, but on torch.Tensor, which is
-        # much faster. But more important, we can do ".append" in GPU mem without complex conversions
-        targets = torch.cat((targets, labels), 0)
-        embeddings = torch.cat((embeddings, net(imgs).to(device)), 0)
+    # Elements is a list of lists, because dataloader returns elements in bathes
+    # Thus, we need to flatten the list
+    # We flatten now, when we have imgs and targets split
+    imgs = list(itertools.chain(*imgs))
+    targets = list(itertools.chain(*targets))
 
-        seen_examples += len(labels)
-        if seen_examples >= max_examples:
-            break
+    # Compute the embeddings on the image
+    embeddings = [net(img).to(device) for img in imgs]
 
-    # Convert gpu torch.tensor to cpu numpy array
-    targets = targets.cpu().numpy()
-    embeddings = embeddings.cpu()
+    # Convert to numpy array
+    targets = np.array(targets)
+
+    # We have a list of tensors. For computing its distance, we need a tensor
+    embeddings = torch.stack(embeddings)
 
     return embeddings, targets
 
