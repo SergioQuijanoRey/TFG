@@ -402,9 +402,6 @@ class IntraClusterLogger(TrainLogger):
 
         return False
 
-# TODO -- PERF -- this logger takes too much time, as we've seen in profile file:
-# profiling_saves/second_profile_filtered.txt
-#
 # We are optimizing and benchmarking compute_intercluster_metrics, thus, this class does not need
 # optimization + benchmarking
 class InterClusterLogger(TrainLogger):

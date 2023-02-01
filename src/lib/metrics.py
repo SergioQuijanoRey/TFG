@@ -119,6 +119,7 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     mean_loss = acumulated_loss / len(data_loader.dataset)
     return mean_loss
 
+# TODO -- PERF -- this function is taking a lot of time
 def calculate_mean_loss_function_online(
     net: nn.Module,
     data_loader: DataLoader,
@@ -176,6 +177,7 @@ def calculate_mean_loss_function_online(
 
     return mean_loss
 
+# TODO -- PERF -- This function is taking a lot of cumulative time
 def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
@@ -211,6 +213,7 @@ def __get_portion_of_dataset_and_embed(
 
     return embeddings, targets
 
+# TODO -- PERF -- this function is taking a lot of time
 def compute_cluster_sizes_metrics(
         data_loader: torch.utils.data.DataLoader,
         net: torch.nn.Module,
@@ -321,15 +324,12 @@ def compute_intercluster_metrics(
 
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
+    # TODO -- PERF -- this is taking too much time
     embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
 
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)
 
-    # TODO -- PERF -- this is where most of the time is spent
-    # As this relies in BatchBaseTripletLoss.precompute_pairwise_distances, we can optimize and
-    # benchmark that function, and thus this function will run faster
-    #
     # Precompute pairwise distances for efficiency
     distances = __compute_pairwise_distances(embeddings)
 

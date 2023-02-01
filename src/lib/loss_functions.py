@@ -199,7 +199,6 @@ class BatchBaseTripletLoss(nn.Module):
 
         return dict_of_negatives
 
-    # TODO -- PERF -- this function is slow
     def precompute_pairwise_distances(
         self,
         embeddings: torch.Tensor,
@@ -221,6 +220,10 @@ class BatchBaseTripletLoss(nn.Module):
         distances = torch.cdist(embeddings, embeddings, p = 2)
 
         # TODO -- DESIGN -- This might make this function slower
+        # In the profiling readme, we see that this function takes 1.56 seconds
+        # to compute. 1.54 seconds are due this comprehension. But 1.56 seconds
+        # out of ~2k seconds for training are not worth the effort
+        #
         # Convert the tensor to a dictionary
         distances = {
             (first, second): distances[first][second]
@@ -308,7 +311,6 @@ class BatchHardTripletLoss(nn.Module):
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
-            # TODO -- PERF -- this list comprehension is slow
             negative_distances = [
                 self.pairwise_distances[self.__resort_dict_idx(embedding_indx, negative_indx)]
                 for negative_indx in self.list_of_negatives[int(img_label)]
