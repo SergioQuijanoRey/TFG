@@ -315,9 +315,9 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
             transforms.Resize((250, 250)),
             transforms.ToTensor(),
             transforms.Normalize(
-                 (0.5, 0.5, 0.5),
-                 (0.5, 0.5, 0.5)
-             ),
+                (0.5, 0.5, 0.5),
+                (0.5, 0.5, 0.5)
+            ),
         ])
         dataset = torchvision.datasets.LFWPeople(
             root = "./data",
@@ -325,7 +325,6 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
             download = True,
             transform = transform,
         )
-
 
         # Apply data augmentation for having at least 4 images per class
         augmented_dataset = data_augmentation.LazyAugmentatedDataset(
@@ -338,7 +337,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
                 transforms.RandomResizedCrop(size=(250, 250)),
                 transforms.RandomRotation(degrees=(0, 180)),
                 transforms.RandomAutocontrast(),
-                ])
+            ])
 
         )
 
@@ -361,7 +360,11 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         net = models.RandomNet(embedding_dimension = 4)
 
         # Get the metrics for a 1/5 of the training dataset
-        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, int(len(augmented_dataset) * DATASET_PORTION))
+        intercluster_metrics = metrics.compute_intercluster_metrics(
+            dataloader,
+            net,
+            int(len(augmented_dataset) * DATASET_PORTION)
+        )
 
         # To check that the metrics were computed, just make some basic checks
         # All entries should be floats. Moreover, all should be greater than zero
