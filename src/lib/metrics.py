@@ -183,7 +183,7 @@ def calculate_mean_loss_function_online(
 def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
-    max_examples: int
+    max_examples: int,
 ) -> Tuple[torch.Tensor, np.ndarray]:
     """
     This aux function gets a portion of a dataset. At the same time, it gets the embedding of the
@@ -219,17 +219,52 @@ def __get_portion_of_dataset_and_embed(
     # Convert to numpy array
     targets = np.array(targets)
 
-    # We have a list of tensors. For computing its distance, we need a tensor
-    embeddings = torch.stack(embeddings)
+    # We have a list of tensors. For computing its distance, we need a matrix
+    # tensor. Also, embeddings is a list of matrix tensors. `torch.stack` would
+    # produce a tensor with a list of matrix tensors. We want a single matrix
+    # tensor, thus, we must use `torch.cat`
+    #
+    # However, we can also have a list of vector tensors. This happens when
+    # we use a batch size of one. So we look to the first entry in the embeddings
+    # list and act accordingly
+    #
+    # Both conversion methods are pytorch calls, that should be fast
+    conversion_method = None
+    if utils.is_vector_tensor(embeddings[0]):
+        conversion_method = lambda embeddings: torch.stack(embeddings)
+    elif utils.is_matrix_tensor(embeddings[1]):
+        conversion_method = lambda embeddings: torch.cat(embeddings, dim = 0)
+    else:
+
+        # Raise an informative exception
+        err_msg = f"""`embeddings` has {utils.number_of_modes(embeddings)}
+        We don't have a conversion method to get the correct format for computing the distance dict"""
+
+        raise Exception(err_msg)
+
+    # Now, use the conversion method to get the correct format
+    embeddings = conversion_method(embeddings)
+
+    # Check that the embeddings tensor is in fact a matrix tensor
+    # That's to say, that it has two modes
+    if utils.is_matrix_tensor(embeddings) is False:
+
+        print(f"TODO -- {embeddings=}")
+
+        err_msg = f"""Embeddings should be a matrix tensor or a vector matrix
+        Embeddings tensor has {len(embeddings.shape)} modes, instead of two or one
+        """
+
+        raise Exception(err_msg)
 
     return embeddings, targets
 
 # TODO -- PERF -- this function is taking a lot of time
 def compute_cluster_sizes_metrics(
-        data_loader: torch.utils.data.DataLoader,
-        net: torch.nn.Module,
-        max_examples: int
-    ) -> Dict[str, float]:
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int
+) -> Dict[str, float]:
     """
     Computes metrics about cluster sizes
     This information will be:
