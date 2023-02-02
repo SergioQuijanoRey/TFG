@@ -13,7 +13,6 @@ from torch.autograd import Variable
 
 import src.lib.utils as utils
 
-
 file_logger = logging.getLogger("MAIN_LOGGER")
 
 # Bases for more complex loss functions
@@ -217,10 +216,10 @@ class BatchBaseTripletLoss(nn.Module):
         """
 
         # Embeddings should be a tensor matrix
-        if self.__is_tensor_matrix(embeddings) is False:
+        if utils.is_matrix_tensor(embeddings) is False:
 
             err_msg = f"""`embeddings` should be a tensor containing a matrix
-            `embeddings` has {len(embeddings.shape)} modes, instead of two"""
+            `embeddings` has {utils.number_of_modes(embeddings)} modes, instead of two"""
 
             raise ValueError(err_msg)
 
@@ -241,14 +240,6 @@ class BatchBaseTripletLoss(nn.Module):
         }
 
         return distances
-
-    def __is_tensor_matrix(self, values: torch.Tensor) -> bool:
-        """
-        Checks if a given tensor `values` is a matrix tensor
-        That's to say, a tensor with two modes
-        """
-
-        return len(values.shape) == 2
 
 # TODO -- precompute all pairwise distances
 class BatchHardTripletLoss(nn.Module):
