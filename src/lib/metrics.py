@@ -217,7 +217,12 @@ def __get_portion_of_dataset_and_embed(
     embeddings = [net(img).to(device) for img in imgs]
 
     # Convert to numpy array
-    targets = np.array(targets)
+    # Numpy arrays cannot live in GPU memory
+    # Also, we have a python list of tensors
+    targets = np.array([
+        target.cpu()
+        for target in targets
+    ])
 
     # We have a list of tensors. For computing its distance, we need a matrix
     # tensor. Also, embeddings is a list of matrix tensors. `torch.stack` would
@@ -299,8 +304,8 @@ def compute_cluster_sizes_metrics(
     metrics = {
         "min": min(cluster_sizes),
         "max": max(cluster_sizes),
-        "mean": np.mean(cluster_sizes),
-        "sd": np.std(cluster_sizes),
+        "mean": float(np.mean(cluster_sizes)),
+        "sd": float(np.mean(cluster_sizes)),
     }
 
     return metrics
@@ -383,14 +388,17 @@ def compute_intercluster_metrics(
     intercluster_distances: Dict[Tuple[int, int], float] = compute_intercluster_distances(distances, dict_of_classes)
 
     # Flatten prev dict, indexed by two indixes
-    flatten_intercluster_distances = [distance for distance in intercluster_distances.values()]
+    flatten_intercluster_distances = intercluster_distances.values()
+
+    # Convert the data to a tensor containing all distances
+    flatten_intercluster_distances = torch.stack(list(flatten_intercluster_distances))
 
     # Now we can easily return the metrics
     metrics = {
         "min": float(min(flatten_intercluster_distances)),
         "max": float(max(flatten_intercluster_distances)),
-        "mean": float(np.mean(flatten_intercluster_distances)),
-        "sd": float(np.std(flatten_intercluster_distances)),
+        "mean": float(torch.mean(flatten_intercluster_distances)),
+        "sd": float(torch.mean(flatten_intercluster_distances)),
     }
 
     return metrics
