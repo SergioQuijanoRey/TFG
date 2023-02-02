@@ -216,6 +216,14 @@ class BatchBaseTripletLoss(nn.Module):
                     distances[(i, j)] where i <= j
         """
 
+        # Embeddings should be a tensor matrix
+        if self.__is_tensor_matrix(embeddings) is False:
+
+            err_msg = f"""`embeddings` should be a tensor containing a matrix
+            `embeddings` has {len(embeddings.shape)} modes, instead of two"""
+
+            raise ValueError(err_msg)
+
         # Use pytorch function to compute all pairwise distances
         distances = torch.cdist(embeddings, embeddings, p = 2)
 
@@ -233,6 +241,14 @@ class BatchBaseTripletLoss(nn.Module):
         }
 
         return distances
+
+    def __is_tensor_matrix(self, values: torch.Tensor) -> bool:
+        """
+        Checks if a given tensor `values` is a matrix tensor
+        That's to say, a tensor with two modes
+        """
+
+        return len(values.shape) == 2
 
 # TODO -- precompute all pairwise distances
 class BatchHardTripletLoss(nn.Module):
