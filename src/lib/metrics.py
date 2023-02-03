@@ -254,8 +254,6 @@ def __get_portion_of_dataset_and_embed(
     # That's to say, that it has two modes
     if utils.is_matrix_tensor(embeddings) is False:
 
-        print(f"TODO -- {embeddings=}")
-
         err_msg = f"""Embeddings should be a matrix tensor or a vector matrix
         Embeddings tensor has {len(embeddings.shape)} modes, instead of two or one
         """
@@ -305,7 +303,7 @@ def compute_cluster_sizes_metrics(
         "min": min(cluster_sizes),
         "max": max(cluster_sizes),
         "mean": float(np.mean(cluster_sizes)),
-        "sd": float(np.mean(cluster_sizes)),
+        "sd": float(np.std(cluster_sizes)),
     }
 
     return metrics
@@ -398,7 +396,7 @@ def compute_intercluster_metrics(
         "min": float(min(flatten_intercluster_distances)),
         "max": float(max(flatten_intercluster_distances)),
         "mean": float(torch.mean(flatten_intercluster_distances)),
-        "sd": float(torch.mean(flatten_intercluster_distances)),
+        "sd": float(torch.std(flatten_intercluster_distances, unbiased = False)),
     }
 
     return metrics
