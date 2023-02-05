@@ -304,10 +304,12 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569, places = PLACES)
         self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045, places = PLACES)
 
-    def test_lfw_dataset_works(self):
+    def test_lfw_dataset_works_basic(self):
         """
         I had problems running `compute_intercluster_metrics` for a portion of the LFW dataset. So
         in this test we're simply try to compute the values without any crash
+
+        We're using a random net to test the behaviour
         """
 
         # Load the dataset
@@ -358,6 +360,83 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         # Using identity would produce nxnx3 (3 channels) outputs, making
         # `loss_functions.precompute_dict_of_classes` fail
         net = models.RandomNet(embedding_dimension = 4)
+
+        # Get the metrics for a 1/5 of the training dataset
+        intercluster_metrics = metrics.compute_intercluster_metrics(
+            dataloader,
+            net,
+            int(len(augmented_dataset) * DATASET_PORTION)
+        )
+
+        # To check that the metrics were computed, just make some basic checks
+        # All entries should be floats. Moreover, all should be greater than zero
+        # So that is enough for our test
+        self.assertGreater(intercluster_metrics["mean"], 0.0)
+        self.assertGreater(intercluster_metrics["min"], 0.0)
+        self.assertGreater(intercluster_metrics["max"], 0.0)
+        self.assertGreater(intercluster_metrics["sd"], 0.0)
+
+
+    def test_lfw_dataset_works_more_real(self):
+        """
+        I had problems running `compute_cluster_sizes_metrics`, and more
+        specifically, in `__get_portion_of_dataset_and_embed`, for a portion of
+        the LFW dataset. `test_lfw_dataset_works_basic` did not catch the error
+        that now happens. We think that is because the network used there is not
+        the network we're using in real training
+
+        So this test is the same as `test_lfw_dataset_works_basic` but using
+        the network that we use in the notebook
+        """
+
+        # Load the dataset
+        transform = transforms.Compose([
+            transforms.Resize((250, 250)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                (0.5, 0.5, 0.5),
+                (0.5, 0.5, 0.5)
+            ),
+        ])
+        dataset = torchvision.datasets.LFWPeople(
+            root = "./data",
+            split = "train",
+            download = True,
+            transform = transform,
+        )
+
+        # Apply data augmentation for having at least 4 images per class
+        augmented_dataset = data_augmentation.LazyAugmentatedDataset(
+            base_dataset = dataset,
+            min_number_of_images = 4,
+
+            # Remember that the trasformation has to be random type
+            # Otherwise, we could end with a lot of repeated images
+            transform = transforms.Compose([
+                transforms.RandomResizedCrop(size=(250, 250)),
+                transforms.RandomRotation(degrees=(0, 180)),
+                transforms.RandomAutocontrast(),
+            ])
+
+        )
+
+        # Now put a loader in front of the augmented dataset
+        dataloader = torch.utils.data.DataLoader(
+            augmented_dataset,
+            batch_size = 3 * 4,
+            num_workers = 2,
+            pin_memory = True,
+            sampler = sampler.CustomSampler(3, 4, augmented_dataset)
+        )
+
+        # Network that we're using in LFW dataset notebook
+        # We cannot use identity, because now we're expecting that the outputs
+        # of the network are vectors of size the embedding dimension
+        # This way, we have a matrix of embedding vectors
+        #
+        # Using identity would produce nxnx3 (3 channels) outputs, making
+        # `loss_functions.precompute_dict_of_classes` fail
+        net = models.LFWResNet18(5)
 
         # Get the metrics for a 1/5 of the training dataset
         intercluster_metrics = metrics.compute_intercluster_metrics(
