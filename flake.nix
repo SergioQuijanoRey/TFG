@@ -37,7 +37,7 @@
 
             # LSP Packages
             python-lsp-server
-            pylsp-mypy
+            # pylsp-mypy -- TODO -- consuming a lot of RAM
             pyls-isort
             pyls-flake8
             mypy
@@ -70,10 +70,7 @@
 
             shellHook = ''
                 # Log that we're in a custom enviroment
-                echo "Running custom dev enviroment with python and other packages"
-
-                # Use zsh shell
-                zsh
+                echo "❄️  Running custom dev enviroment with python and other packages"
             '';
         };
       });
