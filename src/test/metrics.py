@@ -2,6 +2,7 @@ import unittest
 import torch
 import torchvision
 import torchvision.transforms as transforms
+import resource
 
 import src.lib.metrics as metrics
 import src.lib.utils as utils
@@ -389,6 +390,26 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         the network that we use in the notebook
         """
 
+        # This test can get all my RAM memory, freezing the laptop
+        # So limit the mem usage for this test
+
+        # `GB_RAM` sets the max amount of ram that we want to use in this test
+        GB_RAM = 5              # This RAM should be enough
+        MB_RAM = GB_RAM * 1024
+        KB_RAM = MB_RAM * 1024
+        B_RAM = KB_RAM * 1024
+
+        # Now, limit the RAM usage
+        print(f"🧠 Limiting the amount of ram to {MB_RAM} MB")
+        soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+        resource.setrlimit(resource.RLIMIT_AS, (B_RAM, hard))
+        print("Limiting done!")
+        print("")
+
+        # Parameters of the model
+        # P - K values low so RAM usage is below our limit
+        P, K = 2, 2
+
         # Load the dataset
         transform = transforms.Compose([
             transforms.Resize((250, 250)),
@@ -408,7 +429,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         # Apply data augmentation for having at least 4 images per class
         augmented_dataset = data_augmentation.LazyAugmentatedDataset(
             base_dataset = dataset,
-            min_number_of_images = 4,
+            min_number_of_images = K,
 
             # Remember that the trasformation has to be random type
             # Otherwise, we could end with a lot of repeated images
@@ -423,10 +444,10 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         # Now put a loader in front of the augmented dataset
         dataloader = torch.utils.data.DataLoader(
             augmented_dataset,
-            batch_size = 3 * 4,
-            num_workers = 2,
+            batch_size = P * K,
+            num_workers = 1,
             pin_memory = True,
-            sampler = sampler.CustomSampler(3, 4, augmented_dataset)
+            sampler = sampler.CustomSampler(P, K, augmented_dataset)
         )
 
         # Network that we're using in LFW dataset notebook
@@ -439,7 +460,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         #
         # Permutation makes the test fail, because we're running on CPU
         # When running in GPU, `should_permute = True` is fine
-        net = models.LFWResNet18(5)
+        net = models.LFWResNet18(3)
         net.set_permute(should_permute = False)
 
         # Get the metrics for a 1/5 of the training dataset
