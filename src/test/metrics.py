@@ -436,7 +436,11 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
         #
         # Using identity would produce nxnx3 (3 channels) outputs, making
         # `loss_functions.precompute_dict_of_classes` fail
+        #
+        # Permutation makes the test fail, because we're running on CPU
+        # When running in GPU, `should_permute = True` is fine
         net = models.LFWResNet18(5)
+        net.set_permute(should_permute = False)
 
         # Get the metrics for a 1/5 of the training dataset
         intercluster_metrics = metrics.compute_intercluster_metrics(
