@@ -207,15 +207,17 @@ def __get_portion_of_dataset_and_embed(
     # Now, split previous list of pairs to a pair of lists
     imgs, targets = zip(*elements)
 
-    # Elements is a list of lists, because dataloader returns elements in bathes
-    # Thus, we need to flatten the list
-    # We flatten now, when we have imgs and targets split
-    imgs = list(itertools.chain(*imgs))
-    targets = list(itertools.chain(*targets))
+    # imgs, targets are a list of lists, because dataloader returns elements in
+    # batches. We could flatten now the two lists of lists, but the network
+    # expects data in batches. So we use that structure to pass the images
+    # through the network
+    #
+    # This produces a list of tensors containing embeddings batches
+    # Further transformation needs to be done
+    embeddings = [net(img_batch) for img_batch in imgs]
 
-    # Compute the embeddings on the image
-    # TODO -- BUG -- ValueError: expected 4D input (got 3D input)
-    embeddings = [net(img).to(device) for img in imgs]
+    # Now, flatten the targets
+    targets = list(itertools.chain(*targets))
 
     # Convert to numpy array
     # Numpy arrays cannot live in GPU memory
@@ -225,6 +227,7 @@ def __get_portion_of_dataset_and_embed(
         for target in targets
     ])
 
+    # Make the conversion for the embeddings
     # We have a list of tensors. For computing its distance, we need a matrix
     # tensor. Also, embeddings is a list of matrix tensors. `torch.stack` would
     # produce a tensor with a list of matrix tensors. We want a single matrix
