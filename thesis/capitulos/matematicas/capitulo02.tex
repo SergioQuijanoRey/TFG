@@ -564,6 +564,16 @@ es decir:
     h(u, v) = \hat{h}(u \otimes v); \text{   } \forall \mathbf{u} \in \mathbb{V}, \forall \mathbf{v} \in \mathbb{W}
 \end{equation}
 
+Esto se resume en que el siguiente diagrama es conmutativo:
+
+\begin{equation}
+\begin{tikzcd}
+    \mathbb{V} \times \mathbb{W} \ar{r}{h} \ar{d}[left]{\otimes} & \mathbb{Z} \\
+    \mathbb{V} \otimes \mathbb{W} \ar[dashed]{ur}[right, below]{\hat{h}}
+\end{tikzcd}
+\end{equation}
+
+
 \end{teorema}
 
 Es decir, dada una aplicación bilineal en el producto cartesiano de dos espacios vectoriales, podemos asociar unívocamente una aplicación lineal en el producto tensorial de los dos espacios vectoriales. Esto sigue siendo cierto para aplicaciones multilineales en el producto cartesiano de un número arbitrario de espacios vectoriales.

@@ -15,12 +15,6 @@
             # Base latex env
             inherit (pkgs.texlive) scheme-medium
 
-            # Extra packages that we want
-            amsmath
-            hyperref
-            cancel
-            esvect
-
             # Packages that I need for my thesis template to compile
             koma-script
             xpatch
@@ -29,6 +23,14 @@
             inconsolata
             xurl
             upquote
+
+            # Extra packages that we want
+            amsmath
+            hyperref
+            cancel
+            esvect
+            pgf
+            tikz-cd
             ;
         });
 
