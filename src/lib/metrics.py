@@ -214,6 +214,7 @@ def __get_portion_of_dataset_and_embed(
     targets = list(itertools.chain(*targets))
 
     # Compute the embeddings on the image
+    # TODO -- BUG -- ValueError: expected 4D input (got 3D input)
     embeddings = [net(img).to(device) for img in imgs]
 
     # Convert to numpy array
