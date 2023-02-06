@@ -6,6 +6,7 @@
 % [ ] Remove the use of apendixes, we are not using them yet
 % [ ] In first two chapters, some vectors are not well typed, that's to say,
 %     they're not in the form $\mathbf{v}$
+% TODO -- me quedo en la página X de mis notas
 
 % Sergio Quijano Rey
 % Doble Grado Ingenieria Informatica y Matematicas, UGR
@@ -176,6 +177,10 @@
 % Para poder usar \vv{x} para poner una flecha encima de x
 \usepackage{esvect}
 
+% Para hacer diagramas algebraicos
+\usepackage{tikz}
+\usepackage{tikz-cd}
+
 % ---------------------------------------------------------------------
 % COMANDOS Y ENTORNOS
 % ---------------------------------------------------------------------
@@ -249,10 +254,12 @@
 
 \input{capitulos/matematicas/capitulo01}
 \input{capitulos/matematicas/capitulo02}
+\input{capitulos/matematicas/capitulo03}
+
 % Añadir tantos capítulos como sea necesario
 
 \cleardoublepage\part{Segunda parte}
-\input{capitulos/capitulo02}
+% \input{capitulos/capitulo02}
 
 % -------------------------------------------------------------------
 % BACKMATTER

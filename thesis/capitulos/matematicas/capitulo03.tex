@@ -1,0 +1,55 @@
+\chapter{Modelización de las redes neuronales} \label{ch:modelizacion}
+
+A partir de las herramientas matemáticas que hemos introducido en \customref{ch:matematicas_fundamentales}, buscamos desarrollar una modelización matemática de las redes neuronales con las que se suele trabajar en la práctica. Para que sea una buena modelización, debería cumplirse que:
+
+\begin{itemize}
+    \item Sea lo más parecida a los modelos que se usan en la práctica
+    \item Permita obtener resultados interesantes
+\end{itemize}
+
+Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
+
+% TODO -- no se que nombre le dan a cada una de las redes en el paper
+\begin{itemize}
+    \item Redes neuronales no profundas, a partir
+    \item Redes convolucionales profundas, a partir de los \textit{circuitos convolucionales aritméticos}
+\end{itemize}
+
+Creemos que la modelización es muy cercana a las redes usadas en la práctica. Principalmente, porque tiene en cuenta las tres propiedades características de una red convolucional:
+
+\begin{enumerate}
+    \item Localidad
+    \item Compartición de parámetros, que junto a la localidad, da lugar a la convolución
+    \item \textit{Pooling}
+\end{enumerate}
+
+Además, los \textit{circuitos convolucionales aritméticos} son equivalentes a las redes conocidas como \textit{SimNets}, lo que reafirma el hecho de que la modelización es muy buena.
+
+\section{Tarea de aprendizaje}
+
+La tarea de aprendizaje que consideramos es la de clasificación. Durante todo el desarrollo, pensaremos en la clasificación de imágenes. En este caso, el enfoque que más éxito ha tenido históricamente es el uso de redes convolucionales profundas.
+
+Dado un elemento $X = (\mathbf{x_1}, \ldots, \mathbf{x_N})$, donde $\mathbf{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \}$.
+
+Con esto, podemos ver que los datos de entrada viven en el espacio
+
+$$\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (R^s)^N$$
+
+Esta representación de los datos de entrada es natural en muchas situaciones. En el caso de las imágenes, podemos considerar cada vector $\mathbf{x_i}$ como un conjunto de \textit{pixels} de la imagen. Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Podemos incluso considerar \textit{pixels} que aparezcan en más de un vector (es decir, vectores $\mathbf{x_i}$ que se intersequen). Por ejemplo, podemos considerar $\mathbf{x_i}$ como la fila o columna $i$-ésima de la imagen.
+
+Para decidir la etiqueta de un elemento, consideramos $Y$ funciones de puntuación
+
+$$\{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y} \}$$
+
+Con esto, dado un elemento $X \in \mathcal{X}$, lo clasificaremos buscando la etiqueta cuya función de puntuación sea máxima, es decir:
+
+$$label(X) := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
+
+Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de funciones $\mathcal{X} \to \R$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\Gamma_r \subset \Gamma$ de funciones de puntuación.
+
+\section{Espacio de hipótesis general}
+
+% TODO -- desarrollar el apéndice 6 donde se justifica que esta ecuación es lo
+% suficientemente general
+
+\endinput
