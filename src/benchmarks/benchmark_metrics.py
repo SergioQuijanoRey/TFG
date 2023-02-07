@@ -63,11 +63,13 @@ def benchmark_compute_intercluster_metrics():
     net = models.RandomNet(embedding_dimension = 4).to(device)
     data_loader = __generate_dataloader(P = 4, K = 4)
     max_examples = 1_000
+    fast_implementation = True
 
     bench_function = lambda: metrics.compute_intercluster_metrics(
         data_loader = data_loader,
         net = net,
-        max_examples = max_examples
+        max_examples = max_examples,
+        fast_implementation = fast_implementation,
     )
 
     benchmark_runner = base.BenchmarkRunner(bench_function, number_experiments = 5, number_runs_per_experiment = 3)
