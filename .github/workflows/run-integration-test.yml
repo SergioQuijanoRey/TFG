@@ -2,11 +2,11 @@
 
 name: Install dependencies and run integration tests using enviroment declared in poetry
 
+# Only run integration tests on pull request
+# On push might be too much
 on:
-  push:
-    branches: [ "*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "*" ]
 
 permissions:
   contents: read
@@ -17,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
