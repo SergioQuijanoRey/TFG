@@ -12,11 +12,13 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  integration_tests:
 
     runs-on: ubuntu-latest
 
     steps:
+
+
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
@@ -30,3 +32,8 @@ jobs:
     - name: Run integration tests with unitttest module
       run: |
         poetry run python -m unittest src/integration_tests/*.py
+
+      # Secret where the WANDB token is stored
+      env:
+        WANDB_TOKEN: ${{ secrets.WANDB_TOKEN }}
+
