@@ -184,7 +184,7 @@ def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
     max_examples: int,
-    fast_implementation: bool = False
+    fast_implementation: bool,
 ) -> Tuple[torch.Tensor, np.ndarray]:
     """
     This aux function gets a portion of a dataset. At the same time, it gets the embedding of the
@@ -193,14 +193,10 @@ def __get_portion_of_dataset_and_embed(
     We are getting the first `max_examples` elements of the data. No random
     sampling or other technique is done
 
-    `fast_implementation` defines wether or not use the fast implementation.
+    `fast_implementation` defines whether or not use the fast implementation.
     That fast implementation makes a better use of device memory (CPU or GPU)
     but needs more resources. Big data batches can crash the running program, so
-    use it carefully. That's why default value is False
-
-    TODO -- callers of this function are not passing `fast_implementation` param
-    TODO -- so we're relying in default value for the parameter
-    TODO -- DESIGN -- Bad design
+    use it carefully. So most of the time we should use `False`
     """
 
     # Fast implementation
