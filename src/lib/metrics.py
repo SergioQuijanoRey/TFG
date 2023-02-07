@@ -197,6 +197,10 @@ def __get_portion_of_dataset_and_embed(
     That fast implementation makes a better use of device memory (CPU or GPU)
     but needs more resources. Big data batches can crash the running program, so
     use it carefully. That's why default value is False
+
+    TODO -- callers of this function are not passing `fast_implementation` param
+    TODO -- so we're relying in default value for the parameter
+    TODO -- DESIGN -- Bad design
     """
 
     # Fast implementation
@@ -335,7 +339,7 @@ def __get_portion_of_dataset_and_embed_slow(
 def compute_cluster_sizes_metrics(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
-    max_examples: int
+    max_examples: int,
 ) -> Dict[str, float]:
     """
     Computes metrics about cluster sizes
