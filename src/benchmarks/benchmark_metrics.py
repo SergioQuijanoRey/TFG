@@ -78,5 +78,6 @@ def benchmark_compute_intercluster_metrics():
     print(f"Results are:\n{results}")
     print("")
 
+
 if __name__ == "__main__":
     main()
