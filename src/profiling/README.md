@@ -142,3 +142,29 @@ So, next steps could be:
 3. Maybe, remove dict comprehension from `__compute_pairwise_distances`.
     - It takes 1.524 seconds out of 1.526 seconds of total cumtime
     - 1.526 seconds of cumtime mean very little in the whole 2632 seconds of training cumtime
+
+# Second Optimization Process
+
+We're already benchmarking `compute_intercluster_metrics`. `compute_intercluster_distances` is used there, so there is no need for an independent benchmark.
+
+We are not going to optimize `calculate_mean_loss_function_online` yet, as it depends on the `dataloader.__next__` method
+
+We copy the previous table, and keep adding entries as we change the codebase:
+
+| `compute_intercluster_metrics` | `precompute_pairwise_distances` | Training loop | Change Description                                                                                                                                                                                                                                                                                 | Git commit                               |
+| :---                           | :---                            | :---          | :---                                                                                                                                                                                                                                                                                               | :---                                     |
+| 27.3141, 9.1206                | 39.1880, 0.3676                 | 2341.9525     | No changes made. The project is as we started the process                                                                                                                                                                                                                                          | e7d5342a16d466aff904891168eb6a834561fb2d |
+| 16.0072, 2.4126                | 37.0220, 0.5623                 | 939.52497     | No changes made. Just running the same benchmarks a few months after                                                                                                                                                                                                                               | d14c3fb9397e4f2d3c2513d8c6790bba916bb417 |
+| 3.2480, 0.9302                 | 12.0495, 0.6669                 | 734.7535      | In `precompute_pairwise_distances`, use cdist to compute the distance matrix in a tensor way. Then convert the tensor to a dict. The last step might slow down computations. Had to change `benchmark_compute_intercluster_metrics`: `nn.Identity -> RandomNet` so the benchmarks run properly     | cc8176f3c6add706573ba5627b3801851f009868 |
+| 2.5528, 1.6093                 | 12.7482, 1.4838                 | 625.8930      | Use `precompute_pairwise_distances` in Batch Losses. `compute_intracluster_distances` now use precomputations.                                                                                                                                                                                     | 70e4a569660f145f30ac598c3a56f33f747c09a9 |
+| 3.0325, 1.9002                 | 13.6181, 0.4956                 | Can't run     | Refactor `__get_portion_of_dataset_and_embed`. Use `pytorch` calls to generate embeddings, instead of `for loop`. This consumes a lot of resources, crashing Google Colab. So keep two implementations (slow and fast). This metrics are computed using the fast and resource heavy implementation |                                          |
+
+**Conclusions**:
+
+- Changes made to `__get_portion_of_dataset_and_embed` did not speed up the two benchmarks
+- *Google Colab* cannot handle fast implementation of `__get_portion_of_dataset_and_embed`
+- So, we keep the two implementations, and just for now, use the slow one
+
+# Bad practices in this process
+
+1. Using *Google Colab* for profiling is a bad idea. We're using the free tier, so the given resources vary in time, making the results less predictable (that's to say, same code can give two really different results)
