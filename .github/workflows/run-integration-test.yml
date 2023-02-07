@@ -32,8 +32,3 @@ jobs:
     - name: Run integration tests with unitttest module
       run: |
         poetry run python -m unittest src/integration_tests/*.py
-
-      # Secret where the WANDB token is stored
-      env:
-        WANDB_TOKEN: ${{ secrets.WANDB_TOKEN }}
-
