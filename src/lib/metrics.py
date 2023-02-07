@@ -184,6 +184,7 @@ def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
     max_examples: int,
+    fast_implementation: bool = False
 ) -> Tuple[torch.Tensor, np.ndarray]:
     """
     This aux function gets a portion of a dataset. At the same time, it gets the embedding of the
@@ -191,6 +192,37 @@ def __get_portion_of_dataset_and_embed(
 
     We are getting the first `max_examples` elements of the data. No random
     sampling or other technique is done
+
+    `fast_implementation` defines wether or not use the fast implementation.
+    That fast implementation makes a better use of device memory (CPU or GPU)
+    but needs more resources. Big data batches can crash the running program, so
+    use it carefully. That's why default value is False
+    """
+
+    # Fast implementation
+    if fast_implementation is True:
+        return __get_portion_of_dataset_and_embed_fast(
+            data_loader,
+            net,
+            max_examples,
+        )
+
+    # Slow implementation
+    return __get_portion_of_dataset_and_embed_slow(
+        data_loader,
+        net,
+        max_examples,
+    )
+
+def __get_portion_of_dataset_and_embed_fast(
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int,
+):
+    """
+    Fast implementation of `__get_portion_of_dataset_and_embed`
+
+    Be cautious of resource consumption
     """
 
     # Get memory device we are using
@@ -247,7 +279,8 @@ def __get_portion_of_dataset_and_embed(
 
         # Raise an informative exception
         err_msg = f"""`embeddings` has {utils.number_of_modes(embeddings)}
-        We don't have a conversion method to get the correct format for computing the distance dict"""
+        We don't have a conversion method to get the correct format for \
+        computing the distance dict"""
 
         raise Exception(err_msg)
 
@@ -263,6 +296,38 @@ def __get_portion_of_dataset_and_embed(
         """
 
         raise Exception(err_msg)
+
+    return embeddings, targets
+
+def __get_portion_of_dataset_and_embed_slow(
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int,
+):
+    """Slow implementation for __get_portion_of_dataset_and_embed"""
+
+    # Get memory device we are using
+    device = core.get_device()
+
+    embeddings: torch.Tensor = torch.tensor([]).to(device)
+    targets: torch.Tensor = torch.tensor([]).to(device)
+    seen_examples = 0
+
+    for imgs, labels in data_loader:
+        imgs, labels = imgs.to(device), labels.to(device)
+
+        # Doing this cat is like doing .append() on a python list, but on torch.Tensor, which is
+        # much faster. But more important, we can do ".append" in GPU mem without complex conversions
+        targets = torch.cat((targets, labels), 0)
+        embeddings = torch.cat((embeddings, net(imgs).to(device)), 0)
+
+        seen_examples += len(labels)
+        if seen_examples >= max_examples:
+            break
+
+    # Convert gpu torch.tensor to cpu numpy array
+    targets = targets.cpu().numpy()
+    embeddings = embeddings.cpu()
 
     return embeddings, targets
 
