@@ -340,6 +340,7 @@ def compute_cluster_sizes_metrics(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
     max_examples: int,
+    fast_implementation: bool
 ) -> Dict[str, float]:
     """
     Computes metrics about cluster sizes
@@ -352,6 +353,8 @@ def compute_cluster_sizes_metrics(
 
     Given a cluster, its distance is defined as the max distance between two points of that cluster
 
+    `fast_implementation` is used for selecting the implementation of
+    `__get_portion_of_dataset_and_embed`
     """
 
     # Move network to proper device
@@ -360,7 +363,12 @@ def compute_cluster_sizes_metrics(
 
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
-    embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
+    embeddings, targets = __get_portion_of_dataset_and_embed(
+        data_loader,
+        net,
+        max_examples,
+        fast_implementation = fast_implementation
+    )
 
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)
@@ -425,7 +433,8 @@ def compute_intracluster_distances(
 def compute_intercluster_metrics(
         data_loader: torch.utils.data.DataLoader,
         net: torch.nn.Module,
-        max_examples: int
+        max_examples: int,
+        fast_implementation: bool
     ) -> Dict[str, float]:
     """
     Computes metrics about intercluster metrics
@@ -438,6 +447,9 @@ def compute_intercluster_metrics(
 
     Given two clusters, its distance is defined as the min distance between two points, one from
     each cluster
+
+    `fast_implementation` is used for selecting the implementation of
+    `__get_portion_of_dataset_and_embed`
     """
 
     # Move network to proper device
@@ -447,7 +459,12 @@ def compute_intercluster_metrics(
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
     # TODO -- PERF -- this is taking too much time
-    embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
+    embeddings, targets = __get_portion_of_dataset_and_embed(
+        data_loader,
+        net,
+        max_examples,
+        fast_implementation
+    )
 
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)

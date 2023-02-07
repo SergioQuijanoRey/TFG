@@ -441,6 +441,11 @@ class InterClusterLogger(TrainLogger):
         self.train_percentage = train_percentage
         self.validation_percentage = validation_percentage
 
+        # Choose wether or not use fast implementation for underlying functions
+        # that rely on `__get_portion_of_dataset_and_embed`
+        # Underlying functions is about computing cluster metrics
+        self.fast_implementation = False
+
     def log_process(
         self,
         train_loader: DataLoader,
@@ -463,8 +468,18 @@ class InterClusterLogger(TrainLogger):
             self.net.eval()
 
             # Get the two metrics
-            train_metrics = metrics.compute_intercluster_metrics(train_loader, self.net, train_max_examples)
-            validation_metrics = metrics.compute_intercluster_metrics(validation_loader, self.net, validation_max_examples)
+            train_metrics = metrics.compute_intercluster_metrics(
+                train_loader,
+                self.net,
+                train_max_examples,
+                self.fast_implementation
+            )
+            validation_metrics = metrics.compute_intercluster_metrics(
+                validation_loader,
+                self.net,
+                validation_max_examples,
+                self.fast_implementation
+            )
 
         # Get the network in training mode again
         self.net.train()
