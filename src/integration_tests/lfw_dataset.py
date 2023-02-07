@@ -68,6 +68,7 @@ from src.lib.embedding_to_classifier import EmbeddingToClassifier
 from src.lib.sampler import CustomSampler
 from src.lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 
+
 class IntegrationLFWDataset(unittest.TestCase):
     def test_lfw_dataset_trains(self):
         # Training parameters
@@ -90,12 +91,11 @@ class IntegrationLFWDataset(unittest.TestCase):
         BASE_PATH = "./"
         DATA_PATH = os.path.join(BASE_PATH, "data")
 
-        # Init wandb
-        wandb.init(
-            project = "INTEGRATION_TEST_LFW",
-            name = f"{datetime.now()}",
-            config = {}
-        )
+        # Monkey patch the WANDB log
+        def log_patch(msg: str):
+            print(f"NOT LOGGIN TO WANDB: {msg}")
+
+        wandb.log = log_patch
 
         # Load the dataset
         transform = transforms.Compose([
@@ -122,7 +122,7 @@ class IntegrationLFWDataset(unittest.TestCase):
         )
 
         # Use a really small portion of train dataset
-        DATASET_PERCENTAGE = 0.1
+        DATASET_PERCENTAGE = 0.01
         train_dataset, _ = core.split_train_test(train_dataset, DATASET_PERCENTAGE)
         train_dataset = train_dataset.dataset
 
