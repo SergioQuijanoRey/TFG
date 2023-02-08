@@ -198,21 +198,22 @@ class BatchBaseTripletLoss(nn.Module):
 
         return dict_of_negatives
 
-    def precompute_pairwise_distances(
+    def raw_precompute_pairwise_distances(
         self,
         embeddings: torch.Tensor,
-    ) -> Dict[Tuple[int, int], torch.FloatTensor]:
+    ) -> torch.Tensor:
         """
         Given a batch of embeddings, precomputes all the pairwise distances.
         We are using the euclidean distance
+        Returns the pairwise distances tensor
 
         @param embeddings torch.Tensor having a matrix with the embeddings
-               Must be a row matrix, that's to say, each vector is a row
-               of this matrix
-        @return distances, dict of distances where:
-                    distances[(i, j)] = distance(x_i, x_j)
-                Only half of the matrix is computed:
-                    distances[(i, j)] where i <= j
+                Must be a row matrix, that's to say, each vector is a row
+                of this matrix
+
+        @return distances, torch matrix tensor containing pairwise distances
+                That's to say, distances[i, j] has the distance between element
+                i and j
         """
 
         # Embeddings should be a tensor matrix
@@ -225,6 +226,31 @@ class BatchBaseTripletLoss(nn.Module):
 
         # Use pytorch function to compute all pairwise distances
         distances = torch.cdist(embeddings, embeddings, p = 2)
+        return distances
+
+    def precompute_pairwise_distances(
+        self,
+        embeddings: torch.Tensor,
+    ) -> Dict[Tuple[int, int], torch.FloatTensor]:
+        """
+        Given a batch of embeddings, precomputes all the pairwise distances.
+        We are using the euclidean distance
+        Returns a dict of distances
+
+        The only difference with `precompute_pairwise_distances` is that we're
+        converting the pairwise distance matrix to a dict
+
+        @param embeddings torch.Tensor having a matrix with the embeddings
+               Must be a row matrix, that's to say, each vector is a row
+               of this matrix
+        @return distances, dict of distances where:
+                    distances[(i, j)] = distance(x_i, x_j)
+                Only half of the matrix is computed:
+                    distances[(i, j)] where i <= j
+        """
+
+        # Use raw version of the function to compute pairwise distances
+        distances = self.raw_precompute_pairwise_distances(embeddings)
 
         # TODO -- DESIGN -- This might make this function slower
         # In the profiling readme, we see that this function takes 1.56 seconds

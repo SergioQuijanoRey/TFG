@@ -6,9 +6,12 @@ from torch import nn
 import numpy as np
 from typing import Callable, Dict, List, Tuple
 import itertools
+from sklearn.metrics import silhouette_score
 
 import src.lib.core as core
 import src.lib.utils as utils
+import src.lib.loss_functions as loss_functions
+import src.lib.metrics as metrics
 import src.lib.loss_functions as loss_functions
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
@@ -536,3 +539,22 @@ def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, in
     distances = {index: distances[index] for index in distances.keys() if index[0] != index[1]}
 
     return distances
+
+def silhouette(
+    data_loader: torch.utils.data.DataLoader,
+    network: torch.nn.Module,
+) -> float:
+    # Compute the embeddings of the images and their targets
+    embeddings, targets = metrics.__get_portion_of_dataset_and_embed(
+        data_loader,
+        network,
+        max_examples = len(data_loader),
+        fast_implementation = False,
+    )
+
+    # Compute the parwise distances
+    base_loss = loss_functions.BatchBaseTripletLoss().raw_precompute_pairwise_distances
+    pairwise_distances = base_loss(embeddings)
+
+    # Now, use that pairwise distances to compute silhouette metric
+    return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
