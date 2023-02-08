@@ -8,7 +8,7 @@
     outputs = { self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem (system:
       let
-        python = "python39";
+        python = "python310";
         pkgs = nixpkgs.legacyPackages.${system};
 
         # Define a custom python enviroment
@@ -37,7 +37,6 @@
 
             # LSP Packages
             python-lsp-server
-            # pylsp-mypy -- TODO -- consuming a lot of RAM
             pyls-isort
             pyls-flake8
             mypy

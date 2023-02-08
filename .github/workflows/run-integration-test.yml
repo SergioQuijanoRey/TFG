@@ -2,10 +2,10 @@
 
 name: Install dependencies and run integration tests using enviroment declared in poetry
 
-# Only run integration tests on pull request
-# On push might be too much
 on:
   pull_request:
+    branches: [ "*" ]
+  push:
     branches: [ "*" ]
 
 permissions:

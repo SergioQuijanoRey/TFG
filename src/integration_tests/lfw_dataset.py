@@ -67,19 +67,20 @@ from src.lib.loss_functions import MeanTripletBatchTripletLoss, BatchHardTriplet
 from src.lib.embedding_to_classifier import EmbeddingToClassifier
 from src.lib.sampler import CustomSampler
 from src.lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
+from src.lib.split_dataset import split_dataset
 
 
 class IntegrationLFWDataset(unittest.TestCase):
     def test_lfw_dataset_trains(self):
         # Training parameters
-        P = 2
-        K = 2
+        P = 3
+        K = 4
         ONLINE_BATCH_SIZE = P * K
         TRAINING_EPOCHS = 1
         ONLINE_LEARNING_RATE = 0.01
-        LOGGING_ITERATIONS = P * K * 20
-        ONLINE_LOGGER_TRAIN_PERCENTAGE = 1 / 5
-        ONLINE_LOGGER_VALIDATION_PERCENTAGE = 1 / 3
+        LOGGING_ITERATIONS = P * K * 10
+        ONLINE_LOGGER_TRAIN_PERCENTAGE = 1 / 50
+        ONLINE_LOGGER_VALIDATION_PERCENTAGE = 1 / 30
         NET_MODEL = "LFWResNet18"
         MARGIN = 1.0
         EMBEDDING_DIMENSION = 3
@@ -91,9 +92,12 @@ class IntegrationLFWDataset(unittest.TestCase):
         BASE_PATH = "./"
         DATA_PATH = os.path.join(BASE_PATH, "data")
 
+        # Percentage of the complete dataset that we use for this integration test
+        DATASET_PERCENTAGE = 0.1
+
         # Monkey patch the WANDB log
         def log_patch(msg: str):
-            print(f"NOT LOGGIN TO WANDB: {msg}")
+            pass
 
         wandb.log = log_patch
 
@@ -122,24 +126,15 @@ class IntegrationLFWDataset(unittest.TestCase):
         )
 
         # Use a really small portion of train dataset
-        DATASET_PERCENTAGE = 0.01
-        train_dataset, _ = core.split_train_test(train_dataset, DATASET_PERCENTAGE)
-        train_dataset = train_dataset.dataset
+        print(f"==> Previous to dataset cut, train dataset has {len(train_dataset)} images")
+        train_dataset, _ = split_dataset(train_dataset, DATASET_PERCENTAGE)
+        print(f"==> Afeter dataset cut, train dataset has {len(train_dataset)} images")
+        print("")
 
         # Train / Validation split
-        train_dataset, validation_dataset = core.split_train_test(train_dataset, 0.8)
-        train_dataset = train_dataset.dataset
-        validation_dataset = validation_dataset.dataset
+        train_dataset, validation_dataset = split_dataset(train_dataset, DATASET_PERCENTAGE)
 
         # Use custom sampler
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset,
-            batch_size = ONLINE_BATCH_SIZE,
-            num_workers = NUM_WORKERS,
-            pin_memory = True,
-            sampler = CustomSampler(P, K, train_dataset)
-        )
-
         validation_loader = torch.utils.data.DataLoader(
             validation_dataset,
             batch_size = ONLINE_BATCH_SIZE,
@@ -148,16 +143,10 @@ class IntegrationLFWDataset(unittest.TestCase):
             pin_memory = True,
         )
 
-        test_loader = torch.utils.data.DataLoader(
-            test_dataset,
-            batch_size = ONLINE_BATCH_SIZE,
-            shuffle = True,
-            num_workers = NUM_WORKERS,
-            pin_memory = True,
-        )
-
         # Dataset augmentation
         AugmentationClass = LazyAugmentatedDataset if LAZY_DATA_AUGMENTATION is True else AugmentatedDataset
+
+        print(f"==> Previous to dataset augmentation, train dataset has {len(train_dataset)} images")
 
         train_dataset_augmented = AugmentationClass(
             base_dataset = train_dataset,
@@ -180,6 +169,9 @@ class IntegrationLFWDataset(unittest.TestCase):
             pin_memory = True,
             sampler = CustomSampler(P, K, train_dataset_augmented)
         )
+
+        print(f"==> Now training dataset has {len(train_dataset_augmented)} images")
+        print("")
 
         # Choose loss function
         batch_loss_function = None
