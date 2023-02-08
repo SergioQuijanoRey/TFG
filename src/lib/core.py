@@ -45,6 +45,7 @@ def test_model_online(model: nn.Module, test_loader: torch.utils.data.DataLoader
     print(f"Test Loss: {test_loss}")
 
 
+# TODO -- BUG -- when calling this and getting .dataset, we are doing nothing
 def split_train_test(dataset, train_percentage: float = 0.8):
     """
     Splits a pytorch dataset into train / test datasets
