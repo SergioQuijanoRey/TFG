@@ -72,7 +72,7 @@ def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = 
         # Añado la imagen a la posicion especificada
         # Tenemos que cambiar los canales si la imagen es tricolor, pues
         # estamos usando formato cv2 BGR
-        if is_black_and_white(img) == True:
+        if is_black_and_white(img) is True:
             plt.imshow(img)
         else:
             plt.imshow(img[:,:,::-1])
@@ -130,7 +130,7 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
         # Añado la imagen a la posicion especificada
         # Tenemos que cambiar los canales si la imagen es tricolor, pues
         # estamos usando formato cv2 BGR
-        if is_black_and_white(img) == True:
+        if is_black_and_white(img) is True:
             plt.imshow(img)
         else:
             plt.imshow(img[:,:,::-1])

@@ -1,0 +1,30 @@
+Mon Oct 31 16:25:19 2022    profiling_saves/first_profile.stat
+
+         904343 function calls (903380 primitive calls) in 328.638 seconds
+
+   Ordered by: cumulative time
+   Only entries with our src/lib code
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.002    0.002  328.638  328.638 /content/src/lib/trainers.py:149(train_model_online)
+        2    0.000    0.000    6.512    3.256 /content/src/lib/models.py:144(forward)
+        2    0.255    0.128    5.707    2.853 /content/src/lib/loss_functions.py:272(forward)
+      400    0.310    0.001    4.396    0.011 /content/src/lib/loss_functions.py:298(<listcomp>)
+    80800    2.513    0.000    4.202    0.000 /content/src/lib/loss_functions.py:22(distance_function)
+        1    0.000    0.000    0.199    0.199 /content/src/lib/sampler.py:63(__iter__)
+        1    0.005    0.005    0.199    0.199 /content/src/lib/sampler.py:93(generate_index_sequence)
+      400    0.001    0.000    0.074    0.000 /content/src/lib/loss_functions.py:41(forward)
+        1    0.000    0.000    0.071    0.071 /content/src/lib/core.py:78(get_device)
+      400    0.005    0.000    0.066    0.000 /content/src/lib/loss_functions.py:292(<listcomp>)
+       51    0.000    0.000    0.055    0.001 /content/src/lib/sampler.py:154(remove_empty_classes)
+       51    0.038    0.001    0.055    0.001 /content/src/lib/sampler.py:160(<listcomp>)
+       50    0.011    0.000    0.031    0.001 /content/src/lib/sampler.py:170(__new_batch)
+      400    0.012    0.000    0.019    0.000 /content/src/lib/loss_functions.py:56(loss_from_distances)
+        3    0.010    0.003    0.012    0.004 /content/src/lib/utils.py:8(precompute_dict_of_classes)
+        2    0.007    0.004    0.007    0.004 /content/src/lib/loss_functions.py:277(<listcomp>)
+        2    0.007    0.004    0.007    0.004 /content/src/lib/loss_functions.py:170(precompute_negative_class)
+        2    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:131(should_log)
+        2    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:134(<listcomp>)
+        2    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:396(should_log)
+        2    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:504(should_log)
+        2    0.000    0.000    0.000    0.000 /content/src/lib/train_loggers.py:610(should_log)

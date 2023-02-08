@@ -1,18 +1,18 @@
 # Github action for installing dependencies using poetry, and running unit tests
 
-name: Install dependencies and run unit tests using enviroment declared in poetry
+name: Install dependencies and run integration tests using enviroment declared in poetry
 
+# Only run integration tests on pull request
+# On push might be too much
 on:
-  push:
-    branches: [ "*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "*" ]
 
 permissions:
   contents: read
 
 jobs:
-  unit_tests:
+  integration_tests:
 
     runs-on: ubuntu-latest
 
@@ -27,6 +27,6 @@ jobs:
     - name: Install dependencies using poetry
       run: |
         poetry install
-    - name: Test with unitttest module
+    - name: Run integration tests with unitttest module
       run: |
-        poetry run python -m unittest src/test/*.py
+        poetry run python -m unittest src/integration_tests/*.py

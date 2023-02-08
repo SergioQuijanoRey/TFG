@@ -2,9 +2,10 @@
 
 import torch
 from torch.utils.data import DataLoader
-from torch import mean, nn
+from torch import nn
 import numpy as np
 from typing import Callable, Dict, List, Tuple
+import itertools
 
 import src.lib.core as core
 import src.lib.utils as utils
@@ -119,6 +120,8 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     mean_loss = acumulated_loss / len(data_loader.dataset)
     return mean_loss
 
+# TODO -- PERF -- this function is taking a lot of time
+# TODO -- PERF -- but most of the time is spent getting the data
 def calculate_mean_loss_function_online(
     net: nn.Module,
     data_loader: DataLoader,
@@ -176,15 +179,132 @@ def calculate_mean_loss_function_online(
 
     return mean_loss
 
+# TODO -- PERF -- This function is taking a lot of cumulative time
 def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
-    max_examples: int
+    max_examples: int,
+    fast_implementation: bool,
 ) -> Tuple[torch.Tensor, np.ndarray]:
     """
     This aux function gets a portion of a dataset. At the same time, it gets the embedding of the
-    images we're intereseted in, through given net
+    images we're interested in, through given net
+
+    We are getting the first `max_examples` elements of the data. No random
+    sampling or other technique is done
+
+    `fast_implementation` defines whether or not use the fast implementation.
+    That fast implementation makes a better use of device memory (CPU or GPU)
+    but needs more resources. Big data batches can crash the running program, so
+    use it carefully. So most of the time we should use `False`
     """
+
+    # Fast implementation
+    if fast_implementation is True:
+        return __get_portion_of_dataset_and_embed_fast(
+            data_loader,
+            net,
+            max_examples,
+        )
+
+    # Slow implementation
+    return __get_portion_of_dataset_and_embed_slow(
+        data_loader,
+        net,
+        max_examples,
+    )
+
+def __get_portion_of_dataset_and_embed_fast(
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int,
+):
+    """
+    Fast implementation of `__get_portion_of_dataset_and_embed`
+
+    Be cautious of resource consumption
+    """
+
+    # Get memory device we are using
+    device = core.get_device()
+
+    # Get all the batches in the data loader
+    # This is the most slow part of the function
+    elements = [
+        (imgs.to(device), labels.to(device))
+        for (index, (imgs, labels)) in enumerate(data_loader)
+        if index < max_examples
+    ]
+
+    # Now, split previous list of pairs to a pair of lists
+    imgs, targets = zip(*elements)
+
+    # imgs, targets are a list of lists, because dataloader returns elements in
+    # batches. We could flatten now the two lists of lists, but the network
+    # expects data in batches. So we use that structure to pass the images
+    # through the network
+    #
+    # This produces a list of tensors containing embeddings batches
+    # Further transformation needs to be done
+    embeddings = [net(img_batch) for img_batch in imgs]
+
+    # Now, flatten the targets
+    targets = list(itertools.chain(*targets))
+
+    # Convert to numpy array
+    # Numpy arrays cannot live in GPU memory
+    # Also, we have a python list of tensors
+    targets = np.array([
+        target.cpu()
+        for target in targets
+    ])
+
+    # Make the conversion for the embeddings
+    # We have a list of tensors. For computing its distance, we need a matrix
+    # tensor. Also, embeddings is a list of matrix tensors. `torch.stack` would
+    # produce a tensor with a list of matrix tensors. We want a single matrix
+    # tensor, thus, we must use `torch.cat`
+    #
+    # However, we can also have a list of vector tensors. This happens when
+    # we use a batch size of one. So we look to the first entry in the embeddings
+    # list and act accordingly
+    #
+    # Both conversion methods are pytorch calls, that should be fast
+    conversion_method = None
+    if utils.is_vector_tensor(embeddings[0]):
+        conversion_method = lambda embeddings: torch.stack(embeddings)
+    elif utils.is_matrix_tensor(embeddings[1]):
+        conversion_method = lambda embeddings: torch.cat(embeddings, dim = 0)
+    else:
+
+        # Raise an informative exception
+        err_msg = f"""`embeddings` has {utils.number_of_modes(embeddings)}
+        We don't have a conversion method to get the correct format for \
+        computing the distance dict"""
+
+        raise Exception(err_msg)
+
+    # Now, use the conversion method to get the correct format
+    embeddings = conversion_method(embeddings)
+
+    # Check that the embeddings tensor is in fact a matrix tensor
+    # That's to say, that it has two modes
+    if utils.is_matrix_tensor(embeddings) is False:
+
+        err_msg = f"""Embeddings should be a matrix tensor or a vector matrix
+        Embeddings tensor has {len(embeddings.shape)} modes, instead of two or one
+        """
+
+        raise Exception(err_msg)
+
+    return embeddings, targets
+
+def __get_portion_of_dataset_and_embed_slow(
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int,
+):
+    """Slow implementation for __get_portion_of_dataset_and_embed"""
 
     # Get memory device we are using
     device = core.get_device()
@@ -199,7 +319,7 @@ def __get_portion_of_dataset_and_embed(
         # Doing this cat is like doing .append() on a python list, but on torch.Tensor, which is
         # much faster. But more important, we can do ".append" in GPU mem without complex conversions
         targets = torch.cat((targets, labels), 0)
-        embeddings = torch.cat((embeddings, net(imgs)), 0)
+        embeddings = torch.cat((embeddings, net(imgs).to(device)), 0)
 
         seen_examples += len(labels)
         if seen_examples >= max_examples:
@@ -211,11 +331,13 @@ def __get_portion_of_dataset_and_embed(
 
     return embeddings, targets
 
+# TODO -- PERF -- this function is taking a lot of time
 def compute_cluster_sizes_metrics(
-        data_loader: torch.utils.data.DataLoader,
-        net: torch.nn.Module,
-        max_examples: int
-    ) -> Dict[str, float]:
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int,
+    fast_implementation: bool
+) -> Dict[str, float]:
     """
     Computes metrics about cluster sizes
     This information will be:
@@ -227,6 +349,8 @@ def compute_cluster_sizes_metrics(
 
     Given a cluster, its distance is defined as the max distance between two points of that cluster
 
+    `fast_implementation` is used for selecting the implementation of
+    `__get_portion_of_dataset_and_embed`
     """
 
     # Move network to proper device
@@ -235,7 +359,12 @@ def compute_cluster_sizes_metrics(
 
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
-    embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
+    embeddings, targets = __get_portion_of_dataset_and_embed(
+        data_loader,
+        net,
+        max_examples,
+        fast_implementation = fast_implementation
+    )
 
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)
@@ -250,8 +379,8 @@ def compute_cluster_sizes_metrics(
     metrics = {
         "min": min(cluster_sizes),
         "max": max(cluster_sizes),
-        "mean": np.mean(cluster_sizes),
-        "sd": np.std(cluster_sizes),
+        "mean": float(np.mean(cluster_sizes)),
+        "sd": float(np.std(cluster_sizes)),
     }
 
     return metrics
@@ -266,6 +395,10 @@ def compute_intracluster_distances(
 
     class_distances = {label: [] for label in dict_of_classes.keys()}
 
+    # Precompute all pairwise distances
+    base = loss_functions.BatchBaseTripletLoss()
+    pairwise_distances = base.precompute_pairwise_distances(elements)
+
     # Compute intra-cluster distances
     for curr_class in dict_of_classes.keys():
         for first_indx in dict_of_classes[curr_class]:
@@ -277,9 +410,10 @@ def compute_intracluster_distances(
                 if first_indx >= second_indx:
                     continue
 
-                # Get the distance and append to the list
-                distance = loss_functions.distance_function(elements[first_indx], elements[second_indx])
-                class_distances[curr_class].append(float(distance))
+                # Use the precomputation of all pairwise distances
+                class_distances[curr_class].append(
+                    float(pairwise_distances[(first_indx, second_indx)])
+                )
 
     # Some classes can have only one element, and thus no class distance
     # We don't consider this classes
@@ -291,10 +425,12 @@ def compute_intracluster_distances(
 
     return class_distances
 
+# TODO -- PERF -- this takes too much time to compute
 def compute_intercluster_metrics(
         data_loader: torch.utils.data.DataLoader,
         net: torch.nn.Module,
-        max_examples: int
+        max_examples: int,
+        fast_implementation: bool
     ) -> Dict[str, float]:
     """
     Computes metrics about intercluster metrics
@@ -303,10 +439,13 @@ def compute_intercluster_metrics(
     1. Max intercluster distance over all clusters
     2. Min intercluster distance over all clusters
     3. Mean intercluster distance
-    4. SDev of intercluster distances#33
+    4. SDev of intercluster distances
 
     Given two clusters, its distance is defined as the min distance between two points, one from
     each cluster
+
+    `fast_implementation` is used for selecting the implementation of
+    `__get_portion_of_dataset_and_embed`
     """
 
     # Move network to proper device
@@ -315,7 +454,13 @@ def compute_intercluster_metrics(
 
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
-    embeddings, targets = __get_portion_of_dataset_and_embed(data_loader, net, max_examples)
+    # TODO -- PERF -- this is taking too much time
+    embeddings, targets = __get_portion_of_dataset_and_embed(
+        data_loader,
+        net,
+        max_examples,
+        fast_implementation
+    )
 
     # Pre-compute dict of classes for efficiency
     dict_of_classes = utils.precompute_dict_of_classes(targets)
@@ -327,14 +472,17 @@ def compute_intercluster_metrics(
     intercluster_distances: Dict[Tuple[int, int], float] = compute_intercluster_distances(distances, dict_of_classes)
 
     # Flatten prev dict, indexed by two indixes
-    flatten_intercluster_distances = [distance for distance in intercluster_distances.values()]
+    flatten_intercluster_distances = intercluster_distances.values()
+
+    # Convert the data to a tensor containing all distances
+    flatten_intercluster_distances = torch.stack(list(flatten_intercluster_distances))
 
     # Now we can easily return the metrics
     metrics = {
         "min": float(min(flatten_intercluster_distances)),
         "max": float(max(flatten_intercluster_distances)),
-        "mean": float(np.mean(flatten_intercluster_distances)),
-        "sd": float(np.std(flatten_intercluster_distances)),
+        "mean": float(torch.mean(flatten_intercluster_distances)),
+        "sd": float(torch.std(flatten_intercluster_distances, unbiased = False)),
     }
 
     return metrics
@@ -382,10 +530,7 @@ def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, in
 
     # Use BatchBaseTripletLoss class for doing the computation
     base_loss = loss_functions.BatchBaseTripletLoss()
-    distances = base_loss.precompute_pairwise_distances(
-        embeddings,
-        distance_function = loss_functions.distance_function
-    )
+    distances = base_loss.precompute_pairwise_distances(embeddings)
 
     # Prev dict has elements [a, a] with distance 0. We are not interested in those
     distances = {index: distances[index] for index in distances.keys() if index[0] != index[1]}

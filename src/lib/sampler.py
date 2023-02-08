@@ -68,7 +68,6 @@ class CustomSampler(torch.utils.data.Sampler):
         # Return iterator to that index list
         return iter(self.index_list)
 
-
     def __len__(self) -> int:
         """
         Len of the __iter__ generated in this class.
@@ -115,7 +114,9 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # Log and do some debugging
         # If first clean lets us with less than `self.P` classes, we have a problem
-        file_logger.debug(f"After first cleaning, there are {len(available_classes)} available_classes")
+        file_logger.debug(
+            f"After first cleaning, there are {len(available_classes)} available_classes"
+        )
         if len(available_classes) < self.P:
             err_msg = f"After first cleaning, we have {len(available_classes)}, less than `self.P` = {self.P}"
             file_logger.error(err_msg)
@@ -219,5 +220,3 @@ class CustomSampler(torch.utils.data.Sampler):
             unique_labels = [int(x) for x in unique_labels]
 
         return unique_labels
-
-

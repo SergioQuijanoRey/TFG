@@ -157,3 +157,25 @@ class LFWResNet18(torch.nn.Module):
 
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
+
+
+class RandomNet(torch.nn.Module):
+    """
+    Random net that we are going to use in some tests and benchmarks
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(RandomNet, self).__init__()
+
+        # Dimension del embedding que la red va a calcular
+        self.embedding_dimension = embedding_dimension
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Get the batch size so we return the same number of vectors as
+        # number of given images
+        batch_size = x.shape[0]
+
+        # Random values with the embedding_dimension specified in __init__
+        return torch.rand([batch_size, self.embedding_dimension])
+

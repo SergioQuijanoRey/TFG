@@ -4,7 +4,7 @@ Different loss functions used in the project
 
 import itertools as it
 import logging
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Callable
 
 import torch
 import torch.nn as nn
@@ -12,7 +12,6 @@ import wandb
 from torch.autograd import Variable
 
 import src.lib.utils as utils
-
 
 file_logger = logging.getLogger("MAIN_LOGGER")
 
@@ -24,6 +23,7 @@ def distance_function(first: torch.Tensor, second: torch.Tensor) -> torch.Tensor
     Basic distance function. It's the base for all losses implemented in this module
     """
     return ((first - second) * (first - second)).sum().sqrt()
+
 
 
 class TripletLoss(nn.Module):
@@ -88,10 +88,9 @@ class SoftplusTripletLoss(nn.Module):
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
 
-        # Usamos Relu para que el error sea cero cuando la resta de las distancias
-        # este por debajo del margen. Si esta por encima del margen, devolvemos la
-        # identidad de dicho error. Es decir, aplicamos Relu a la formula que
-        # tenemos debajo
+        # We use ReLU so the error will be zero when positive - negative is bellow certain margin
+        # If it is above that margin, we return the identity of that error
+        # That's what ReLU does
         return self.loss_from_distances(distance_positive, distance_negative)
 
     def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
@@ -202,29 +201,47 @@ class BatchBaseTripletLoss(nn.Module):
     def precompute_pairwise_distances(
         self,
         embeddings: torch.Tensor,
-        distance_function
-    ) -> Dict[Tuple[int, int], float]:
+    ) -> Dict[Tuple[int, int], torch.FloatTensor]:
         """
-        Given a batch of embeddings and a distance function, precomputes all the pairwise distances.
-        @return distances, dict of distances where distances[i][j] = distance(x_i, x_j)
-                Only half of the matrix is computed, distances[i][j] where i <= j
+        Given a batch of embeddings, precomputes all the pairwise distances.
+        We are using the euclidean distance
+
+        @param embeddings torch.Tensor having a matrix with the embeddings
+               Must be a row matrix, that's to say, each vector is a row
+               of this matrix
+        @return distances, dict of distances where:
+                    distances[(i, j)] = distance(x_i, x_j)
+                Only half of the matrix is computed:
+                    distances[(i, j)] where i <= j
         """
 
-        distances = dict()
+        # Embeddings should be a tensor matrix
+        if utils.is_matrix_tensor(embeddings) is False:
 
-        for first_idx, first in enumerate(embeddings):
-            for second_idx, second in enumerate(embeddings):
+            err_msg = f"""`embeddings` should be a tensor containing a matrix
+            `embeddings` has {utils.number_of_modes(embeddings)} modes, instead of two"""
 
-                # Only half of the matrix is computed
-                if first_idx > second_idx:
-                    continue
+            raise ValueError(err_msg)
 
-                # Store this distance
-                distances[first_idx, second_idx] = distance_function(first, second)
+        # Use pytorch function to compute all pairwise distances
+        distances = torch.cdist(embeddings, embeddings, p = 2)
+
+        # TODO -- DESIGN -- This might make this function slower
+        # In the profiling readme, we see that this function takes 1.56 seconds
+        # to compute. 1.54 seconds are due this comprehension. But 1.56 seconds
+        # out of ~2k seconds for training are not worth the effort
+        #
+        # Convert the tensor to a dictionary
+        distances = {
+            (first, second): distances[first][second]
+            for first in range(len(distances))
+            for second in range(len(distances))
+            if first <= second
+        }
 
         return distances
 
-
+# TODO -- precompute all pairwise distances
 class BatchHardTripletLoss(nn.Module):
     """
     Implementation of Batch Hard Triplet Loss
@@ -269,6 +286,10 @@ class BatchHardTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
+
+        # Precompute all pairwise distances to speed up computation
+        self.pairwise_distances = None
+
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
         loss = 0
@@ -279,24 +300,27 @@ class BatchHardTripletLoss(nn.Module):
         # Pre-computamos la lista de negativos de cada clase
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
 
+        # Precompute all pairwise distances
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings)
+
         # Count non zero losses in order to compute the > 0 mean
         non_zero_losses = 0
 
         # Iteramos sobre todas los embeddings de las imagenes del dataset
         # TODO -- try to use pre-computed pairwise distances and see if it speeds up the calculation
-        for embedding, img_label in zip(embeddings, labels):
+        for embedding_indx, (embedding, img_label) in enumerate(zip(embeddings, labels)):
 
             # Calculamos las distancias a positivos y negativos
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
-                distance_function(embedding, embeddings[positive])
-                for positive in self.dict_of_classes[int(img_label)]
+                self.pairwise_distances[self.__resort_dict_idx(embedding_indx, positive_indx)]
+                for positive_indx in self.dict_of_classes[int(img_label)]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
             negative_distances = [
-                distance_function(embedding, embeddings[negative])
-                for negative in self.list_of_negatives[int(img_label)]
+                self.pairwise_distances[self.__resort_dict_idx(embedding_indx, negative_indx)]
+                for negative_indx in self.list_of_negatives[int(img_label)]
             ]
 
             # Tenemos una lista de tensores de un unico elemento (el valor
@@ -340,6 +364,13 @@ class BatchHardTripletLoss(nn.Module):
 
         return mean
 
+    def __resort_dict_idx(self, first: int, second: int) -> Tuple[int, int]:
+        """Our dict containing pre-computed distances only has entries indexed by [i, j] where i <= j"""
+
+        if first > second:
+            return second, first
+
+        return first, second
 
 class BatchAllTripletLoss(nn.Module):
     """
@@ -381,6 +412,9 @@ class BatchAllTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
+        # Precompute all pairwise distances to speed up computation
+        self.pairwise_distances = None
+
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
 
         loss = 0
@@ -388,7 +422,7 @@ class BatchAllTripletLoss(nn.Module):
         # Precomputations to speed up calculations
         self.dict_of_classes = utils.precompute_dict_of_classes([int(label) for label in labels])
         self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
-        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings, distance_function)
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings)
 
         # For computing the mean
         # We have to instantiate the var using this syntax so backpropagation can be done properly

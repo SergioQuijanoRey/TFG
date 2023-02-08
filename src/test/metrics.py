@@ -2,12 +2,16 @@ import unittest
 import torch
 import torchvision
 import torchvision.transforms as transforms
+import resource
 
 import src.lib.metrics as metrics
 import src.lib.utils as utils
 import src.lib.data_augmentation as data_augmentation
-import src.lib.models as models
 import src.lib.sampler as sampler
+import src.lib.models as models
+
+# Precision that we want in certain tests
+PLACES = 4
 
 class TestComputeIntraclusterDistances(unittest.TestCase):
 
@@ -30,14 +34,14 @@ class TestComputeIntraclusterDistances(unittest.TestCase):
         intra_cluster_distances = metrics.compute_intracluster_distances(dict_of_classes, images)
 
         # Distances corresponding to the first cluster
-        self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0)
-        self.assertAlmostEqual(intra_cluster_distances[0][1], 2.0)
-        self.assertAlmostEqual(intra_cluster_distances[0][2], 1.0)
+        self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[0][1], 2.0, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[0][2], 1.0, places = PLACES)
 
         # Distances corresponding to the second cluster
-        self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979)
-        self.assertAlmostEqual(intra_cluster_distances[1][1], 9.0)
-        self.assertAlmostEqual(intra_cluster_distances[1][2], 7.0710678118654755)
+        self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[1][1], 9.0, places = PLACES)
+        self.assertAlmostEqual(intra_cluster_distances[1][2], 7.0710678118654755, places = PLACES)
 
     def test_clusters_with_one_element_produce_no_distance(self):
         targets = [0, 1, 2, 3, 4, 5]
@@ -83,9 +87,21 @@ class TestComputeIntraclusterDistances(unittest.TestCase):
 
         # Some checks
         self.assertEqual(len(intra_cluster_distances), 3)
-        self.assertAlmostEqual(intra_cluster_distances[0][0], 1.0)
-        self.assertAlmostEqual(intra_cluster_distances[1][0], 2.23606797749979)
-        self.assertAlmostEqual(intra_cluster_distances[2][0], 7.0710678118654755)
+        self.assertAlmostEqual(
+            intra_cluster_distances[0][0],
+            1.0,
+            places = PLACES
+        )
+        self.assertAlmostEqual(
+            intra_cluster_distances[1][0],
+            2.23606797749979,
+            places = PLACES
+        )
+        self.assertAlmostEqual(
+            intra_cluster_distances[2][0],
+            7.0710678118654755,
+            places = PLACES
+        )
 
 class TestComputeClusterSizesMetrics(unittest.TestCase):
 
@@ -108,18 +124,25 @@ class TestComputeClusterSizesMetrics(unittest.TestCase):
 
     def test_basic_case(self):
 
-        dataset = self.__generate_basic_dataset()
-        dataloader = torch.utils.data.DataLoader(dataset)
-        net = torch.nn.Identity()
+        for fast_implementation in [True, False]:
 
-        # Compute the cluster metrics
-        cluster_metrics = metrics.compute_cluster_sizes_metrics(dataloader, net, 6)
+            dataset = self.__generate_basic_dataset()
+            dataloader = torch.utils.data.DataLoader(dataset)
+            net = torch.nn.Identity()
 
-        # Make some checks
-        self.assertAlmostEqual(cluster_metrics["min"], 2.0)
-        self.assertAlmostEqual(cluster_metrics["max"], 9.0)
-        self.assertAlmostEqual(cluster_metrics["mean"], 5.5)
-        self.assertAlmostEqual(cluster_metrics["sd"], 3.5)
+            # Compute the cluster metrics
+            cluster_metrics = metrics.compute_cluster_sizes_metrics(
+                dataloader,
+                net,
+                6,
+                fast_implementation
+            )
+
+            # Make some checks
+            self.assertAlmostEqual(cluster_metrics["min"], 2.0, places = PLACES)
+            self.assertAlmostEqual(cluster_metrics["max"], 9.0, places = PLACES)
+            self.assertAlmostEqual(cluster_metrics["mean"], 5.5, places = PLACES)
+            self.assertAlmostEqual(cluster_metrics["sd"], 3.5, places = PLACES)
 
 class TestComputeInterclusterDistances(unittest.TestCase):
 
@@ -157,9 +180,9 @@ class TestComputeInterclusterDistances(unittest.TestCase):
         intercluster_distances = metrics.compute_intercluster_distances(distances, dict_of_classes)
 
         # Make some checks on the returned data
-        self.assertAlmostEqual(intercluster_distances[0, 1], 1.1)
-        self.assertAlmostEqual(intercluster_distances[0, 2], 0.5)
-        self.assertAlmostEqual(intercluster_distances[1, 2], 0.102)
+        self.assertAlmostEqual(intercluster_distances[0, 1], 1.1, places = PLACES)
+        self.assertAlmostEqual(intercluster_distances[0, 2], 0.5, places = PLACES)
+        self.assertAlmostEqual(intercluster_distances[1, 2], 0.102, places = PLACES)
 
     def test_single_element_clusters(self):
         # Basic data for the test
@@ -239,114 +262,245 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
 
     def test_basic_case(self):
 
-        # Get the data into a dataloader
-        dataset = self.__generate_basic_dataset()
-        dataloader = torch.utils.data.DataLoader(dataset)
+        for fast_implementation in [True, False]:
 
-        # Identity net for not mutating the mock data
-        net = torch.nn.Identity()
+            # Get the data into a dataloader
+            dataset = self.__generate_basic_dataset()
+            dataloader = torch.utils.data.DataLoader(dataset)
 
-        # Get the metrics
-        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
+            # Identity net for not mutating the mock data
+            net = torch.nn.Identity()
 
-        # Make some checks on the metrics
-        self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = 4)
-        self.assertAlmostEqual(intercluster_metrics["max"], 3.1623, places = 4)
-        self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = 4)
+            # Get the metrics
+            intercluster_metrics = metrics.compute_intercluster_metrics(
+                dataloader,
+                net,
+                6,
+                fast_implementation
+            )
+
+            # Make some checks on the metrics
+            self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = PLACES)
+            self.assertAlmostEqual(intercluster_metrics["max"], 3.1623, places = PLACES)
+            self.assertAlmostEqual(intercluster_metrics["mean"], 2.1328, places = PLACES)
 
     def test_single_element_clusters(self):
 
-        # Get the same data as in __generate_basic_dataset, but changing the labels
-        # We cannot get the dataset and change `dataset.targets` because in TensorDataset
-        # this doesn't work
-        targets = torch.Tensor([0, 1, 2, 3, 4, 5])
-        images = torch.Tensor([
-            # Class 0 images
-            [0, 0, 0],
-            [0, 0, 1],
-            [0, 0, 2],
+        for fast_implementation in [True, False]:
 
-            # Class 1 images
-            [1, 0, 0],
-            [3, 1, 0],
-            [10, 0, 0],
-        ])
+            # Get the same data as in __generate_basic_dataset, but changing the labels
+            # We cannot get the dataset and change `dataset.targets` because in TensorDataset
+            # this doesn't work
+            targets = torch.Tensor([0, 1, 2, 3, 4, 5])
+            images = torch.Tensor([
+                # Class 0 images
+                [0, 0, 0],
+                [0, 0, 1],
+                [0, 0, 2],
 
-        dataset = torch.utils.data.TensorDataset(images, targets)
+                # Class 1 images
+                [1, 0, 0],
+                [3, 1, 0],
+                [10, 0, 0],
+            ])
 
-        # Wrap dataset into a dataloader
-        dataloader = torch.utils.data.DataLoader(dataset)
+            dataset = torch.utils.data.TensorDataset(images, targets)
 
-        # Identity network
-        net = torch.nn.Identity()
+            # Wrap dataset into a dataloader
+            dataloader = torch.utils.data.DataLoader(dataset)
 
-        # Get the metrics
-        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, 6)
+            # Identity network
+            net = torch.nn.Identity()
 
-        # Make some checks about the obtained metrics
-        self.assertAlmostEqual(intercluster_metrics["mean"], 4.495059454322822)
-        self.assertAlmostEqual(intercluster_metrics["min"], 1.0)
-        self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569)
-        self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045)
+            # Get the metrics
+            intercluster_metrics = metrics.compute_intercluster_metrics(
+                dataloader,
+                net,
+                6,
+                fast_implementation
+            )
 
-    def test_lfw_dataset_works(self):
+            # Make some checks about the obtained metrics
+            self.assertAlmostEqual(intercluster_metrics["mean"], 4.495059454322822, places = PLACES)
+            self.assertAlmostEqual(intercluster_metrics["min"], 1.0, places = PLACES)
+            self.assertAlmostEqual(intercluster_metrics["max"], 10.198039027185569, places = PLACES)
+            self.assertAlmostEqual(intercluster_metrics["sd"], 3.5300293438964045, places = PLACES)
+
+    def test_lfw_dataset_works_basic(self):
         """
         I had problems running `compute_intercluster_metrics` for a portion of the LFW dataset. So
         in this test we're simply try to compute the values without any crash
+
+        We're using a random net to test the behaviour
         """
 
-        # Load the dataset
-        transform = transforms.Compose([
-            transforms.Resize((250, 250)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                 (0.5, 0.5, 0.5),
-                 (0.5, 0.5, 0.5)
-             ),
-        ])
-        dataset = torchvision.datasets.LFWPeople(
-            root = "./data",
-            split = "train",
-            download = True,
-            transform = transform,
-        )
+        for fast_implementation in [True, False]:
 
-
-        # Apply data augmentation for having at least 4 images per class
-        augmented_dataset = data_augmentation.LazyAugmentatedDataset(
-            base_dataset = dataset,
-            min_number_of_images = 4,
-
-            # Remember that the trasformation has to be random type
-            # Otherwise, we could end with a lot of repeated images
+            # Load the dataset
             transform = transforms.Compose([
-                transforms.RandomResizedCrop(size=(250, 250)),
-                transforms.RandomRotation(degrees=(0, 180)),
-                transforms.RandomAutocontrast(),
+                transforms.Resize((250, 250)),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    (0.5, 0.5, 0.5),
+                    (0.5, 0.5, 0.5)
+                ),
+            ])
+            dataset = torchvision.datasets.LFWPeople(
+                root = "./data",
+                split = "train",
+                download = True,
+                transform = transform,
+            )
+
+            # Apply data augmentation for having at least 4 images per class
+            augmented_dataset = data_augmentation.LazyAugmentatedDataset(
+                base_dataset = dataset,
+                min_number_of_images = 4,
+
+                # Remember that the trasformation has to be random type
+                # Otherwise, we could end with a lot of repeated images
+                transform = transforms.Compose([
+                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomRotation(degrees=(0, 180)),
+                    transforms.RandomAutocontrast(),
                 ])
 
-        )
+            )
 
-        # Now put a loader in front of the augmented dataset
-        dataloader = torch.utils.data.DataLoader(
-            augmented_dataset,
-            batch_size = 3 * 4,
-            num_workers = 1,
-            pin_memory = True,
-            sampler = sampler.CustomSampler(3, 4, augmented_dataset)
-        )
+            # Now put a loader in front of the augmented dataset
+            dataloader = torch.utils.data.DataLoader(
+                augmented_dataset,
+                batch_size = 3 * 4,
+                num_workers = 1,
+                pin_memory = True,
+                sampler = sampler.CustomSampler(3, 4, augmented_dataset)
+            )
 
-        # Network that we're using in LFW dataset notebook
-        net = models.LFWResNet18(5)
-        net = torch.nn.Identity()
+            # Network that we're using in LFW dataset notebook
+            # We cannot use identity, because now we're expecting that the outputs
+            # of the network are vectors of size the embedding dimension
+            # This way, we have a matrix of embedding vectors
+            #
+            # Using identity would produce nxnx3 (3 channels) outputs, making
+            # `loss_functions.precompute_dict_of_classes` fail
+            net = models.RandomNet(embedding_dimension = 4)
 
-        # Get the metrics for a 1/5 of the training dataset
-        intercluster_metrics = metrics.compute_intercluster_metrics(dataloader, net, int(len(augmented_dataset) * DATASET_PORTION))
+            # Get the metrics for a 1/5 of the training dataset
+            intercluster_metrics = metrics.compute_intercluster_metrics(
+                dataloader,
+                net,
+                int(len(augmented_dataset) * DATASET_PORTION),
+                fast_implementation
+            )
 
-        # To check that the metrics were computed, just make some basic checks
-        # All entries should be floats. Moreover, all should be greater than zero
-        # So that is enough for our test
-        self.assertGreater(intercluster_metrics["mean"], 0.0)
-        self.assertGreater(intercluster_metrics["min"], 0.0)
-        self.assertGreater(intercluster_metrics["max"], 0.0)
-        self.assertGreater(intercluster_metrics["sd"], 0.0)
+            # To check that the metrics were computed, just make some basic checks
+            # All entries should be floats. Moreover, all should be greater than zero
+            # So that is enough for our test
+            self.assertGreater(intercluster_metrics["mean"], 0.0)
+            self.assertGreater(intercluster_metrics["min"], 0.0)
+            self.assertGreater(intercluster_metrics["max"], 0.0)
+            self.assertGreater(intercluster_metrics["sd"], 0.0)
+
+
+    def test_lfw_dataset_works_more_real(self):
+        """
+        I had problems running `compute_cluster_sizes_metrics`, and more
+        specifically, in `__get_portion_of_dataset_and_embed`, for a portion of
+        the LFW dataset. `test_lfw_dataset_works_basic` did not catch the error
+        that now happens. We think that is because the network used there is not
+        the network we're using in real training
+
+        So this test is the same as `test_lfw_dataset_works_basic` but using
+        the network that we use in the notebook
+        """
+
+        for fast_implementation in [True, False]:
+
+            # This test can get all my RAM memory, freezing the laptop
+            # So limit the mem usage for this test
+
+            # `GB_RAM` sets the max amount of ram that we want to use in this test
+            GB_RAM = 5              # This RAM should be enough
+            MB_RAM = GB_RAM * 1024
+            KB_RAM = MB_RAM * 1024
+            B_RAM = KB_RAM * 1024
+
+            # Now, limit the RAM usage
+            print(f"🧠 Limiting the amount of ram to {MB_RAM} MB")
+            soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+            resource.setrlimit(resource.RLIMIT_AS, (B_RAM, hard))
+            print("Limiting done!")
+            print("")
+
+            # Parameters of the model
+            # P - K values low so RAM usage is below our limit
+            P, K = 2, 2
+
+            # Load the dataset
+            transform = transforms.Compose([
+                transforms.Resize((250, 250)),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    (0.5, 0.5, 0.5),
+                    (0.5, 0.5, 0.5)
+                ),
+            ])
+            dataset = torchvision.datasets.LFWPeople(
+                root = "./data",
+                split = "train",
+                download = True,
+                transform = transform,
+            )
+
+            # Apply data augmentation for having at least 4 images per class
+            augmented_dataset = data_augmentation.LazyAugmentatedDataset(
+                base_dataset = dataset,
+                min_number_of_images = K,
+
+                # Remember that the trasformation has to be random type
+                # Otherwise, we could end with a lot of repeated images
+                transform = transforms.Compose([
+                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomRotation(degrees=(0, 180)),
+                    transforms.RandomAutocontrast(),
+                ])
+
+            )
+
+            # Now put a loader in front of the augmented dataset
+            dataloader = torch.utils.data.DataLoader(
+                augmented_dataset,
+                batch_size = P * K,
+                num_workers = 1,
+                pin_memory = True,
+                sampler = sampler.CustomSampler(P, K, augmented_dataset)
+            )
+
+            # Network that we're using in LFW dataset notebook
+            # We cannot use identity, because now we're expecting that the outputs
+            # of the network are vectors of size the embedding dimension
+            # This way, we have a matrix of embedding vectors
+            #
+            # Using identity would produce nxnx3 (3 channels) outputs, making
+            # `loss_functions.precompute_dict_of_classes` fail
+            #
+            # Permutation makes the test fail, because we're running on CPU
+            # When running in GPU, `should_permute = True` is fine
+            net = models.LFWResNet18(3)
+            net.set_permute(should_permute = False)
+
+            # Get the metrics for a 1/5 of the training dataset
+            intercluster_metrics = metrics.compute_intercluster_metrics(
+                dataloader,
+                net,
+                int(len(augmented_dataset) * DATASET_PORTION),
+                fast_implementation
+            )
+
+            # To check that the metrics were computed, just make some basic checks
+            # All entries should be floats. Moreover, all should be greater than zero
+            # So that is enough for our test
+            self.assertGreater(intercluster_metrics["mean"], 0.0)
+            self.assertGreater(intercluster_metrics["min"], 0.0)
+            self.assertGreater(intercluster_metrics["max"], 0.0)
+            self.assertGreater(intercluster_metrics["sd"], 0.0)

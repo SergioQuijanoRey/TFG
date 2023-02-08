@@ -1,9 +1,8 @@
 import torch
-import torchvision
 import numpy as np
 from tqdm import tqdm
 from collections import Counter
-from typing import Callable, List
+from typing import List
 
 import src.lib.utils as utils
 

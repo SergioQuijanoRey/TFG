@@ -4,6 +4,7 @@ Module to put utilities code
 
 from typing import Tuple, List, Dict, Union
 import numpy as np
+import torch
 
 def precompute_dict_of_classes(labels: Union[List[int], np.ndarray]) -> Dict[int, List[int]]:
     """
@@ -45,3 +46,23 @@ def rearrange_indx(first: int, second: int) -> Tuple[int, int]:
 
     return (second, first)
 
+def is_matrix_tensor(tensor: torch.Tensor) -> bool:
+    """
+    Checks if a given `tensor` is a matrix tensor
+    That's to say, if the `tensor` has two modes
+    """
+
+    return number_of_modes(tensor) == 2
+
+def is_vector_tensor(tensor: torch.Tensor) -> bool:
+    """
+    Checks if a given `tensor` is a vector tensor
+    That's to say, if the `tensor` has only one mode
+    """
+
+    return number_of_modes(tensor) == 1
+
+def number_of_modes(tensor: torch.Tensor) -> int:
+    """Given a `tensor`, returns its number of modes"""
+
+    return len(tensor.shape)
