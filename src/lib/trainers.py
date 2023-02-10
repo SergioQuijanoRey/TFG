@@ -14,6 +14,7 @@ import wandb
 from torch.utils.data import DataLoader
 
 import src.lib.filesystem as filesystem
+import src.lib.utils as utils
 from src.lib.core import get_device, get_datetime_str
 from src.lib.train_loggers import TrainLogger, SilentLogger
 
@@ -242,11 +243,9 @@ def train_model_online(
             file_logger.debug(f"In iteration {i} of epoch {epoch}, {len(labels)} elements have been seen")
             wandb.log({"Running loss": loss})
 
-            # TODO -- write the implementation
-            # Log the norm of the obtained embeddings
-            # We compute the norm of each row of the matrix tensor, using
-            # `dim = 1`
-            embeddings_norm = torch.norm(outputs, dim = 1)
+            # Log the norm of the embeddings. Start by computing the norm of
+            # each embedding in the batch
+            embeddings_norm = utils.norm_of_each_row(outputs)
 
             # We have a list of norms, of len the used batch size. Compute some
             # stats and log them
