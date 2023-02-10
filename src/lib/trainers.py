@@ -7,6 +7,7 @@ import logging
 import os
 from typing import List, Dict, Union
 
+import torch
 import torch.nn as nn
 import torch.optim as optim
 import wandb
@@ -237,8 +238,26 @@ def train_model_online(
             how_may_elements_seen += len(labels)
             epoch_iteration += len(labels)
 
-            file_logger.debug(f"In iteration {i} of epoch {epoch} {len(labels)} elements have been seen")
+            # Log the running loss
+            file_logger.debug(f"In iteration {i} of epoch {epoch}, {len(labels)} elements have been seen")
             wandb.log({"Running loss": loss})
+
+            # TODO -- write the implementation
+            # Log the norm of the obtained embeddings
+            # We compute the norm of each row of the matrix tensor, using
+            # `dim = 1`
+            embeddings_norm = torch.norm(outputs, dim = 1)
+
+            # We have a list of norms, of len the used batch size. Compute some
+            # stats and log them
+            norm_metrics = {
+                "Embeddings norm, min": torch.min(embeddings_norm),
+                "Embeddings norm, max": torch.max(embeddings_norm),
+                "Embeddings norm, mean": torch.mean(embeddings_norm),
+                "Embeddings norm, std": torch.std(embeddings_norm, unbiased = False),
+            }
+            wandb.log(norm_metrics)
+            file_logger.debug(f"In iteration {i} of epoch {epoch}, embedding norms have the following metrics:\n{norm_metrics}")
 
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):
