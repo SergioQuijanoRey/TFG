@@ -267,7 +267,6 @@ class BatchBaseTripletLoss(nn.Module):
 
         return distances
 
-# TODO -- precompute all pairwise distances
 class BatchHardTripletLoss(nn.Module):
     """
     Implementation of Batch Hard Triplet Loss
@@ -505,3 +504,42 @@ class BatchAllTripletLoss(nn.Module):
             return second, first
 
         return first, second
+
+
+class AddSmallEmbeddingPenalization(nn.Module):
+    """
+    Given a loss function that acts on batches, compute that loss and add a
+    loss term related to the norm of the embeddings
+
+    We don't want our embeddings to collapse to zero, so we compute the norm
+    of the embeddings. We penalize small norms.
+
+    We do that in the following way:
+
+    1. Compute the given loss on the batch
+    2. Compute the `mean` of the norms of the embeddings
+    3. Add `penalty_factor * 1 / mean` to the base loss
+
+    NOTE: can be unstable, because we are adding the inverse of the mean norm
+    (which can be zero) scaled by a factor. That's why we have `self.epsilon`,
+    to try to mitigate instability
+    """
+
+    def __init__(self, base_loss: nn.Module, penalty_factor: float):
+        super(AddSmallEmbeddingPenalization, self).__init__()
+
+        self.base_loss = base_loss
+        self.penalty_factor = penalty_factor
+        self.epsilon = 0.0001
+
+    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
+
+        # Start computing base loss
+        loss = self.base_loss(embeddings, labels)
+
+        # Compute the mean of the norms
+        norms = utils.norm_of_each_row(embeddings)
+        norms_mean = float(torch.mean(norms))
+
+        # Compose both terms adding them
+        return loss + self.penalty_factor / (norms_mean + self.epsilon)
