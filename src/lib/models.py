@@ -114,7 +114,6 @@ class LFWResNet18(torch.nn.Module):
     """
     Pretrained ResNet18 on ImageNet, for MNIST dataset. Some slight changes have been made:
 
-    - First convolution (in_channels = 1 and not in_channels = 3)
     - Last linear layer have out_features given by __init__ parameter
     """
 
@@ -178,4 +177,3 @@ class RandomNet(torch.nn.Module):
 
         # Random values with the embedding_dimension specified in __init__
         return torch.rand([batch_size, self.embedding_dimension])
-
