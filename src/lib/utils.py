@@ -66,3 +66,23 @@ def number_of_modes(tensor: torch.Tensor) -> int:
     """Given a `tensor`, returns its number of modes"""
 
     return len(tensor.shape)
+
+
+def norm_of_each_row(embeddings: torch.Tensor) -> torch.Tensor:
+    """
+    Given a matrix tensor, containing embedding vectors stored in rows,
+    computes the norm of each vector
+
+    Returns a tensor list, with the norm of each row
+    """
+
+    # Sanity check
+    if is_matrix_tensor(embeddings) is False:
+        err_msg = f"""`embeddings` is not a matrix tensor
+        Expected order 2, got order {number_of_modes(embeddings)}"""
+
+        raise ValueError(err_msg)
+
+    # We compute the norm of each row of the matrix tensor, using
+    # `dim = 1`
+    return torch.norm(embeddings, dim = 1)
