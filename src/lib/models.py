@@ -157,6 +157,58 @@ class LFWResNet18(torch.nn.Module):
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
 
+class LFWLightModel(torch.nn.Module):
+    """
+    Very light model. Used mainly to test ideas with a fast model. For LFW dataset
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(LFWLightModel, self).__init__()
+
+        # Dimension del embedding que la red va a calcular
+        self.embedding_dimension = embedding_dimension
+
+        # Bloques convolucionales
+        self.conv1 = nn.Conv2d(in_channels = 3, out_channels = 4, kernel_size = 3)
+        self.conv2 = nn.Conv2d(in_channels = 4, out_channels = 8, kernel_size = 3)
+        self.conv3 = nn.Conv2d(in_channels = 8, out_channels = 16, kernel_size = 3)
+        self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
+        self.fc = nn.Linear(in_features = 468512, out_features = self.embedding_dimension)
+
+        self.should_permute = True
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+
+        # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
+        # queremos tensores (DATALOADER_BACH_SIZE, 1, 28, 28) para poder trabajar
+        # con la red
+        # Usamos permute en vez de reshape porque queremos que tambien funcione al
+        # realizar inferencia con distintos tamaños de minibatch (ie. 1)
+        if self.should_permute is True:
+            x = torch.permute(x, (1, 0, 2, 3))
+
+        # Pasamos el tensor por los distintos bloques de nuestra red
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+
+
+        # Max pooling y seguido flatten de todas las dimensiones menos la del batch
+        x = F.max_pool2d(x, 2)
+        x = torch.flatten(x, 1)
+
+        # Fully connected para llevar el vector aplanado a la dimension del
+        # embedding
+        x = self.fc(x)
+
+        return x
+
+    def set_permute(self, should_permute: bool):
+        self.should_permute = should_permute
+
+
 
 class RandomNet(torch.nn.Module):
     """
