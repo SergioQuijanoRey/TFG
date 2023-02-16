@@ -467,9 +467,9 @@ En el caso de que tengamos dos vectores $\mathbf{u} \in \R^{N_1}, \mathbf{v} \in
 Como ya se ha comentado en \customref{ch:introduccion}, las descomposiciones tensoriales van a ser fundamentales en este estudio. Así que empezamos con la descomposición mas sencilla de las dos. Comenzamos con la siguiente propiedad:
 
 \begin{proposicion}[Producto tensorial de dos vectores]
-    Sean $\mathbf{v} \in R^{N_1}, \mathbf{w} \in \R^{N_2}$ dos vectores. Entonces su producto tensorial puede expresarse como:
+    Sean $\mathbf{v} \in R^{N}, \mathbf{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
 
-    $$\mathbf{v} \otimes \mathbf{w} = \mathbf{v} \mathbf{w}^T \in \matrices{N_1}{N_2}$$
+    $$\mathbf{v} \otimes \mathbf{w} = \mathbf{v} \mathbf{w}^T \in \matrices{N}{M}$$
 
     Además, esta matriz es de rango uno.
 \end{proposicion}
@@ -477,11 +477,39 @@ Como ya se ha comentado en \customref{ch:introduccion}, las descomposiciones ten
 % TODO -- probar esta proposicion, que la tengo en las notas a mano
 \begin{proof}
 
-TODO -- hay que probarlo!
+Sean $\mathbf{v} = (v_1, \ldots, v_N)$ y $\mathbf{w} = (w_1, \ldots, w_M)$, ambos no nulos. Entonces, usando la expresión del producto tensorial que introducimos en \customref{sec:otra_forma_tensores}, tenemos que:
+
+\begin{equation}
+    \mathbf{v} \otimes \mathbf{w} = (v_i w_j)_{i \in \deltaset{N},\ j \in \deltaset{M}}
+\end{equation}
+
+O lo que es lo mismo:
+
+\begin{equation}
+    \mathbf{v} \otimes \mathbf{w} = \begin{pmatrix}
+        v_1 w_1 & v_1 w_2 & \ldots & v_1 w_M \\
+        v_2 w_1 & v_2 w_2 & \ldots & v_1 w_M \\
+        \vdots  & \vdots & & \vdots \\
+        v_N w_1 & v_N w_2 & \ldots & v_N w_M \\
+    \end{pmatrix}
+\end{equation}
+
+Que claramente se corresponde con la expresión de $\mathbf{v} \mathbf{w}^T$. Además, es claro que la fila $i$-ésima viene dada por el vector fila
+
+$$(v_i w_1, v_i w_2, \ldots, v_i w_M) = v_i (w_1, \ldots, w_M) = v_i \mathbf{w}^T$$
+
+Por tanto, todas las filas son combinación lineal de una de las filas. Como $\mathbf{v} \neq \gorroflecha{0}$, se debe cumplir que $\exists i_0 \in \deltaset{N}: v_{i_0} \neq 0$. Esa será la fila que escogemos para expresar el resto de filas como combinación lineal de esta, aprovechando de que es no nula. Dicha fila se puede expresar como $v_{i_0} \mathbf{w}^T$. La fila $i$-ésima se puede expresar como $v_i \mathbf{w}^T$. Y por tanto:
+
+\begin{equation}
+\begin{split}
+    v_i \mathbf{w}^T = \lambda \cdot v_{i_0} \mathbf{w}^T \iif & \lambda = \frac{v_i}{v_{i_0}} \\
+    & \lambda \neq 0 \iif v_i \neq 0
+\end{split}
+\end{equation}
+
+Con esto sabemos que $rank(\mathbf{v} \otimes \mathbf{w}) \leq 1$, pero podría darse el caso de que el rango fuese cero. Sin embargo, esto no es posible. Como $\mathbf{v}, \mathbf{w} \neq \gorroflecha{0}$, entonces $\exists i_0 \in \deltaset{N}, \exists j_0 \in \deltaset{M}$ de modo que $v_{i_0}, w_{j_0} \neq 0$. Por tanto, el menor de orden 1 asociado a la fila $i_0$-ésima y columna $j_0$-ésima tiene el valor $v_{i_0} w_{j_0} \neq 0$, y con ello, $rank(\mathbf{v} \otimes \mathbf{w}) \geq 1$.
 
 \end{proof}
-
-$\customqed$
 
 Con esto, podemos definir el siguiente tipo de tensores:
 
