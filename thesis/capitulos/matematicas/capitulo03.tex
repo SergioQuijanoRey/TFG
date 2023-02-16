@@ -11,6 +11,7 @@ Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
 
 % TODO -- no se que nombre le dan a cada una de las redes en el paper
 \begin{itemize}
+    % TODO -- hay que darle un nombre a esto
     \item Redes neuronales no profundas, a partir
     \item Redes convolucionales profundas, a partir de los \textit{circuitos convolucionales aritméticos}
 \end{itemize}
@@ -45,17 +46,61 @@ Con esto, dado un elemento $X \in \mathcal{X}$, lo clasificaremos buscando la et
 
 $$label(X) := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
 
-Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de funciones $\mathcal{X} \to \R$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\Gamma_r \subset \Gamma$ de funciones de puntuación.
+Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de funciones $\mathcal{X} \to \R$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\Gamma_{restringido} \subset \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
 
 \section{Espacio de hipótesis general}
 
+\subsection{Justificación para la representación de las funciones de puntuación} \label{sec:justificacion_func_repr}
+
 % TODO -- desarrollar el apéndice 6 donde se justifica que esta ecuación es lo
 % suficientemente general
+TODO -- desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general
 
-Por todo esto, las funciones de puntuación serán de la forma:
+\subsection{Representación de las funciones de puntuación}
+
+Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
 \begin{equation} \label{eq:puntuacion_general}
     h_y(\mathbf{x_1}, \ldots, \mathbf{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\mathbf{x_i})
 \end{equation}
+
+Explicamos ahora algunos detalles sobre esta ecuación, que será central en nuestro trabajo.
+
+En primer lugar, usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$
+
+Las funciones $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ son las \textbf{funciones de representación}. Cada una de estas funciones se selecciona de una familia paramétrica
+
+$$\mathcal{F} = \{ f_{\theta}: \R^s \to \R / \theta \in \Theta \}$$
+
+Algunas funciones de representación usuales son:
+
+\begin{itemize}
+    \item \textit{Wavelets}
+    \item Funciones de base radial (\textit{RBF}), normalmente la Gaussian
+    \item Neuronas
+\end{itemize}
+
+% TODO -- no he justificado que haya funciones de representacion linealmente independientes
+El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumatoria en \eqref{eq:puntuacion_general}, es claro que tiene orden $N$ y dimensión $M$ en cada modo. Por lo comentado en \customref{sec:justificacion_func_repr}, normalmente consideramos funciones de representación linealmente independientes.
+
+Estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de representación $h_y, y \in \mathcal{Y}$, lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$.
+
+La tarea de aprendizaje ahora será aprender los valores de los parámetros $\theta_1, \ldots, \theta_M$ y los valores de los tensores de coeficientes $\mathcal{A}^1, \ldots, \mathcal{A}^Y$.
+
+\begin{observacion}
+    Notar que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\mathbf{x_i}$ solo participan en el productorio que involucra computar $f_{\theta_{d_i}}(\mathbf{x_i})$.
+
+    Por tanto, podemos considerar como paso inicial el cómputo de los valores
+
+    $$\{f_{\theta_d}(x_i) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
+
+    % Lo de los M canales lo tengo mas dudoso, porque no es necesariamente igual
+    % que en una capa convolucional de machine learning
+    Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los valores $\mathbf{x_i}$ para nada más. Con esto, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores. Podemos considerar dicha capa como una \textbf{primera capa convolucional} con $M$ canales, a la que llamaremos \textbf{capa de representación}.
+
+    Y como ya hemos comentado, estamos usando las mismas funciones de representación para las $Y$ funciones de puntuación. Por tanto, en todas las funciones de puntuación, la capa de representación será la misma.
+\end{observacion}
+
+
 
 \endinput
