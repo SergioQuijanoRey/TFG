@@ -56,7 +56,7 @@ Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de fun
 % suficientemente general
 TODO -- desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general
 
-\subsection{Representación de las funciones de puntuación}
+\subsection{Representación de las funciones de puntuación} \label{sec:repr_funciones_puntuacion}
 
 Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
@@ -101,6 +101,30 @@ La tarea de aprendizaje ahora será aprender los valores de los parámetros $\th
     Y como ya hemos comentado, estamos usando las mismas funciones de representación para las $Y$ funciones de puntuación. Por tanto, en todas las funciones de puntuación, la capa de representación será la misma.
 \end{observacion}
 
+\begin{observacion}
+    Si consideramos el espacio de funciones generado por la base
+
+    $$\{(\mathbf{x_1}, \ldots, \mathbf{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\mathbf{x_i}) / d_i \in \deltaset{M} \forall i \in \deltaset{N}\}$$
+
+    entonces el tensor $\mathcal{A}^y$ nos da los coeficientes en dicha base de la función de puntuación $h_y$.
+\end{observacion}
+
+Como ya hemos dicho, los tensores de coeficientes tienen orden $N$ y dimensión $M$ en cada modo. Por tanto, cada tensor tiene $M^N$ valores reales, que deberemos aprender. Esto supone un reto, lo que \textbf{motiva uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje de los tensores de coeficientes sea más factible.
+
+\subsection{Modelo CP}
+
+Como ya hemos comentado en \customref{sec:repr_funciones_puntuacion}, buscaremos descomponer el tensor de coeficientes $\mathcal{A}^y$ en la ecuación \eqref{eq:puntuacion_general}, para que el aprendizaje de sus coeficientes sea computacionalmente factible.
+
+La idea más simple es aplicar la \textit{descomposición CP}, que introducimos en \eqref{eq:cp_decomp}, en la ecuación \eqref{eq:puntuacion_general}. Usaremos una descomposición conjunta para los tensores:
+
+\begin{equation}
+    \mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \boldsymbol{\omega}^{z, 1} \otimes \ldots \otimes \boldsymbol{\omega}^{z, N}
+\end{equation}
+
+Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por \eqref{eq:cp_decomp} que $a_z^y \in \R$, y por tanto, podemos considerar $\mathbf{a}^y := (a_1^y, \ldots, a_Z^y)^T \in \R^Z$. En segundo lugar, y de nuevo, conforme a \eqref{eq:cp_decomp}, tenemos los vectores $\boldsymbol{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}, i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\boldsymbol{\omega}^{z, i}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\mathbf{a}^y$.
+
+\begin{equation} \label{eq:modelo_cp}
+\end{equation}
 
 
 \endinput

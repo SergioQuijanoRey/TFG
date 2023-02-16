@@ -503,7 +503,7 @@ Por tanto, todas las filas son combinación lineal de una de las filas. Como $\m
 \begin{equation}
 \begin{split}
     v_i \mathbf{w}^T = \lambda \cdot v_{i_0} \mathbf{w}^T \iif & \lambda = \frac{v_i}{v_{i_0}} \\
-    & \lambda \neq 0 \iif v_i \neq 0
+                                                               & \lambda \neq 0 \iif v_i \neq 0
 \end{split}
 \end{equation}
 
@@ -538,15 +538,13 @@ TODO -- hay que demostrarlo
 
 \end{proof}
 
-$\customqed$
+\begin{observacion}
+    Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
+\end{observacion}
 
-A partir de esto, hay que tener en cuenta las siguientes observaciones:
-
-\begin{enumerate}
-    % TODO -- colocar el valor real de $Z$
-    \item En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. Esto motivará la definición que haremos más adelante de \textit{rango CP}.
-    \item Todos los sumandos tienen el mismo número de vectores con los que hacemos el producto tensorial. Además, este número es el orden del tensor que estamos descomponiendo
-\end{enumerate}
+\begin{observacion}
+En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. Esto motivará la definición que haremos más adelante de \textit{rango CP}. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
+\end{observacion}
 
 Con esto, hemos motivado la siguiente definición:
 
