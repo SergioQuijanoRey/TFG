@@ -40,6 +40,7 @@ upload_uni:
         --exclude '.mypy_cache' \
         --exclude 'justfile' \
         --exclude 'slurm*.out' \
+        --exclude 'wandb' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server
@@ -52,6 +53,7 @@ download_uni:
         --exclude '.mypy_cache' \
         --exclude 'justfile' \
         --exclude 'slurm*.out' \
+        --exclude 'wandb' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
 remote_fs:
