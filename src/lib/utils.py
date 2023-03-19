@@ -5,6 +5,9 @@ Module to put utilities code
 from typing import Tuple, List, Dict, Union
 import numpy as np
 import torch
+import os
+import wandb
+import dotenv
 
 def precompute_dict_of_classes(labels: Union[List[int], np.ndarray]) -> Dict[int, List[int]]:
     """
@@ -86,3 +89,28 @@ def norm_of_each_row(embeddings: torch.Tensor) -> torch.Tensor:
     # We compute the norm of each row of the matrix tensor, using
     # `dim = 1`
     return torch.norm(embeddings, dim = 1)
+
+def wandb_log_and_set_env_vars(base_path: str):
+    """
+    WANDB in UGR's servers need to change some env vars
+    So we change that env vars in this function
+    """
+
+    print("-> Changing WANDB env values")
+
+    os.environ["WANDB_CONFIG_DIR"] = os.path.join(base_path, "wandb_config_dir_testing")
+    os.environ["WANDB_CACHE_DIR"] = os.path.join(base_path, "wandb_cache_dir_testing")
+    os.environ["WANDB_DIR"] = os.path.join(base_path, "wandb_dir_testing")
+    os.environ["WANDB_DATA_DIR"] = os.path.join(base_path, "wandb_datadir_testing")
+
+    print("-> Changing done!")
+    print("")
+
+    # Read contents from .env file
+    # Use them to login to wandb
+    print("-> Loging to wandb using key stored in `.env`")
+    dotenv.load_dotenv()
+    wandb.login(key = os.environ["WANDB_API_KEY"])
+    print("-> Loging done")
+    print("")
+
