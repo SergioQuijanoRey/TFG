@@ -1,5 +1,9 @@
 CURRENT_NOTEBOOK := "LFW Notebook.ipynb"
 
+# Uni server parameters
+SSH_ALIAS := "ugr"
+SSH_DATA_PATH := "/mnt/homeGPU/squijano/TFG/"
+
 # Default command that list all the available commands
 default:
 	@just --list
@@ -26,6 +30,32 @@ upload_benchmarks REMOTE:
 upload_lib_benchmarks REMOTE:
     just upload_lib "{{REMOTE}}"
     just upload_benchmarks "{{REMOTE}}"
+
+# Upload code to UNI server
+upload_uni:
+    rsync -zaP \
+        --exclude 'custom_env_squijano' \
+        --exclude '.git' \
+        --exclude '.github' \
+        --exclude '.mypy_cache' \
+        --exclude 'justfile' \
+        --exclude 'slurm*.out' \
+        ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
+
+# Download code from the UNI server
+# Avoid downloading useless logs and other files
+download_uni:
+    rsync -zaP \
+        --exclude 'custom_env_squijano' \
+        --exclude '.git' \
+        --exclude '.github' \
+        --exclude '.mypy_cache' \
+        --exclude 'justfile' \
+        --exclude 'slurm*.out' \
+        {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
+
+remote_fs:
+    sshfs {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./remote_dev
 
 # Downloads the notebook from Google Colab
 download REMOTE:
