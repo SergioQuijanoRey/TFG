@@ -96,21 +96,14 @@ def wandb_log_and_set_env_vars(base_path: str):
     So we change that env vars in this function
     """
 
-    print("-> Changing WANDB env values")
-
+    # Change WANDB env vars
+    # This way, we write to certain dirs
     os.environ["WANDB_CONFIG_DIR"] = os.path.join(base_path, "wandb_config_dir_testing")
     os.environ["WANDB_CACHE_DIR"] = os.path.join(base_path, "wandb_cache_dir_testing")
     os.environ["WANDB_DIR"] = os.path.join(base_path, "wandb_dir_testing")
     os.environ["WANDB_DATA_DIR"] = os.path.join(base_path, "wandb_datadir_testing")
 
-    print("-> Changing done!")
-    print("")
-
-    # Read contents from .env file
-    # Use them to login to wandb
-    print("-> Loging to wandb using key stored in `.env`")
+    # This change forces us to login to wandb again
+    # We load the API key from `.env` file
     dotenv.load_dotenv()
     wandb.login(key = os.environ["WANDB_API_KEY"])
-    print("-> Loging done")
-    print("")
-
