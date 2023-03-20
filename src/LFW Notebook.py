@@ -197,6 +197,18 @@ NUM_WORKERS = 2
 # Fix random seed to make reproducible results
 RANDOM_SEED = 123456789
 
+# Add some paths to PYTHONPATH
+# ==============================================================================
+
+# Python paths are difficult to manage
+# In this script we can do something like:
+# `import lib.core as core` and that's fine
+# But in lib code we cannot import properly the modules
+
+import sys
+sys.path.append(os.path.join(BASE_PATH, "src"))
+sys.path.append(os.path.join(BASE_PATH, "src/lib"))
+sys.path.append(BASE_PATH)
 
 # Importing the modules we are going to use
 # ==============================================================================
@@ -242,26 +254,26 @@ from tqdm import tqdm
 from typing import List
 
 # Now that files are loaded, we can import pieces of code
-import src.lib.core as core
-import src.lib.trainers as trainers
-import src.lib.filesystem as filesystem
-import src.lib.metrics as metrics
-import src.lib.loss_functions as loss_functions
-import src.lib.embedding_to_classifier as embedding_to_classifier
-import src.lib.sampler as sampler
-import src.lib.utils as utils
-import src.lib.data_augmentation as data_augmentation
-import src.lib.split_dataset as split_dataset
+import lib.core as core
+import lib.trainers as trainers
+import lib.filesystem as filesystem
+import lib.metrics as metrics
+import lib.loss_functions as loss_functions
+import lib.embedding_to_classifier as embedding_to_classifier
+import lib.sampler as sampler
+import lib.utils as utils
+import lib.data_augmentation as data_augmentation
+import lib.split_dataset as split_dataset
 
-from src.lib.trainers import train_model_offline, train_model_online
-from src.lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger
-from src.lib.models import *
-from src.lib.visualizations import *
-from src.lib.models import ResNet18, LFWResNet18, LFWLightModel
-from src.lib.loss_functions import MeanTripletBatchTripletLoss, BatchHardTripletLoss, BatchAllTripletLoss, AddSmallEmbeddingPenalization
-from src.lib.embedding_to_classifier import EmbeddingToClassifier
-from src.lib.sampler import CustomSampler
-from src.lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
+from lib.trainers import train_model_offline, train_model_online
+from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger
+from lib.models import *
+from lib.visualizations import *
+from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet
+from lib.loss_functions import MeanTripletBatchTripletLoss, BatchHardTripletLoss, BatchAllTripletLoss, AddSmallEmbeddingPenalization
+from lib.embedding_to_classifier import EmbeddingToClassifier
+from lib.sampler import CustomSampler
+from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 
 
 # Configuration of the logger
