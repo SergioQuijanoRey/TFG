@@ -344,12 +344,17 @@ wandb_config_dict["PENALTY_FACTOR"] = PENALTY_FACTOR
 
 # If we're running in UGR's servers, we need to set some ENV vars
 # Otherwise, wandb is going to write to dirs that it has no access
+# Also, pytorch tries to save pretrained models in the home folder
 if RUNNING_ENV == "ugr":
-    # TODO -- use `utils.wandb_log_and_set_env_vars()`
 
-    print("-> Changing WANDB env values and login to WANDB")
-    utils.wandb_log_and_set_env_vars(base_path = BASE_PATH)
+    print("-> Changing dir env values")
+    utils.change_dir_env_vars(base_path = BASE_PATH)
     print("-> Changing done!")
+    print("")
+
+    print("-> Login again to WANDB")
+    utils.login_wandb()
+    print("-> Login done!")
     print("")
 
 
