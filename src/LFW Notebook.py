@@ -335,24 +335,10 @@ wandb_config_dict["PENALTY_FACTOR"] = PENALTY_FACTOR
 if RUNNING_ENV == "ugr":
     # TODO -- use `utils.wandb_log_and_set_env_vars()`
 
-    base_path = BASE_PATH
-
-    print("-> Changing WANDB env values")
-
-    os.environ["WANDB_CONFIG_DIR"] = os.path.join(base_path, "wandb_config_dir_testing")
-    os.environ["WANDB_CACHE_DIR"] = os.path.join(base_path, "wandb_cache_dir_testing")
-    os.environ["WANDB_DIR"] = os.path.join(base_path, "wandb_dir_testing")
-    os.environ["WANDB_DATA_DIR"] = os.path.join(base_path, "wandb_datadir_testing")
-
+    print("-> Changing WANDB env values and login to WANDB")
+    utils.wandb_log_and_set_env_vars(base_path = BASE_PATH)
     print("-> Changing done!")
     print("")
-
-    print("-> Loging to wandb using key stored in `.env`")
-    dotenv.load_dotenv()
-    wandb.login(key = os.environ["WANDB_API_KEY"])
-    print("-> Loging done")
-    print("")
-
 
 
 # Init the wandb tracker
