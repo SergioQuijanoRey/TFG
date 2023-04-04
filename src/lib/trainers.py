@@ -156,7 +156,8 @@ def train_model_online(
     validation_loader: DataLoader,
     logger: TrainLogger,
     name: str = "Model",
-    snapshot_iterations: Union[int, None] = None
+    snapshot_iterations: Union[int, None] = None,
+    gradient_clipping: Union[float, None] = None
 ) -> Dict[str, List[float]]:
     """
     Trains and saves a neural net
@@ -179,6 +180,8 @@ def train_model_online(
                   A `SilentLogger` can always be used
     snapshot_iterations: at how many iterations we want to take an snapshot of the model
                          If its None, no snapshots are taken
+    gradient_clipping: if its None, no gradient clipping is performed
+                       if its a Float value, we clip the gradients to that value
     """
 
     # Get parameters from the dic parameter
@@ -232,7 +235,13 @@ def train_model_online(
             file_logger.debug(f"Obtained running loss at {i} iteration of epoch {epoch} is {loss}")
 
             # Backward + Optimize
+            # Clip the gradient if that is specified
+            # Gradient Clipping is performed after backward and before step
             loss.backward()
+
+            if gradient_clipping is not None:
+                torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm = gradient_clipping)
+
             optimizer.step()
 
             # Update the number counter for seen elements

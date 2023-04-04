@@ -95,7 +95,6 @@ class LightModel(torch.nn.Module):
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
 
-
         # Max pooling y seguido flatten de todas las dimensiones menos la del batch
         x = F.max_pool2d(x, 2)
         x = torch.flatten(x,1)
@@ -125,7 +124,7 @@ class LFWResNet18(torch.nn.Module):
         self.embedding_dimension = embedding_dimension
 
         # Tomamos el modelo pre-entrenado ResNet18
-        self.pretrained = models.resnet18(pretrained=True)
+        self.pretrained = models.resnet18(weights = models.ResNet18_Weights.DEFAULT)
 
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
@@ -156,6 +155,7 @@ class LFWResNet18(torch.nn.Module):
 
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
+
 
 class LFWLightModel(torch.nn.Module):
     """
@@ -209,7 +209,6 @@ class LFWLightModel(torch.nn.Module):
         self.should_permute = should_permute
 
 
-
 class RandomNet(torch.nn.Module):
     """
     Random net that we are going to use in some tests and benchmarks
@@ -229,3 +228,28 @@ class RandomNet(torch.nn.Module):
 
         # Random values with the embedding_dimension specified in __init__
         return torch.rand([batch_size, self.embedding_dimension])
+
+
+class NormalizedNet(torch.nn.Module):
+    """
+    Use a base model to compute outputs. This model gets that ouputs and
+    normalizes them, dividing each vector by its euclidean norm
+    """
+
+    def __init__(self, base_model):
+        super(NormalizedNet, self).__init__()
+
+        self.base_model = base_model
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        output = self.base_model(x)
+        normalized_output = torch.nn.functional.normalize(
+            output,
+            p = 2,
+            dim = 1,
+            eps = 0.1
+        )
+        return normalized_output
+
+    def set_permute(self, should_permute: bool):
+        self.base_model.set_permute(should_permute)

@@ -8,3 +8,11 @@
 /src/lib/__init__.py
 /src/data/
 /data/
+.ropeproject
+.ruff_cache
+.mypy_cache
+/src/integration_tests/__pycache__/
+/remote_dev/custom_env_squijano
+/.env
+/wandb/
+/wandb_data/
