@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-#SBATCH --job-name Prueba         # Nombre del proceso
+#SBATCH --job-name TripletLoss    # Nombre del proceso
 #SBATCH --partition dios    	  # Cola para ejecutar
 #SBATCH --gres=gpu:1              # Numero de gpus a usar
 
