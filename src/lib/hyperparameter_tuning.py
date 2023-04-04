@@ -1,9 +1,10 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Subset
 import numpy as np
 from sklearn.model_selection import ShuffleSplit
 
 import src.lib.metrics as metrics
+from src.lib.split_dataset import WrappedSubset
 
 from typing import List, Callable
 
@@ -48,8 +49,9 @@ def custom_cross_validation(
 
         # We have the index of the elements for training and validation for this
         # fold. So we have to take that elements and create a dataset for each
-        train_fold = [train_dataset[idx] for idx in train_index]
-        validation_fold = [train_dataset[idx] for idx in validation_index]
+        # We use our WrappedSubset class to avoid the problems that Subset provokes
+        train_fold = WrappedSubset(Subset(train_dataset, train_index))
+        validation_fold = WrappedSubset(Subset(train_dataset, validation_index))
 
         # Transform dataset folds to dataloaders
         train_loader = loader_generator(train_fold)
