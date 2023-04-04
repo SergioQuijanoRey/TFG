@@ -256,7 +256,6 @@ import dotenv
 
 # All concrete pieces we're using form sklearn
 from sklearn.metrics import roc_auc_score, accuracy_score, silhouette_score
-from sklearn.model_selection import ShuffleSplit
 
 
 from tqdm import tqdm
@@ -273,6 +272,7 @@ import lib.sampler as sampler
 import lib.utils as utils
 import lib.data_augmentation as data_augmentation
 import lib.split_dataset as split_dataset
+import lib.hyperparameter_tuning as hptuning
 
 from lib.trainers import train_model_offline, train_model_online
 from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger
@@ -603,49 +603,27 @@ if ADD_NORM_PENALTY:
 # ==============================================================================
 
 
-# TODO -- translate to english
-# TODO -- move to lib
-def custom_cross_validation(
-        net: torch.nn.Module,
-        parameters,
-        train_dataset,
-        k: int
-    ):
-    """
-    Perform k-fold cross validation
-    """
+# TODO -- explore more hyperparameters now that we have compute power
+# Controlamos si queremos realizar el hyperparameater tuning o no
+if SKIP_HYPERPARAMTER_TUNING is False:
 
-    # Definimos la forma en la que vamos a hacer el split de los folds
-    ss = ShuffleSplit(n_splits=k, test_size=0.25, random_state=RANDOM_SEED)
+    # The loader used for converting each fold to a DataLoader
+    def loader_generator(fold_dataset: Dataset) -> DataLoader:
 
-    # Lista en la que guardamos las perdidas encontradas en cada fold
-    losses = []
-
-    # Iteramos usando el split que nos da sklearn
-    for train_index, validation_index in ss.split(train_dataset):
-
-        # Tenemos los indices de los elementos, asi que tomamos los dos datasets
-        # usando dichos indices
-        train_fold = [train_dataset[idx] for idx in train_index]
-        validation_fold = [train_dataset[idx] for idx in validation_index]
-
-        # Transformamos los datasets en dataloaders
-        train_loader = torch.utils.data.DataLoader(
-            train_fold,
-            batch_size = ONLINE_BATCH_SIZE,
-            shuffle = True,
-            num_workers = NUM_WORKERS,
-            pin_memory = True,
-        )
-        validation_loader = torch.utils.data.DataLoader(
-            validation_fold,
+        loader = torch.utils.data.DataLoader(
+            fold_dataset,
             batch_size = ONLINE_BATCH_SIZE,
             shuffle = True,
             num_workers = NUM_WORKERS,
             pin_memory = True,
         )
 
-        # Entrenamos la red
+        return loader
+
+    # The function that takes a training fold loader, and returns a trained net
+    def network_trainer(fold_dataloader: DataLoader) -> torch.nn.Module:
+        # TODO -- this should be controlled in the iteration loop
+        net = LFWResNet18(embedding_dimension = 15)
         _ = train_model_online(
             net = net,
             path = os.path.join(BASE_PATH, "tmp"),
@@ -658,22 +636,21 @@ def custom_cross_validation(
             gradient_clipping = GRADIENT_CLIPPING
         )
 
-        # Evaluamos la red en el fold de validacion
-        net.eval()
-        loss = metrics.calculate_mean_triplet_loss_online(net, validation_loader, parameters["criterion"], 1.0)
+        return net
+
+    # The function that takes a trained net, and the loader for the validation
+    # fold, and produces the loss value that we want to optimize
+    def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
+        loss = metrics.calculate_mean_triplet_loss_online(
+            net,
+            validation_loader,
+            parameters["criterion"],
+            1.0
+        )
         loss = float(loss) # Pasamos el tensor de un unico elemento a un float simple
-
-        # Añadimos el loss a nuestra lista
-        losses.append(loss)
-
-    # Devolvemos el array en formato numpy para que sea mas comodo trabajar con ella
-    return np.array(losses)
+        return loss
 
 
-
-# TODO -- explore more hyperparameters now that we have compute power
-# Controlamos si queremos realizar el hyperparameater tuning o no
-if SKIP_HYPERPARAMTER_TUNING is False:
 
     # Para controlar que parametros ya hemos explorado y queremos saltar
     already_explored_parameters = [
@@ -727,7 +704,7 @@ if SKIP_HYPERPARAMTER_TUNING is False:
                     logger = SilentLogger()
 
                     # Usamos nuestra propia funcion de cross validation para validar el modelo
-                    losses = custom_cross_validation(net, parameters, train_dataset, k = NUMBER_OF_FOLDS)
+                    losses = hptuning.custom_cross_validation(net, parameters, train_dataset, k = NUMBER_OF_FOLDS)
                     print(f"El loss conseguido es {losses.mean()}")
                     print("")
 
