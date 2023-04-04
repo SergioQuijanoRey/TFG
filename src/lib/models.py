@@ -229,3 +229,28 @@ class RandomNet(torch.nn.Module):
 
         # Random values with the embedding_dimension specified in __init__
         return torch.rand([batch_size, self.embedding_dimension])
+
+
+class NormalizedNet(torch.nn.Module):
+    """
+    Use a base model to compute outputs. This model gets that ouputs and
+    normalizes them, dividing each vector by its euclidean norm
+    """
+
+    def __init__(self, base_model):
+        super(NormalizedNet, self).__init__()
+
+        self.base_model = base_model
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        output = self.base_model(x)
+        normalized_output = torch.nn.functional.normalize(
+            output,
+            p = 2,
+            dim = 1,
+            eps = 0.1
+        )
+        return normalized_output
+
+    def set_permute(self, should_permute: bool):
+        self.base_model.set_permute(should_permute)

@@ -134,6 +134,14 @@ ADD_NORM_PENALTY = True
 
 # If we add that penalty term, which scaling factor to use
 PENALTY_FACTOR = 1.0
+# If we want to wrap our model into a normalizer
+# That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
+NORMALIZED_MODEL_OUTPUT = True
+
+# If its None, we do not perform gradient clipping
+# If its a Float value, we perform gradient clipping, using that value as a
+# parameter for the max norm
+GRADIENT_CLIPPING = MARGIN * 10
 
 
 ## Section parameters
@@ -341,6 +349,8 @@ wandb_config_dict["USE_GT_ZERO_MEAN_LOSS"] = USE_GT_ZERO_MEAN_LOSS
 wandb_config_dict["PROFILE_TRAINING"] = PROFILE_TRAINING
 wandb_config_dict["ADD_NORM_PENALTY"] = ADD_NORM_PENALTY
 wandb_config_dict["PENALTY_FACTOR"] = PENALTY_FACTOR
+wandb_config_dict["NORMALIZED_MODEL_OUTPUT"] = NORMALIZED_MODEL_OUTPUT
+wandb_config_dict["GRADIENT_CLIPPING"] = GRADIENT_CLIPPING
 
 # If we're running in UGR's servers, we need to set some ENV vars
 # Otherwise, wandb is going to write to dirs that it has no access
@@ -833,6 +843,8 @@ def custom_cross_validation(
             name = "SiameseNetworkOnline",
             logger = SilentLogger(),
             snapshot_iterations = None
+            snapshot_iterations = None,
+            gradient_clipping = GRADIENT_CLIPPING
         )
 
         # Evaluamos la red en el fold de validacion
@@ -951,6 +963,9 @@ elif NET_MODEL == "LFWLightModel":
 else:
     raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
+# Wrap the model if we want to normalize the output
+if NORMALIZED_MODEL_OUTPUT is True:
+    net = NormalizedNet(net)
 # The custom sampler takes care of minibatch management
 # Thus, we don't have to make manipulations on them
 net.set_permute(False)
@@ -1024,7 +1039,8 @@ if USE_CACHED_MODEL is False:
                 validation_loader = validation_loader,
                 name = NET_MODEL,
                 logger = logger,
-                snapshot_iterations = None
+                snapshot_iterations = None,
+                gradient_clipping = GRADIENT_CLIPPING
             )""",
             PROFILE_SAVE_FILE
         )
@@ -1040,6 +1056,8 @@ if USE_CACHED_MODEL is False:
             name = NET_MODEL,
             logger = logger,
             snapshot_iterations = None
+            snapshot_iterations = None,
+            gradient_clipping = GRADIENT_CLIPPING
         )
 
     # Compute how long it took
