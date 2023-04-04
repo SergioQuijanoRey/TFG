@@ -5,10 +5,8 @@ from sklearn.model_selection import ShuffleSplit
 
 import src.lib.metrics as metrics
 
-from typing import Callable
+from typing import List, Callable
 
-# TODO -- translate to english
-# TODO -- document the parameters
 def custom_cross_validation(
     train_dataset: Dataset,
     k: int,
@@ -19,6 +17,12 @@ def custom_cross_validation(
 ):
     """
     Perform k-fold cross validation
+
+    `train_dataset`: dataset where we perform k-fold cross validation
+
+    `k`: number of folds that we want to use
+
+    `random_seed`: seed, for reproducibility purposes
 
     `network_trainer` should be a function that produces a network trained on
     a given dataloader for each fold (see `loader_generator`). It has to return
@@ -33,17 +37,17 @@ def custom_cross_validation(
     to optimize
     """
 
-    # Definimos la forma en la que vamos a hacer el split de los folds
+    # Object to generate the folds in a easy way
     ss = ShuffleSplit(n_splits=k, test_size=0.25, random_state=random_seed)
 
-    # Lista en la que guardamos las perdidas encontradas en cada fold
-    losses = []
+    # List where we're going to store all the loss values for each fold
+    losses: List[float] = []
 
-    # Iteramos usando el split que nos da sklearn
+    # Iterate over each fold
     for train_index, validation_index in ss.split(train_dataset):
 
-        # Tenemos los indices de los elementos, asi que tomamos los dos datasets
-        # usando dichos indices
+        # We have the index of the elements for training and validation for this
+        # fold. So we have to take that elements and create a dataset for each
         train_fold = [train_dataset[idx] for idx in train_index]
         validation_fold = [train_dataset[idx] for idx in validation_index]
 
@@ -54,12 +58,12 @@ def custom_cross_validation(
         # Train the network and get the trained network
         net = network_trainer(train_loader)
 
-        # Evaluamos la red en el fold de validacion
+        # Evaluate  the network on the validation fold
         net.eval()
         loss = loss_function(net, validation_loader)
 
-        # Añadimos el loss a nuestra lista
+        # Add that loss to our loss list
         losses.append(loss)
 
-    # Devolvemos el array en formato numpy para que sea mas comodo trabajar con ella
+    # Use numpy instead of vanilla lists
     return np.array(losses)
