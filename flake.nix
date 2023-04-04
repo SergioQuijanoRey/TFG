@@ -28,6 +28,9 @@
             seaborn
             snakeviz
 
+            # Dataframes
+            pandas
+
             # Basic library for computation
             numpy
 
