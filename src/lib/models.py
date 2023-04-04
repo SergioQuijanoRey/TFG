@@ -95,7 +95,6 @@ class LightModel(torch.nn.Module):
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
 
-
         # Max pooling y seguido flatten de todas las dimensiones menos la del batch
         x = F.max_pool2d(x, 2)
         x = torch.flatten(x,1)
@@ -125,7 +124,7 @@ class LFWResNet18(torch.nn.Module):
         self.embedding_dimension = embedding_dimension
 
         # Tomamos el modelo pre-entrenado ResNet18
-        self.pretrained = models.resnet18(pretrained=True)
+        self.pretrained = models.resnet18(weights = models.ResNet18_Weights.DEFAULT)
 
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
@@ -156,6 +155,7 @@ class LFWResNet18(torch.nn.Module):
 
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
+
 
 class LFWLightModel(torch.nn.Module):
     """
@@ -207,7 +207,6 @@ class LFWLightModel(torch.nn.Module):
 
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
-
 
 
 class RandomNet(torch.nn.Module):
