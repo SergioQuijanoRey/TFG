@@ -153,7 +153,7 @@ GRADIENT_CLIPPING = MARGIN * 10
 
 
 # Skip hyper parameter tuning for online training
-SKIP_HYPERPARAMTER_TUNING = True
+SKIP_HYPERPARAMTER_TUNING = False
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
@@ -608,7 +608,7 @@ if ADD_NORM_PENALTY:
 if SKIP_HYPERPARAMTER_TUNING is False:
 
     # The loader used for converting each fold to a DataLoader
-    def loader_generator(fold_dataset: Dataset) -> DataLoader:
+    def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
 
         loader = torch.utils.data.DataLoader(
             fold_dataset,
@@ -623,7 +623,6 @@ if SKIP_HYPERPARAMTER_TUNING is False:
     # The function that takes a training fold loader, and returns a trained net
     def network_trainer(fold_dataloader: DataLoader) -> torch.nn.Module:
         # TODO -- this should be controlled in the iteration loop
-        net = LFWResNet18(embedding_dimension = 15)
         _ = train_model_online(
             net = net,
             path = os.path.join(BASE_PATH, "tmp"),
@@ -641,16 +640,7 @@ if SKIP_HYPERPARAMTER_TUNING is False:
     # The function that takes a trained net, and the loader for the validation
     # fold, and produces the loss value that we want to optimize
     def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
-        loss = metrics.calculate_mean_triplet_loss_online(
-            net,
-            validation_loader,
-            parameters["criterion"],
-            1.0
-        )
-        loss = float(loss) # Pasamos el tensor de un unico elemento a un float simple
-        return loss
-
-
+        return metrics.silhouette(validation_fold, net)
 
     # Para controlar que parametros ya hemos explorado y queremos saltar
     already_explored_parameters = [
@@ -675,60 +665,83 @@ if SKIP_HYPERPARAMTER_TUNING is False:
         "model": None
     }
 
+    # Aux function so we decrease the indentation level of the CV for loop
+    def cv_parameters_generator(
+        margin_values,
+        learning_rate_values,
+        embedding_dimension_values,
+        network_models
+    ):
+        for margin in margin_values:
+            for learning_rate in learning_rate_values:
+                for embedding_dimension in embedding_dimension_values:
+                    for network in network_models:
+                        yield margin, learning_rate, embedding_dimension, network
+
+
     # Exploramos las combinaciones de parametros
-    for margin in margin_values:
-        for learning_rate in learning_rate_values:
-            for embedding_dimension in embedding_dimension_values:
-                for network in network_models:
+    for margin, learning_rate, embedding_dimension, network in cv_parameters_generator(
+        margin_values,
+        learning_rate_values,
+        embedding_dimension_values,
+        network_models
+    ):
 
-                    print(f"Optimizando para margin: {margin}, lr: {learning_rate}, embedding_dim: {embedding_dimension}, model: {network}")
+        print(f"Optimizando para margin: {margin}, lr: {learning_rate}, embedding_dim: {embedding_dimension}, model: {network}")
 
-                    # Comprobamos si tenemos que saltarnos el calculo de algun valor
-                    # porque ya se haya hecho
-                    if (embedding_dimension, learning_rate, margin, network) in already_explored_parameters:
-                        print("\tSaltando este calculo porque ya se realizo")
-                        continue
+        # Comprobamos si tenemos que saltarnos el calculo de algun valor
+        # porque ya se haya hecho
+        if (embedding_dimension, learning_rate, margin, network) in already_explored_parameters:
+            print("\tSaltando este calculo porque ya se realizo")
+            continue
 
-                    # Definimos el modelo que queremos optimizar
-                    net = network(embedding_dimension)
+        # Definimos el modelo que queremos optimizar
+        net = network(embedding_dimension)
 
-                    # En este caso, al no estar trabajando con los minibatches
-                    # (los usamos directamente como nos los da pytorch), no tenemos
-                    # que manipular los tensores
-                    net.set_permute(False)
+        # En este caso, al no estar trabajando con los minibatches
+        # (los usamos directamente como nos los da pytorch), no tenemos
+        # que manipular los tensores
+        net.set_permute(False)
 
-                    parameters = dict()
-                    parameters["epochs"] = epochs
-                    parameters["lr"] = learning_rate
-                    parameters["criterion"] = BatchHardTripletLoss(margin)
-                    logger = SilentLogger()
+        parameters = dict()
+        parameters["epochs"] = epochs
+        parameters["lr"] = learning_rate
+        parameters["criterion"] = BatchHardTripletLoss(margin)
+        logger = SilentLogger()
 
-                    # Usamos nuestra propia funcion de cross validation para validar el modelo
-                    losses = hptuning.custom_cross_validation(net, parameters, train_dataset, k = NUMBER_OF_FOLDS)
-                    print(f"El loss conseguido es {losses.mean()}")
-                    print("")
+        # Usamos nuestra propia funcion de cross validation para validar el modelo
+        losses = hptuning.custom_cross_validation(
+            train_dataset = train_dataset,
+            k = NUMBER_OF_FOLDS,
+            random_seed = RANDOM_SEED,
+            network_trainer = network_trainer,
+            loader_generator = loader_generator,
+            loss_function = loss_function,
+        )
+        print(f"El loss conseguido es {losses.mean()}")
+        print("")
 
-                    # Comprobamos si hemos mejorado la funcion de perdida
-                    # En cuyo caso, actualizamos nuestra estructura de datos y, sobre todo, mostramos
-                    # por pantalla los nuevos mejores parametros
-                    basic_condition = math.isnan(losses.mean()) is False             # Si es NaN no entramos al if
-                    enter_condition = best_loss is None or losses.mean() < best_loss # Entramos al if si mejoramos la perdida
-                    compound_condition = basic_condition and enter_condition
-                    if compound_condition:
+        # Comprobamos si hemos mejorado la funcion de perdida
+        # En cuyo caso, actualizamos nuestra estructura de datos y, sobre todo, mostramos
+        # por pantalla los nuevos mejores parametros
+        basic_condition = math.isnan(losses.mean()) is False             # Si es NaN no entramos al if
+        enter_condition = best_loss is None or losses.mean() < best_loss # Entramos al if si mejoramos la perdida
+        compound_condition = basic_condition and enter_condition
+        if compound_condition:
 
-                        # Actualizamos nuestra estructura de datos
-                        best_loss = losses.mean()
-                        best_parameters = {
-                            "embedding_dimension": embedding_dimension,
-                            "lr": learning_rate,
-                            "margin": margin,
-                            "network_model": network
-                        }
+            # Actualizamos nuestra estructura de datos
+            best_loss = losses.mean()
+            best_parameters = {
+                "embedding_dimension": embedding_dimension,
+                "lr": learning_rate,
+                "margin": margin,
+                "network_model": network
+            }
 
-                        # Mostramos el cambio encontrado
-                        print("==> ENCONTRADOS NUEVOS MEJORES PARAMETROS")
-                        print(f"Mejores parametros: {best_parameters}")
-                        print(f"Mejor loss: {best_loss}")
+            # Mostramos el cambio encontrado
+            print("==> ENCONTRADOS NUEVOS MEJORES PARAMETROS")
+            print(f"Mejores parametros: {best_parameters}")
+            print(f"Mejor loss: {best_loss}")
 
 
 
