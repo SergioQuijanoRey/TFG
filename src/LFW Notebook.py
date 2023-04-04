@@ -797,7 +797,7 @@ def custom_cross_validation(
         net: torch.nn.Module,
         parameters,
         train_dataset,
-        k
+        k: int
     ):
     """
     Perform k-fold cross validation
@@ -842,7 +842,6 @@ def custom_cross_validation(
             validation_loader = validation_loader,
             name = "SiameseNetworkOnline",
             logger = SilentLogger(),
-            snapshot_iterations = None
             snapshot_iterations = None,
             gradient_clipping = GRADIENT_CLIPPING
         )
@@ -860,23 +859,19 @@ def custom_cross_validation(
 
 
 
+# TODO -- explore more hyperparameters now that we have compute power
 # Controlamos si queremos realizar el hyperparameater tuning o no
 if SKIP_HYPERPARAMTER_TUNING is False:
 
     # Para controlar que parametros ya hemos explorado y queremos saltar
     already_explored_parameters = [
-        # Embedding dimension, learning rate, margin
-        (2, 0.0001, 0.01),
-        (2, 0.0001, 1),
-        (3, 0.0001),
     ]
 
-    # Parametros que queremos mover
-    #margin_values = [0.01, 0.1, 1.0]
-    # TODO -- volver a poner todos los valores
-    margin_values = [1.0]
-    learning_rate_values = [0.0001, 0.001, 0.01]
-    embedding_dimension_values = [2, 3, 4]
+    # Parameters that we are going to explore
+    margin_values = [0.1, 0.5, 1.0]
+    learning_rate_values = [0.00001, 0.0001, 0.001, 0.01]
+    embedding_dimension_values = [2, 3, 4, 5, 10, 15]
+    network_models = [LFWResNet18, LFWLightModel, LFWResNet18]
 
     # Parametros que fijamos de antemano
     epochs = HYPERPARAMETER_TUNING_EPOCHS
@@ -887,61 +882,64 @@ if SKIP_HYPERPARAMTER_TUNING is False:
     best_parameters = {
         "embedding_dimension": None,
         "lr": None,
-        "margin": None
+        "margin": None,
+        "model": None
     }
 
     # Exploramos las combinaciones de parametros
     for margin in margin_values:
         for learning_rate in learning_rate_values:
             for embedding_dimension in embedding_dimension_values:
+                for network in network_models:
 
-                print(f"Optimizando para margin: {margin}, lr: {learning_rate}, embedding_dim: {embedding_dimension}")
+                    print(f"Optimizando para margin: {margin}, lr: {learning_rate}, embedding_dim: {embedding_dimension}, model: {network}")
 
-                # Comprobamos si tenemos que saltarnos el calculo de algun valor
-                # porque ya se haya hecho
-                if (embedding_dimension, learning_rate, margin) in already_explored_parameters:
-                    print("\tSaltando este calculo porque ya se realizo")
-                    continue
+                    # Comprobamos si tenemos que saltarnos el calculo de algun valor
+                    # porque ya se haya hecho
+                    if (embedding_dimension, learning_rate, margin, network) in already_explored_parameters:
+                        print("\tSaltando este calculo porque ya se realizo")
+                        continue
 
-                # Definimos el modelo que queremos optimizar
-                net = ResNet18(embedding_dimension)
+                    # Definimos el modelo que queremos optimizar
+                    net = network(embedding_dimension)
 
-                # En este caso, al no estar trabajando con los minibatches
-                # (los usamos directamente como nos los da pytorch), no tenemos
-                # que manipular los tensores
-                net.set_permute(False)
+                    # En este caso, al no estar trabajando con los minibatches
+                    # (los usamos directamente como nos los da pytorch), no tenemos
+                    # que manipular los tensores
+                    net.set_permute(False)
 
-                parameters = dict()
-                parameters["epochs"] = epochs
-                parameters["lr"] = learning_rate
-                parameters["criterion"] = BatchHardTripletLoss(margin)
-                logger = SilentLogger()
+                    parameters = dict()
+                    parameters["epochs"] = epochs
+                    parameters["lr"] = learning_rate
+                    parameters["criterion"] = BatchHardTripletLoss(margin)
+                    logger = SilentLogger()
 
-                # Usamos nuestra propia funcion de cross validation para validar el modelo
-                losses = custom_cross_validation(net, parameters, train_dataset, k = NUMBER_OF_FOLDS)
-                print(f"El loss conseguido es {losses.mean()}")
-                print("")
+                    # Usamos nuestra propia funcion de cross validation para validar el modelo
+                    losses = custom_cross_validation(net, parameters, train_dataset, k = NUMBER_OF_FOLDS)
+                    print(f"El loss conseguido es {losses.mean()}")
+                    print("")
 
-                # Comprobamos si hemos mejorado la funcion de perdida
-                # En cuyo caso, actualizamos nuestra estructura de datos y, sobre todo, mostramos
-                # por pantalla los nuevos mejores parametros
-                basic_condition = math.isnan(losses.mean()) is False             # Si es NaN no entramos al if
-                enter_condition = best_loss is None or losses.mean() < best_loss # Entramos al if si mejoramos la perdida
-                compound_condition = basic_condition and enter_condition
-                if compound_condition:
+                    # Comprobamos si hemos mejorado la funcion de perdida
+                    # En cuyo caso, actualizamos nuestra estructura de datos y, sobre todo, mostramos
+                    # por pantalla los nuevos mejores parametros
+                    basic_condition = math.isnan(losses.mean()) is False             # Si es NaN no entramos al if
+                    enter_condition = best_loss is None or losses.mean() < best_loss # Entramos al if si mejoramos la perdida
+                    compound_condition = basic_condition and enter_condition
+                    if compound_condition:
 
-                    # Actualizamos nuestra estructura de datos
-                    best_loss = losses.mean()
-                    best_parameters = {
-                        "embedding_dimension": embedding_dimension,
-                        "lr": learning_rate,
-                        "margin": margin,
-                    }
+                        # Actualizamos nuestra estructura de datos
+                        best_loss = losses.mean()
+                        best_parameters = {
+                            "embedding_dimension": embedding_dimension,
+                            "lr": learning_rate,
+                            "margin": margin,
+                            "network_model": network
+                        }
 
-                    # Mostramos el cambio encontrado
-                    print("==> ENCONTRADOS NUEVOS MEJORES PARAMETROS")
-                    print(f"Mejores parametros: {best_parameters}")
-                    print(f"Mejor loss: {best_loss}")
+                        # Mostramos el cambio encontrado
+                        print("==> ENCONTRADOS NUEVOS MEJORES PARAMETROS")
+                        print(f"Mejores parametros: {best_parameters}")
+                        print(f"Mejor loss: {best_loss}")
 
 
 
