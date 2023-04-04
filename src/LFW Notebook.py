@@ -482,115 +482,8 @@ test_loader = torch.utils.data.DataLoader(
 )
 
 
-# Exploratory Data Analysis
+# Data augmentation
 # ==============================================================================
-
-## Show some images from the dataset
-# ==============================================================================
-#
-# Show some images with their classes, to verify that data loading was properly done:
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-
-    imgs_to_show = 5
-
-    for i, (img, label) in enumerate(train_dataset):
-
-        # Show information about the image before plotting it
-        print(f"Img label is: {label}")
-
-        # Plot the img
-        # TODO -- figure out a function to do propper img showing
-        #img = img.reshape((250, 250, 3))
-        #show_img(img, color_format_range = (-1.0, 1.0))
-        plt.imshow(img.permute(1, 2, 0))
-        plt.show()
-
-        # Stop the loop
-        if i == imgs_to_show:
-            break
-
-
-# ## Show the sizes of the datasets
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    print(f"Train dataset: {len(train_dataset)}")
-    print(f"Validation dataset: {len(validation_dataset)}")
-    print(f"Test dataset: {len(test_dataset)}")
-
-
-# ## Show some of the triplets that we generated with our custom sampler:
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    # We show the triplets associated to only two classes
-    triplets_to_show = 2 * K
-
-    # TODO -- plot these images grouped in rows
-
-    counter = 0
-    finished = False
-    for (imgs, labels) in train_loader:
-        if finished is True:
-            break
-
-        for img, label in zip(imgs, labels):
-            print(f"Current label is {label}")
-            plt.imshow(img.permute(1, 2, 0))
-            plt.show()
-            counter = counter + 1
-
-            if counter >= triplets_to_show:
-                finished = True
-                break
-
-
-
-# ## Explore how many images each class has
-#
-# Not all the classes have the same amount of images associated. So we plot the distribution of how many images has each class:
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    plot_how_many_images_per_class(
-        train_dataset,
-        cut = 25,
-        fig_size = (10, 10)
-    )
-
-
-# We can see that most of the classes have only one image associated. Almost all classes have less than 10 images associated. So we have to develop a mechanism to do `P-K` sampling with a big enough value of `K`.
-
-# ## Let's see how many classes have at least `K` images
-#
-# - This is important, because it shows us how many classes can be used in training using *P-K* sampling without any modification to the pipeline
-
-
-def how_many_classes_have_at_least_K_images(dataset: torch.utils.data.Dataset, K: int):
-    # Get the dict with class -> number of images of that class
-    how_many_images_per_class = Counter(dataset.targets)
-
-    # Get a list of classes that have at least P images
-    # Use list comprehension with filtering over prev Counter dict
-    classes_with_at_least_K_images = [
-        curr_class
-        for curr_class, curr_value in how_many_images_per_class.items()
-        if curr_value >= K
-    ]
-
-    # Show some stats
-    n = len(classes_with_at_least_K_images)
-    print(f"There are {n} classes with at least {K} images")
-    print(f"That represents the {n / len(how_many_images_per_class) * 100:.2f}% of the initial classes")
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    how_many_classes_have_at_least_K_images(train_dataset, K)
-
-
-# # Data augmentation
 #
 # - As we've seen before, the main problem with this dataset is that most of the classes have only one or two images associated
 # - So we're going to apply data augmentation to have at least a minimun number of images per class
@@ -614,7 +507,8 @@ if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
 # 2. If that class has less than `K` images, perform data augmentation to get at least that number of images
 # 3. Wrap it on a `Dataset` class for ease of use
 
-# ## Augmentation of the dataset
+## Augmentation of the dataset
+# ==============================================================================
 
 
 # Use the cached dataset
@@ -656,7 +550,8 @@ train_loader_augmented = torch.utils.data.DataLoader(
 )
 
 
-# ## Remove previous datasets
+## Remove previous datasets
+# ==============================================================================
 #
 # - If we're not doing hyperparameter tuning, we don't need to hold previous dataset and dataloader
 
@@ -671,94 +566,8 @@ if SKIP_HYPERPARAMTER_TUNING is True:
     try_to_clean_memory()
 
 
-# ## Repeat some basic EDA on augmented dataset
-
-# ### Show some images from the dataset
-#
-# Show some images with their classes, to verify that data loading was properly done:
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    imgs_to_show = 5
-
-    for i, (img, label) in enumerate(train_dataset_augmented):
-
-        # Show information about the image before plotting it
-        print(f"Img label is: {label}")
-
-        # Plot the img
-        # TODO -- figure out a function to do propper img showing
-        #img = img.reshape((250, 250, 3))
-        #show_img(img, color_format_range = (-1.0, 1.0))
-        plt.imshow(img.permute(1, 2, 0))
-        plt.show()
-
-        # Stop the loop
-        if i == imgs_to_show:
-            break
-
-
-# ### Show the sizes of the datasets
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    print(f"Train dataset: {len(train_dataset_augmented)}")
-    print(f"Validation dataset: {len(validation_dataset)}")
-    print(f"Test dataset: {len(test_dataset)}")
-
-
-# ### Show some of the triplets that we generated with our custom sampler:
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    # We show the triplets associated to only two classes
-    triplets_to_show = 2 * K
-
-    # TODO -- plot these images grouped in rows
-
-    counter = 0
-    finished = False
-    for (imgs, labels) in train_loader_augmented:
-        if finished is True:
-            break
-
-        for img, label in zip(imgs, labels):
-            print(f"Current label is {label}")
-            plt.imshow(img.permute(1, 2, 0))
-            plt.show()
-            counter = counter + 1
-
-            if counter >= triplets_to_show:
-                finished = True
-                break
-
-
-
-# ### Explore how many images each class has
-#
-# Not all the classes have the same amount of images associated. So we plot the distribution of how many images has each class:
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    plot_how_many_images_per_class(
-        train_dataset_augmented,
-        cut = 25,
-        fig_size = (10, 10)
-    )
-
-
-# We can see that most of the classes have only one image associated. Almost all classes have less than 10 images associated. So we have to develop a mechanism to do `P-K` sampling with a big enough value of `K`.
-
-# ### Let's see how many classes have at least `P` images
-#
-# - This is important, because it shows us how many classes can be used in training using *P-K* sampling without any modification to the pipeline
-
-
-if SKIP_EXPLORATORY_DATA_ANALYSYS is False:
-    how_many_classes_have_at_least_K_images(train_dataset_augmented, K)
-
-
-# # Choose the loss function to use
+# Choose the loss function to use
+# ==============================================================================
 #
 # - We have so many combinations for loss functions that is not feasible to use one Colab section for each
 # - Combinations depend on:
@@ -779,7 +588,8 @@ if batch_loss_function is None:
     raise Exception(f"BATCH_TRIPLET_LOSS global parameter got unexpected value: {BATCH_TRIPLET_LOSS_FUNCTION}")
 
 
-# # Choose wheter to add embedding norm or not
+# Choose wheter to add embedding norm or not
+# ==============================================================================
 
 
 if ADD_NORM_PENALTY:
@@ -789,7 +599,8 @@ if ADD_NORM_PENALTY:
     )
 
 
-# # Hyperparameter tuning
+# Hyperparameter tuning
+# ==============================================================================
 
 
 # TODO -- translate to english
@@ -945,9 +756,11 @@ if SKIP_HYPERPARAMTER_TUNING is False:
 
 
 
-# # Training of the model
+# Training of the model
+# ==============================================================================
 
-# ## Selecting the network and tweaking some parameters
+## Selecting the network and tweaking some parameters
+# ==============================================================================
 
 
 net = None
@@ -982,7 +795,8 @@ parameters["criterion"] = batch_loss_function
 print(net)
 
 
-# ## Defining the loggers we want to use
+## Defining the loggers we want to use
+# ==============================================================================
 
 
 # Define the loggers we want to use
@@ -1017,7 +831,8 @@ logger = CompoundLogger([
 ])
 
 
-# ## Running the training loop
+## Running the training loop
+# ==============================================================================
 
 
 import torch
@@ -1086,9 +901,11 @@ else:
 net.eval()
 
 
-# # Model evaluation
+# Model evaluation
+# ==============================================================================
 
-# We start computing the *silhouette* metric for the produced embedding, on train, validation and test set:
+# We start computing the *silhouette* metric for the produced embedding, on
+# train, validation and test set:
 
 
 with torch.no_grad():
@@ -1155,7 +972,8 @@ with torch.no_grad():
         if counter == max_iterations: break
 
 
-# # Plot of the embedding
+# Plot of the embedding
+# ==============================================================================
 #
 # - If the dimension of the embedding is 2, then we can plot how the transformation to a classificator works:
 
@@ -1164,7 +982,8 @@ with torch.no_grad():
     classifier.scatter_plot()
 
 
-# # Evaluating the obtained classifier
+# Evaluating the obtained classifier
+# ==============================================================================
 #
 # - Now that we adapted our network to a classification task, we can compute some classification metrics
 
