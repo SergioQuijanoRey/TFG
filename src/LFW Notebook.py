@@ -64,8 +64,8 @@ PROFILE_SAVE_FILE = os.path.join(BASE_PATH, "training_profile.stat")
 
 
 # Parameters of P-K sampling
-P = 50    # Number of classes used in each minibatch
-K = 3     # Number of images sampled for each selected class
+P = 100   # Number of classes used in each minibatch
+K = 2     # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -78,10 +78,10 @@ K = 3     # Number of images sampled for each selected class
 ONLINE_BATCH_SIZE = P * K
 
 # Epochs for hard triplets, online training
-TRAINING_EPOCHS = 10
+TRAINING_EPOCHS = 25
 
 # Learning rate for hard triplets, online training
-ONLINE_LEARNING_RATE = 0.001
+ONLINE_LEARNING_RATE = 0.0001
 
 # How many single elements we want to see before logging
 # It has to be a multiple of P * K, otherwise `should_log` would return always
@@ -97,20 +97,20 @@ ONLINE_LOGGER_VALIDATION_PERCENTAGE = 1 / 3
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18" or "LFWLightModel"
-NET_MODEL = "LFWLightModel"
+NET_MODEL = "LFWResNet18"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
-HYPERPARAMETER_TUNING_EPOCHS = 7
+HYPERPARAMETER_TUNING_EPOCHS = 10
 
 # Number of folds used in k-fold Cross Validation
 NUMBER_OF_FOLDS = 4
 
 # Margin used in the loss function
-MARGIN = 0.5
+MARGIN = 1.0
 
 # Dim of the embedding calculated by the network
-EMBEDDING_DIMENSION = 3
+EMBEDDING_DIMENSION = 5
 
 # Number of neighbours considered in K-NN
 # K-NN used for transforming embedding task to classification task
@@ -121,7 +121,7 @@ NUMBER_NEIGHBOURS = 4
 BATCH_TRIPLET_LOSS_FUNCTION = "hard"
 
 # Whether or not use softplus loss function instead of vanilla triplet loss
-USE_SOFTPLUS_LOSS = False
+USE_SOFTPLUS_LOSS = True
 
 # Count all sumamnds in the mean loss or only those summands greater than zero
 USE_GT_ZERO_MEAN_LOSS = True
@@ -130,10 +130,11 @@ USE_GT_ZERO_MEAN_LOSS = True
 LAZY_DATA_AUGMENTATION = True
 
 # Where or not add penalty term to the loss function
-ADD_NORM_PENALTY = True
+ADD_NORM_PENALTY = False
 
 # If we add that penalty term, which scaling factor to use
-PENALTY_FACTOR = 1.0
+PENALTY_FACTOR = MARGIN
+
 # If we want to wrap our model into a normalizer
 # That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
 NORMALIZED_MODEL_OUTPUT = True
@@ -964,6 +965,7 @@ else:
 # Wrap the model if we want to normalize the output
 if NORMALIZED_MODEL_OUTPUT is True:
     net = NormalizedNet(net)
+
 # The custom sampler takes care of minibatch management
 # Thus, we don't have to make manipulations on them
 net.set_permute(False)
@@ -1053,7 +1055,6 @@ if USE_CACHED_MODEL is False:
             validation_loader = validation_loader,
             name = NET_MODEL,
             logger = logger,
-            snapshot_iterations = None
             snapshot_iterations = None,
             gradient_clipping = GRADIENT_CLIPPING
         )
