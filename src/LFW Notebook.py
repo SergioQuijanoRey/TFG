@@ -606,23 +606,10 @@ if ADD_NORM_PENALTY:
 # Hyperparameter tuning
 # ==============================================================================
 
-# The following two functions are parameters for our `custom_cross_validation`
-# They do not depend on the hyperparameters that we are exploring, so we can
-# define them here
-
-# The loader used for converting each fold to a DataLoader
-def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
-
-    loader = torch.utils.data.DataLoader(
-        fold_dataset,
-        batch_size = ONLINE_BATCH_SIZE,
-        shuffle = True,
-        num_workers = NUM_WORKERS,
-        pin_memory = True,
-    )
-
-    return loader
-
+# The following function is a parameters for our `custom_cross_validation`
+# It does not depend on the hyperparameters that we are exploring, so we can
+# define it here
+#
 # The function that takes a trained net, and the loader for the validation
 # fold, and produces the loss value that we want to optimize
 def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
@@ -654,6 +641,21 @@ def objective(trial):
         ])
 
     )
+
+    # And with p, k values we can define the way we use the laoder generator
+    # This p, k values are captured in the outer scope for the `CustomSampler`
+    def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
+
+        loader = torch.utils.data.DataLoader(
+            fold_dataset,
+            batch_size = p * k,
+            num_workers = NUM_WORKERS,
+            pin_memory = True,
+            sampler = CustomSampler(p, k, fold_dataset)
+        )
+
+        return loader
+
 
     # Choose the newtork for this trial
     # Wrap it in a lambda function so we can use it in `custom_cross_validation`
