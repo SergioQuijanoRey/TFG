@@ -55,6 +55,8 @@ LOGGING_FILE = os.path.join(BASE_PATH, "training.log")
 # Binary file where the stats of the profiling are saved
 PROFILE_SAVE_FILE = os.path.join(BASE_PATH, "training_profile.stat")
 
+OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna.db"
+
 
 ## ML parameters
 # ==============================================================================
@@ -721,9 +723,19 @@ if SKIP_HYPERPARAMTER_TUNING is False:
 
     # We want to maximize silhouete value
     print("🔎 Started hyperparameter tuning")
-    study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials = 100)
+
+    study = optuna.create_study(
+        direction = "maximize",
+        study_name = "Silhouette optimization",
+        storage = OPTUNA_DATABASE,
+        load_if_exists = True
+    )
+    study.optimize(objective, n_trials = 10)
+
     print("🔎 Hyperparameter tuning ended")
+    print("")
+    print(f"🔎 Best trial: {study.best_trial}")
+    print("")
 
 
 # Training of the model
