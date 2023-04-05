@@ -236,6 +236,8 @@ import torchvision.transforms as transforms
 
 from torch.utils.data import Dataset, DataLoader
 
+import optuna
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -602,162 +604,126 @@ if ADD_NORM_PENALTY:
 # Hyperparameter tuning
 # ==============================================================================
 
+# The following two functions are parameters for our `custom_cross_validation`
+# They do not depend on the hyperparameters that we are exploring, so we can
+# define them here
 
-# TODO -- explore more hyperparameters now that we have compute power
-# Controlamos si queremos realizar el hyperparameater tuning o no
-if SKIP_HYPERPARAMTER_TUNING is False:
+# The loader used for converting each fold to a DataLoader
+def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
 
-    # The loader used for converting each fold to a DataLoader
-    def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
+    loader = torch.utils.data.DataLoader(
+        fold_dataset,
+        batch_size = ONLINE_BATCH_SIZE,
+        shuffle = True,
+        num_workers = NUM_WORKERS,
+        pin_memory = True,
+    )
 
-        loader = torch.utils.data.DataLoader(
-            fold_dataset,
-            batch_size = ONLINE_BATCH_SIZE,
-            shuffle = True,
-            num_workers = NUM_WORKERS,
-            pin_memory = True,
-        )
+    return loader
 
-        return loader
+# The function that takes a trained net, and the loader for the validation
+# fold, and produces the loss value that we want to optimize
+def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
+    return metrics.silhouette(validation_fold, net)
+
+
+# TODO -- move more hyperparameters
+# TODO -- now we are only moving P, K values
+def objective(trial):
+    """Optuna function that is going to be used in the optimization process"""
+
+    # P, K values
+    p = trial.suggest_int('P', 10, 200)
+    k = trial.suggest_int('K', 1, 5)
+
+    p, k = int(p), int(k)
+
+    # With P, K values, we can generate the augmented dataset
+    train_dataset_augmented = LazyAugmentatedDataset(
+        base_dataset = train_dataset,
+        min_number_of_images = k,
+
+        # Remember that the trasformation has to be random type
+        # Otherwise, we could end with a lot of repeated images
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=(250, 250)),
+            transforms.RandomRotation(degrees=(0, 45)),
+            transforms.RandomAutocontrast(),
+        ])
+
+    )
+
+    # Choose the newtork for this trial
+    # Wrap it in a lambda function so we can use it in `custom_cross_validation`
+    def network_creator():
+        net = LFWResNet18(embedding_dimension = 10)
+        net.set_permute(False)
+        return net
+
 
     # The function that takes a training fold loader and a network, and returns
-    # a trained net
+    # a trained net. This is a parameter for our `custom_cross_validation`
     def network_trainer(fold_dataloader: DataLoader, net: torch.nn.Module) -> torch.nn.Module:
+
+        parameters = dict()
+        parameters["epochs"] = HYPERPARAMETER_TUNING_EPOCHS
+        parameters["lr"] = ONLINE_LEARNING_RATE
+        parameters["criterion"] = BatchHardTripletLoss(MARGIN, use_softplus = True)
+
         _ = train_model_online(
             net = net,
-            path = os.path.join(BASE_PATH, "tmp"),
+            path = os.path.join(BASE_PATH, "tmp_hp_tuning"),
             parameters = parameters,
-            train_loader = train_loader,
-            validation_loader = validation_loader,
-            name = "SiameseNetworkOnline",
+            train_loader = fold_dataloader,
+            validation_loader = None,
+            name = "Hyperparameter Tuning Network",
             logger = SilentLogger(),
             snapshot_iterations = None,
-            gradient_clipping = GRADIENT_CLIPPING
+            gradient_clipping = GRADIENT_CLIPPING,
         )
 
         return net
 
-    # The function that takes a trained net, and the loader for the validation
-    # fold, and produces the loss value that we want to optimize
-    def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
-        return metrics.silhouette(validation_fold, net)
 
-    # Para controlar que parametros ya hemos explorado y queremos saltar
-    already_explored_parameters = [
-    ]
+    # Now we have defined everything for `custom_cross_validation`. So we can
+    # run k-fold cross validation for this configuration of parameters
+    # For some combinations of parameters, this can fail
+    try:
+        losses = hptuning.custom_cross_validation(
+            train_dataset = train_dataset_augmented,
+            k = NUMBER_OF_FOLDS,
+            random_seed = RANDOM_SEED,
+            network_creator = network_creator,
+            network_trainer = network_trainer,
+            loader_generator = loader_generator,
+            loss_function = loss_function,
+        )
+        print(f"Obtained loss is {losses.mean()}")
+        print("")
 
-    # Parameters that we are going to explore
-    margin_values = [0.1, 0.5, 1.0]
-    learning_rate_values = [0.00001, 0.0001, 0.001, 0.01]
-    embedding_dimension_values = [2, 3, 4, 5, 10, 15]
-    network_models = [LFWResNet18, LFWLightModel, LFWResNet18]
+    except Exception as e:
 
-    # Parametros que fijamos de antemano
-    epochs = HYPERPARAMETER_TUNING_EPOCHS
+        # Show that cross validation failed for this combination
+        msg = "Could not run succesfully k-fold cross validation for this combination of parameters"
+        msg = msg + f"\nError was: {e}"
+        print(msg)
+        file_logger.warn(msg)
 
-    # Llevamos la cuenta de los mejores parametros y el mejor error encontrados hasta
-    # el momento
-    best_loss = None
-    best_parameters = {
-        "embedding_dimension": None,
-        "lr": None,
-        "margin": None,
-        "model": None
-    }
-
-    # Aux function so we decrease the indentation level of the CV for loop
-    # TODO -- consider PK values and other important parameters
-    def cv_parameters_generator(
-        margin_values,
-        learning_rate_values,
-        embedding_dimension_values,
-        network_models
-    ):
-        for margin in margin_values:
-            for learning_rate in learning_rate_values:
-                for embedding_dimension in embedding_dimension_values:
-                    for network in network_models:
-                        yield margin, learning_rate, embedding_dimension, network
+        # Return None so this trial is not considered
+        return None
 
 
-    # Exploramos las combinaciones de parametros
-    for margin, learning_rate, embedding_dimension, network in cv_parameters_generator(
-        margin_values,
-        learning_rate_values,
-        embedding_dimension_values,
-        network_models
-    ):
-
-        print(f"Optimizando para margin: {margin}, lr: {learning_rate}, embedding_dim: {embedding_dimension}, model: {network}")
-
-        # Comprobamos si tenemos que saltarnos el calculo de algun valor
-        # porque ya se haya hecho
-        if (embedding_dimension, learning_rate, margin, network) in already_explored_parameters:
-            print("\tSaltando este calculo porque ya se realizo")
-            continue
-
-        # Network generator that we use in our custom cross validation
-        def network_creator():
-            net = network(embedding_dimension)
-            net.set_permute(False)
-            return net
-
-        parameters = dict()
-        parameters["epochs"] = epochs
-        parameters["lr"] = learning_rate
-        parameters["criterion"] = BatchHardTripletLoss(margin)
-        logger = SilentLogger()
-
-        # Run k-fold cross validation for this configuration of parameters
-        # For some combinations of parameters, this can fail
-        try:
-            losses = hptuning.custom_cross_validation(
-                train_dataset = train_dataset,
-                k = NUMBER_OF_FOLDS,
-                random_seed = RANDOM_SEED,
-                network_creator = network_creator,
-                network_trainer = network_trainer,
-                loader_generator = loader_generator,
-                loss_function = loss_function,
-            )
-            print(f"Obtained loss is {losses.mean()}")
-            print("")
-
-        except Exception as e:
-
-            # Show that cross validation failed for this combination
-            msg = "Could not run succesfully k-fold cross validation for this combination of parameters"
-            msg = msg + f"\nError was: {e}"
-            print(msg)
-            file_logger.warn(msg)
-
-            # Use None loss, that is treated later
-            losses = None
+    # If everything went alright, return the mean of the loss
+    return losses.mean()
 
 
-        # Check if we have a better loss value
-        # First we check that we have a valid loss list
-        # Second we check that we have a better value
-        valid_loss_values = losses is not None and math.isnan(losses.mean()) is False
-        better_loss_value = best_loss is None or losses.mean() < best_loss
-        compound_condition = valid_loss_values and better_loss_value
-        if compound_condition:
+if SKIP_HYPERPARAMTER_TUNING is False:
 
-            # Update the best loss value
-            best_loss = losses.mean()
-            best_parameters = {
-                "embedding_dimension": embedding_dimension,
-                "lr": learning_rate,
-                "margin": margin,
-                "network_model": network
-            }
-
-            # Show the better values that we have found
-            print("==> 🔎 FOUND NEW BEST PARAMETERS")
-            print(f"Current best parameters: {best_parameters}")
-            print(f"Current best loss: {best_loss}")
-
-
+    # We want to maximize silhouete value
+    print("🔎 Started hyperparameter tuning")
+    study = optuna.create_study(direction='maximize')
+    study.optimize(objective, n_trials = 100)
+    print("🔎 Hyperparameter tuning ended")
 
 
 # Training of the model
