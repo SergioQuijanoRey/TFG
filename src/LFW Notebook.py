@@ -654,6 +654,9 @@ def objective(trial):
             sampler = CustomSampler(p, k, fold_dataset)
         )
 
+        # To avoid accessing loader.__len__ without computing the necessary data
+        _ = loader.__iter__()
+
         return loader
 
 
