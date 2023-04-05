@@ -620,9 +620,9 @@ if SKIP_HYPERPARAMTER_TUNING is False:
 
         return loader
 
-    # The function that takes a training fold loader, and returns a trained net
-    def network_trainer(fold_dataloader: DataLoader) -> torch.nn.Module:
-        # TODO -- this should be controlled in the iteration loop
+    # The function that takes a training fold loader and a network, and returns
+    # a trained net
+    def network_trainer(fold_dataloader: DataLoader, net: torch.nn.Module) -> torch.nn.Module:
         _ = train_model_online(
             net = net,
             path = os.path.join(BASE_PATH, "tmp"),
@@ -666,6 +666,7 @@ if SKIP_HYPERPARAMTER_TUNING is False:
     }
 
     # Aux function so we decrease the indentation level of the CV for loop
+    # TODO -- consider PK values and other important parameters
     def cv_parameters_generator(
         margin_values,
         learning_rate_values,
@@ -695,13 +696,11 @@ if SKIP_HYPERPARAMTER_TUNING is False:
             print("\tSaltando este calculo porque ya se realizo")
             continue
 
-        # Definimos el modelo que queremos optimizar
-        net = network(embedding_dimension)
-
-        # En este caso, al no estar trabajando con los minibatches
-        # (los usamos directamente como nos los da pytorch), no tenemos
-        # que manipular los tensores
-        net.set_permute(False)
+        # Network generator that we use in our custom cross validation
+        def network_creator():
+            net = network(embedding_dimension)
+            net.set_permute(False)
+            return net
 
         parameters = dict()
         parameters["epochs"] = epochs
@@ -709,27 +708,42 @@ if SKIP_HYPERPARAMTER_TUNING is False:
         parameters["criterion"] = BatchHardTripletLoss(margin)
         logger = SilentLogger()
 
-        # Usamos nuestra propia funcion de cross validation para validar el modelo
-        losses = hptuning.custom_cross_validation(
-            train_dataset = train_dataset,
-            k = NUMBER_OF_FOLDS,
-            random_seed = RANDOM_SEED,
-            network_trainer = network_trainer,
-            loader_generator = loader_generator,
-            loss_function = loss_function,
-        )
-        print(f"El loss conseguido es {losses.mean()}")
-        print("")
+        # Run k-fold cross validation for this configuration of parameters
+        # For some combinations of parameters, this can fail
+        try:
+            losses = hptuning.custom_cross_validation(
+                train_dataset = train_dataset,
+                k = NUMBER_OF_FOLDS,
+                random_seed = RANDOM_SEED,
+                network_creator = network_creator,
+                network_trainer = network_trainer,
+                loader_generator = loader_generator,
+                loss_function = loss_function,
+            )
+            print(f"Obtained loss is {losses.mean()}")
+            print("")
 
-        # Comprobamos si hemos mejorado la funcion de perdida
-        # En cuyo caso, actualizamos nuestra estructura de datos y, sobre todo, mostramos
-        # por pantalla los nuevos mejores parametros
-        basic_condition = math.isnan(losses.mean()) is False             # Si es NaN no entramos al if
-        enter_condition = best_loss is None or losses.mean() < best_loss # Entramos al if si mejoramos la perdida
-        compound_condition = basic_condition and enter_condition
+        except Exception as e:
+
+            # Show that cross validation failed for this combination
+            msg = "Could not run succesfully k-fold cross validation for this combination of parameters"
+            msg = msg + f"\nError was: {e}"
+            print(msg)
+            file_logger.warn(msg)
+
+            # Use None loss, that is treated later
+            losses = None
+
+
+        # Check if we have a better loss value
+        # First we check that we have a valid loss list
+        # Second we check that we have a better value
+        valid_loss_values = losses is not None and math.isnan(losses.mean()) is False
+        better_loss_value = best_loss is None or losses.mean() < best_loss
+        compound_condition = valid_loss_values and better_loss_value
         if compound_condition:
 
-            # Actualizamos nuestra estructura de datos
+            # Update the best loss value
             best_loss = losses.mean()
             best_parameters = {
                 "embedding_dimension": embedding_dimension,
@@ -738,10 +752,10 @@ if SKIP_HYPERPARAMTER_TUNING is False:
                 "network_model": network
             }
 
-            # Mostramos el cambio encontrado
-            print("==> ENCONTRADOS NUEVOS MEJORES PARAMETROS")
-            print(f"Mejores parametros: {best_parameters}")
-            print(f"Mejor loss: {best_loss}")
+            # Show the better values that we have found
+            print("==> 🔎 FOUND NEW BEST PARAMETERS")
+            print(f"Current best parameters: {best_parameters}")
+            print(f"Current best loss: {best_loss}")
 
 
 

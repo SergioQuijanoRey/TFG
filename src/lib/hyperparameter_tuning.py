@@ -12,10 +12,11 @@ def custom_cross_validation(
     train_dataset: Dataset,
     k: int,
     random_seed: int,
-    network_trainer: Callable[[DataLoader], torch.nn.Module],
+    network_creator: Callable[[], torch.nn.Module],
+    network_trainer: Callable[[DataLoader, torch.nn.Module], torch.nn.Module],
     loader_generator: Callable[[Dataset], DataLoader],
     loss_function: Callable[[torch.nn.Module, DataLoader], float]
-):
+) -> np.ndarray:
     """
     Perform k-fold cross validation
 
@@ -25,9 +26,11 @@ def custom_cross_validation(
 
     `random_seed`: seed, for reproducibility purposes
 
-    `network_trainer` should be a function that produces a network trained on
-    a given dataloader for each fold (see `loader_generator`). It has to return
-    the trained network
+    `network_creator` should be a function that creates a new and untrained
+    network, that later we are going to use in the training process
+
+    `network_trainer` should be a function that, given a network and a dataloader,
+    trains the network and returns that trained network
 
     `loader_generator` should be a function that takes one fold (which is a
     dataset) and converts it to a `DataLoader`. For example, taking care of
@@ -57,14 +60,13 @@ def custom_cross_validation(
         train_loader = loader_generator(train_fold)
         validation_loader = loader_generator(validation_fold)
 
-        # Train the network and get the trained network
-        net = network_trainer(train_loader)
+        # Generate a network, train it and get the trained network
+        net = network_creator()
+        net = network_trainer(train_loader, net)
 
         # Evaluate  the network on the validation fold
         net.eval()
         loss = loss_function(net, validation_loader)
-
-        # Add that loss to our loss list
         losses.append(loss)
 
     # Use numpy instead of vanilla lists
