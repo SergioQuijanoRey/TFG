@@ -50,6 +50,10 @@ def custom_cross_validation(
     # Iterate over each fold
     for train_index, validation_index in ss.split(train_dataset):
 
+        # This transformation avoids using np.int to index a dataset
+        train_index = [int(idx) for idx in train_index]
+        validation_index = [int(idx) for idx in validation_index]
+
         # We have the index of the elements for training and validation for this
         # fold. So we have to take that elements and create a dataset for each
         # We use our WrappedSubset class to avoid the problems that Subset provokes
