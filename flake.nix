@@ -34,6 +34,9 @@
             # Basic library for computation
             numpy
 
+            # Hyperparameter tuning
+            optuna
+
             # Loggin
             wandb
             tqdm
