@@ -105,6 +105,11 @@ NET_MODEL = "LFWResNet18"
 # k-Fold Cross validation used for parameter exploration
 HYPERPARAMETER_TUNING_EPOCHS = 10
 
+# Number of tries in the optimization process
+# We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
+# hyperparameter configurations
+HYPERPARAMETER_TUNING_TRIES = 100
+
 # Number of folds used in k-fold Cross Validation
 NUMBER_OF_FOLDS = 4
 
@@ -621,11 +626,38 @@ def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
 def objective(trial):
     """Optuna function that is going to be used in the optimization process"""
 
-    # P, K values
+    # Parameters that we are going to explore
+    # TODO -- we've added all reasonable parameters, but we have to end with just
+    # really important parameters. number_of_trials grows exponentially with
+    # the number of explored parameters
+
     p = trial.suggest_int('P', 10, 200)
     k = trial.suggest_int('K', 1, 5)
+    net_election = trial.suggest_categorical(
+        "Network",
+        ["LFWResNet18", "LFWLightModel"]
+    )
+    normalization_election = trial.suggest_categorical(
+        "UseNormalization", [True, False]
+    )
+    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 20)
+    learning_rate = trial.suggest_float("Learning rate", 0.0000001, 0.1)
+    margin = trial.suggest_float("Margin", 0.001, 1.0)
+    softplus = trial.suggest_categorical("Use Softplus", [True, False])
+    use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
+    if use_norm_penalty is True:
+        norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
 
-    p, k = int(p), int(k)
+    # Log that we are going to do k-fold cross validation and the values of the
+    # parameters. k-fold cross validation can be really slow, so this logs are
+    # useful for babysitting the process
+    print("")
+    print(f"🔎 Starting cross validation for trial {trial.number}")
+    print(f"🔎 Parameters for this trial are:\n{trial.params}")
+    print("")
+
+    # With all parameters set, we can create all the necessary elements for
+    # running k-fold cross validation with this configuration
 
     # With P, K values, we can generate the augmented dataset
     train_dataset_augmented = LazyAugmentatedDataset(
@@ -659,14 +691,23 @@ def objective(trial):
 
         return loader
 
-
-    # Choose the newtork for this trial
-    # Wrap it in a lambda function so we can use it in `custom_cross_validation`
+    # Wrap the network in a lambda function so we can use it in `custom_cross_validation`
     def network_creator():
-        net = LFWResNet18(embedding_dimension = 10)
+
+        # Model that we have chosen
+        if net_election == "LFWResNet18":
+            net = LFWResNet18(embedding_dimension = embedding_dimension)
+        elif net_election == "LFWLightModel":
+            net = LFWLightModel(embedding_dimension = embedding_dimension)
+        else:
+            raise ValueError("String for net election is not valid")
+
+        # Wether or not use normalization
+        if normalization_election is True:
+            net = NormalizedNet(net)
+
         net.set_permute(False)
         return net
-
 
     # The function that takes a training fold loader and a network, and returns
     # a trained net. This is a parameter for our `custom_cross_validation`
@@ -674,8 +715,15 @@ def objective(trial):
 
         parameters = dict()
         parameters["epochs"] = HYPERPARAMETER_TUNING_EPOCHS
-        parameters["lr"] = ONLINE_LEARNING_RATE
-        parameters["criterion"] = BatchHardTripletLoss(MARGIN, use_softplus = True)
+        parameters["lr"] = learning_rate
+        parameters["criterion"] = BatchHardTripletLoss(margin, use_softplus = softplus)
+
+        # Wether or not use norm penalization
+        if use_norm_penalty:
+            parameters["criterion"] = AddSmallEmbeddingPenalization(
+                base_loss = parameters["criterion"],
+                penalty_factor = norm_penalty,
+            )
 
         _ = train_model_online(
             net = net,
@@ -705,7 +753,7 @@ def objective(trial):
             loader_generator = loader_generator,
             loss_function = loss_function,
         )
-        print(f"Obtained loss is {losses.mean()}")
+        print(f"Obtained loss (cross validation mean) is {losses.mean()}")
         print("")
 
     except Exception as e:
@@ -735,7 +783,7 @@ if SKIP_HYPERPARAMTER_TUNING is False:
         storage = OPTUNA_DATABASE,
         load_if_exists = True
     )
-    study.optimize(objective, n_trials = 10)
+    study.optimize(objective, n_trials = HYPERPARAMETER_TUNING_TRIES)
 
     print("🔎 Hyperparameter tuning ended")
     print("")
