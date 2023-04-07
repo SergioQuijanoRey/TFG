@@ -24,6 +24,8 @@ class CustomSampler(torch.utils.data.Sampler):
 
     Used this tutorial to code this class:
     https://www.scottcondron.com/jupyter/visualisation/audio/2020/12/02/dataloaders-samplers-collate.html
+
+    Raises an exception when there are less than P classes with at least K images
     """
 
     def __init__(self, P: int, K: int, dataset: torch.utils.data.Dataset):
@@ -118,7 +120,7 @@ class CustomSampler(torch.utils.data.Sampler):
             f"After first cleaning, there are {len(available_classes)} available_classes"
         )
         if len(available_classes) < self.P:
-            err_msg = f"After first cleaning, we have {len(available_classes)}, less than `self.P` = {self.P}"
+            err_msg = f"After first cleaning, we have {len(available_classes)} classes with at least `self.k` = {self.K} images, less than `self.P` = {self.P}"
             file_logger.error(err_msg)
             raise Exception(err_msg)
 
