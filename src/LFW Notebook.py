@@ -758,6 +758,7 @@ def objective(trial):
             logger = SilentLogger(),
             snapshot_iterations = None,
             gradient_clipping = GRADIENT_CLIPPING,
+            fail_fast = True,
         )
 
         return net

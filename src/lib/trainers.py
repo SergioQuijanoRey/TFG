@@ -157,7 +157,8 @@ def train_model_online(
     logger: TrainLogger,
     name: str = "Model",
     snapshot_iterations: Union[int, None] = None,
-    gradient_clipping: Union[float, None] = None
+    gradient_clipping: Union[float, None] = None,
+    fail_fast: bool = False,
 ) -> Dict[str, List[float]]:
     """
     Trains and saves a neural net
@@ -182,6 +183,9 @@ def train_model_online(
                          If its None, no snapshots are taken
     gradient_clipping: if its None, no gradient clipping is performed
                        if its a Float value, we clip the gradients to that value
+    fail_fast: if it's True, when something goes wrong, it raises an exception
+               as soon as possible. List of things that can go wrong:
+                1. Running loss is NaN
     """
 
     # Get parameters from the dic parameter
@@ -251,6 +255,14 @@ def train_model_online(
             # Log the running loss
             file_logger.debug(f"In iteration {i} of epoch {epoch}, {len(labels)} elements have been seen")
             wandb.log({"Running loss": loss})
+
+            # If running loss is NaN, and caller specified to fail fast, raise
+            # an informative exception
+            if fail_fast is True and torch.isnan(loss):
+                msg = "Failing fast because obtained loss is NaN"
+
+                file_logger.error(msg)
+                raise Exception(msg)
 
             # Log the norm of the embeddings. Start by computing the norm of
             # each embedding in the batch
