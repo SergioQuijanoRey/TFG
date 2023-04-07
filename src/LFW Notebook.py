@@ -640,8 +640,8 @@ def objective(trial):
     normalization_election = trial.suggest_categorical(
         "UseNormalization", [True, False]
     )
-    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 20)
-    learning_rate = trial.suggest_float("Learning rate", 0.0000001, 0.1)
+    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
+    learning_rate = trial.suggest_float("Learning rate", 0.0000001, 0.0001)
     margin = trial.suggest_float("Margin", 0.001, 1.0)
     softplus = trial.suggest_categorical("Use Softplus", [True, False])
     use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
@@ -678,8 +678,31 @@ def objective(trial):
     # This p, k values are captured in the outer scope for the `CustomSampler`
     def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
 
+        # When doing the split, we can end with less than p classes with at least
+        # k images associated. So we do an augmentation again:
+        #
+        # This assures that all classes have at least k images, so they are not
+        # erased in `LazyAugmentatedDataset`. But this does not create more
+        # classes, if fold has already less than P classes
+        #
+        # TODO -- this can affect the optimization process, but otherwise most
+        # of the tries will fail because of this problem
+        fold_dataset_augmented = LazyAugmentatedDataset(
+            base_dataset = fold_dataset,
+            min_number_of_images = k,
+
+            # Remember that the trasformation has to be random type
+            # Otherwise, we could end with a lot of repeated images
+            transform = transforms.Compose([
+                transforms.RandomResizedCrop(size=(250, 250)),
+                transforms.RandomRotation(degrees=(0, 45)),
+                transforms.RandomAutocontrast(),
+            ])
+
+        )
+
         loader = torch.utils.data.DataLoader(
-            fold_dataset,
+            fold_dataset_augmented,
             batch_size = p * k,
             num_workers = NUM_WORKERS,
             pin_memory = True,
