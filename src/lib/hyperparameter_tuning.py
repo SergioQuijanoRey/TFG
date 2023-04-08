@@ -2,11 +2,21 @@ import torch
 from torch.utils.data import Dataset, DataLoader, Subset
 import numpy as np
 from sklearn.model_selection import ShuffleSplit
+from enum import Enum
 
 import src.lib.metrics as metrics
 from src.lib.split_dataset import WrappedSubset
 
 from typing import List, Callable
+
+
+class FoldType(Enum):
+    """
+    Enumerate to define which fold are we dealing with
+    Some functions might behave different if we are in one fold or another
+    """
+    TRAIN_FOLD = "Train Fold"
+    VALIDATION_FOLD = "Validation Fold"
 
 def custom_cross_validation(
     train_dataset: Dataset,
@@ -14,7 +24,7 @@ def custom_cross_validation(
     random_seed: int,
     network_creator: Callable[[], torch.nn.Module],
     network_trainer: Callable[[DataLoader, torch.nn.Module], torch.nn.Module],
-    loader_generator: Callable[[Dataset], DataLoader],
+    loader_generator: Callable[[Dataset, FoldType], DataLoader],
     loss_function: Callable[[torch.nn.Module, DataLoader], float]
 ) -> np.ndarray:
     """
@@ -33,8 +43,10 @@ def custom_cross_validation(
     trains the network and returns that trained network
 
     `loader_generator` should be a function that takes one fold (which is a
-    dataset) and converts it to a `DataLoader`. For example, taking care of
-    creating one of our custom dataloaders
+    dataset) and their type (training or validation), and converts it to a `DataLoader`.
+    For example, taking care of creating one of our custom dataloaders if we
+    are in the training fold, and using a normal dataloader for the validation
+    fold
 
     `loss_function` should be a function that takes a trained network and
     the validation fold dataloader, and produces the loss value that we want
@@ -61,8 +73,8 @@ def custom_cross_validation(
         validation_fold = WrappedSubset(Subset(train_dataset, validation_index))
 
         # Transform dataset folds to dataloaders
-        train_loader = loader_generator(train_fold)
-        validation_loader = loader_generator(validation_fold)
+        train_loader = loader_generator(train_fold, FoldType.TRAIN_FOLD)
+        validation_loader = loader_generator(validation_fold, FoldType.VALIDATION_FOLD)
 
         # Generate a network, train it and get the trained network
         net = network_creator()

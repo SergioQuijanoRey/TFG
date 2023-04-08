@@ -55,7 +55,7 @@ LOGGING_FILE = os.path.join(BASE_PATH, "training.log")
 # Binary file where the stats of the profiling are saved
 PROFILE_SAVE_FILE = os.path.join(BASE_PATH, "training_profile.stat")
 
-OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna.db"
+OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna_v2.db"
 
 
 ## ML parameters
@@ -676,7 +676,11 @@ def objective(trial):
 
     # And with p, k values we can define the way we use the laoder generator
     # This p, k values are captured in the outer scope for the `CustomSampler`
-    def loader_generator(fold_dataset: split_dataset.WrappedSubset) -> DataLoader:
+    def loader_generator(
+        fold_dataset: split_dataset.WrappedSubset,
+        fold_type: hptuning.FoldType
+    ) -> DataLoader:
+
 
         # When doing the split, we can end with less than p classes with at least
         # k images associated. So we do an augmentation again:
@@ -685,29 +689,47 @@ def objective(trial):
         # erased in `LazyAugmentatedDataset`. But this does not create more
         # classes, if fold has already less than P classes
         #
+        # We only perform data augmentation in the training fold
+        #
         # TODO -- this can affect the optimization process, but otherwise most
         # of the tries will fail because of this problem
-        fold_dataset_augmented = LazyAugmentatedDataset(
-            base_dataset = fold_dataset,
-            min_number_of_images = k,
+        if fold_type is hptuning.FoldType.TRAIN_FOLD:
+            fold_dataset_augmented = LazyAugmentatedDataset(
+                base_dataset = fold_dataset,
+                min_number_of_images = k,
 
-            # Remember that the trasformation has to be random type
-            # Otherwise, we could end with a lot of repeated images
-            transform = transforms.Compose([
-                transforms.RandomResizedCrop(size=(250, 250)),
-                transforms.RandomRotation(degrees=(0, 45)),
-                transforms.RandomAutocontrast(),
-            ])
+                # Remember that the trasformation has to be random type
+                # Otherwise, we could end with a lot of repeated images
+                transform = transforms.Compose([
+                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomRotation(degrees=(0, 45)),
+                    transforms.RandomAutocontrast(),
+                ])
 
-        )
+            )
+        else:
+            # Do not perform any augmentation
+            fold_dataset_augmented = fold_dataset
 
-        loader = torch.utils.data.DataLoader(
-            fold_dataset_augmented,
-            batch_size = p * k,
-            num_workers = NUM_WORKERS,
-            pin_memory = True,
-            sampler = CustomSampler(p, k, fold_dataset)
-        )
+        # In the same line, we only use our custom sampler for the training fold
+        # Otherwise, we use a normal sampler
+        if fold_type is hptuning.FoldType.TRAIN_FOLD:
+            loader = torch.utils.data.DataLoader(
+                fold_dataset_augmented,
+                batch_size = p * k,
+                num_workers = NUM_WORKERS,
+                pin_memory = True,
+                sampler = CustomSampler(p, k, fold_dataset)
+            )
+        elif fold_type is hptuning.FoldType.VALIDATION_FOLD:
+            loader = torch.utils.data.DataLoader(
+                fold_dataset_augmented,
+                batch_size = p * k,
+                num_workers = NUM_WORKERS,
+                pin_memory = True,
+            )
+        else:
+            raise ValueError(f"{fold_type} enum value is not managed in if elif construct!")
 
         # To avoid accessing loader.__len__ without computing the necessary data
         _ = loader.__iter__()
