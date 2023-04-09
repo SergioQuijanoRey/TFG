@@ -620,30 +620,30 @@ if ADD_NORM_PENALTY:
 def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
     return metrics.silhouette(validation_fold, net)
 
-
-# TODO -- move more hyperparameters
-# TODO -- now we are only moving P, K values
 def objective(trial):
     """Optuna function that is going to be used in the optimization process"""
 
+    # Fixed parameters
+    # This parameters were explored using previous hp tuning experiments
+    # Fixing the parameters lets us explore other parameters in a better way
+    learning_rate = 0.00005
+    net_election = "LFWResNet18"
+    softplus = True
+
     # Parameters that we are going to explore
+    #
     # TODO -- we've added all reasonable parameters, but we have to end with just
     # really important parameters. number_of_trials grows exponentially with
     # the number of explored parameters
+    #
+    # TODO -- in v2 of hp tuning, `normalization_election = False` and
+    # `use_norm_penalty = True`, but I do not move yet, as results are kinda weird
 
     p = trial.suggest_int('P', 10, 200)
     k = trial.suggest_int('K', 1, 5)
-    net_election = trial.suggest_categorical(
-        "Network",
-        ["LFWResNet18", "LFWLightModel"]
-    )
-    normalization_election = trial.suggest_categorical(
-        "UseNormalization", [True, False]
-    )
     embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
-    learning_rate = trial.suggest_float("Learning rate", 0.0000001, 0.0001)
     margin = trial.suggest_float("Margin", 0.001, 1.0)
-    softplus = trial.suggest_categorical("Use Softplus", [True, False])
+    normalization_election = trial.suggest_categorical("UseNormalization", [True, False])
     use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
     if use_norm_penalty is True:
         norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
