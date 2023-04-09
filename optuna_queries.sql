@@ -5,8 +5,9 @@
 SELECT *  FROM trial_values WHERE value == (SELECT MAX(value) FROM trial_values);
 
 -- Get the parameters of the best trial
-SELECT param_name, param_value
+SELECT param_name, param_value, distribution_json
 FROM trial_params
 WHERE trial_id == (
     SELECT trial_id  FROM trial_values WHERE value == (SELECT MAX(value) FROM trial_values)
 );
+
