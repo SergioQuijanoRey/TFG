@@ -632,15 +632,9 @@ def objective(trial):
     use_norm_penalty = True
     norm_penalty = 0.6
     normalization_election = True
-
-    # Parameters that we are going to explore
-    #
-    # TODO -- we've added all reasonable parameters, but we have to end with just
-    # really important parameters. number_of_trials grows exponentially with
-    # the number of explored parameters
-    p = trial.suggest_int('P', 10, 200)
-    k = trial.suggest_int('K', 1, 5)
-    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
+    p = 11
+    k = 5
+    embedding_dimension = 5
 
     # Log that we are going to do k-fold cross validation and the values of the
     # parameters. k-fold cross validation can be really slow, so this logs are
