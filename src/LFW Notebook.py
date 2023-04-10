@@ -55,8 +55,7 @@ LOGGING_FILE = os.path.join(BASE_PATH, "training.log")
 # Binary file where the stats of the profiling are saved
 PROFILE_SAVE_FILE = os.path.join(BASE_PATH, "training_profile.stat")
 
-OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna_v2.db"
-
+OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna.db"
 
 ## ML parameters
 # ==============================================================================
@@ -108,7 +107,7 @@ HYPERPARAMETER_TUNING_EPOCHS = 10
 # Number of tries in the optimization process
 # We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
 # hyperparameter configurations
-HYPERPARAMETER_TUNING_TRIES = 100
+HYPERPARAMETER_TUNING_TRIES = 300
 
 # Number of folds used in k-fold Cross Validation
 NUMBER_OF_FOLDS = 4
@@ -629,24 +628,19 @@ def objective(trial):
     learning_rate = 0.00005
     net_election = "LFWResNet18"
     softplus = True
+    margin = 0.5
+    use_norm_penalty = True
+    norm_penalty = 0.6
+    normalization_election = True
 
     # Parameters that we are going to explore
     #
     # TODO -- we've added all reasonable parameters, but we have to end with just
     # really important parameters. number_of_trials grows exponentially with
     # the number of explored parameters
-    #
-    # TODO -- in v2 of hp tuning, `normalization_election = False` and
-    # `use_norm_penalty = True`, but I do not move yet, as results are kinda weird
-
     p = trial.suggest_int('P', 10, 200)
     k = trial.suggest_int('K', 1, 5)
     embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
-    margin = trial.suggest_float("Margin", 0.001, 1.0)
-    normalization_election = trial.suggest_categorical("UseNormalization", [True, False])
-    use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
-    if use_norm_penalty is True:
-        norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
 
     # Log that we are going to do k-fold cross validation and the values of the
     # parameters. k-fold cross validation can be really slow, so this logs are
