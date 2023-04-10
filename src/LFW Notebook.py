@@ -292,6 +292,15 @@ from lib.embedding_to_classifier import EmbeddingToClassifier
 from lib.sampler import CustomSampler
 from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 
+# Server security check
+# ==============================================================================
+#
+# - Sometimes UGR's server does not provide GPU access
+# - In that case, fail fast so we start ASAP debugging the problem
+
+if RUNNING_ENV == "ugr" and torch.cuda.is_available() is False:
+    raise Exception("`torch.cuda.is_available()` returned false, so we dont have access to GPU's")
+
 
 # Configuration of the logger
 # ==============================================================================
