@@ -65,7 +65,7 @@ OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna.db"
 
 
 # Parameters of P-K sampling
-P = 100   # Number of classes used in each minibatch
+P = 34    # Number of classes used in each minibatch
 K = 2     # Number of images sampled for each selected class
 
 # Batch size for online training
@@ -82,7 +82,7 @@ ONLINE_BATCH_SIZE = P * K
 TRAINING_EPOCHS = 25
 
 # Learning rate for hard triplets, online training
-ONLINE_LEARNING_RATE = 0.0001
+ONLINE_LEARNING_RATE = 0.00005
 
 # How many single elements we want to see before logging
 # It has to be a multiple of P * K, otherwise `should_log` would return always
@@ -113,10 +113,10 @@ HYPERPARAMETER_TUNING_TRIES = 300
 NUMBER_OF_FOLDS = 8
 
 # Margin used in the loss function
-MARGIN = 1.0
+MARGIN = 0.5
 
 # Dim of the embedding calculated by the network
-EMBEDDING_DIMENSION = 5
+EMBEDDING_DIMENSION = 8
 
 # Number of neighbours considered in K-NN
 # K-NN used for transforming embedding task to classification task
@@ -136,10 +136,10 @@ USE_GT_ZERO_MEAN_LOSS = True
 LAZY_DATA_AUGMENTATION = True
 
 # Where or not add penalty term to the loss function
-ADD_NORM_PENALTY = False
+ADD_NORM_PENALTY = True
 
 # If we add that penalty term, which scaling factor to use
-PENALTY_FACTOR = MARGIN
+PENALTY_FACTOR = 0.6
 
 # If we want to wrap our model into a normalizer
 # That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
@@ -148,7 +148,7 @@ NORMALIZED_MODEL_OUTPUT = True
 # If its None, we do not perform gradient clipping
 # If its a Float value, we perform gradient clipping, using that value as a
 # parameter for the max norm
-GRADIENT_CLIPPING = MARGIN * 10
+GRADIENT_CLIPPING = 100
 
 
 ## Section parameters
@@ -159,7 +159,7 @@ GRADIENT_CLIPPING = MARGIN * 10
 
 
 # Skip hyper parameter tuning for online training
-SKIP_HYPERPARAMTER_TUNING = False
+SKIP_HYPERPARAMTER_TUNING = True
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
@@ -207,7 +207,8 @@ WANDB_RUN_NAME = str(datetime.now())
 # they recomend to explore this parameter, growing it until system RAM saturates
 # Using a value greater than 2 makes pytorch tell us that this value is not optimal
 # So sticking with what pytorch tells uss
-NUM_WORKERS = 2
+# TODO -- trying a higher value in UGR's server
+NUM_WORKERS = 4
 
 # Fix random seed to make reproducible results
 RANDOM_SEED = 123456789
