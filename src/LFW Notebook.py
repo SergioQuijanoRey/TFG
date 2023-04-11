@@ -102,7 +102,7 @@ NET_MODEL = "LFWResNet18"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
-HYPERPARAMETER_TUNING_EPOCHS = 10
+HYPERPARAMETER_TUNING_EPOCHS = 20
 
 # Number of tries in the optimization process
 # We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
@@ -110,7 +110,7 @@ HYPERPARAMETER_TUNING_EPOCHS = 10
 HYPERPARAMETER_TUNING_TRIES = 300
 
 # Number of folds used in k-fold Cross Validation
-NUMBER_OF_FOLDS = 4
+NUMBER_OF_FOLDS = 8
 
 # Margin used in the loss function
 MARGIN = 1.0
@@ -641,9 +641,15 @@ def objective(trial):
     use_norm_penalty = True
     norm_penalty = 0.6
     normalization_election = True
-    p = 11
-    k = 5
-    embedding_dimension = 5
+
+    # Parameters that we are going to explore
+    #
+    # TODO -- we've added all reasonable parameters, but we have to end with just
+    # really important parameters. number_of_trials grows exponentially with
+    # the number of explored parameters
+    p = trial.suggest_int('P', 10, 200)
+    k = trial.suggest_int('K', 1, 5)
+    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
 
     # Log that we are going to do k-fold cross validation and the values of the
     # parameters. k-fold cross validation can be really slow, so this logs are
