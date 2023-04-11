@@ -85,5 +85,9 @@ def custom_cross_validation(
         loss = loss_function(net, validation_loader)
         losses.append(loss)
 
+        # k-fold cross validation can be very slow
+        # So this logs are very important to watch the process
+        print(f"🔎 Current fold loss is {loss}")
+
     # Use numpy instead of vanilla lists
     return np.array(losses)
