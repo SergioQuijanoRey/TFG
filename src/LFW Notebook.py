@@ -79,7 +79,7 @@ K = 2     # Number of images sampled for each selected class
 ONLINE_BATCH_SIZE = P * K
 
 # Epochs for hard triplets, online training
-TRAINING_EPOCHS = 25
+TRAINING_EPOCHS = 100
 
 # Learning rate for hard triplets, online training
 ONLINE_LEARNING_RATE = 0.00005
