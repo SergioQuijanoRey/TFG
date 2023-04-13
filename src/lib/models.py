@@ -95,7 +95,6 @@ class LightModel(torch.nn.Module):
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
 
-
         # Max pooling y seguido flatten de todas las dimensiones menos la del batch
         x = F.max_pool2d(x, 2)
         x = torch.flatten(x,1)
@@ -114,7 +113,6 @@ class LFWResNet18(torch.nn.Module):
     """
     Pretrained ResNet18 on ImageNet, for MNIST dataset. Some slight changes have been made:
 
-    - First convolution (in_channels = 1 and not in_channels = 3)
     - Last linear layer have out_features given by __init__ parameter
     """
 
@@ -126,7 +124,7 @@ class LFWResNet18(torch.nn.Module):
         self.embedding_dimension = embedding_dimension
 
         # Tomamos el modelo pre-entrenado ResNet18
-        self.pretrained = models.resnet18(pretrained=True)
+        self.pretrained = models.resnet18(weights = models.ResNet18_Weights.DEFAULT)
 
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
@@ -157,3 +155,101 @@ class LFWResNet18(torch.nn.Module):
 
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
+
+
+class LFWLightModel(torch.nn.Module):
+    """
+    Very light model. Used mainly to test ideas with a fast model. For LFW dataset
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(LFWLightModel, self).__init__()
+
+        # Dimension del embedding que la red va a calcular
+        self.embedding_dimension = embedding_dimension
+
+        # Bloques convolucionales
+        self.conv1 = nn.Conv2d(in_channels = 3, out_channels = 4, kernel_size = 3)
+        self.conv2 = nn.Conv2d(in_channels = 4, out_channels = 8, kernel_size = 3)
+        self.conv3 = nn.Conv2d(in_channels = 8, out_channels = 16, kernel_size = 3)
+        self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
+        self.fc = nn.Linear(in_features = 468512, out_features = self.embedding_dimension)
+
+        self.should_permute = True
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+
+        # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
+        # queremos tensores (DATALOADER_BACH_SIZE, 1, 28, 28) para poder trabajar
+        # con la red
+        # Usamos permute en vez de reshape porque queremos que tambien funcione al
+        # realizar inferencia con distintos tamaños de minibatch (ie. 1)
+        if self.should_permute is True:
+            x = torch.permute(x, (1, 0, 2, 3))
+
+        # Pasamos el tensor por los distintos bloques de nuestra red
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+
+
+        # Max pooling y seguido flatten de todas las dimensiones menos la del batch
+        x = F.max_pool2d(x, 2)
+        x = torch.flatten(x, 1)
+
+        # Fully connected para llevar el vector aplanado a la dimension del
+        # embedding
+        x = self.fc(x)
+
+        return x
+
+    def set_permute(self, should_permute: bool):
+        self.should_permute = should_permute
+
+
+class RandomNet(torch.nn.Module):
+    """
+    Random net that we are going to use in some tests and benchmarks
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(RandomNet, self).__init__()
+
+        # Dimension del embedding que la red va a calcular
+        self.embedding_dimension = embedding_dimension
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Get the batch size so we return the same number of vectors as
+        # number of given images
+        batch_size = x.shape[0]
+
+        # Random values with the embedding_dimension specified in __init__
+        return torch.rand([batch_size, self.embedding_dimension])
+
+
+class NormalizedNet(torch.nn.Module):
+    """
+    Use a base model to compute outputs. This model gets that ouputs and
+    normalizes them, dividing each vector by its euclidean norm
+    """
+
+    def __init__(self, base_model):
+        super(NormalizedNet, self).__init__()
+
+        self.base_model = base_model
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        output = self.base_model(x)
+        normalized_output = torch.nn.functional.normalize(
+            output,
+            p = 2,
+            dim = 1,
+            eps = 0.1
+        )
+        return normalized_output
+
+    def set_permute(self, should_permute: bool):
+        self.base_model.set_permute(should_permute)

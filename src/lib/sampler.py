@@ -4,19 +4,9 @@ Module where custom samplers go
 
 import torch
 import random
-
-# utils import depend on enviroment (local or remote), so we can do two try-except blocks
-# for dealing with that
-try:
-    import utils
-except Exception as e:
-    pass
-try:
-    import src.lib.utils as utils
-except Exception as e:
-    pass
-
 from typing import Iterator, List, Dict, Optional
+
+import src.lib.utils as utils
 
 import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
@@ -34,6 +24,8 @@ class CustomSampler(torch.utils.data.Sampler):
 
     Used this tutorial to code this class:
     https://www.scottcondron.com/jupyter/visualisation/audio/2020/12/02/dataloaders-samplers-collate.html
+
+    Raises an exception when there are less than P classes with at least K images
     """
 
     def __init__(self, P: int, K: int, dataset: torch.utils.data.Dataset):
@@ -77,7 +69,6 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # Return iterator to that index list
         return iter(self.index_list)
-
 
     def __len__(self) -> int:
         """
@@ -125,9 +116,11 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # Log and do some debugging
         # If first clean lets us with less than `self.P` classes, we have a problem
-        file_logger.debug(f"After first cleaning, there are {len(available_classes)} available_classes")
+        file_logger.debug(
+            f"After first cleaning, there are {len(available_classes)} available_classes"
+        )
         if len(available_classes) < self.P:
-            err_msg = f"After first cleaning, we have {len(available_classes)}, less than `self.P` = {self.P}"
+            err_msg = f"After first cleaning, we have {len(available_classes)} classes with at least `self.k` = {self.K} images, less than `self.P` = {self.P}"
             file_logger.error(err_msg)
             raise Exception(err_msg)
 
@@ -229,5 +222,3 @@ class CustomSampler(torch.utils.data.Sampler):
             unique_labels = [int(x) for x in unique_labels]
 
         return unique_labels
-
-

@@ -1,21 +1,10 @@
 import torch
-import torchvision
 import numpy as np
 from tqdm import tqdm
 from collections import Counter
-from typing import Callable, List
+from typing import List
 
-
-# utils import depend on enviroment (local or remote), so we can do two try-except blocks
-# for dealing with that
-try:
-    import utils
-except Exception as e:
-    pass
-try:
-    import src.lib.utils as utils
-except Exception as e:
-    pass
+import src.lib.utils as utils
 
 
 import logging
@@ -176,6 +165,9 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
         self.dict_of_classes = utils.precompute_dict_of_classes(self.base_dataset.targets)
 
     def __getitem__(self, index: int):
+
+        if type(index) is not int:
+            raise TypeError(f"Index should be an integer, got {type(index)} type instead")
 
         # If the index is from the original dataset, return from that
         if index < len(self.base_dataset):
