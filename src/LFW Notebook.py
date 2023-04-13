@@ -11,6 +11,13 @@
 
 # Global Parameters of the Notebook
 # ==============================================================================
+#
+# - For ease of use, we are going to store all global parameters into a dict
+# - This way, we can pass this dict directly to wandb init, so we can keep track
+# of which parameters produced which output
+
+from typing import Dict, Union
+GLOBALS: Dict[str, Union[str, int, float, bool]] = dict()
 
 ## Paths
 # ==============================================================================
@@ -23,39 +30,39 @@ import os
 # Define if we are running the notebook in our computer ("local")
 # or in Google Colab ("remote")
 # or in UGR's server ("ugr")
-RUNNING_ENV = "ugr"
+GLOBALS['RUNNING_ENV'] = "ugr"
 
 # Base path for the rest of paths defined in the notebook
-BASE_PATH = None
-if RUNNING_ENV == "local":
-    BASE_PATH = "./"
-elif RUNNING_ENV == "remote":
-    BASE_PATH = "/content/drive/MyDrive/Colab Notebooks/"
-elif RUNNING_ENV == "ugr":
-    BASE_PATH = "/mnt/homeGPU/squijano/TFG/"
+GLOBALS['BASE_PATH'] = None
+if GLOBALS['RUNNING_ENV'] == "local":
+    GLOBALS['BASE_PATH'] = "./"
+elif GLOBALS['RUNNING_ENV'] == "remote":
+    GLOBALS['BASE_PATH'] = "/content/drive/MyDrive/Colab Notebooks/"
+elif GLOBALS['RUNNING_ENV'] == "ugr":
+    GLOBALS['BASE_PATH'] = "/mnt/homeGPU/squijano/TFG/"
 else:
-    raise Exception(f"RUNNING ENV is not valid, got value {RUNNING_ENV}")
+    raise Exception(f"RUNNING ENV is not valid, got value {GLOBALS['RUNNING_ENV']}")
 
 # Path to our lib dir
-LIB_PATH = os.path.join(BASE_PATH, "lib")
+GLOBALS['LIB_PATH'] = os.path.join(GLOBALS['BASE_PATH'], "lib")
 
 # Path where we store training / test data
-DATA_PATH = os.path.join(BASE_PATH, "data")
+GLOBALS['DATA_PATH'] = os.path.join(GLOBALS['BASE_PATH'], "data")
 
 # Dir with all cached models
 # This cached models can be loaded from disk when training is skipped
-MODEL_CACHE_FOLDER = os.path.join(BASE_PATH, "cached_models")
+GLOBALS['MODEL_CACHE_FOLDER'] = os.path.join(GLOBALS['BASE_PATH'], "cached_models")
 
 # Cache for the augmented dataset
-AUGMENTED_DATASET_CACHE_FILE = os.path.join(BASE_PATH, "cached_augmented_dataset.pt")
+GLOBALS['AUGMENTED_DATASET_CACHE_FILE'] = os.path.join(GLOBALS['BASE_PATH'], "cached_augmented_dataset.pt")
 
 # File where the logs are written
-LOGGING_FILE = os.path.join(BASE_PATH, "training.log")
+GLOBALS['LOGGING_FILE'] = os.path.join(GLOBALS['BASE_PATH'], "training.log")
 
 # Binary file where the stats of the profiling are saved
-PROFILE_SAVE_FILE = os.path.join(BASE_PATH, "training_profile.stat")
+GLOBALS['PROFILE_SAVE_FILE'] = os.path.join(GLOBALS['BASE_PATH'], "training_profile.stat")
 
-OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna.db"
+GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna.db"
 
 ## ML parameters
 # ==============================================================================
@@ -65,8 +72,8 @@ OPTUNA_DATABASE = f"sqlite:///{BASE_PATH}/hp_tuning_optuna.db"
 
 
 # Parameters of P-K sampling
-P = 34    # Number of classes used in each minibatch
-K = 2     # Number of images sampled for each selected class
+GLOBALS['P'] = 34    # Number of classes used in each minibatch
+GLOBALS['K'] = 2     # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -76,13 +83,13 @@ K = 2     # Number of images sampled for each selected class
 # minibatche concatenated together
 # Be careful when doing this because it can be really slow, and there is no
 # clear reason to do this
-ONLINE_BATCH_SIZE = P * K
+GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Epochs for hard triplets, online training
-TRAINING_EPOCHS = 500
+GLOBALS['TRAINING_EPOCHS'] = 500
 
 # Learning rate for hard triplets, online training
-ONLINE_LEARNING_RATE = 0.00005
+GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
 
 # How many single elements we want to see before logging
 # It has to be a multiple of P * K, otherwise `should_log` would return always
@@ -90,65 +97,65 @@ ONLINE_LEARNING_RATE = 0.00005
 #
 # `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
 # minibatches
-LOGGING_ITERATIONS = P * K * 100
+GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
 
 # Which percentage of the training and validation set we want to use for the logging
-ONLINE_LOGGER_TRAIN_PERCENTAGE = 1 / 10
-ONLINE_LOGGER_VALIDATION_PERCENTAGE = 1 / 3
+GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1 / 10
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 1 / 3
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18" or "LFWLightModel"
-NET_MODEL = "LFWResNet18"
+GLOBALS['NET_MODEL'] = "LFWResNet18"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
-HYPERPARAMETER_TUNING_EPOCHS = 20
+GLOBALS['HYPERPARAMETER_TUNING_EPOCHS'] = 20
 
 # Number of tries in the optimization process
 # We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
 # hyperparameter configurations
-HYPERPARAMETER_TUNING_TRIES = 300
+GLOBALS['HYPERPARAMETER_TUNING_TRIES'] = 300
 
 # Number of folds used in k-fold Cross Validation
-NUMBER_OF_FOLDS = 8
+GLOBALS['NUMBER_OF_FOLDS'] = 8
 
 # Margin used in the loss function
-MARGIN = 0.5
+GLOBALS['MARGIN'] = 0.5
 
 # Dim of the embedding calculated by the network
-EMBEDDING_DIMENSION = 8
+GLOBALS['EMBEDDING_DIMENSION'] = 8
 
 # Number of neighbours considered in K-NN
 # K-NN used for transforming embedding task to classification task
-NUMBER_NEIGHBOURS = 4
+GLOBALS['NUMBER_NEIGHBOURS'] = 4
 
 # Batch Triplet Loss Function
 # This way we can choose among "hard", "all"
-BATCH_TRIPLET_LOSS_FUNCTION = "hard"
+GLOBALS['BATCH_TRIPLET_LOSS_FUNCTION'] = "hard"
 
 # Whether or not use softplus loss function instead of vanilla triplet loss
-USE_SOFTPLUS_LOSS = True
+GLOBALS['USE_SOFTPLUS_LOSS'] = True
 
 # Count all sumamnds in the mean loss or only those summands greater than zero
-USE_GT_ZERO_MEAN_LOSS = True
+GLOBALS['USE_GT_ZERO_MEAN_LOSS'] = True
 
 # Wether or not use lazy computations in the data augmentation
-LAZY_DATA_AUGMENTATION = True
+GLOBALS['LAZY_DATA_AUGMENTATION'] = True
 
 # Where or not add penalty term to the loss function
-ADD_NORM_PENALTY = True
+GLOBALS['ADD_NORM_PENALTY'] = True
 
 # If we add that penalty term, which scaling factor to use
-PENALTY_FACTOR = 0.6
+GLOBALS['PENALTY_FACTOR'] = 0.6
 
 # If we want to wrap our model into a normalizer
 # That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
-NORMALIZED_MODEL_OUTPUT = True
+GLOBALS['NORMALIZED_MODEL_OUTPUT'] = True
 
 # If its None, we do not perform gradient clipping
 # If its a Float value, we perform gradient clipping, using that value as a
 # parameter for the max norm
-GRADIENT_CLIPPING = 100
+GLOBALS['GRADIENT_CLIPPING'] = 100
 
 
 ## Section parameters
@@ -159,27 +166,27 @@ GRADIENT_CLIPPING = 100
 
 
 # Skip hyper parameter tuning for online training
-SKIP_HYPERPARAMTER_TUNING = True
+GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = True
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
 # Thus, when False training is not computed and a cached model
 # is loaded from disk
 # Cached models are stored in `MODEL_CACHE_FOLDER`
-USE_CACHED_MODEL = False
+GLOBALS['USE_CACHED_MODEL'] = False
 
 # Skip data augmentation and use the cached augmented dataset
-USE_CACHED_AUGMENTED_DATASET = False
+GLOBALS['USE_CACHED_AUGMENTED_DATASET'] = False
 
 # Most of the time we're not exploring the data, but doing
 # either hyperparameter settings or training of the model
 # So if we skip this step we can start the process faster
-SKIP_EXPLORATORY_DATA_ANALYSYS = True
+GLOBALS['SKIP_EXPLORATORY_DATA_ANALYSYS'] = True
 
 # Wether or not profile the training
 # This should be False most of the times
 # Note that profiling adds a significant overhead to the training
-PROFILE_TRAINING = False
+GLOBALS['PROFILE_TRAINING'] = False
 
 
 ## WANDB Parameters
@@ -189,12 +196,12 @@ from datetime import datetime
 
 # Name for the project
 # One project groups different runs
-WANDB_PROJECT_NAME = "Labeled Faces in the Wild (LFW) Dataset"
+GLOBALS['WANDB_PROJECT_NAME'] = "Labeled Faces in the Wild (LFW) Dataset"
 
 # Name for this concrete run
 # I don't care too much about it, because wandb tracks the parameters we use
 # in this run (see "Configuration for Weights and Biases" section)
-WANDB_RUN_NAME = str(datetime.now())
+GLOBALS['WANDB_RUN_NAME'] = str(datetime.now())
 
 
 ## Others
@@ -208,10 +215,10 @@ WANDB_RUN_NAME = str(datetime.now())
 # Using a value greater than 2 makes pytorch tell us that this value is not optimal
 # So sticking with what pytorch tells uss
 # TODO -- trying a higher value in UGR's server
-NUM_WORKERS = 4
+GLOBALS['NUM_WORKERS'] = 4
 
 # Fix random seed to make reproducible results
-RANDOM_SEED = 123456789
+GLOBALS['RANDOM_SEED'] = 123456789
 
 # Add some paths to PYTHONPATH
 # ==============================================================================
@@ -222,9 +229,9 @@ RANDOM_SEED = 123456789
 # But in lib code we cannot import properly the modules
 
 import sys
-sys.path.append(os.path.join(BASE_PATH, "src"))
-sys.path.append(os.path.join(BASE_PATH, "src/lib"))
-sys.path.append(BASE_PATH)
+sys.path.append(os.path.join(GLOBALS['BASE_PATH'], "src"))
+sys.path.append(os.path.join(GLOBALS['BASE_PATH'], "src/lib"))
+sys.path.append(GLOBALS['BASE_PATH'])
 
 # Importing the modules we are going to use
 # ==============================================================================
@@ -299,7 +306,7 @@ from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 # - Sometimes UGR's server does not provide GPU access
 # - In that case, fail fast so we start ASAP debugging the problem
 
-if RUNNING_ENV == "ugr" and torch.cuda.is_available() is False:
+if GLOBALS['RUNNING_ENV'] == "ugr" and torch.cuda.is_available() is False:
     raise Exception("`torch.cuda.is_available()` returned false, so we dont have access to GPU's")
 
 
@@ -314,11 +321,12 @@ if RUNNING_ENV == "ugr" and torch.cuda.is_available() is False:
 file_logger = logging.getLogger("MAIN_LOGGER")
 
 # Configure it
-file_logger.propagate = False # Avoid propagatint to upper logger, which logs to
-                         # the console
+# Avoid propagating to upper logger, which logs to the console
+file_logger.propagate = False
+
 file_logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s::%(levelname)s::%(funcName)s::> %(message)s")
-file_handler = logging.FileHandler(LOGGING_FILE)
+file_handler = logging.FileHandler(GLOBALS['LOGGING_FILE'])
 file_handler.setFormatter(formatter)
 file_logger.addHandler(file_handler)
 
@@ -330,54 +338,16 @@ file_logger.debug('debug message')
 # ==============================================================================
 #
 # - We're going to use `wandb` for tracking the training of the models
-# - In this section, we configure `wandb`, mainly selecting which parameters of the notebook are we going to track
-
-
-# Select which parameters of the notebook we're going to track in wand
-# This has to be done before `wandb.init()` in order to pass this dict to
-# `wandb.init`
-#
-# I could create a config dict in "Global Parameters of the Notebook" and pass it
-# rightaway. Or use directly wandb.config.SOMETHING everywhere. We don't do this
-# because of the following reasons:
-#
-# 1. We don't want to track all parameters (ie. section parameters, dir paths...)
-# 2. At this moment, we're not 100% sure that wandb is the right tool, so we are
-#    looking for loose coupling
-
-wandb_config_dict = {}
-
-
-wandb_config_dict["P"] = P
-wandb_config_dict["K"] = K
-wandb_config_dict["ONLINE_BATCH_SIZE"] = ONLINE_BATCH_SIZE
-wandb_config_dict["TRAINING_EPOCHS"] = TRAINING_EPOCHS
-wandb_config_dict["ONLINE_LEARNING_RATE"] = ONLINE_LEARNING_RATE
-wandb_config_dict["LOGGING_ITERATIONS"] = LOGGING_ITERATIONS
-wandb_config_dict["ONLINE_LOGGER_TRAIN_PERCENTAGE"] = ONLINE_LOGGER_TRAIN_PERCENTAGE
-wandb_config_dict["ONLINE_LOGGER_VALIDATION_PERCENTAGE"] = ONLINE_LOGGER_VALIDATION_PERCENTAGE
-wandb_config_dict["NET_MODEL"] = NET_MODEL
-wandb_config_dict["HYPERPARAMETER_TUNING_EPOCHS"] = HYPERPARAMETER_TUNING_EPOCHS
-wandb_config_dict["NUMBER_OF_FOLDS"] = NUMBER_OF_FOLDS
-wandb_config_dict["MARGIN"] = MARGIN
-wandb_config_dict["EMBEDDING_DIMENSION"] = EMBEDDING_DIMENSION
-wandb_config_dict["NUMBER_NEIGHBOURS"] = NUMBER_NEIGHBOURS
-wandb_config_dict["BATCH_TRIPLET_LOSS_FUNCTION"] = BATCH_TRIPLET_LOSS_FUNCTION
-wandb_config_dict["USE_SOFTPLUS_LOSS"] = USE_SOFTPLUS_LOSS
-wandb_config_dict["USE_GT_ZERO_MEAN_LOSS"] = USE_GT_ZERO_MEAN_LOSS
-wandb_config_dict["PROFILE_TRAINING"] = PROFILE_TRAINING
-wandb_config_dict["ADD_NORM_PENALTY"] = ADD_NORM_PENALTY
-wandb_config_dict["PENALTY_FACTOR"] = PENALTY_FACTOR
-wandb_config_dict["NORMALIZED_MODEL_OUTPUT"] = NORMALIZED_MODEL_OUTPUT
-wandb_config_dict["GRADIENT_CLIPPING"] = GRADIENT_CLIPPING
+# - We use our `GLOBALS` dict to init wandb, that is going to keep track of all
+# of that parameters
 
 # If we're running in UGR's servers, we need to set some ENV vars
 # Otherwise, wandb is going to write to dirs that it has no access
 # Also, pytorch tries to save pretrained models in the home folder
-if RUNNING_ENV == "ugr":
+if GLOBALS['RUNNING_ENV'] == "ugr":
 
     print("-> Changing dir env values")
-    utils.change_dir_env_vars(base_path = BASE_PATH)
+    utils.change_dir_env_vars(base_path = GLOBALS['BASE_PATH'])
     print("-> Changing done!")
     print("")
 
@@ -386,14 +356,12 @@ if RUNNING_ENV == "ugr":
     print("-> Login done!")
     print("")
 
-
 # Init the wandb tracker
-# We need to do this before
-#  wandb.login()
+# We need to do this before `wandb.login`
 wandb.init(
-    project = WANDB_PROJECT_NAME,
-    name = WANDB_RUN_NAME,
-    config = wandb_config_dict,
+    project = GLOBALS['WANDB_PROJECT_NAME'],
+    name = GLOBALS['WANDB_RUN_NAME'],
+    config = GLOBALS,
 )
 
 # Functions that we are going to use
@@ -445,14 +413,14 @@ transform = transforms.Compose([
 # torchvision has a method to download and load the dataset
 # TODO -- look what's the difference between this dataset and LFWPairs
 train_dataset = torchvision.datasets.LFWPeople(
-    root = DATA_PATH,
+    root = GLOBALS['DATA_PATH'],
     split = "train",
     download = True,
     transform = transform,
 )
 
 test_dataset = torchvision.datasets.LFWPeople(
-    root = DATA_PATH,
+    root = GLOBALS['DATA_PATH'],
     split = "test",
     download = True,
     transform = transform,
@@ -475,27 +443,27 @@ train_dataset, validation_dataset = split_dataset.split_dataset(train_dataset, 0
 # New dataloaders that use our custom sampler
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
-    batch_size = ONLINE_BATCH_SIZE,
-    num_workers = NUM_WORKERS,
+    batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
+    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
-    sampler = CustomSampler(P, K, train_dataset)
+    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], train_dataset)
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
 validation_loader = torch.utils.data.DataLoader(
     validation_dataset,
-    batch_size = ONLINE_BATCH_SIZE,
+    batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
     shuffle = True,
-    num_workers = NUM_WORKERS,
+    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
 test_loader = torch.utils.data.DataLoader(
   test_dataset,
-  batch_size = ONLINE_BATCH_SIZE,
+  batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
   shuffle = True,
-  num_workers = NUM_WORKERS,
+  num_workers = GLOBALS['NUM_WORKERS'],
   pin_memory = True,
 )
 
@@ -530,20 +498,20 @@ test_loader = torch.utils.data.DataLoader(
 
 
 # Use the cached dataset
-if USE_CACHED_AUGMENTED_DATASET == True:
-    train_dataset_augmented = torch.load(AUGMENTED_DATASET_CACHE_FILE)
+if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == True:
+    train_dataset_augmented = torch.load(GLOBALS['AUGMENTED_DATASET_CACHE_FILE'])
 
 # We have to do the data augmentation if we mark that we want to do it (section parameter)
 # Or if the cached dataset was done for other number of images (ie. for 4 when
 # now we want 32)
-if USE_CACHED_AUGMENTED_DATASET == False or train_dataset_augmented.min_number_of_images != K:
+if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.min_number_of_images != GLOBALS['K']:
 
     # Select the data augmentation mechanism
-    AugmentationClass = LazyAugmentatedDataset if LAZY_DATA_AUGMENTATION is True else AugmentatedDataset
+    AugmentationClass = LazyAugmentatedDataset if GLOBALS['LAZY_DATA_AUGMENTATION'] is True else AugmentatedDataset
 
     train_dataset_augmented = AugmentationClass(
         base_dataset = train_dataset,
-        min_number_of_images = K,
+        min_number_of_images = GLOBALS['K'],
 
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
@@ -556,15 +524,15 @@ if USE_CACHED_AUGMENTED_DATASET == False or train_dataset_augmented.min_number_o
     )
 
     # Save the augmented dataset to cache
-    torch.save(train_dataset_augmented, AUGMENTED_DATASET_CACHE_FILE)
+    torch.save(train_dataset_augmented, GLOBALS['AUGMENTED_DATASET_CACHE_FILE'])
 
 # Now put a loader in front of the augmented dataset
 train_loader_augmented = torch.utils.data.DataLoader(
     train_dataset_augmented,
-    batch_size = ONLINE_BATCH_SIZE,
-    num_workers = NUM_WORKERS,
+    batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
+    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
-    sampler = CustomSampler(P, K, train_dataset_augmented)
+    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], train_dataset_augmented)
 )
 
 
@@ -574,7 +542,7 @@ train_loader_augmented = torch.utils.data.DataLoader(
 # - If we're not doing hyperparameter tuning, we don't need to hold previous dataset and dataloader
 
 
-if SKIP_HYPERPARAMTER_TUNING is True:
+if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is True:
     # We are not using the old dataset and dataloader
     # So delete them to try to have as much RAM as we can
     # Otherwise, train will crash due to lack of RAM
@@ -596,24 +564,24 @@ if SKIP_HYPERPARAMTER_TUNING is True:
 
 
 batch_loss_function = None
-if BATCH_TRIPLET_LOSS_FUNCTION == "hard":
-    batch_loss_function = BatchHardTripletLoss(MARGIN, use_softplus = USE_SOFTPLUS_LOSS, use_gt_than_zero_mean = USE_GT_ZERO_MEAN_LOSS)
-if BATCH_TRIPLET_LOSS_FUNCTION == "all":
-    batch_loss_function = BatchAllTripletLoss(MARGIN, use_softplus = USE_SOFTPLUS_LOSS, use_gt_than_zero_mean =  USE_GT_ZERO_MEAN_LOSS)
+if GLOBALS['BATCH_TRIPLET_LOSS_FUNCTION'] == "hard":
+    batch_loss_function = BatchHardTripletLoss(GLOBALS['MARGIN'], use_softplus = GLOBALS['USE_SOFTPLUS_LOSS'], use_gt_than_zero_mean = GLOBALS['USE_GT_ZERO_MEAN_LOSS'])
+if GLOBALS['BATCH_TRIPLET_LOSS_FUNCTION'] == "all":
+    batch_loss_function = BatchAllTripletLoss(GLOBALS['MARGIN'], use_softplus = GLOBALS['USE_SOFTPLUS_LOSS'], use_gt_than_zero_mean =  GLOBALS['USE_GT_ZERO_MEAN_LOSS'])
 
 # Sanity check
 if batch_loss_function is None:
-    raise Exception(f"BATCH_TRIPLET_LOSS global parameter got unexpected value: {BATCH_TRIPLET_LOSS_FUNCTION}")
+    raise Exception(f"BATCH_TRIPLET_LOSS global parameter got unexpected value: {GLOBALS['BATCH_TRIPLET_LOSS_FUNCTION']}")
 
 
 # Choose wheter to add embedding norm or not
 # ==============================================================================
 
 
-if ADD_NORM_PENALTY:
+if GLOBALS['ADD_NORM_PENALTY']:
     batch_loss_function = AddSmallEmbeddingPenalization(
         base_loss = batch_loss_function,
-        penalty_factor = PENALTY_FACTOR,
+        penalty_factor = GLOBALS['PENALTY_FACTOR'],
     )
 
 
@@ -715,7 +683,7 @@ def objective(trial):
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
                 batch_size = p * k,
-                num_workers = NUM_WORKERS,
+                num_workers = GLOBALS['NUM_WORKERS'],
                 pin_memory = True,
                 sampler = CustomSampler(p, k, fold_dataset)
             )
@@ -723,7 +691,7 @@ def objective(trial):
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
                 batch_size = p * k,
-                num_workers = NUM_WORKERS,
+                num_workers = GLOBALS['NUM_WORKERS'],
                 pin_memory = True,
             )
         else:
@@ -757,7 +725,7 @@ def objective(trial):
     def network_trainer(fold_dataloader: DataLoader, net: torch.nn.Module) -> torch.nn.Module:
 
         parameters = dict()
-        parameters["epochs"] = HYPERPARAMETER_TUNING_EPOCHS
+        parameters["epochs"] = GLOBALS['HYPERPARAMETER_TUNING_EPOCHS']
         parameters["lr"] = learning_rate
         parameters["criterion"] = BatchHardTripletLoss(margin, use_softplus = softplus)
 
@@ -770,14 +738,14 @@ def objective(trial):
 
         _ = train_model_online(
             net = net,
-            path = os.path.join(BASE_PATH, "tmp_hp_tuning"),
+            path = os.path.join(GLOBALS['BASE_PATH'], "tmp_hp_tuning"),
             parameters = parameters,
             train_loader = fold_dataloader,
             validation_loader = None,
             name = "Hyperparameter Tuning Network",
             logger = SilentLogger(),
             snapshot_iterations = None,
-            gradient_clipping = GRADIENT_CLIPPING,
+            gradient_clipping = GLOBALS['GRADIENT_CLIPPING'],
             fail_fast = True,
         )
 
@@ -790,8 +758,8 @@ def objective(trial):
     try:
         losses = hptuning.custom_cross_validation(
             train_dataset = train_dataset_augmented,
-            k = NUMBER_OF_FOLDS,
-            random_seed = RANDOM_SEED,
+            k = GLOBALS['NUMBER_OF_FOLDS'],
+            random_seed = GLOBALS['RANDOM_SEED'],
             network_creator = network_creator,
             network_trainer = network_trainer,
             loader_generator = loader_generator,
@@ -816,7 +784,7 @@ def objective(trial):
     return losses.mean()
 
 
-if SKIP_HYPERPARAMTER_TUNING is False:
+if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
 
     # We want to maximize silhouete value
     print("🔎 Started hyperparameter tuning")
@@ -824,10 +792,10 @@ if SKIP_HYPERPARAMTER_TUNING is False:
     study = optuna.create_study(
         direction = "maximize",
         study_name = "Silhouette optimization",
-        storage = OPTUNA_DATABASE,
+        storage = GLOBALS['OPTUNA_DATABASE'],
         load_if_exists = True
     )
-    study.optimize(objective, n_trials = HYPERPARAMETER_TUNING_TRIES)
+    study.optimize(objective, n_trials = GLOBALS['HYPERPARAMETER_TUNING_TRIES'])
 
     print("🔎 Hyperparameter tuning ended")
     print("")
@@ -843,19 +811,19 @@ if SKIP_HYPERPARAMTER_TUNING is False:
 
 
 net = None
-if NET_MODEL == "ResNet18":
-    net = ResNet18(EMBEDDING_DIMENSION)
-elif NET_MODEL == "LightModel":
-    net = LightModel(EMBEDDING_DIMENSION)
-elif NET_MODEL == "LFWResNet18":
-    net = LFWResNet18(EMBEDDING_DIMENSION)
-elif NET_MODEL == "LFWLightModel":
-    net = LFWLightModel(EMBEDDING_DIMENSION)
+if GLOBALS['NET_MODEL'] == "ResNet18":
+    net = ResNet18(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "LightModel":
+    net = LightModel(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "LFWResNet18":
+    net = LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "LFWLightModel":
+    net = LFWLightModel(GLOBALS['EMBEDDING_DIMENSION'])
 else:
     raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
 # Wrap the model if we want to normalize the output
-if NORMALIZED_MODEL_OUTPUT is True:
+if GLOBALS['NORMALIZED_MODEL_OUTPUT'] is True:
     net = NormalizedNet(net)
 
 # The custom sampler takes care of minibatch management
@@ -864,8 +832,8 @@ net.set_permute(False)
 
 # Training parameters
 parameters = dict()
-parameters["epochs"] = TRAINING_EPOCHS
-parameters["lr"] = ONLINE_LEARNING_RATE
+parameters["epochs"] = GLOBALS['TRAINING_EPOCHS']
+parameters["lr"] = GLOBALS['ONLINE_LEARNING_RATE']
 
 # We use the loss function that depends on the global parameter BATCH_TRIPLET_LOSS_FUNCTION
 # We selected this loss func in *Choose the loss function to use* section
@@ -881,25 +849,25 @@ print(net)
 # Define the loggers we want to use
 triplet_loss_logger = TripletLoggerOnline(
     net = net,
-    iterations = LOGGING_ITERATIONS,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
     loss_func = parameters["criterion"],
-    train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
-    validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
-    greater_than_zero = USE_GT_ZERO_MEAN_LOSS,
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    greater_than_zero = GLOBALS['USE_GT_ZERO_MEAN_LOSS'],
 )
 
 cluster_sizes_logger = IntraClusterLogger(
     net = net,
-    iterations = LOGGING_ITERATIONS,
-    train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
-    validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
 )
 
 intercluster_metrics_logger = InterClusterLogger(
     net = net,
-    iterations = LOGGING_ITERATIONS,
-    train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
-    validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
 )
 
 # Combine them in a single logger
@@ -917,13 +885,13 @@ logger = CompoundLogger([
 import torch
 
 # Check if we want to skip training
-if USE_CACHED_MODEL is False:
+if GLOBALS['USE_CACHED_MODEL'] is False:
 
     # To measure the time it takes to train
     ts = time.time()
 
     # Run the training with or without profiling
-    if PROFILE_TRAINING is True:
+    if GLOBALS['PROFILE_TRAINING'] is True:
         training_history = cProfile.run(
             f"""train_model_online(
                 net = net,
@@ -936,21 +904,21 @@ if USE_CACHED_MODEL is False:
                 snapshot_iterations = None,
                 gradient_clipping = GRADIENT_CLIPPING
             )""",
-            PROFILE_SAVE_FILE
+            GLOBALS['PROFILE_SAVE_FILE']
         )
 
     else:
 
         training_history = train_model_online(
             net = net,
-            path = os.path.join(BASE_PATH, "tmp"),
+            path = os.path.join(GLOBALS['BASE_PATH'], "tmp"),
             parameters = parameters,
             train_loader = train_loader_augmented,
             validation_loader = validation_loader,
-            name = NET_MODEL,
+            name = GLOBALS['NET_MODEL'],
             logger = logger,
             snapshot_iterations = None,
-            gradient_clipping = GRADIENT_CLIPPING
+            gradient_clipping = GLOBALS['GRADIENT_CLIPPING']
         )
 
     # Compute how long it took
@@ -958,15 +926,15 @@ if USE_CACHED_MODEL is False:
     print(f"It took {te - ts} seconds to train")
 
     # Update the model cache
-    filesystem.save_model(net, MODEL_CACHE_FOLDER, "online_model_cached")
+    filesystem.save_model(net, GLOBALS['MODEL_CACHE_FOLDER'], "online_model_cached")
 
 # In case we skipped training, load the model from cache
 else:
 
     # Load the model from cache
     net = filesystem.load_model(
-        os.path.join(MODEL_CACHE_FOLDER, "online_model_cached"),
-        lambda: LFWResNet18(EMBEDDING_DIMENSION)
+        os.path.join(GLOBALS['MODEL_CACHE_FOLDER'], "online_model_cached"),
+        lambda: LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
     )
 
     # Load the network in corresponding mem device (cpu -> ram, gpu -> gpu mem
@@ -1031,7 +999,7 @@ with torch.no_grad():
     try_to_clean_memory()
 
     # With hopefully enough memory, try to convert the embedding to a classificator
-    classifier = EmbeddingToClassifier(net, k = NUMBER_NEIGHBOURS, data_loader = train_loader_augmented, embedding_dimension = EMBEDDING_DIMENSION)
+    classifier = EmbeddingToClassifier(net, k = GLOBALS['NUMBER_NEIGHBOURS'], data_loader = train_loader_augmented, embedding_dimension = GLOBALS['EMBEDDING_DIMENSION'])
 
 
 # We evaluate this classifier by watching how it works over a small test set. Later we take some metrics from this classifier to evaluate it more precisely.
