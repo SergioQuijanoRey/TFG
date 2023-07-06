@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies using conda
       run: |
         # $CONDA points to the path of the dir where conda is installed
-        $CONDA/bin/conda env update --file enviroment.yml --name /mnt/homeGPU/squijano/TFG/custom_env_squijano
+        $CONDA/bin/conda env update --file enviroment.yml --name custom_env_squijano
 
     - name: Run integration tests with unitttest module
       run: |
