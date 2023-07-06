@@ -19,19 +19,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
         python-version: "3.8.17"
+
     - name: Install dependencies using conda
       run: |
         # $CONDA points to the path of the dir where conda is installed
         $CONDA/bin/conda env update --file enviroment.yml --name base
+
     - name: Run integration tests with unitttest module
       run: |
 
-        # Activate the enviroment with all the installed packages
-        $CONDA/bin/conda activate base
-
-        # Run the integration test
-        python -m unittest src/integration_tests/*.py
+        # Run the integration test using the conda enviroment
+        $CONDA/bin/python -m unittest src/integration_tests/*.py
