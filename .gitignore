@@ -16,3 +16,4 @@
 /.env
 /wandb/
 /wandb_data/
+/src/benchmarks/__pycache__/
