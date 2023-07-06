@@ -34,4 +34,6 @@ jobs:
       run: |
 
         # Run the integration test using the conda enviroment
-        $CONDA/bin/python -m unittest src/integration_tests/*.py
+        $CONDA/bin/conda activate custom_env_squijano
+        $CONDA/bin/conda init bash
+        python -m unittest src/integration_tests/*.py
