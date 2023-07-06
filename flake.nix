@@ -1,13 +1,15 @@
 {
+    # TODO -- use a proper description for the project!
     description = "Flake to handle some tasks and dependencies for this project";
     inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+        nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
         utils.url = "github:numtide/flake-utils";
     };
 
     outputs = { self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem (system:
       let
+
         python = "python310";
         pkgs = nixpkgs.legacyPackages.${system};
 
@@ -35,7 +37,8 @@
             numpy
 
             # Hyperparameter tuning
-            optuna
+            # TODO -- uncomment
+            # optuna
 
             # Loggin
             wandb
