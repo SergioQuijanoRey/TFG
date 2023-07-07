@@ -6,14 +6,12 @@ name: Install dependencies and run integration tests using conda enviroment dump
 on:
   pull_request:
     branches: [ "*" ]
-  push:
-    branches: [ "*" ]
 
 permissions:
   contents: read
 
 jobs:
-  integration_tests_conda:
+  integration_tests:
 
     runs-on: ubuntu-latest
 
@@ -32,11 +30,8 @@ jobs:
         environment-file: enviroment.yml
         auto-activate-base: false
 
-    - name: Run integration tests with unitttest module
+    - name: Run unit tests with unitttest module
       run: |
-
-        # For debuggin purposes
-        conda list
 
         # Run the integration test using the conda enviroment
         conda run python -m unittest src/integration_tests/*.py
