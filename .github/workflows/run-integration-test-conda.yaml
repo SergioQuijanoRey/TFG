@@ -17,23 +17,26 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Conda needs a loggin shell to be able to run `conda activate`
+    defaults:
+      run:
+        shell: bash -el {0}
+
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v3
+    # Activate the conda enviroment using the dump of the enviroment
+    - uses: conda-incubator/setup-miniconda@v2
       with:
-        python-version: "3.8.17"
-
-    - name: Install dependencies using conda
-      run: |
-        # $CONDA points to the path of the dir where conda is installed
-        $CONDA/bin/conda env update --file enviroment.yml --name custom_env_squijano
+        activate-environment: /mnt/homeGPU/squijano/TFG/custom_env_squijano
+        environment-file: environment.yml
+        auto-activate-base: false
 
     - name: Run integration tests with unitttest module
       run: |
 
+        # For debuggin purposes
+        conda list
+
         # Run the integration test using the conda enviroment
-        $CONDA/bin/conda activate custom_env_squijano
-        $CONDA/bin/conda init bash
-        python -m unittest src/integration_tests/*.py
+        conda run python -m unittest src/integration_tests/*.py
