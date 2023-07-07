@@ -1,4 +1,4 @@
-# Github action for installing depende0cies using conda dump, and running unit tests
+# Github action for installing dependencies using conda dump, and running unit tests
 # Conda dump is in `enviroment.yml` file
 
 name: Install dependencies and run integration tests using conda enviroment dump
