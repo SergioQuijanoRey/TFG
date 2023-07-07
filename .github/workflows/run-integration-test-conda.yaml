@@ -28,7 +28,7 @@ jobs:
     # Activate the conda enviroment using the dump of the enviroment
     - uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: /mnt/homeGPU/squijano/TFG/custom_env_squijano
+        activate-environment: squijano
         environment-file: enviroment.yml
         auto-activate-base: false
 
