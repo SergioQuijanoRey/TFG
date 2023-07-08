@@ -934,6 +934,8 @@ else:
     # Load the model from cache
     net = filesystem.load_model(
         os.path.join(GLOBALS['MODEL_CACHE_FOLDER'], "online_model_cached"),
+
+        # TODO -- BUG -- we are not taking in consideration `GLOBALS['NET_MODEL']`
         lambda: LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
     )
 
