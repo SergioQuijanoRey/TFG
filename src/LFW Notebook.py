@@ -401,7 +401,7 @@ def try_to_clean_memory():
 # Now we are only transforming images to tensors (pythorch only works with tensors)
 # But we can apply here some normalizations
 transform = transforms.Compose([
-    transforms.Resize((250, 250)),
+    transforms.Resize((250, 250), antialias=True),
     transforms.ToTensor(),
     transforms.Normalize(
          (0.5, 0.5, 0.5),
@@ -516,7 +516,7 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=(250, 250)),
+            transforms.RandomResizedCrop(size=(250, 250), antialias = True),
             transforms.RandomRotation(degrees=(0, 45)),
             transforms.RandomAutocontrast(),
         ])
@@ -633,7 +633,7 @@ def objective(trial):
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=(250, 250)),
+            transforms.RandomResizedCrop(size=(250, 250), antialias = True),
             transforms.RandomRotation(degrees=(0, 45)),
             transforms.RandomAutocontrast(),
         ])
@@ -667,7 +667,7 @@ def objective(trial):
                 # Remember that the trasformation has to be random type
                 # Otherwise, we could end with a lot of repeated images
                 transform = transforms.Compose([
-                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomResizedCrop(size=(250, 250), antialias = True),
                     transforms.RandomRotation(degrees=(0, 45)),
                     transforms.RandomAutocontrast(),
                 ])

@@ -338,7 +338,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
 
             # Load the dataset
             transform = transforms.Compose([
-                transforms.Resize((250, 250)),
+                transforms.Resize((250, 250), antialias=True),
                 transforms.ToTensor(),
                 transforms.Normalize(
                     (0.5, 0.5, 0.5),
@@ -360,7 +360,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
                 # Remember that the trasformation has to be random type
                 # Otherwise, we could end with a lot of repeated images
                 transform = transforms.Compose([
-                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomResizedCrop(size=(250, 250), antialias=True),
                     transforms.RandomRotation(degrees=(0, 180)),
                     transforms.RandomAutocontrast(),
                 ])
@@ -438,7 +438,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
 
             # Load the dataset
             transform = transforms.Compose([
-                transforms.Resize((250, 250)),
+                transforms.Resize((250, 250), antialias=True),
                 transforms.ToTensor(),
                 transforms.Normalize(
                     (0.5, 0.5, 0.5),
@@ -460,7 +460,7 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
                 # Remember that the trasformation has to be random type
                 # Otherwise, we could end with a lot of repeated images
                 transform = transforms.Compose([
-                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomResizedCrop(size=(250, 250), antialias=True),
                     transforms.RandomRotation(degrees=(0, 180)),
                     transforms.RandomAutocontrast(),
                 ])
