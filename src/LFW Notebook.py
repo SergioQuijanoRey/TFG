@@ -977,9 +977,11 @@ class RetrievalAdapter(torch.nn.Module):
     def query(self, query: torch.Tensor, candidates: torch.Tensor, k: int = 5) -> torch.Tensor:
         """
         Given a `query` image, and a list of image `candidates` (list in the form
-        of a pytorch tensor), returns the `k` most promising candidates, ranked
+        of a pytorch tensor), returns the `k` most promising candidate indixes, ranked
         by relevance (that is to say, the first element of the list should be more
         similar to the `query` than the last element of the list)
+
+        The list of indixes is returned as a `torch.Tensor`
         """
 
         # Check the dimensions of the query
@@ -1013,21 +1015,27 @@ class RetrievalAdapter(torch.nn.Module):
         candidates = candidates.to(device)
         query = query.to(device)
 
-
         # Compute the embeddings of the images
         query_embedding = self.base_net(query)
         candidate_embeddings = self.base_net(candidates)
 
         # Compute the euclidean distances between the query and the candidates
-
+        #
         # In fist step, `query - candidates` expands query to be a torch list of
         # `k` copies of the query tensor to match `candidates` dimensions
         # We have `k` tensors of `embedding_dimension` entries.
+        #
+        # In the second step, we sum all the squares of each diff entry and then
+        # compute the square root of each square sum, which actually is the
+        # euclidean distance of each entry
         diff_squared = (query_embedding - candidate_embeddings) ** 2
         distances = torch.sqrt(diff_squared.sum(1))
-        print(f"TODO -- {distances=}")
-        print(f"TODO -- {distances.shape=}")
-        return None
+
+        # Now get the best `k` indixes
+        sorted_indixes = torch.sort(distances, descending = False)[1]
+        best_k_indixes = sorted_indixes[:k]
+
+        return best_k_indixes
 
     def set_permute(self, should_permute: bool):
         self.base_net.set_permute(should_permute)
@@ -1051,7 +1059,8 @@ example_imgs, example_labels = example_batch
 query_img, query_label = example_imgs[0], example_labels[0]
 candidate_imgs, candidate_labels = example_imgs[1:], example_labels[1:]
 
-result = retrieval_net.query(query_img, candidate_imgs, GLOBALS['K'] - 1)
+result = retrieval_net.query(query_img, candidate_imgs, 5)
+print(f"TODO -- {result=}")
 raise ValueError("All went good! :D")
 
 # TODO -- end of testing of ideas
