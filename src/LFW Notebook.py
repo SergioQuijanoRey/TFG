@@ -980,29 +980,16 @@ class RetrievalAdapter(torch.nn.Module):
         of a pytorch tensor), returns the `k` most promising candidates, ranked
         by relevance (that is to say, the first element of the list should be more
         similar to the `query` than the last element of the list)
-
-        NOTE: Even though `query` is a single image, it has to be a `torch.Tensor`
-        with shape `[1, channels, witdh, height]`, that is to say, it has to be a
-        batch of a single element. This is the shape that most of the networks
-        we are working with accept
         """
 
-        print(f"TODO -- {self.base_net=}")
-        print("")
-
         # Check the dimensions of the query
-        # Query is a single image so `query.shape == [1, 1 | 3, width, height]`
-        # Note that it could be `query.shape == [1 | 3, width, height]`, but to be able
-        # to pass the image through the network, we need to have a batch of
-        # a single image
-        if len(query.shape) != 4:
-            raise ValueError(f"`query` should be a tensor with four modes, only {len(query.shape)} modes were found")
+        # Query is a single image so `query.shape == [channels, width, height]`
+        # and `channels in [1, 3]`
+        if len(query.shape) != 3:
+            raise ValueError(f"`query` should be a tensor with three modes, only {len(query.shape)} modes were found")
 
-        if query.shape[0] != 1:
-            raise ValueError(f"`query` must be a tensor of batch size 1, batch size found was {query.shape[0]}\nTODO -- {query.shape=}")
-
-        if query.shape[1] != 3 and query.shape[1] != 1:
-            raise ValueError(f"`query` must be an image with one or three channels, got {query.shape[1]} channels \nTODO -- {query.shape=}")
+        if query.shape[0] != 3 and query.shape[1] != 1:
+            raise ValueError(f"`query` must be an image with one or three channels, got {query.shape[0]} channels")
 
         # Check the dimensions of the candidates
         # `candidates` is a list of images, so `candidates.shape == [n, channels = 1 | 3, width, height]`
@@ -1018,26 +1005,24 @@ class RetrievalAdapter(torch.nn.Module):
             raise ValueError(f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total\nTODO -- {candidates.shape=}")
 
         # Make sure that both query and candidates tensors are in the proper device
-        # Also, check that the network is in the proper device
         device = core.get_device()
-        self.base_net.to(device) # TODO -- remove, should be useless
-        query.to(device)
         candidates.to(device)
 
-        # Compute the embeddings of the images
-        query_embedding = self.base_net(query)
-        print("TODO -- query embedding computed")
-        candidate_embeddings = self.base_net(candidates)
-        print("TODO -- candidate embeddings computed!")
+        # Our network only accepts batches of images. Query is a single image,
+        # so create a batch with a single image:
 
-        pass
+        # Compute the embeddings of the images
+        query_embedding = self.base_net(query[None, ...].to(device))
+        print("TODO #1")
+        candidate_embeddings = self.base_net(candidates.to(device))
+        print("TODO #2")
+        print("Embeddings computed properly!")
+
+        return None
 
     def set_permute(self, should_permute: bool):
         self.base_net.set_permute(should_permute)
 
-
-# TODO -- remove this monkey patching
-core.get_device = lambda: "cpu"
 
 # Wrap the net to perform retrieval
 retrieval_net = RetrievalAdapter(net)
@@ -1055,9 +1040,6 @@ for batch in train_loader_augmented:
 example_imgs, example_labels = example_batch
 
 query_img, query_label = example_imgs[0], example_labels[0]
-query_img = torch.unsqueeze(query_img, 0)  # We want a batch of a single element
-print(f"Batched query now looks like: {query_img=}")
-print(f"Batched query now has shape: {query_img.shape=}")
 candidate_imgs, candidate_labels = example_imgs[1:], example_labels[1:]
 
 result = retrieval_net.query(query_img, candidate_imgs, GLOBALS['K'] - 1)
@@ -1065,6 +1047,7 @@ raise ValueError("All went good! :D")
 
 # TODO -- end of testing of ideas
 # <|
+
 # We start computing the *silhouette* metric for the produced embedding, on
 # train, validation and test set:
 
