@@ -1004,19 +1004,19 @@ class RetrievalAdapter(torch.nn.Module):
         if candidates.shape[0] < k:
             raise ValueError(f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total\nTODO -- {candidates.shape=}")
 
-        # Make sure that both query and candidates tensors are in the proper device
-        device = core.get_device()
-        candidates.to(device)
-
         # Our network only accepts batches of images. Query is a single image,
         # so create a batch with a single image:
+        query = query[None, ...]
+
+        # Make sure that both query and candidates tensors are in the proper device
+        device = core.get_device()
+        candidates = candidates.to(device)
+        query = query.to(device)
+
 
         # Compute the embeddings of the images
-        query_embedding = self.base_net(query[None, ...].to(device))
-        print("TODO #1")
-        candidate_embeddings = self.base_net(candidates.to(device))
-        print("TODO #2")
-        print("Embeddings computed properly!")
+        query_embedding = self.base_net(query)
+        candidate_embeddings = self.base_net(candidates)
 
         return None
 
