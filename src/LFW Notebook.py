@@ -881,9 +881,6 @@ logger = CompoundLogger([
 ## Running the training loop
 # ==============================================================================
 
-
-import torch
-
 # Check if we want to skip training
 if GLOBALS['USE_CACHED_MODEL'] is False:
 
