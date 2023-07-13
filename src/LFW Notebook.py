@@ -1018,6 +1018,15 @@ class RetrievalAdapter(torch.nn.Module):
         query_embedding = self.base_net(query)
         candidate_embeddings = self.base_net(candidates)
 
+        # Compute the euclidean distances between the query and the candidates
+
+        # In fist step, `query - candidates` expands query to be a torch list of
+        # `k` copies of the query tensor to match `candidates` dimensions
+        # We have `k` tensors of `embedding_dimension` entries.
+        diff_squared = (query_embedding - candidate_embeddings) ** 2
+        distances = torch.sqrt(diff_squared.sum(1))
+        print(f"TODO -- {distances=}")
+        print(f"TODO -- {distances.shape=}")
         return None
 
     def set_permute(self, should_permute: bool):
