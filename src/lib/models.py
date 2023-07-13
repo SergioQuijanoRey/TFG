@@ -9,6 +9,8 @@ import torch.nn.functional as F
 # In order to use pre-trained resnet
 import torchvision.models as models
 
+import src.lib.core as core
+
 class ResNet18(torch.nn.Module):
     """
     Pretrained ResNet18 on ImageNet, for MNIST dataset. Some slight changes have been made:
@@ -97,7 +99,7 @@ class LightModel(torch.nn.Module):
 
         # Max pooling y seguido flatten de todas las dimensiones menos la del batch
         x = F.max_pool2d(x, 2)
-        x = torch.flatten(x,1)
+        x = torch.flatten(x, 1)
 
         # Fully connected para llevar el vector aplanado a la dimension del
         # embedding
@@ -253,3 +255,87 @@ class NormalizedNet(torch.nn.Module):
 
     def set_permute(self, should_permute: bool):
         self.base_model.set_permute(should_permute)
+
+
+class RetrievalAdapter(torch.nn.Module):
+    """
+    Takes a network that computes embeddings of the input images and adapts it
+    to a network that does a retrieval task
+
+    That is to say, we end up with a network that, given a query image and a set
+    of candidates, returns a ranked list of the most promising candidates
+    """
+
+    def __init__(self, base_net: torch.nn.Module):
+        super(RetrievalAdapter, self).__init__()
+        self.base_net = base_net
+
+        # Put the base model on the proper device
+        device = core.get_device()
+        self.base_net.to(device)
+
+    def query(self, query: torch.Tensor, candidates: torch.Tensor, k: int = 5) -> torch.Tensor:
+        """
+        Given a `query` image, and a list of image `candidates` (list in the form
+        of a pytorch tensor), returns the `k` most promising candidate indixes, ranked
+        by relevance (that is to say, the first element of the list should be more
+        similar to the `query` than the last element of the list)
+
+        The list of indixes is returned as a `torch.Tensor`
+        """
+
+        # Check the dimensions of the query
+        # Query is a single image so `query.shape == [channels, width, height]`
+        # and `channels in [1, 3]`
+        if len(query.shape) != 3:
+            raise ValueError(f"`query` should be a tensor with three modes, only {len(query.shape)} modes were found")
+
+        if query.shape[0] != 3 and query.shape[1] != 1:
+            raise ValueError(f"`query` must be an image with one or three channels, got {query.shape[0]} channels")
+
+        # Check the dimensions of the candidates
+        # `candidates` is a list of images, so `candidates.shape == [n, channels = 1 | 3, width, height]`
+        # Also, as we are querying for the best `k` candidates, we should have at least
+        # `k` candidates
+        if len(candidates.shape) != 4:
+            raise ValueError(f"`candidates` should be a tensor with four modes, only {len(candidates.shape)} modes were found")
+
+        if candidates.shape[1] != 3 and candidates.shape[1] != 1:
+            raise ValueError(f"Candidates must be images of one or three channels, got {candidates.shape[1]} channels")
+
+        if candidates.shape[0] < k:
+            raise ValueError(f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total\nTODO -- {candidates.shape=}")
+
+        # Our network only accepts batches of images. Query is a single image,
+        # so create a batch with a single image:
+        query = query[None, ...]
+
+        # Make sure that both query and candidates tensors are in the proper device
+        device = core.get_device()
+        candidates = candidates.to(device)
+        query = query.to(device)
+
+        # Compute the embeddings of the images
+        query_embedding = self.base_net(query)
+        candidate_embeddings = self.base_net(candidates)
+
+        # Compute the euclidean distances between the query and the candidates
+        #
+        # In fist step, `query - candidates` expands query to be a torch list of
+        # `k` copies of the query tensor to match `candidates` dimensions
+        # We have `k` tensors of `embedding_dimension` entries.
+        #
+        # In the second step, we sum all the squares of each diff entry and then
+        # compute the square root of each square sum, which actually is the
+        # euclidean distance of each entry
+        diff_squared = (query_embedding - candidate_embeddings) ** 2
+        distances = torch.sqrt(diff_squared.sum(1))
+
+        # Now get the best `k` indixes
+        sorted_indixes = torch.sort(distances, descending = False)[1]
+        best_k_indixes = sorted_indixes[:k]
+
+        return best_k_indixes
+
+    def set_permute(self, should_permute: bool):
+        self.base_net.set_permute(should_permute)
