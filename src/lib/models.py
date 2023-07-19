@@ -319,6 +319,30 @@ class RetrievalAdapter(torch.nn.Module):
         query_embedding = self.base_net(query)
         candidate_embeddings = self.base_net(candidates)
 
+        # Take advantage of the method that computes the best k candidates
+        # using the embeddings that we have computed
+        return self.query_embedding(query_embedding, candidate_embeddings, k)
+
+    def query_embedding(self, query_embedding: torch.Tensor, candidate_embeddings: torch.Tensor, k: int = 5) -> torch.Tensor:
+        """
+        Does the same as `Self.query_embedding` but taking as parameters the
+        embeddings, and not the images that we are going to embed
+        """
+
+        # Check the shapes of the embeddings given as parameters
+        if len(query_embedding.shape) != 1:
+            raise ValueError(f"We were expecting a single embedding, thus only one mode, got {len(query_embedding.shape)} modes")
+
+        if len(candidate_embeddings.shape) != 2:
+            raise ValueError(f"We were expecting a batch of embeddings, thus two modes, got {len(candidate_embeddings.shape)} modes")
+
+        # Check that embedding dimension are the same for the query and the candidates
+        if query_embedding.shape[0] != candidate_embeddings.shape[1]:
+            err_msg = "Embedding dimensions are not the same for candidates and query\n"
+            err_msg += f"Embedding dimension for query is {query_embedding.shape[0]}\n"
+            err_msg += f"Embedding dimension for candidates is {candidate_embeddings.shape[1]}\n"
+            raise ValueError(err_msg)
+
         # Compute the euclidean distances between the query and the candidates
         #
         # In fist step, `query - candidates` expands query to be a torch list of
