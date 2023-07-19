@@ -55,7 +55,7 @@ class TestRetrievalAdapter(unittest.TestCase):
         """
 
         result = torch.equal(first, second)
-        if result == False:
+        if result is False:
             msg = "Two given tensors are not the same!\n"
             msg = msg + f"First: {first}\n"
             msg = msg + f"Second: {second}\n"
@@ -127,8 +127,7 @@ class TestRetrievalAdapter(unittest.TestCase):
         expected_best_candidates = torch.Tensor([4, 3, 2, 0, 1])
         self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
 
-
-    def test_boundaries(self):
+    def test_boundaries_in_number_of_candidates(self):
 
         # We use our TmpNetwork so we can now which is going to be the output
         # embedding, and thus, make checks based on that known behaviour
