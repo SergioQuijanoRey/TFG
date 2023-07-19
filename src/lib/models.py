@@ -304,7 +304,7 @@ class RetrievalAdapter(torch.nn.Module):
             raise ValueError(f"Candidates must be images of one or three channels, got {candidates.shape[1]} channels")
 
         if candidates.shape[0] < k:
-            raise ValueError(f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total\nTODO -- {candidates.shape=}")
+            raise ValueError(f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total")
 
         # Our network only accepts batches of images. Query is a single image,
         # so create a batch with a single image:
