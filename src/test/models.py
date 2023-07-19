@@ -13,6 +13,32 @@ import src.lib.models as models
 # Precision that we want in certain tests
 PLACES = 4
 
+class TmpNetwork(torch.nn.Module):
+    """Temporal network for this tests. RetrievalAdapter work with 4 mode tensors,
+    that is to say, tensors with shape `[batch_size, channels, width, height]`
+
+    We are going to pass, inside tensors of that shape, the embeddings that we
+    want as a result, and therefore, doing so we can play with it in our tests,
+    as we now the embedding output this network is going to produce
+    """
+    def __init__(self):
+        super(TmpNetwork, self).__init__()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+
+        # We are expecting a batch of images, that is to say,
+        # `x.shape == [batch_size, channels, width, height]`
+        if len(x.shape) != 4:
+            raise Exception(f"TMP class got a tensor with {len(x.shape)} modes, when we were expecting 4 modes (a batch of images)")
+
+        # And we want to return a list of embeddings, that is to say,
+        # `output.shape == [batch_size, 3]`
+        # `squeeze` removes the dimensions with value 1. As we are passing tensors
+        # with shape `[batch_size >= 1, 1, 3]`, we obtain `[batch_size, 3]`, which
+        # is the size of the desired output embeddings
+        output = x.squeeze()
+        return output
+
 class TestRetrievalAdapter(unittest.TestCase):
 
     def assertEqualsTensor(self, first: torch.Tensor, second: torch.Tensor):
@@ -36,19 +62,17 @@ class TestRetrievalAdapter(unittest.TestCase):
             msg = msg + "\n"
             raise Exception(msg)
 
-
-
     def test_basic_case(self):
 
         # With the identity network we can pass as query and candidate images
         # directly the embeddings we want to play with
-        net = torch.nn.Identity()
+        net = TmpNetwork()
 
         # Wrap it with our adapter
         retrieval_net = models.RetrievalAdapter(net)
 
         # Put directly the embeddings in the query and candidates images as
-        # we are using an Identity network
+        # we are using TmpNetwork
         query = torch.Tensor([[[0, 0, 0]]])
         candidates = torch.Tensor([
             [[[1, 0, 0]]],
@@ -60,6 +84,5 @@ class TestRetrievalAdapter(unittest.TestCase):
 
         # Compute the best 3 candidates
         computed_best_candidates = retrieval_net.query(query, candidates, k = 3)
-
         expected_best_candidates = torch.Tensor([1, 0, 3])
         self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
