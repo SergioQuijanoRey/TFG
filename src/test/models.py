@@ -64,8 +64,8 @@ class TestRetrievalAdapter(unittest.TestCase):
 
     def test_basic_case(self):
 
-        # With the identity network we can pass as query and candidate images
-        # directly the embeddings we want to play with
+        # We use our TmpNetwork so we can now which is going to be the output
+        # embedding, and thus, make checks based on that known behaviour
         net = TmpNetwork()
 
         # Wrap it with our adapter
@@ -86,3 +86,69 @@ class TestRetrievalAdapter(unittest.TestCase):
         computed_best_candidates = retrieval_net.query(query, candidates, k = 3)
         expected_best_candidates = torch.Tensor([1, 0, 3])
         self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
+
+        # Compute the best 2 candidates
+        computed_best_candidates = retrieval_net.query(query, candidates, k = 2)
+        expected_best_candidates = torch.Tensor([1, 0])
+        self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
+
+        # Compute the best candidate
+        computed_best_candidates = retrieval_net.query(query, candidates, k = 1)
+        expected_best_candidates = torch.Tensor([1])
+        self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
+
+    def test_other_basic_case(self):
+
+        # With the identity network we can pass as query and candidate images
+        # directly the embeddings we want to play with
+        net = TmpNetwork()
+
+        # Wrap it with our adapter
+        retrieval_net = models.RetrievalAdapter(net)
+
+        # Put directly the embeddings in the query and candidates images as
+        # we are using TmpNetwork
+        query = torch.Tensor([[[0, 0, 0]]])
+        candidates = torch.Tensor([
+            [[[105, 0, 0]]],
+            [[[110, 0, 0]]],
+            [[[103, 0, 0]]],
+            [[[102, 0, 0]]],
+            [[[100, 0, 0]]]
+        ])
+
+        # Compute the best 3 candidates
+        computed_best_candidates = retrieval_net.query(query, candidates, k = 3)
+        expected_best_candidates = torch.Tensor([4, 3, 2])
+        self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
+
+        # Compute the best 5 candidates
+        computed_best_candidates = retrieval_net.query(query, candidates, k = 5)
+        expected_best_candidates = torch.Tensor([4, 3, 2, 0, 1])
+        self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
+
+
+    def test_boundaries(self):
+
+        # We use our TmpNetwork so we can now which is going to be the output
+        # embedding, and thus, make checks based on that known behaviour
+        net = TmpNetwork()
+
+        # Wrap it with our adapter
+        retrieval_net = models.RetrievalAdapter(net)
+
+        # Put directly the embeddings in the query and candidates images as
+        # we are using TmpNetwork
+        query = torch.Tensor([[[0, 0, 0]]])
+        candidates = torch.Tensor([
+            [[[1, 0, 0]]],
+            [[[0, 0, 0]]],
+            [[[3, 0, 0]]],
+            [[[2, 0, 0]]],
+            [[[100, 100, 100]]]
+        ])
+
+        # Compute the best 6 candidates
+        # It should fail as we only have 5 candidates
+        with self.assertRaises(ValueError):
+            retrieval_net.query(query, candidates, k = 6)
