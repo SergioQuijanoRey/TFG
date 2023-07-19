@@ -181,7 +181,7 @@ class TestRetrievalAdapter(unittest.TestCase):
         self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
 
         # Compute the best candidate
-        computed_best_candidates = retrieval_net.query(query_embedding, candidates_embeddings, k = 1)
+        computed_best_candidates = retrieval_net.query_embedding(query_embedding, candidates_embeddings, k = 1)
         expected_best_candidates = torch.Tensor([1])
         self.assertEqualsTensor(computed_best_candidates, expected_best_candidates)
 

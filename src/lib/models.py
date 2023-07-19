@@ -343,6 +343,10 @@ class RetrievalAdapter(torch.nn.Module):
             err_msg += f"Embedding dimension for candidates is {candidate_embeddings.shape[1]}\n"
             raise ValueError(err_msg)
 
+        # We must have at least `k` candidates to be able to compute the search
+        if candidate_embeddings.shape[0] < k:
+            raise ValueError(f"Querying for the best {k} candidates, but we only have {candidate_embeddings.shape[0]} candidates in total")
+
         # Compute the euclidean distances between the query and the candidates
         #
         # In fist step, `query - candidates` expands query to be a torch list of
