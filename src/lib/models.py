@@ -327,6 +327,9 @@ class RetrievalAdapter(torch.nn.Module):
         """
         Does the same as `Self.query_embedding` but taking as parameters the
         embeddings, and not the images that we are going to embed
+
+        NOTE: in this computation, as we already have the embeddings computed,
+        we are not using `self.base_net`
         """
 
         # Check the shapes of the embeddings given as parameters
