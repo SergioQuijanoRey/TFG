@@ -12,6 +12,7 @@ import src.lib.core as core
 import src.lib.utils as utils
 import src.lib.loss_functions as loss_functions
 import src.lib.metrics as metrics
+import src.lib.models as models
 import src.lib.loss_functions as loss_functions
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
@@ -551,10 +552,79 @@ def silhouette(
         max_examples = len(data_loader),
         fast_implementation = False,
     )
-
     # Compute the parwise distances
     base_loss = loss_functions.BatchBaseTripletLoss().raw_precompute_pairwise_distances
     pairwise_distances = base_loss(embeddings)
 
     # Now, use that pairwise distances to compute silhouette metric
     return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
+
+# TODO -- work on this metric, which lacks an implementation
+# TODO -- write more comments on why we are doing some things the way we are doing it
+# TODO -- test this metric!
+# TODO -- this metric should be called using our Logger interface, see `./src/lib/train_loggers.py`
+def rank_accuracy(
+    k: int,
+    data_loader: torch.utils.data.DataLoader,
+    network: torch.nn.Module,
+    max_examples: int,
+) -> float:
+    """"
+    Computes the rank-k accuracy metric. Thus, this only can be used when the
+    network performs information retrieval
+
+    We iterate over all the elements in the dataloader, and query for the `k`
+    best candidates. If there is any element in that `k` best candidates of the
+    same class, then we count an success, else we count an error. This way we compute
+    rank @ `k` accuracy
+
+    `network` should be a embedding network, this function takes care of wrapping
+    it with `RetrievalAdapter`
+
+    `data_loader` should be a loader implementing our P-K custom sampling
+    """
+
+    # Wrap the network into a RetrievalAdapter
+    retrieval_network = models.RetrievalAdapter(network)
+
+    # Move the retrieval network to the proper device
+    device = core.get_device()
+    retrieval_network = retrieval_network.to(device)
+
+    # Get the portion of the dataset we're interested in
+    # Also, use this step to compute the embeddings of the images
+    embeddings, targets = __get_portion_of_dataset_and_embed(
+        data_loader,
+        network,
+        max_examples,
+        fast_implementation = True,
+    )
+
+    # We are going to use some pytorch methods to get only one part of the
+    # embeddings and targets, and targets are now a `np.ndarray`, so convert
+    # it to a pytorch tensor and assure that is in the proper device
+    targets = torch.Tensor(targets)
+    targets = targets.to(device)
+
+    deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
+
+    successes = 0
+    for index, (embedding, target) in enumerate(zip(embeddings, targets)):
+        embeddings_without_query = deleter(embeddings, index)
+        targets_without_query = deleter(targets, index)
+
+        embeddings_without_query = embeddings_without_query.to(device)
+        targets_without_query = targets_without_query.to(device)
+
+        best_k_candidates = retrieval_network.query_embedding(
+            query_embedding = embedding,
+            candidate_embeddings = embeddings_without_query,
+            k = k
+        )
+        best_k_candidates = best_k_candidates.to(device)
+
+        best_k_targets = targets_without_query[best_k_candidates]
+        if target in best_k_targets:
+            successes = successes + 1
+
+    return successes / max_examples
