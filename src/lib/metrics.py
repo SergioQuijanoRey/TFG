@@ -183,7 +183,7 @@ def calculate_mean_loss_function_online(
 
     return mean_loss
 
-# TODO -- PERF -- This function is taking a lot of cumulative time
+# TODO -- BUG -- sometimes we get a lot more of values than `max_examples`
 def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
