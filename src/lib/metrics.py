@@ -330,9 +330,6 @@ def __get_portion_of_dataset_and_embed_slow(
         if seen_examples >= max_examples:
             break
 
-    # Convert gpu torch.tensor to cpu numpy array
-    targets = targets.cpu().numpy()
-    embeddings = embeddings.cpu()
 
     return embeddings, targets
 
