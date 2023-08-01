@@ -232,12 +232,18 @@ def __get_portion_of_dataset_and_embed_fast(
     # Get memory device we are using
     device = core.get_device()
 
+    # We need to know the batch size so we can get only the needed batches
+    batch_size = 0
+    for imgs, labels in data_loader:
+        batch_size = labels.shape[0]
+        break
+
     # Get all the batches in the data loader
     # This is the most slow part of the function
     elements = [
         (imgs.to(device), labels.to(device))
         for (index, (imgs, labels)) in enumerate(data_loader)
-        if index < max_examples
+        if index * batch_size <= max_examples + batch_size
     ]
 
     # Now, split previous list of pairs to a pair of lists
@@ -316,7 +322,6 @@ def __get_portion_of_dataset_and_embed_slow(
 
     embeddings: torch.Tensor = torch.tensor([]).to(device)
     targets: torch.Tensor = torch.tensor([]).to(device)
-    seen_examples = 0
 
     for imgs, labels in data_loader:
         imgs, labels = imgs.to(device), labels.to(device)
@@ -326,10 +331,9 @@ def __get_portion_of_dataset_and_embed_slow(
         targets = torch.cat((targets, labels), 0)
         embeddings = torch.cat((embeddings, net(imgs).to(device)), 0)
 
-        seen_examples += len(labels)
-        if seen_examples >= max_examples:
+        # Check if we have accumulated enough values
+        if targets.shape[0] >= max_examples:
             break
-
 
     return embeddings, targets
 
@@ -635,4 +639,4 @@ def rank_accuracy(
         if target in best_k_targets:
             successes = successes + 1
 
-    return successes / max_examples
+    return successes / len(embeddings)
