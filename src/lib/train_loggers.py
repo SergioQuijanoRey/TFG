@@ -58,6 +58,7 @@ class TrainLogger(ABC):
         """
         pass
 
+
 class SilentLogger(TrainLogger):
     """Logger that does not log data"""
 
@@ -528,6 +529,117 @@ class InterClusterLogger(TrainLogger):
             "Validation Max Intercluster Distance": validation_metrics["max"],
             "Validation Mean Intercluster Distance": validation_metrics["mean"],
             "Validation SD Intercluster Distance": validation_metrics["sd"],
+        }
+
+        return renamed_metrics
+
+    # TODO -- this method is repeated multiple times
+    # TODO -- REFACTOR -- Create base class that does this by default and use it
+    def should_log(self, iteration: int) -> bool:
+
+        if iteration % self.iterations == 0:
+            return True
+
+        return False
+
+# We are optimizing and benchmarking compute_intercluster_metrics, thus, this class does not need
+# optimization + benchmarking
+class RankAtKLogger(TrainLogger):
+    """
+    Logger that logs Rank@k accuracy metric. This metric is computed the following way:
+
+    For each element in the dataset (image + target):
+
+    1. Wrap the network into a `RetrievalAdapter` to perform a retrieval-like task
+    2. Query the best `k` candidates for thate given element
+    3. Check if there is at least one of the best `k` candidates of the same target
+       as the current element. If so, count it as a success
+
+    Then compute the rank@k accuracy with the number of successes and the total
+    number of elements
+    """
+
+    def __init__(
+        self,
+        net: nn.Module,
+        iterations: int,
+        train_percentage: float = 1.0,
+        validation_percentage: float = 1.0,
+        k: int = 5,
+    ):
+        """
+        Initializes the logger
+
+        @param net: the net we are testing
+        @param iterations: how many iterations we have to wait to log again
+        @param train_percentage: percentage of the training set we want to use. Less than 1 can be
+                                 used for faster computations
+        @param validation_percentage: percentage of the training set we want to use. Less than 1 can
+                                      be used for faster computations
+        @param k: how many candidates we are going to use in the queries
+        """
+
+        self.net = net
+        self.iterations = iterations
+        self.train_percentage = train_percentage
+        self.validation_percentage = validation_percentage
+        self.k = k
+
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        epoch_iteration: int
+    ) -> Dict[str, float]:
+
+        # This log can be slow so we print this beforehand to have a notion on how slow it is
+        print(f"[{epoch} / {epoch_iteration}] <-- Rank@{self.k}")
+
+        # Compute the maximun number of examples to use in the metrics
+        train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
+        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+
+        # Compute the metrics faster
+        with torch.no_grad():
+
+            # Compute the metrics faster
+            self.net.eval()
+
+            # Get the train / validation metrics
+            train_rank_k_accuracy = metrics.rank_accuracy(
+                k = self.k,
+                data_loader = train_loader,
+                network = self.net,
+                max_examples = train_max_examples,
+            )
+
+            validation_rank_k_accuracy = metrics.rank_accuracy(
+                k = self.k,
+                data_loader = validation_loader,
+                network = self.net,
+                max_examples = validation_max_examples,
+            )
+
+        # Get the network in training mode again
+        self.net.train()
+
+        # Show obtained metrics
+        print(f"\tTrain Rank@{self.k} accuracy: {train_rank_k_accuracy}")
+        print(f"\tValidation Rank@{self.k} accuracy: {validation_rank_k_accuracy}")
+        print("")
+
+        # Log that metrics to wandb
+        wandb.log({
+            f"Train Rank@{self.k} accuracy": train_rank_k_accuracy,
+            f"Validation Rank@{self.k} accuracy": validation_rank_k_accuracy,
+        })
+
+        # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
+        # names for the keys
+        renamed_metrics = {
+            f"Train Rank@{self.k} accuracy": {train_rank_k_accuracy},
+            f"Validation Rank@{self.k} accuracy": {validation_rank_k_accuracy},
         }
 
         return renamed_metrics

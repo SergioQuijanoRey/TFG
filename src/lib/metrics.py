@@ -559,7 +559,6 @@ def silhouette(
     # Now, use that pairwise distances to compute silhouette metric
     return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
 
-# TODO -- write more comments on why we are doing some things the way we are doing it
 # TODO -- test this metric!
 # TODO -- this metric should be called using our Logger interface, see `./src/lib/train_loggers.py`
 def rank_accuracy(

@@ -291,7 +291,7 @@ import lib.split_dataset as split_dataset
 import lib.hyperparameter_tuning as hptuning
 
 from lib.trainers import train_model_offline, train_model_online
-from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger
+from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, RankAtKLogger
 from lib.models import *
 from lib.visualizations import *
 from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter
@@ -870,11 +870,29 @@ intercluster_metrics_logger = InterClusterLogger(
     validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
 )
 
+rank_at_one_logger = RankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = 1
+)
+
+rank_at_five_logger = RankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = 5
+)
+
 # Combine them in a single logger
 logger = CompoundLogger([
     triplet_loss_logger,
     cluster_sizes_logger,
-    intercluster_metrics_logger
+    intercluster_metrics_logger,
+    rank_at_one_logger,
+    rank_at_five_logger,
 ])
 
 
@@ -949,35 +967,6 @@ net.eval()
 
 # Model evaluation
 # ==============================================================================
-
-# TODO -- testing out ideas
-# TODO -- clean and move to propper place in the codebase
-# |>
-
-# Wrap the net to perform retrieval
-retrieval_net = RetrievalAdapter(net)
-
-# Test a single query to check that all is working
-# We are going to use our custom sampler, this way we have P-K sampling. Therefore
-# we have P classes with K images each one. If the network were perfect, a
-# `k-1` query should return only images of the same class
-
-# Get the first batch of the training set using our custom sampler
-example_batch = None
-for batch in train_loader_augmented:
-    example_batch = batch
-    break
-example_imgs, example_labels = example_batch
-
-query_img, query_label = example_imgs[0], example_labels[0]
-candidate_imgs, candidate_labels = example_imgs[1:], example_labels[1:]
-
-result = retrieval_net.query(query_img, candidate_imgs, 5)
-print(f"TODO -- {result=}")
-raise ValueError("All went good! :D")
-
-# TODO -- end of testing of ideas
-# <|
 
 # We start computing the *silhouette* metric for the produced embedding, on
 # train, validation and test set:
