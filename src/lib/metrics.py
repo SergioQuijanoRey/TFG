@@ -559,7 +559,6 @@ def silhouette(
     # Now, use that pairwise distances to compute silhouette metric
     return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
 
-# TODO -- work on this metric, which lacks an implementation
 # TODO -- write more comments on why we are doing some things the way we are doing it
 # TODO -- test this metric!
 # TODO -- this metric should be called using our Logger interface, see `./src/lib/train_loggers.py`
@@ -606,16 +605,26 @@ def rank_accuracy(
     targets = torch.Tensor(targets)
     targets = targets.to(device)
 
+    # In each step, we are going to use one entry as the query, and the rest
+    # of the entries as the candidates. This function takes a tensor `data`
+    # and a position, `n` and returns the same tensor without the `n`-th entry
     deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
 
+    # Iterate over all entries and count the number of successes
+    # We consider a success when in the returned `k` best candidates, there is
+    # at least one candidate of the same class as the query entry
     successes = 0
     for index, (embedding, target) in enumerate(zip(embeddings, targets)):
+
+        # Get all the data withot the current query entry
         embeddings_without_query = deleter(embeddings, index)
         targets_without_query = deleter(targets, index)
 
+        # Make sure that they are on the proper device
         embeddings_without_query = embeddings_without_query.to(device)
         targets_without_query = targets_without_query.to(device)
 
+        # Use the network to retrieve the best `k` candidates for our current query
         best_k_candidates = retrieval_network.query_embedding(
             query_embedding = embedding,
             candidate_embeddings = embeddings_without_query,
@@ -623,6 +632,8 @@ def rank_accuracy(
         )
         best_k_candidates = best_k_candidates.to(device)
 
+        # Get the targets of the returned best `k` candidates and check if there
+        # is one candidate of the same target as the query
         best_k_targets = targets_without_query[best_k_candidates]
         if target in best_k_targets:
             successes = successes + 1
