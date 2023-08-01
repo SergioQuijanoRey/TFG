@@ -185,7 +185,7 @@ class TripletLoggerOffline(TrainLogger):
         self.net.train()
 
         # Mostramos las metricas obtenidas
-        print(f"[{epoch} / {epoch_iteration}]")
+        print(f"[{epoch} / {epoch_iteration}] <- Offline loss metric")
         print(f"\tTraining loss: {mean_train_loss}")
         print(f"\tValidation loss: {mean_val_loss}")
         print("")
@@ -248,7 +248,7 @@ class TripletLoggerOnline(TrainLogger):
     ) -> Dict[str, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
-        print(f"[{epoch} / {epoch_iteration}] <-- ")
+        print(f"[{epoch} / {epoch_iteration}] <-- Online loss metric")
 
         # We are interested in mean triplet loss
         metric = metrics.calculate_mean_loss_function_online
@@ -347,7 +347,7 @@ class IntraClusterLogger(TrainLogger):
     ) -> Dict[str, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
-        print(f"[{epoch} / {epoch_iteration}] <-- ")
+        print(f"[{epoch} / {epoch_iteration}] <-- Intracluster metrics")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
@@ -471,7 +471,7 @@ class InterClusterLogger(TrainLogger):
     ) -> Dict[str, float]:
 
         # This log can be slow so we print this beforehand to have a notion on how slow it is
-        print(f"[{epoch} / {epoch_iteration}] <-- ")
+        print(f"[{epoch} / {epoch_iteration}] <-- Intercluster Metrics")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
