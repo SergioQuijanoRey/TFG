@@ -303,6 +303,7 @@ def __get_portion_of_dataset_and_embed_fast(
 
     return embeddings, targets
 
+# TODO -- BUG -- fails when using GPU memory!
 def __get_portion_of_dataset_and_embed_slow(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
