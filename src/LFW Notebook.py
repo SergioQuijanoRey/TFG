@@ -86,7 +86,7 @@ GLOBALS['K'] = 2     # Number of images sampled for each selected class
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Epochs for hard triplets, online training
-GLOBALS['TRAINING_EPOCHS'] = 500
+GLOBALS['TRAINING_EPOCHS'] = 1
 
 # Learning rate for hard triplets, online training
 GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
@@ -972,6 +972,44 @@ net.eval()
 # Model evaluation
 # ==============================================================================
 
+
+# Use the network to perform a retrieval task and compute rank@1 and rank@5 accuracy
+with torch.no_grad():
+    net.set_permute(False)
+
+    train_rank_at_one = metrics.rank_accuracy(
+        k = 1,
+        data_loader = train_loader_augmented,
+        network = net,
+        max_examples = len(train_loader_augmented)
+    )
+    test_rank_at_one = metrics.rank_accuracy(
+        k = 1,
+        data_loader = test_loader,
+        network = net,
+        max_examples = len(test_loader)
+    )
+    train_rank_at_five = metrics.rank_accuracy(
+        k = 5,
+        data_loader = train_loader_augmented,
+        network = net,
+        max_examples = len(train_loader_augmented)
+    )
+    test_rank_at_five = metrics.rank_accuracy(
+        k = 5,
+        data_loader = test_loader,
+        network = net,
+        max_examples = len(test_loader)
+    )
+
+    print(f"Train Rank@1 Accuracy: {train_rank_at_one}")
+    print(f"Test Rank@1 Accuracy: {test_rank_at_one}")
+    print(f"Train Rank@5 Accuracy: {train_rank_at_five}")
+    print(f"Test Rank@5 Accuracy: {test_rank_at_five}")
+
+    net.set_permute(True)
+
+
 # We start computing the *silhouette* metric for the produced embedding, on
 # train, validation and test set:
 
@@ -1008,7 +1046,6 @@ with torch.no_grad():
     core.test_model_online(net, test_loader, parameters["criterion"], online = True)
 
     net.set_permute(True)
-
 
 # Now take the classifier from the embedding and use it to compute some classification metrics:
 
