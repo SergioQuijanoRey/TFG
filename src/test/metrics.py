@@ -3,6 +3,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import resource
+from typing import Tuple
 
 import src.lib.metrics as metrics
 import src.lib.utils as utils
@@ -504,3 +505,108 @@ class TestComputeInterclusterMetrics(unittest.TestCase):
             self.assertGreater(intercluster_metrics["min"], 0.0)
             self.assertGreater(intercluster_metrics["max"], 0.0)
             self.assertGreater(intercluster_metrics["sd"], 0.0)
+
+
+class TmpNetwork(torch.nn.Module):
+    """Temporal network for this tests. RetrievalAdapter work with 4 mode tensors,
+    that is to say, tensors with shape `[batch_size, channels, width, height]`
+
+    We are going to pass, inside tensors of that shape, the embeddings that we
+    want as a result, and therefore, doing so we can play with it in our tests,
+    as we now the embedding output this network is going to produce
+
+    For example, we can decide if a certain input is going to be properly predicted
+    or not, and thus, controlling the rank@k accuracy that should be produced
+    """
+    def __init__(self):
+        super(TmpNetwork, self).__init__()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+
+        # We are expecting a batch of images, that is to say,
+        # `x.shape == [batch_size, channels, width, height]`
+        if len(x.shape) != 4:
+            raise Exception(f"TMP class got a tensor with {len(x.shape)} modes, when we were expecting 4 modes (a batch of images)")
+
+        # And we want to return a list of embeddings, that is to say,
+        # `output.shape == [batch_size, 3]`
+        # `squeeze` removes the dimensions with value 1. As we are passing tensors
+        # with shape `[batch_size >= 1, 1, 3]`, we obtain `[batch_size, 3]`, which
+        # is the size of the desired output embeddings
+        output = x.squeeze()
+        return output
+
+class TestRankAtKAccuracy(unittest.TestCase):
+
+    def __generate_dataset_and_dataloader(
+        self,
+        P: int,
+        K: int,
+        images: torch.Tensor,
+        targets: torch.Tensor
+    ) -> Tuple[torch.utils.data.Dataset, torch.utils.data.DataLoader]:
+        """
+        Generates a dataset and dataloader for our tests. The dataloader is using
+        our `CustomSampler` that gets the `P, K` parameters of the method
+
+        We return both the dataset and dataloader, so we can get information about
+        both type of objects
+        """
+
+        dataset = torch.utils.data.TensorDataset(images, targets)
+        dataset.targets = targets
+
+        custom_sampler = sampler.CustomSampler(
+            P = P,
+            K = K,
+            dataset = dataset,
+        )
+
+        dataloader = torch.utils.data.DataLoader(
+            dataset = dataset,
+            sampler = custom_sampler,
+        )
+
+        return dataset, dataloader
+
+    def test_perfect_network(self):
+
+        # Generate a perfect dataset, based on the implementation of `TmpNetwork`
+        # This way, images of the same class have the exact same embedding output
+        images = torch.Tensor([
+            [[[0, 0, 0]]],
+            [[[0, 0, 0]]],
+            [[[1, 0, 0]]],
+            [[[1, 0, 0]]],
+            [[[2, 0, 0]]],
+            [[[2, 0, 0]]],
+        ])
+        labels = torch.Tensor([0, 0, 1, 1, 2, 2])
+        dataset, dataloader = self.__generate_dataset_and_dataloader(
+            P = 2,
+            K = 2,
+            images = images,
+            targets = labels,
+        )
+
+        # Get a `TmpNetwork` so embedding outputs are predictable
+        network = TmpNetwork()
+
+        # Now compute the rank@k accuracy and check that value
+        accuracy_at_one = metrics.rank_accuracy(
+            k = 1,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_one = 1.0
+        self.assertEqual(accuracy_at_one, expected_accuracy_at_one, "Perfect network should produce 1.0 rank@1 accuracy")
+
+        accuracy_at_five = metrics.rank_accuracy(
+            k = 1,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_five = 1.0
+        self.assertEqual(accuracy_at_five, expected_accuracy_at_five, "Perfect network should produce 1.0 rank@5 accuracy")
