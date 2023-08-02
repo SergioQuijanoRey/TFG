@@ -157,6 +157,10 @@ GLOBALS['NORMALIZED_MODEL_OUTPUT'] = True
 # parameter for the max norm
 GLOBALS['GRADIENT_CLIPPING'] = 100
 
+# Number of candidates that we are going to consider in the retrieval task,
+# used in the Rank@K accuracy metric
+# We use k = 1 and k = this value
+GLOBALS['ACCURACY_AT_K_VALUE'] = 5
 
 ## Section parameters
 # ==============================================================================
@@ -883,7 +887,7 @@ rank_at_five_logger = RankAtKLogger(
     iterations = GLOBALS['LOGGING_ITERATIONS'],
     train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
     validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
-    k = 5
+    k = GLOBALS['ACCURACY_AT_K_VALUE']
 )
 
 # Combine them in a single logger
