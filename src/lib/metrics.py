@@ -561,8 +561,6 @@ def silhouette(
     # Now, use that pairwise distances to compute silhouette metric
     return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
 
-# TODO -- test this metric!
-# TODO -- this metric should be called using our Logger interface, see `./src/lib/train_loggers.py`
 def rank_accuracy(
     k: int,
     data_loader: torch.utils.data.DataLoader,
