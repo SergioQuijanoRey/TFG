@@ -101,7 +101,7 @@ GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
 
 # Which percentage of the training and validation set we want to use for the logging
 GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1 / 10
-GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 1 / 3
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 0.90
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18" or "LFWLightModel"
