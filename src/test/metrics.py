@@ -668,3 +668,137 @@ class TestRankAtKAccuracy(unittest.TestCase):
             expected_accuracy_at_three,
             msg = "This non perfect network should produce 1.0 rank@3 accuracy",
         )
+
+
+class TestLocalRankAtKAccuracy(unittest.TestCase):
+
+    def __generate_dataset_and_dataloader(
+        self,
+        P: int,
+        K: int,
+        images: torch.Tensor,
+        targets: torch.Tensor
+    ) -> Tuple[torch.utils.data.Dataset, torch.utils.data.DataLoader]:
+        """
+        Generates a dataset and dataloader for our tests. The dataloader is using
+        our `CustomSampler` that gets the `P, K` parameters of the method
+
+        We return both the dataset and dataloader, so we can get information about
+        both type of objects
+        """
+
+        dataset = torch.utils.data.TensorDataset(images, targets)
+        dataset.targets = targets
+
+        custom_sampler = sampler.CustomSampler(
+            P = P,
+            K = K,
+            dataset = dataset,
+        )
+
+        dataloader = torch.utils.data.DataLoader(
+            dataset = dataset,
+            sampler = custom_sampler,
+            batch_size = P * K,
+        )
+
+        return dataset, dataloader
+
+    def test_perfect_network(self):
+
+        # Generate a perfect dataset, based on the implementation of `TmpNetwork`
+        # This way, images of the same class have the exact same embedding output
+        images = torch.Tensor([
+            [[[0, 0, 0]]],
+            [[[0, 0, 0]]],
+            [[[1, 0, 0]]],
+            [[[1, 0, 0]]],
+            [[[2, 0, 0]]],
+            [[[2, 0, 0]]],
+        ])
+        labels = torch.Tensor([0, 0, 1, 1, 2, 2])
+        dataset, dataloader = self.__generate_dataset_and_dataloader(
+            P = 3,
+            K = 2,
+            images = images,
+            targets = labels,
+        )
+
+        # Get a `TmpNetwork` so embedding outputs are predictable
+        network = TmpNetwork()
+
+        # Now compute the rank@k accuracy and check that value
+        accuracy_at_one = metrics.local_rank_accuracy(
+            k = 1,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_one = 1.0
+        self.assertEqual(accuracy_at_one, expected_accuracy_at_one, "Perfect network should produce 1.0 rank@1 accuracy")
+
+        accuracy_at_three = metrics.local_rank_accuracy(
+            k = 3,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_three = 1.0
+        self.assertEqual(accuracy_at_three, expected_accuracy_at_three, "Perfect network should produce 1.0 rank@5 accuracy")
+
+    def test_non_perfect_network(self):
+
+        # Generate a non perfect dataset, based on the implementation of `TmpNetwork`
+        images = torch.Tensor([
+            [[[0, 0, 0.1]]],
+            [[[1, 0, 0.1]]],
+            [[[0, 0, 0]]],
+            [[[0.7, 0, 0]]],
+        ])
+        labels = torch.Tensor([0, 0, 1, 1])
+        dataset, dataloader = self.__generate_dataset_and_dataloader(
+            P = 2,
+            K = 2,
+            images = images,
+            targets = labels,
+        )
+
+        # Get a `TmpNetwork` so embedding outputs are predictable
+        network = TmpNetwork()
+
+        # Now compute the rank@k accuracy and check that value
+        accuracy_at_one = metrics.local_rank_accuracy(
+            k = 1,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_one = 0.0
+        self.assertEqual(accuracy_at_one, expected_accuracy_at_one, "This dataset should have 0 rank@1 accuracy")
+
+        accuracy_at_two = metrics.local_rank_accuracy(
+            k = 2,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_two = 3 / 4
+        self.assertAlmostEqual(
+            accuracy_at_two,
+            expected_accuracy_at_two,
+            msg = "This non perfect network should produce 3/4 rank@2 accuracy",
+            places = PLACES
+        )
+
+        accuracy_at_three = metrics.local_rank_accuracy(
+            k = 3,
+            data_loader = dataloader,
+            network = network,
+            max_examples = dataset.targets.shape[0],
+        )
+        expected_accuracy_at_three = 1.0
+        self.assertEquals(
+            accuracy_at_three,
+            expected_accuracy_at_three,
+            msg = "This non perfect network should produce 1.0 rank@3 accuracy",
+        )
