@@ -583,7 +583,7 @@ class TestRankAtKAccuracy(unittest.TestCase):
         ])
         labels = torch.Tensor([0, 0, 1, 1, 2, 2])
         dataset, dataloader = self.__generate_dataset_and_dataloader(
-            P = 2,
+            P = 3,
             K = 2,
             images = images,
             targets = labels,
@@ -603,7 +603,7 @@ class TestRankAtKAccuracy(unittest.TestCase):
         self.assertEqual(accuracy_at_one, expected_accuracy_at_one, "Perfect network should produce 1.0 rank@1 accuracy")
 
         accuracy_at_five = metrics.rank_accuracy(
-            k = 1,
+            k = 5,
             data_loader = dataloader,
             network = network,
             max_examples = dataset.targets.shape[0],
