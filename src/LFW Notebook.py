@@ -86,7 +86,7 @@ GLOBALS['K'] = 2     # Number of images sampled for each selected class
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Epochs for hard triplets, online training
-GLOBALS['TRAINING_EPOCHS'] = 1
+GLOBALS['TRAINING_EPOCHS'] = 500
 
 # Learning rate for hard triplets, online training
 GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
@@ -101,7 +101,7 @@ GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
 
 # Which percentage of the training and validation set we want to use for the logging
 GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1 / 10
-GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 0.90
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 2 / 3
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18" or "LFWLightModel"
@@ -295,7 +295,7 @@ import lib.split_dataset as split_dataset
 import lib.hyperparameter_tuning as hptuning
 
 from lib.trainers import train_model_offline, train_model_online
-from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, RankAtKLogger
+from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, RankAtKLogger, LocalRankAtKLogger
 from lib.models import *
 from lib.visualizations import *
 from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter
@@ -890,6 +890,23 @@ rank_at_five_logger = RankAtKLogger(
     k = GLOBALS['ACCURACY_AT_K_VALUE']
 )
 
+
+local_rank_at_one_logger = LocalRankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = 1
+)
+
+local_rank_at_five_logger = LocalRankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = GLOBALS['ACCURACY_AT_K_VALUE']
+)
+
 # Combine them in a single logger
 logger = CompoundLogger([
     triplet_loss_logger,
@@ -897,6 +914,8 @@ logger = CompoundLogger([
     intercluster_metrics_logger,
     rank_at_one_logger,
     rank_at_five_logger,
+    local_rank_at_one_logger,
+    local_rank_at_five_logger,
 ])
 
 
