@@ -882,7 +882,7 @@ rank_at_one_logger = RankAtKLogger(
     k = 1
 )
 
-rank_at_five_logger = RankAtKLogger(
+rank_at_k_logger = RankAtKLogger(
     net = net,
     iterations = GLOBALS['LOGGING_ITERATIONS'],
     train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
@@ -899,7 +899,7 @@ local_rank_at_one_logger = LocalRankAtKLogger(
     k = 1
 )
 
-local_rank_at_five_logger = LocalRankAtKLogger(
+local_rank_at_k_logger = LocalRankAtKLogger(
     net = net,
     iterations = GLOBALS['LOGGING_ITERATIONS'],
     train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
@@ -913,9 +913,9 @@ logger = CompoundLogger([
     cluster_sizes_logger,
     intercluster_metrics_logger,
     rank_at_one_logger,
-    rank_at_five_logger,
+    rank_at_k_logger,
     local_rank_at_one_logger,
-    local_rank_at_five_logger,
+    local_rank_at_k_logger,
 ])
 
 
