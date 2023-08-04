@@ -886,3 +886,41 @@ class TestLocalRankAtKAccuracy(unittest.TestCase):
             expected_accuracy_at_three,
             msg = "This non perfect network should produce 1.0 rank@3 accuracy",
         )
+
+    def test_rank_is_increasing_function(self):
+
+        # Generate our random dataset
+        dataset, dataloader = generate_random_dataset_dataloader(
+            number_of_images = 200,
+            number_of_classes = 10,
+            P = 2,
+            K = 5,
+        )
+
+        # Again, we utilize `TmpNetwork`, this time just because
+        # `generate_random_dataset_dataloader` is thought for using that network
+        network = TmpNetwork()
+
+        # Compute rank@k for a sequence of k's
+        ranks = [
+            metrics.local_rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
+            for k in range(1, 10)
+        ]
+
+        # Check that the ranks are increasing
+        # Because it's easier to make a good prediction with 10 candidates than
+        # with only one
+        for index, rank in enumerate(ranks):
+            if index == 0:
+                continue
+
+            # We get the previous rank
+            smaller_rank = ranks[index - 1]
+
+            # Previous rank should have a worse acc val as it has less candidates
+            # to be succesful
+            if smaller_rank > rank:
+                msg = "Got a rank@k with smaller K but bigger value"
+                msg = msg + f"Rank@{index - 1} = {ranks[index - 1]}"
+                msg = msg + f"Rank@{index} = {rank}"
+                raise Exception(msg)
