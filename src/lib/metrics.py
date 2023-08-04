@@ -723,4 +723,8 @@ def local_rank_accuracy(
         if seen_examples >= max_examples:
             break
 
+    # Safety check
+    if seen_examples == 0:
+        raise Exception("We could not see any example, thus we can't compute accuracy!")
+
     return successes / seen_examples
