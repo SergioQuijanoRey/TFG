@@ -58,6 +58,32 @@ class TrainLogger(ABC):
         """
         pass
 
+class IterationLogger(TrainLogger):
+    """
+    Many classes log only when a certain number of iterations hits. So this abstract
+    class implements that behaviour so we don't have to repeat the same
+    `should_log` over and over
+
+    Classes that implement this Abstract class have only to set `self.iterations`
+    and, of course, implement `log_process()`
+    """
+
+    @property
+    def iterations(self):
+        """After how many iterations we want to log the metric"""
+        return self.__iterations
+
+    @iterations.setter
+    def iterations(self, new_it):
+        self.__iterations = new_it
+
+    def should_log(self, iteration: int) -> bool:
+
+        if iteration % self.iterations == 0:
+            return True
+
+        return False
+
 
 class SilentLogger(TrainLogger):
     """Logger that does not log data"""
@@ -136,7 +162,7 @@ class CompoundLogger(TrainLogger):
         return any(self.logger_should_log)
 
 # TODO -- check if I can use same logger for offline and online triplet training
-class TripletLoggerOffline(TrainLogger):
+class TripletLoggerOffline(IterationLogger):
     """
     Custom logger for offline triplet training
     """
@@ -197,14 +223,7 @@ class TripletLoggerOffline(TrainLogger):
         }
 
 
-    def should_log(self, iteration: int) -> bool:
-        if iteration % self.iterations == 0 and iteration != 0:
-            return True
-
-        return False
-
-
-class TripletLoggerOnline(TrainLogger):
+class TripletLoggerOnline(IterationLogger):
     """
     Custom logger for online triplet training
     """
@@ -289,14 +308,8 @@ class TripletLoggerOnline(TrainLogger):
             "mean validation loss": mean_val_loss,
         }
 
-    def should_log(self, iteration: int) -> bool:
-        if iteration % self.iterations == 0:
-            return True
 
-        return False
-
-
-class IntraClusterLogger(TrainLogger):
+class IntraClusterLogger(IterationLogger):
     """
     Logger that logs information about intra cluster information
     This information will be:
@@ -410,17 +423,9 @@ class IntraClusterLogger(TrainLogger):
         return renamed_metrics
 
 
-    # TODO -- this method is repeated multiple times
-    # TODO -- REFACTOR -- Create base class that does this by default and use it
-    def should_log(self, iteration: int) -> bool:
-        if iteration % self.iterations == 0:
-            return True
-
-        return False
-
 # We are optimizing and benchmarking compute_intercluster_metrics, thus, this class does not need
 # optimization + benchmarking
-class InterClusterLogger(TrainLogger):
+class InterClusterLogger(IterationLogger):
     """
     Logger that logs information about inter cluster information
     This information will be:
@@ -533,16 +538,8 @@ class InterClusterLogger(TrainLogger):
 
         return renamed_metrics
 
-    # TODO -- this method is repeated multiple times
-    # TODO -- REFACTOR -- Create base class that does this by default and use it
-    def should_log(self, iteration: int) -> bool:
 
-        if iteration % self.iterations == 0:
-            return True
-
-        return False
-
-class RankAtKLogger(TrainLogger):
+class RankAtKLogger(IterationLogger):
     """
     Logger that logs Rank@k accuracy metric. This metric is computed the following way:
 
@@ -642,16 +639,8 @@ class RankAtKLogger(TrainLogger):
 
         return renamed_metrics
 
-    # TODO -- this method is repeated multiple times
-    # TODO -- REFACTOR -- Create base class that does this by default and use it
-    def should_log(self, iteration: int) -> bool:
 
-        if iteration % self.iterations == 0:
-            return True
-
-        return False
-
-class LocalRankAtKLogger(TrainLogger):
+class LocalRankAtKLogger(IterationLogger):
     """
     Logger that logs local Rank@k accuracy metric. This metric is computed the
     following way:
@@ -687,6 +676,8 @@ class LocalRankAtKLogger(TrainLogger):
                                       be used for faster computations
         @param k: how many candidates we are going to use in the queries
         """
+
+        super(LocalRankAtKLogger, self).__init__()
 
         self.net = net
         self.iterations = iterations
@@ -752,12 +743,3 @@ class LocalRankAtKLogger(TrainLogger):
         }
 
         return renamed_metrics
-
-    # TODO -- this method is repeated multiple times
-    # TODO -- REFACTOR -- Create base class that does this by default and use it
-    def should_log(self, iteration: int) -> bool:
-
-        if iteration % self.iterations == 0:
-            return True
-
-        return False
