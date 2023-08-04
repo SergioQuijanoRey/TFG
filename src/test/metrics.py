@@ -3,7 +3,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import resource
-from typing import Tuple
+from typing import Tuple, List
 
 import src.lib.metrics as metrics
 import src.lib.utils as utils
@@ -536,6 +536,52 @@ class TmpNetwork(torch.nn.Module):
         output = x.squeeze()
         return output
 
+
+# This aux function is going to be used both in `TestRankAtKAccuracy` and in
+# `TestLocalRankAtKAccuracy`
+def generate_random_dataset_dataloader(
+    number_of_images: int,
+    number_of_classes: int,
+    P: int,
+    K: int,
+) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.Dataset]:
+
+    # Check that we can split the number of images in the number of classes evenly
+    if number_of_images % number_of_classes != 0:
+        msg = "The number of images should be a multiple of the number of classes!"
+        msg = msg + f"Got {number_of_images} images, {number_of_classes} classes"
+        raise ValueError(msg)
+
+    # Generate the random images
+    # Tests are going to use `TmpNetwork`, so we create images with shape
+    # `[number_of_images, 1, 1, 3]` that are going to be useful for that net,
+    # instead of usual `[number_of_images, channels (1 or 3), width, height]`
+    images = torch.rand((number_of_images, 1, 1, 3))
+
+    # Now generate a sequence with the targets
+    images_per_class = number_of_images // number_of_classes
+    targets = [i for i in range(number_of_classes) for _ in range(images_per_class)]
+    targets = torch.Tensor(targets)
+
+    # Now, generate a dataset with our random data
+    dataset = torch.utils.data.TensorDataset(images, targets)
+    dataset.targets = targets
+
+    # And put it into a dataloader that uses our custom sampler
+    custom_sampler = sampler.CustomSampler(
+        P = P,
+        K = K,
+        dataset = dataset,
+    )
+
+    dataloader = torch.utils.data.DataLoader(
+        dataset = dataset,
+        sampler = custom_sampler,
+        batch_size = P * K,
+    )
+
+    return dataset, dataloader
+
 class TestRankAtKAccuracy(unittest.TestCase):
 
     def __generate_dataset_and_dataloader(
@@ -581,6 +627,7 @@ class TestRankAtKAccuracy(unittest.TestCase):
             [[[2, 0, 0]]],
             [[[2, 0, 0]]],
         ])
+
         labels = torch.Tensor([0, 0, 1, 1, 2, 2])
         dataset, dataloader = self.__generate_dataset_and_dataloader(
             P = 3,
@@ -610,7 +657,6 @@ class TestRankAtKAccuracy(unittest.TestCase):
         )
         expected_accuracy_at_five = 1.0
         self.assertEqual(accuracy_at_five, expected_accuracy_at_five, "Perfect network should produce 1.0 rank@5 accuracy")
-
 
     def test_non_perfect_network(self):
 
@@ -668,6 +714,44 @@ class TestRankAtKAccuracy(unittest.TestCase):
             expected_accuracy_at_three,
             msg = "This non perfect network should produce 1.0 rank@3 accuracy",
         )
+
+    def test_rank_is_increasing_function(self):
+
+        # Generate our random dataset
+        dataset, dataloader = generate_random_dataset_dataloader(
+            number_of_images = 200,
+            number_of_classes = 10,
+            P = 2,
+            K = 5,
+        )
+
+        # Again, we utilize `TmpNetwork`, this time just because
+        # `generate_random_dataset_dataloader` is thought for using that network
+        network = TmpNetwork()
+
+        # Compute rank@k for a sequence of k's
+        ranks = [
+            metrics.rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
+            for k in range(1, 10)
+        ]
+
+        # Check that the ranks are increasing
+        # Because it's easier to make a good prediction with 10 candidates than
+        # with only one
+        for index, rank in enumerate(ranks):
+            if index == 0:
+                continue
+
+            # We get the previous rank
+            smaller_rank = ranks[index - 1]
+
+            # Previous rank should have a worse acc val as it has less candidates
+            # to be succesful
+            if smaller_rank > rank:
+                msg = "Got a rank@k with smaller K but bigger value"
+                msg = msg + f"Rank@{index - 1} = {ranks[index - 1]}"
+                msg = msg + f"Rank@{index} = {rank}"
+                raise Exception(msg)
 
 
 class TestLocalRankAtKAccuracy(unittest.TestCase):
