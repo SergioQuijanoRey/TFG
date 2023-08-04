@@ -732,7 +732,7 @@ class TestRankAtKAccuracy(unittest.TestCase):
         # Compute rank@k for a sequence of k's
         ranks = [
             metrics.rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
-            for k in range(1, 10)
+            for k in range(1, 150)
         ]
 
         # Check that the ranks are increasing
@@ -748,9 +748,9 @@ class TestRankAtKAccuracy(unittest.TestCase):
             # Previous rank should have a worse acc val as it has less candidates
             # to be succesful
             if smaller_rank > rank:
-                msg = "Got a rank@k with smaller K but bigger value"
-                msg = msg + f"Rank@{index - 1} = {ranks[index - 1]}"
-                msg = msg + f"Rank@{index} = {rank}"
+                msg = "Got a rank@k with smaller K but bigger value\n"
+                msg = msg + f"Rank@{index - 1} = {ranks[index - 1]}\n"
+                msg = msg + f"Rank@{index} = {rank}\n"
                 raise Exception(msg)
 
 
@@ -891,10 +891,10 @@ class TestLocalRankAtKAccuracy(unittest.TestCase):
 
         # Generate our random dataset
         dataset, dataloader = generate_random_dataset_dataloader(
-            number_of_images = 200,
-            number_of_classes = 10,
-            P = 2,
-            K = 5,
+            number_of_images = 1_000,
+            number_of_classes = 100,
+            P = 50,
+            K = 2,
         )
 
         # Again, we utilize `TmpNetwork`, this time just because
@@ -904,7 +904,7 @@ class TestLocalRankAtKAccuracy(unittest.TestCase):
         # Compute rank@k for a sequence of k's
         ranks = [
             metrics.local_rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
-            for k in range(1, 10)
+            for k in range(1, 40)
         ]
 
         # Check that the ranks are increasing
@@ -920,7 +920,7 @@ class TestLocalRankAtKAccuracy(unittest.TestCase):
             # Previous rank should have a worse acc val as it has less candidates
             # to be succesful
             if smaller_rank > rank:
-                msg = "Got a rank@k with smaller K but bigger value"
-                msg = msg + f"Rank@{index - 1} = {ranks[index - 1]}"
-                msg = msg + f"Rank@{index} = {rank}"
+                msg = "Got a rank@k with smaller K but bigger value\n"
+                msg = msg + f"Rank@{index - 1} = {ranks[index - 1]}\n"
+                msg = msg + f"Rank@{index} = {rank}\n"
                 raise Exception(msg)
