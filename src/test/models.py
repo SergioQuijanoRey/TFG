@@ -236,3 +236,58 @@ class TestRetrievalAdapter(unittest.TestCase):
         # It should fail as we only have 5 candidates
         with self.assertRaises(ValueError):
             retrieval_net.query_embedding(query_embeddings, candidates_embeddings, k = 6)
+
+    def test_number_of_candidates_returned(self):
+
+        # We are not going to use this network for the computations
+        net = TmpNetwork()
+
+        # Wrap it with our adapter
+        retrieval_net = models.RetrievalAdapter(net)
+
+        # Generate the synthethic data
+        # Shapes chosen due to `TmpNetwork`, so they are not the same shapes as
+        # usual
+        query_img = torch.rand(size = (1, 1, 3))
+        candidate_images = torch.rand(size = (100, 1, 1, 3))
+
+        # Compute the queries and check for the sizes of the returned tensor list
+        for k in range(1, 100):
+            computed_best_candidates = retrieval_net.query(
+                query_img,
+                candidate_images,
+                k = k
+            )
+
+            self.assertEquals(
+                computed_best_candidates.shape[0],
+                k,
+                "Query does not return the proper number of best candidates"
+            )
+
+    def test_number_of_candidates_returned_direct(self):
+
+        # We are not going to use this network for the computations
+        net = torch.nn.Identity()
+
+        # Wrap it with our adapter
+        retrieval_net = models.RetrievalAdapter(net)
+
+        # Put directly the embeddings in the query and candidates images as
+        # we are using TmpNetwork
+        query_embedding = torch.Tensor([0, 0, 0])
+        candidates_embeddings = torch.rand(size = (100, 3))
+
+        # Compute the queries and check for the sizes of the returned tensor list
+        for k in range(1, 100):
+            computed_best_candidates = retrieval_net.query_embedding(
+                query_embedding,
+                candidates_embeddings,
+                k = k
+            )
+
+            self.assertEquals(
+                computed_best_candidates.shape[0],
+                k,
+                "Query embedding does not return the proper number of best candidates"
+            )
