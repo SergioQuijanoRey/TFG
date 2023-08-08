@@ -13,7 +13,6 @@ import src.lib.utils as utils
 import src.lib.loss_functions as loss_functions
 import src.lib.metrics as metrics
 import src.lib.models as models
-import src.lib.loss_functions as loss_functions
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
     """
