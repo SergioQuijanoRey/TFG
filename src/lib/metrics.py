@@ -675,6 +675,9 @@ def local_rank_accuracy(
     # In each step, we are going to use one entry as the query, and the rest
     # of the entries as the candidates. This function takes a tensor `data`
     # and a position, `n` and returns the same tensor without the `n`-th entry
+    #
+    # TODO -- extract this deleter function, because it is used twice, and
+    # test properly
     deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
 
     # Count seen examples (so we respect `max_examples`) and count successes,

@@ -3,6 +3,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 import resource
+import random
 from typing import Tuple, List
 
 import src.lib.metrics as metrics
@@ -730,10 +731,19 @@ class TestRankAtKAccuracy(unittest.TestCase):
         network = TmpNetwork()
 
         # Compute rank@k for a sequence of k's
-        ranks = [
-            metrics.rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
-            for k in range(1, 150)
-        ]
+        ranks = []
+        for k in range(1, 100):
+
+            # To be able to compare the accuracy among runs, we have to set the
+            # random state. Otherwise, the random nature of `CustomSampler` could
+            # generate worse results for bigger values of `k`. This simply by
+            # generating harder `P-K` batches for bigger values of `k`
+            fixed_seed = 123456789
+            torch.manual_seed(fixed_seed)
+            random.seed(fixed_seed)
+
+            currect_acc = metrics.rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
+            ranks.append(currect_acc)
 
         # Check that the ranks are increasing
         # Because it's easier to make a good prediction with 10 candidates than
@@ -902,10 +912,19 @@ class TestLocalRankAtKAccuracy(unittest.TestCase):
         network = TmpNetwork()
 
         # Compute rank@k for a sequence of k's
-        ranks = [
-            metrics.local_rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
-            for k in range(1, 40)
-        ]
+        ranks = []
+        for k in range(1, 40):
+
+            # To be able to compare the accuracy among runs, we have to set the
+            # random state. Otherwise, the random nature of `CustomSampler` could
+            # generate worse results for bigger values of `k`. This simply by
+            # generating harder `P-K` batches for bigger values of `k`
+            fixed_seed = 123456789
+            torch.manual_seed(fixed_seed)
+            random.seed(fixed_seed)
+
+            current_acc = metrics.local_rank_accuracy(k = k, data_loader = dataloader, network = network, max_examples = 200)
+            ranks.append(current_acc)
 
         # Check that the ranks are increasing
         # Because it's easier to make a good prediction with 10 candidates than
