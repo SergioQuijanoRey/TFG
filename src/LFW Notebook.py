@@ -520,8 +520,12 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform = transforms.Compose([
+
+            # NOTE: LFW images have shape `(3, 250, 250)`. With this, we generate
+            # new images, so they have to have the same width and height that the
+            # rest of the images!
             transforms.RandomResizedCrop(size=(250, 250), antialias = True),
-            transforms.RandomRotation(degrees=(0, 45)),
+            transforms.RandomRotation(degrees=(0, 20)),
             transforms.RandomAutocontrast(),
         ])
 
