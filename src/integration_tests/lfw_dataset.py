@@ -240,7 +240,7 @@ class IntegrationLFWDataset(unittest.TestCase):
             iterations = LOGGING_ITERATIONS,
             train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
             validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
-            k = GLOBALS['ACCURACY_AT_K_VALUE']
+            k = 5
         )
 
 
@@ -257,7 +257,7 @@ class IntegrationLFWDataset(unittest.TestCase):
             iterations = LOGGING_ITERATIONS,
             train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
             validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
-            k = GLOBALS['ACCURACY_AT_K_VALUE']
+            k = 5
         )
 
         logger = CompoundLogger([
