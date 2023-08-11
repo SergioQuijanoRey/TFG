@@ -558,7 +558,11 @@ def silhouette(
     pairwise_distances = base_loss(embeddings)
 
     # Now, use that pairwise distances to compute silhouette metric
-    return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
+    return silhouette_score(
+        pairwise_distances.cpu().detach().numpy(),
+        targets.cpu().detach().numpy(),
+        metric = "euclidean"
+    )
 
 def rank_accuracy(
     k: int,

@@ -1039,6 +1039,8 @@ with torch.no_grad():
 
 with torch.no_grad():
 
+    net.set_permute(False)
+
     # Try to clean memory, because we can easily run out of memory
     # This provoke the notebook to crash, and all in-memory objects to be lost
     try_to_clean_memory()
@@ -1059,6 +1061,7 @@ with torch.no_grad():
         "Test silh": test_silh
     })
 
+    net.set_permute(True)
 
 # Show the "criterion" metric on test set
 
@@ -1088,7 +1091,9 @@ with torch.no_grad():
 
 with torch.no_grad():
 
-    # Shoow only `max_iterations` classifications
+    net.set_permute(False)
+
+    # Show only `max_iterations` classifications
     counter = 0
     max_iterations = 20
 
@@ -1099,6 +1104,8 @@ with torch.no_grad():
         counter += 1
         if counter == max_iterations: break
 
+    net.set_permute(True)
+
 
 # Plot of the embedding
 # ==============================================================================
@@ -1108,20 +1115,3 @@ with torch.no_grad():
 
 with torch.no_grad():
     classifier.scatter_plot()
-
-
-# Evaluating the obtained classifier
-# ==============================================================================
-#
-# - Now that we adapted our network to a classification task, we can compute some classification metrics
-
-
-with torch.no_grad():
-    try_to_clean_memory()
-    classifier.embedder.set_permute(False)
-
-    metrics = evaluate_model(classifier, train_loader, test_loader)
-    pprint(metrics)
-
-    classifier.embedder.set_permute(True)
-
