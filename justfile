@@ -42,6 +42,9 @@ upload_uni:
         --exclude 'slurm*.out' \
         --exclude 'wandb' \
         --exclude '.worktree' \
+        --exclude 'tmp' \
+        --exclude 'cached_models' \
+        --exclude 'cached_augmented_dataset.pt' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server
@@ -56,6 +59,9 @@ download_uni:
         --exclude 'slurm*.out' \
         --exclude 'wandb' \
         --exclude '.worktree' \
+        --exclude 'tmp' \
+        --exclude 'cached_models' \
+        --exclude 'cached_augmented_dataset.pt' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
 remote_fs:

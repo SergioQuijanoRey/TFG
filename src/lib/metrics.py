@@ -12,7 +12,7 @@ import src.lib.core as core
 import src.lib.utils as utils
 import src.lib.loss_functions as loss_functions
 import src.lib.metrics as metrics
-import src.lib.loss_functions as loss_functions
+import src.lib.models as models
 
 def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
     """
@@ -182,7 +182,7 @@ def calculate_mean_loss_function_online(
 
     return mean_loss
 
-# TODO -- PERF -- This function is taking a lot of cumulative time
+# TODO -- BUG -- sometimes we get a lot more of values than `max_examples`
 def __get_portion_of_dataset_and_embed(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
@@ -231,12 +231,18 @@ def __get_portion_of_dataset_and_embed_fast(
     # Get memory device we are using
     device = core.get_device()
 
+    # We need to know the batch size so we can get only the needed batches
+    batch_size = 0
+    for imgs, labels in data_loader:
+        batch_size = labels.shape[0]
+        break
+
     # Get all the batches in the data loader
     # This is the most slow part of the function
     elements = [
         (imgs.to(device), labels.to(device))
         for (index, (imgs, labels)) in enumerate(data_loader)
-        if index < max_examples
+        if index * batch_size <= max_examples + batch_size
     ]
 
     # Now, split previous list of pairs to a pair of lists
@@ -302,6 +308,7 @@ def __get_portion_of_dataset_and_embed_fast(
 
     return embeddings, targets
 
+# TODO -- BUG -- fails when using GPU memory!
 def __get_portion_of_dataset_and_embed_slow(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
@@ -314,7 +321,6 @@ def __get_portion_of_dataset_and_embed_slow(
 
     embeddings: torch.Tensor = torch.tensor([]).to(device)
     targets: torch.Tensor = torch.tensor([]).to(device)
-    seen_examples = 0
 
     for imgs, labels in data_loader:
         imgs, labels = imgs.to(device), labels.to(device)
@@ -324,13 +330,9 @@ def __get_portion_of_dataset_and_embed_slow(
         targets = torch.cat((targets, labels), 0)
         embeddings = torch.cat((embeddings, net(imgs).to(device)), 0)
 
-        seen_examples += len(labels)
-        if seen_examples >= max_examples:
+        # Check if we have accumulated enough values
+        if targets.shape[0] >= max_examples:
             break
-
-    # Convert gpu torch.tensor to cpu numpy array
-    targets = targets.cpu().numpy()
-    embeddings = embeddings.cpu()
 
     return embeddings, targets
 
@@ -551,10 +553,180 @@ def silhouette(
         max_examples = len(data_loader),
         fast_implementation = False,
     )
-
     # Compute the parwise distances
     base_loss = loss_functions.BatchBaseTripletLoss().raw_precompute_pairwise_distances
     pairwise_distances = base_loss(embeddings)
 
     # Now, use that pairwise distances to compute silhouette metric
     return silhouette_score(pairwise_distances.detach().numpy(), targets, metric = "euclidean")
+
+def rank_accuracy(
+    k: int,
+    data_loader: torch.utils.data.DataLoader,
+    network: torch.nn.Module,
+    max_examples: int,
+) -> float:
+    """"
+    Computes the rank-k accuracy metric. Thus, this only can be used when the
+    network performs information retrieval
+
+    We iterate over all the elements in the dataloader, and query for the `k`
+    best candidates. If there is any element in that `k` best candidates of the
+    same class, then we count an success, else we count an error. This way we compute
+    rank @ `k` accuracy
+
+    `network` should be a embedding network, this function takes care of wrapping
+    it with `RetrievalAdapter`
+
+    `data_loader` should be a loader implementing our P-K custom sampling
+
+    NOTE: we are making the queries with all the data available, not within batches
+    """
+
+    # Wrap the network into a RetrievalAdapter
+    retrieval_network = models.RetrievalAdapter(network)
+
+    # Move the retrieval network to the proper device
+    device = core.get_device()
+    retrieval_network = retrieval_network.to(device)
+
+    # Get the portion of the dataset we're interested in
+    # Also, use this step to compute the embeddings of the images
+    embeddings, targets = __get_portion_of_dataset_and_embed(
+        data_loader,
+        network,
+        max_examples,
+        fast_implementation = True,
+    )
+
+    # We are going to use some pytorch methods to get only one part of the
+    # embeddings and targets, and targets are now a `np.ndarray`, so convert
+    # it to a pytorch tensor and assure that is in the proper device
+    targets = torch.Tensor(targets)
+    targets = targets.to(device)
+
+    # In each step, we are going to use one entry as the query, and the rest
+    # of the entries as the candidates. This function takes a tensor `data`
+    # and a position, `n` and returns the same tensor without the `n`-th entry
+    deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
+
+    # Iterate over all entries and count the number of successes
+    # We consider a success when in the returned `k` best candidates, there is
+    # at least one candidate of the same class as the query entry
+    successes = 0
+    for index, (embedding, target) in enumerate(zip(embeddings, targets)):
+
+        # Get all the data withot the current query entry
+        embeddings_without_query = deleter(embeddings, index)
+        targets_without_query = deleter(targets, index)
+
+        # Make sure that they are on the proper device
+        embeddings_without_query = embeddings_without_query.to(device)
+        targets_without_query = targets_without_query.to(device)
+
+        # Use the network to retrieve the best `k` candidates for our current query
+        best_k_candidates = retrieval_network.query_embedding(
+            query_embedding = embedding,
+            candidate_embeddings = embeddings_without_query,
+            k = k
+        )
+        best_k_candidates = best_k_candidates.to(device)
+
+        # Get the targets of the returned best `k` candidates and check if there
+        # is one candidate of the same target as the query
+        best_k_targets = targets_without_query[best_k_candidates]
+        if target in best_k_targets:
+            successes = successes + 1
+
+    return successes / len(embeddings)
+
+
+def local_rank_accuracy(
+    k: int,
+    data_loader: torch.utils.data.DataLoader,
+    network: torch.nn.Module,
+    max_examples: int,
+) -> float:
+    """"
+    Computes the rank-k accuracy metric. Thus, this only can be used when the
+    network performs information retrieval
+
+    We iterate over all the elements in the dataloader, in batches, and query
+    for the `k` best candidates inside that batch. If there is any element in
+    that `k` best candidates of the same class, then we count an success, else
+    we count an error. This way we compute rank @ `k` accuracy `network`
+    should be a embedding network, this function takes care of wrapping it
+    with `RetrievalAdapter`
+
+    `data_loader` should be a loader implementing our P-K custom sampling
+
+    NOTE: this computes the same as `rank_accuracy`. But this function queries
+    against the batch of the element we are looking at, instead of the whole dataset
+    """
+
+    # Wrap the network into a RetrievalAdapter
+    retrieval_network = models.RetrievalAdapter(network)
+
+    # Move the retrieval network to the proper device
+    device = core.get_device()
+    retrieval_network = retrieval_network.to(device)
+
+    # In each step, we are going to use one entry as the query, and the rest
+    # of the entries as the candidates. This function takes a tensor `data`
+    # and a position, `n` and returns the same tensor without the `n`-th entry
+    #
+    # TODO -- extract this deleter function, because it is used twice, and
+    # test properly
+    deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
+
+    # Count seen examples (so we respect `max_examples`) and count successes,
+    # so we can compute the accuracy
+    seen_examples = 0
+    successes = 0
+    for images, targets in data_loader:
+
+        # Compute the embedding of the images inside this batch
+        embeddings = network(images.to(device))
+        embeddings = embeddings.to(device)
+
+        # Targets is a `np.ndarray`, but `deleter` requires a `torch.Tensor`,
+        # so make the conversion
+        targets = torch.Tensor(targets)
+        targets = targets.to(device)
+
+        # Sometimes we can get a batch that has less elements than k
+        # So check that and skip this step in that case
+        if targets.shape[0] <= k:
+            continue
+
+        # Now iterate over the elements of the current batch
+        for index, (embedding, target) in enumerate(zip(embeddings, targets)):
+
+            # Get the data we are interested in
+            other_embeddings = deleter(embeddings, index)
+            other_targets = deleter(targets, index)
+
+            # Perform the query, within the current batch!
+            best_k_candidates = retrieval_network.query_embedding(
+                query_embedding = embedding,
+                candidate_embeddings = other_embeddings,
+                k = k
+            )
+            best_k_candidates = best_k_candidates.to(device)
+
+            # Get the targets of the returned best `k` candidates and check if there
+            # is one candidate of the same target as the query
+            best_k_targets = other_targets[best_k_candidates]
+            if target in best_k_targets:
+                successes = successes + 1
+
+        # Update the seen examples and check if we have to stop
+        seen_examples = seen_examples + targets.shape[0]
+        if seen_examples >= max_examples:
+            break
+
+    # Safety check
+    if seen_examples == 0:
+        raise Exception("We could not see any example, thus we can't compute accuracy!")
+
+    return successes / seen_examples

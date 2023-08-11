@@ -10,7 +10,7 @@ class TestSplitDataset(unittest.TestCase):
 
         # Load the dataset
         transform = torchvision.transforms.Compose([
-            torchvision.transforms.Resize((250, 250)),
+            torchvision.transforms.Resize((250, 250), antialias=True),
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(
                 (0.5, 0.5, 0.5),

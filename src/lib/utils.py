@@ -105,6 +105,7 @@ def change_dir_env_vars(base_path: str):
     os.environ["WANDB_DIR"] = os.path.join(base_path, "wandb_dir_testing")
     os.environ["WANDB_DATA_DIR"] = os.path.join(base_path, "wandb_datadir_testing")
     os.environ["TORCH_HOME"] = os.path.join(base_path, "torch_home")
+    os.environ["MPLCONFIGDIR"] = os.path.join(base_path, "matplotlib_config")
 
 def login_wandb():
     """

@@ -101,7 +101,7 @@ GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
 
 # Which percentage of the training and validation set we want to use for the logging
 GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1 / 10
-GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 1 / 3
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 2 / 3
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18" or "LFWLightModel"
@@ -157,6 +157,10 @@ GLOBALS['NORMALIZED_MODEL_OUTPUT'] = True
 # parameter for the max norm
 GLOBALS['GRADIENT_CLIPPING'] = 100
 
+# Number of candidates that we are going to consider in the retrieval task,
+# used in the Rank@K accuracy metric
+# We use k = 1 and k = this value
+GLOBALS['ACCURACY_AT_K_VALUE'] = 5
 
 ## Section parameters
 # ==============================================================================
@@ -291,10 +295,10 @@ import lib.split_dataset as split_dataset
 import lib.hyperparameter_tuning as hptuning
 
 from lib.trainers import train_model_offline, train_model_online
-from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger
+from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, RankAtKLogger, LocalRankAtKLogger
 from lib.models import *
 from lib.visualizations import *
-from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet
+from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter
 from lib.loss_functions import MeanTripletBatchTripletLoss, BatchHardTripletLoss, BatchAllTripletLoss, AddSmallEmbeddingPenalization
 from lib.embedding_to_classifier import EmbeddingToClassifier
 from lib.sampler import CustomSampler
@@ -401,7 +405,7 @@ def try_to_clean_memory():
 # Now we are only transforming images to tensors (pythorch only works with tensors)
 # But we can apply here some normalizations
 transform = transforms.Compose([
-    transforms.Resize((250, 250)),
+    transforms.Resize((250, 250), antialias=True),
     transforms.ToTensor(),
     transforms.Normalize(
          (0.5, 0.5, 0.5),
@@ -516,8 +520,12 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=(250, 250)),
-            transforms.RandomRotation(degrees=(0, 45)),
+
+            # NOTE: LFW images have shape `(3, 250, 250)`. With this, we generate
+            # new images, so they have to have the same width and height that the
+            # rest of the images!
+            transforms.RandomResizedCrop(size=(250, 250), antialias = True),
+            transforms.RandomRotation(degrees=(0, 20)),
             transforms.RandomAutocontrast(),
         ])
 
@@ -633,7 +641,7 @@ def objective(trial):
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=(250, 250)),
+            transforms.RandomResizedCrop(size=(250, 250), antialias = True),
             transforms.RandomRotation(degrees=(0, 45)),
             transforms.RandomAutocontrast(),
         ])
@@ -667,7 +675,7 @@ def objective(trial):
                 # Remember that the trasformation has to be random type
                 # Otherwise, we could end with a lot of repeated images
                 transform = transforms.Compose([
-                    transforms.RandomResizedCrop(size=(250, 250)),
+                    transforms.RandomResizedCrop(size=(250, 250), antialias = True),
                     transforms.RandomRotation(degrees=(0, 45)),
                     transforms.RandomAutocontrast(),
                 ])
@@ -870,19 +878,53 @@ intercluster_metrics_logger = InterClusterLogger(
     validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
 )
 
+rank_at_one_logger = RankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = 1
+)
+
+rank_at_k_logger = RankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = GLOBALS['ACCURACY_AT_K_VALUE']
+)
+
+
+local_rank_at_one_logger = LocalRankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = 1
+)
+
+local_rank_at_k_logger = LocalRankAtKLogger(
+    net = net,
+    iterations = GLOBALS['LOGGING_ITERATIONS'],
+    train_percentage = GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'],
+    validation_percentage = GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'],
+    k = GLOBALS['ACCURACY_AT_K_VALUE']
+)
+
 # Combine them in a single logger
 logger = CompoundLogger([
     triplet_loss_logger,
     cluster_sizes_logger,
-    intercluster_metrics_logger
+    intercluster_metrics_logger,
+    rank_at_one_logger,
+    rank_at_k_logger,
+    local_rank_at_one_logger,
+    local_rank_at_k_logger,
 ])
 
 
 ## Running the training loop
 # ==============================================================================
-
-
-import torch
 
 # Check if we want to skip training
 if GLOBALS['USE_CACHED_MODEL'] is False:
@@ -934,6 +976,8 @@ else:
     # Load the model from cache
     net = filesystem.load_model(
         os.path.join(GLOBALS['MODEL_CACHE_FOLDER'], "online_model_cached"),
+
+        # TODO -- BUG -- we are not taking in consideration `GLOBALS['NET_MODEL']`
         lambda: LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
     )
 
@@ -950,6 +994,44 @@ net.eval()
 
 # Model evaluation
 # ==============================================================================
+
+
+# Use the network to perform a retrieval task and compute rank@1 and rank@5 accuracy
+with torch.no_grad():
+    net.set_permute(False)
+
+    train_rank_at_one = metrics.rank_accuracy(
+        k = 1,
+        data_loader = train_loader_augmented,
+        network = net,
+        max_examples = len(train_loader_augmented)
+    )
+    test_rank_at_one = metrics.rank_accuracy(
+        k = 1,
+        data_loader = test_loader,
+        network = net,
+        max_examples = len(test_loader)
+    )
+    train_rank_at_five = metrics.rank_accuracy(
+        k = 5,
+        data_loader = train_loader_augmented,
+        network = net,
+        max_examples = len(train_loader_augmented)
+    )
+    test_rank_at_five = metrics.rank_accuracy(
+        k = 5,
+        data_loader = test_loader,
+        network = net,
+        max_examples = len(test_loader)
+    )
+
+    print(f"Train Rank@1 Accuracy: {train_rank_at_one}")
+    print(f"Test Rank@1 Accuracy: {test_rank_at_one}")
+    print(f"Train Rank@5 Accuracy: {train_rank_at_five}")
+    print(f"Test Rank@5 Accuracy: {test_rank_at_five}")
+
+    net.set_permute(True)
+
 
 # We start computing the *silhouette* metric for the produced embedding, on
 # train, validation and test set:
@@ -987,7 +1069,6 @@ with torch.no_grad():
     core.test_model_online(net, test_loader, parameters["criterion"], online = True)
 
     net.set_permute(True)
-
 
 # Now take the classifier from the embedding and use it to compute some classification metrics:
 

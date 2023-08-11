@@ -59,7 +59,7 @@ import src.lib.utils as utils
 import src.lib.data_augmentation as data_augmentation
 
 from src.lib.trainers import train_model_offline, train_model_online
-from src.lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger
+from src.lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, LocalRankAtKLogger, RankAtKLogger
 from src.lib.models import *
 from src.lib.visualizations import *
 from src.lib.models import ResNet18, LFWResNet18
@@ -103,7 +103,7 @@ class IntegrationLFWDataset(unittest.TestCase):
 
         # Load the dataset
         transform = transforms.Compose([
-            transforms.Resize((250, 250)),
+            transforms.Resize((250, 250), antialias=True),
             transforms.ToTensor(),
             transforms.Normalize(
                 (0.5, 0.5, 0.5),
@@ -155,7 +155,7 @@ class IntegrationLFWDataset(unittest.TestCase):
             # Remember that the trasformation has to be random type
             # Otherwise, we could end with a lot of repeated images
             transform = transforms.Compose([
-                transforms.RandomResizedCrop(size=(250, 250)),
+                transforms.RandomResizedCrop(size=(250, 250), antialias = True),
                 transforms.RandomRotation(degrees=(0, 180)),
                 transforms.RandomAutocontrast(),
             ])
@@ -227,10 +227,47 @@ class IntegrationLFWDataset(unittest.TestCase):
             validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
         )
 
+        rank_at_one_logger = RankAtKLogger(
+            net = net,
+            iterations = LOGGING_ITERATIONS,
+            train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
+            validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
+            k = 1
+        )
+
+        rank_at_k_logger = RankAtKLogger(
+            net = net,
+            iterations = LOGGING_ITERATIONS,
+            train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
+            validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
+            k = 5
+        )
+
+
+        local_rank_at_one_logger = LocalRankAtKLogger(
+            net = net,
+            iterations = LOGGING_ITERATIONS,
+            train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
+            validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
+            k = 1
+        )
+
+        local_rank_at_k_logger = LocalRankAtKLogger(
+            net = net,
+            iterations = LOGGING_ITERATIONS,
+            train_percentage = ONLINE_LOGGER_TRAIN_PERCENTAGE,
+            validation_percentage = ONLINE_LOGGER_VALIDATION_PERCENTAGE,
+            k = 5
+        )
+
         logger = CompoundLogger([
             triplet_loss_logger,
             cluster_sizes_logger,
-            intercluster_metrics_logger
+            intercluster_metrics_logger,
+            rank_at_one_logger,
+            rank_at_k_logger,
+            local_rank_at_one_logger,
+            local_rank_at_k_logger,
         ])
 
         # Run the training loop

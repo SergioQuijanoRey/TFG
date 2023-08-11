@@ -24,7 +24,7 @@ def main():
 def __generate_dataloader(P, K) -> torch.utils.data.DataLoader:
     # Load the dataset
     transform = transforms.Compose([
-        transforms.Resize((250, 250)),
+        transforms.Resize((250, 250), antialias=True),
         transforms.ToTensor(),
         transforms.Normalize(
              (0.5, 0.5, 0.5),

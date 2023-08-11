@@ -43,6 +43,7 @@
             # Loggin
             wandb
             tqdm
+            python-dotenv
 
             # LSP Packages
             python-lsp-server
@@ -74,6 +75,8 @@
                 # For sync with Google Colab / Google Drive
                 pkgs.rsync
 
+                # For launching github actions locally
+                pkgs.act
             ];
 
             shellHook = ''
