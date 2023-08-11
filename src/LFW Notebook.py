@@ -1030,13 +1030,22 @@ with torch.no_grad():
     print(f"Train Rank@5 Accuracy: {train_rank_at_five}")
     print(f"Test Rank@5 Accuracy: {test_rank_at_five}")
 
+    # Put this info in wandb
+    wandb.log({
+        "Final Train Rank@1 Accuracy": train_rank_at_one,
+        "Final Test Rank@1 Accuracy": test_rank_at_one,
+        "Final Train Rank@5 Accuracy": train_rank_at_five,
+        "Final Test Rank@5 Accuracy": test_rank_at_five,
+    })
+
     net.set_permute(True)
 
 
 # We start computing the *silhouette* metric for the produced embedding, on
 # train, validation and test set:
 
-
+# Compute the the *silhouette* metric for the produced embedding, on
+# train, validation and test set:
 with torch.no_grad():
 
     net.set_permute(False)
@@ -1056,9 +1065,9 @@ with torch.no_grad():
 
     # Put this info in wandb
     wandb.log({
-        "Training silh": train_silh,
-        "Validation silh": validation_silh,
-        "Test silh": test_silh
+        "Final Training silh": train_silh,
+        "Final Validation silh": validation_silh,
+        "Final Test silh": test_silh
     })
 
     net.set_permute(True)
