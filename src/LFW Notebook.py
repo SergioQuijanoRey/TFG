@@ -1041,9 +1041,6 @@ with torch.no_grad():
     net.set_permute(True)
 
 
-# We start computing the *silhouette* metric for the produced embedding, on
-# train, validation and test set:
-
 # Compute the the *silhouette* metric for the produced embedding, on
 # train, validation and test set:
 with torch.no_grad():
@@ -1072,9 +1069,8 @@ with torch.no_grad():
 
     net.set_permute(True)
 
+
 # Show the "criterion" metric on test set
-
-
 with torch.no_grad():
     net.set_permute(False)
 
@@ -1082,9 +1078,8 @@ with torch.no_grad():
 
     net.set_permute(True)
 
+
 # Now take the classifier from the embedding and use it to compute some classification metrics:
-
-
 with torch.no_grad():
 
     # Try to clean memory, because we can easily run out of memory
@@ -1095,9 +1090,7 @@ with torch.no_grad():
     classifier = EmbeddingToClassifier(net, k = GLOBALS['NUMBER_NEIGHBOURS'], data_loader = train_loader_augmented, embedding_dimension = GLOBALS['EMBEDDING_DIMENSION'])
 
 
-# We evaluate this classifier by watching how it works over a small test set. Later we take some metrics from this classifier to evaluate it more precisely.
-
-
+# See how it works on a small test set
 with torch.no_grad():
 
     net.set_permute(False)
@@ -1120,7 +1113,6 @@ with torch.no_grad():
 # ==============================================================================
 #
 # - If the dimension of the embedding is 2, then we can plot how the transformation to a classificator works:
-
-
+# - That logic is encoded in the `scatter_plot` method
 with torch.no_grad():
     classifier.scatter_plot()
