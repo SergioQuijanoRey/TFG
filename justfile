@@ -1,3 +1,6 @@
+# The current jupyter notebook
+# This is the notebook that we are going to use when working (upload, download)
+# with Google Colab
 CURRENT_NOTEBOOK := "LFW Notebook.ipynb"
 
 # Uni server parameters
@@ -7,6 +10,10 @@ SSH_DATA_PATH := "/mnt/homeGPU/squijano/TFG/"
 # Default command that list all the available commands
 default:
 	@just --list
+
+
+# == GOOGLE COLAB ==
+# ==============================================================================
 
 # Uploads the notebook, the lib code and also the benchmarks
 upload_all REMOTE:
@@ -30,6 +37,16 @@ upload_benchmarks REMOTE:
 upload_lib_benchmarks REMOTE:
     just upload_lib "{{REMOTE}}"
     just upload_benchmarks "{{REMOTE}}"
+
+
+# Downloads the notebook from Google Colab
+download REMOTE:
+	rclone copy --progress "{{REMOTE}}:Colab Notebooks/{{CURRENT_NOTEBOOK}}" src/ && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
+
+
+# == UGR UNI's SERVERS ==
+# ==============================================================================
+
 
 # Upload code to UNI server
 upload_uni:
@@ -64,12 +81,13 @@ download_uni:
         --exclude 'cached_augmented_dataset.pt' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
+# Create a remote file system, so we can work easily on the server
 remote_fs:
     sshfs {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./remote_dev
 
-# Downloads the notebook from Google Colab
-download REMOTE:
-	rclone copy --progress "{{REMOTE}}:Colab Notebooks/{{CURRENT_NOTEBOOK}}" src/ && notify-send "🟢 Rclone succeed" || notify-send -u critical "🔴 Rclone failed"
+
+# == LOCAL TASKS ==
+# ==============================================================================
 
 # Runs all the benchmarks, using shell.nix
 benchmarks:
@@ -86,18 +104,21 @@ benchmarks:
         nix-shell --run "zsh -c 'python $file'"
     done
 
-# Runs all the tests
+# Runs all the tests, both unit tests and integration tests
 tests:
-    python -m unittest src/test/*.py && notify-send "🟢 All tests passed" || notify-send -u critical "🔴 Some tests failed"
+    python -m unittest src/test/*.py && notify-send "🟢 All unit tests passed" || notify-send -u critical "🔴 Some unit tests failed"
+    python -m unittest src/integration_tests/*.py && notify-send "🟢 All integration tests passed" || notify-send -u critical "🔴 Some integration tests failed"
 
 # Run all the linters configured for the project
 lint:
-    ruff src/lib || echo "Lib is not clean"
-    ruff src/benchmarks || echo "Benchmarks are not clean"
-    ruff src/tests || echo "Tests are not clean"
+    ruff src/lib || echo "🏮Lib is not clean"
+    ruff src/benchmarks || echo "🏮Benchmarks are not clean"
+    ruff src/tests || echo "🏮Unit Tests are not clean"
+    ruff src/integration_tests || echo "🏮Integration Tests are not clean"
 
 # Run type checks using mypy
 type_lint:
-    mypy src/lib || echo "Lib is not well typed"
-    mypy src/benchmarks || echo "Benchmarks are not well typed"
-    mypy src/tests || echo "Tests are not well typed"
+    mypy src/lib || echo "🏮Lib is not well typed"
+    mypy src/benchmarks || echo "🏮Benchmarks are not well typed"
+    mypy src/tests || echo "🏮Unit Tests are not well typed"
+    mypy src/integration_tests || echo "🏮Integration Tests are not well typed"
