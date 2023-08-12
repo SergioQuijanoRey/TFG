@@ -4,8 +4,10 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from collections import Counter
+from functools import lru_cache
 
 from src.lib.sampler import CustomSampler
+from src.lib.data_augmentation import LazyAugmentatedDataset
 
 # Parameters for this tests
 #===================================================================================================
@@ -15,8 +17,19 @@ NUM_WORKERS = 1
 DATASET_PERCENTAGE = 0.1
 
 class TestCustomSampler(unittest.TestCase):
+    """
+    Tests for the class `CustomSampler`
+    Tests are organized in the following way:
+        1. `__get_dataset` can return either MNIST or LFW dataset
+        2. Each tests has a `__test_<name>` method, that accepts a `dataset_selection` string to select
+           which dataset is going to be used
+        3. Then, a `test_<name>` calls `__test_<name>` for each dataset, removing duplicated test code
+           for each dataset
+    """
 
-    def __load_dataset(self, percentage: float = 1.0):
+    # Cache so we don't download many times the same dataset
+    @lru_cache(maxsize = 32)
+    def __load_MNIST_dataset(self, percentage: float = 1.0):
         """
         Aux function to load MNIST into a torch.Dataset
 
@@ -53,15 +66,74 @@ class TestCustomSampler(unittest.TestCase):
 
         return dataset
 
-    def test_sampling_is_P_correct(self):
+    # Cache so we don't download many times the same dataset
+    @lru_cache(maxsize = 32)
+    def __load_LFW_dataset(self, percentage: float = 1.0):
+        """
+        Aux function to load LFW into a torch.Dataset
+
+        Some tests use K = 32, which lefts our dataset with almost no class with that many images
+        associated. So we perform data augmentation to have at least 32 images per class, so tests
+        won't fail because that property of the LFW dataset
+        """
+
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+        ])
+
+        dataset = torchvision.datasets.LFWPeople(
+            root = DATA_PATH,
+            split = "train",
+            download = True,
+            transform = transform,
+        )
+
+        # Get a portion of the dataset if percentage is lower than 1
+        if percentage < 1:
+
+            # Subset class don't preserve targets, so we keep this targets to add them later
+            old_targets = dataset.targets
+
+            # We don't care about shuffling, this is only for speeding up some computations on
+            # unit tests, and they don't rely on shuffling
+            new_dataset_len = int(percentage * len(dataset))
+            dataset = torch.utils.data.Subset(dataset, range(0, new_dataset_len))
+
+            # Add the prev targets to the dataset manually
+            dataset.targets = old_targets[0:new_dataset_len]
+
+        # Perform data augmentation to have at least 32 images per class
+        dataset = LazyAugmentatedDataset(
+            base_dataset = dataset,
+            min_number_of_images = 48,
+            transform = lambda x: x
+        )
+
+        return dataset
+
+    def __get_dataset(self, dataset: str = "MNIST") -> torch.utils.data.Dataset:
+        """
+        This function returns one of the two datasets we're using for testing
+        @param dataset: string that can be `"MNIST"` or `"LFW"`
+        @returns specified dataset
+        """
+
+        if dataset == "MNIST":
+            return self.__load_MNIST_dataset(DATASET_PERCENTAGE)
+        elif dataset == "LFW":
+            return self.__load_LFW_dataset(DATASET_PERCENTAGE)
+        else:
+            raise Exception("Bad `dataset` parameter given!")
+
+    def __test_sampling_is_P_correct(self, dataset_selection: str = "MNIST"):
         """
         Test that the sampling we are doing respect the P-K philosophy relative to P.
 
         That's to say, check That every batch has exactly P classes
         """
 
-        # Dataset is going to be the same for all checks
-        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+        # Select the dataset we're going to use
+        dataset = self.__get_dataset(dataset_selection)
 
         for P in range(1, 4):
 
@@ -92,8 +164,14 @@ class TestCustomSampler(unittest.TestCase):
                 # Assert we have exactly the number of expected labels
                 self.assertEqual(len(unique_labels_in_batch), P, msg = "This batch doesn't contain exactly P classes")
 
+    def test_sampling_is_P_correct(self):
 
-    def test_sampling_is_K_correct(self):
+        # Test for the two datasets
+        self.__test_sampling_is_P_correct(dataset_selection = "MNIST")
+        self.__test_sampling_is_P_correct(dataset_selection = "LFW")
+
+
+    def __test_sampling_is_K_correct(self, dataset_selection: str = "MNIST"):
         """
         Test that the sampling we are doing respect the P-K philosophy relative to K.
 
@@ -101,7 +179,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Dataset is going to be the same for all checks
-        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+        dataset = self.__get_dataset(dataset_selection)
 
         for K in range(1, 4):
 
@@ -135,14 +213,25 @@ class TestCustomSampler(unittest.TestCase):
                 for label in unique_labels_in_batch:
                     self.assertEqual(counter[label], K, msg = "In this batch there is one class with not exactly K elements associated")
 
-    def test_list_of_classes_has_all_classes(self):
+    def test_sampling_is_K_correct(self):
+
+        # Test for the two datasets
+        self.__test_sampling_is_K_correct(dataset_selection = "MNIST")
+        self.__test_sampling_is_K_correct(dataset_selection = "LFW")
+
+    def __test_list_of_classes_has_all_classes(self, dataset_selection: str = "MNIST"):
         """
         Check that the precomputation for list_of_classes generates a list of list with all 10 classes
-        precomputed properly
+        precomputed properly. We have to know that the dataset has 10 classes. Thus, LFW dataset
+        can't be used
         """
 
+        # Check that we're not using LFW dataset
+        if dataset_selection == "LFW":
+            raise Exception("This test can only be run on MNIST dataset")
+
         # Create dataset and then directly a sampler (without dataloader)
-        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+        dataset = self.__get_dataset(dataset_selection)
         P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
@@ -152,32 +241,40 @@ class TestCustomSampler(unittest.TestCase):
         sampler.generate_index_sequence()
 
         # Check that list of classes has all classes pre-computed
-        self.assertEqual(len(sampler.list_of_classes), 10)
+        self.assertEqual(len(sampler.dict_of_classes), 10)
+
+    def test_list_of_classes_has_all_classes(self):
+
+        # Test for the two datasets
+        self.__test_list_of_classes_has_all_classes(dataset_selection = "MNIST")
+
+        # This test can only be runned in MNIST dataset
+        #  self.__test_list_of_classes_has_all_classes(dataset_selection = "LFW")
 
     # TODO -- what was 'the cleaning mechanism'??
-    def test_remove_empty_classes(self):
+    def __test_remove_empty_classes(self, dataset_selection: str = "MNIST"):
         """Check that the cleaning mechanism for available classes works fine"""
 
         # Create dataset and then directly a sampler (without dataloader)
-        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+        dataset = self.__get_dataset(dataset_selection)
         P, K = 3, 16
         sampler = CustomSampler(P, K, dataset)
 
-        # Now manually create list of classes
+        # Now manually create a dict of classes
         # This classes should survive cleanning
-        sampler.list_of_classes = [[] for _ in range(10)]
-        sampler.list_of_classes[0] = list(range(80))
-        sampler.list_of_classes[1] = list(range(80))
-        sampler.list_of_classes[2] = list(range(80))
-        sampler.list_of_classes[5] = list(range(80))
-        sampler.list_of_classes[6] = list(range(80))
-        sampler.list_of_classes[7] = list(range(80))
-        sampler.list_of_classes[8] = list(range(80))
+        sampler.dict_of_classes = dict()
+        sampler.dict_of_classes[0] = list(range(80))
+        sampler.dict_of_classes[1] = list(range(80))
+        sampler.dict_of_classes[2] = list(range(80))
+        sampler.dict_of_classes[5] = list(range(80))
+        sampler.dict_of_classes[6] = list(range(80))
+        sampler.dict_of_classes[7] = list(range(80))
+        sampler.dict_of_classes[8] = list(range(80))
 
         # This classes should not survive cleaning
-        sampler.list_of_classes[3] = [1, 2, 3]
-        sampler.list_of_classes[4] = [1]
-        sampler.list_of_classes[9] = [1, 2, 3, 4]
+        sampler.dict_of_classes[3] = [1, 2, 3]
+        sampler.dict_of_classes[4] = [1]
+        sampler.dict_of_classes[9] = [1, 2, 3, 4]
 
         # Clean and check the list
         cleaned_list_of_classes = sampler.remove_empty_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -195,18 +292,18 @@ class TestCustomSampler(unittest.TestCase):
 
         # Repeat the process with other list of classes
         # This classes should survive cleanning
-        sampler.list_of_classes[0] = list(range(80))
-        sampler.list_of_classes[3] = list(range(80))
-        sampler.list_of_classes[4] = list(range(80))
-        sampler.list_of_classes[5] = list(range(80))
-        sampler.list_of_classes[6] = list(range(80))
-        sampler.list_of_classes[7] = list(range(80))
-        sampler.list_of_classes[8] = list(range(80))
-        sampler.list_of_classes[9] = list(range(80))
+        sampler.dict_of_classes[0] = list(range(80))
+        sampler.dict_of_classes[3] = list(range(80))
+        sampler.dict_of_classes[4] = list(range(80))
+        sampler.dict_of_classes[5] = list(range(80))
+        sampler.dict_of_classes[6] = list(range(80))
+        sampler.dict_of_classes[7] = list(range(80))
+        sampler.dict_of_classes[8] = list(range(80))
+        sampler.dict_of_classes[9] = list(range(80))
 
         # This classes should not survive cleaning
-        sampler.list_of_classes[1] = [1, 2, 3]
-        sampler.list_of_classes[2] = [1]
+        sampler.dict_of_classes[1] = [1, 2, 3]
+        sampler.dict_of_classes[2] = [1]
 
         # Clean and check the list
         cleaned_list_of_classes = sampler.remove_empty_classes([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -222,8 +319,14 @@ class TestCustomSampler(unittest.TestCase):
         self.assertIn(8, cleaned_list_of_classes)
         self.assertIn(9, cleaned_list_of_classes)
 
+    def test_remove_empty_classes(self):
 
-    def test_len_computation_is_correct(self):
+        # Test for the two datasets
+        self.__test_remove_empty_classes(dataset_selection = "MNIST")
+        self.__test_remove_empty_classes(dataset_selection = "LFW")
+
+
+    def __test_len_computation_is_correct(self, dataset_selection: str = "MNIST"):
         """
         Due to P-K sampling, not all elements of the dataset are sampled
 
@@ -233,7 +336,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Create a dataset
-        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+        dataset = self.__get_dataset(dataset_selection)
 
         # Create a sampler with certain values of P, K
         P, K = 3, 32
@@ -258,7 +361,14 @@ class TestCustomSampler(unittest.TestCase):
             msg = "Len of returned elements of the sampler is not equal to CustomSampler.__len__ computation"
         )
 
-    def test_sampler_len_is_less_than_dataset_len(self):
+    def test_len_computation_is_correct(self):
+
+        # Test for the two datasets
+        self.__test_len_computation_is_correct(dataset_selection = "MNIST")
+        self.__test_len_computation_is_correct(dataset_selection = "LFW")
+
+
+    def __test_sampler_len_is_less_than_dataset_len(self, dataset_selection: str = "MNIST"):
         """
         Check that sampler len is less or equal than dataset len
 
@@ -267,7 +377,7 @@ class TestCustomSampler(unittest.TestCase):
         """
 
         # Create a dataset
-        dataset = self.__load_dataset(DATASET_PERCENTAGE)
+        dataset = self.__get_dataset(dataset_selection)
 
         # Create a sampler with certain values of P, K
         P, K = 3, 32
@@ -294,3 +404,8 @@ class TestCustomSampler(unittest.TestCase):
             msg = "Len of sampler has to be less or equal to len of dataset"
         )
 
+    def test_sampler_len_is_less_than_dataset_len(self):
+
+        # Test for the two datasets
+        self.__test_sampler_len_is_less_than_dataset_len(dataset_selection = "MNIST")
+        self.__test_sampler_len_is_less_than_dataset_len(dataset_selection = "LFW")

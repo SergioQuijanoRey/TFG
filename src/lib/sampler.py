@@ -4,8 +4,12 @@ Module where custom samplers go
 
 import torch
 import random
+from typing import Iterator, List, Dict, Optional
 
-from typing import Iterator, List, Optional
+import src.lib.utils as utils
+
+import logging
+file_logger = logging.getLogger("MAIN_LOGGER")
 
 class CustomSampler(torch.utils.data.Sampler):
     """
@@ -20,6 +24,8 @@ class CustomSampler(torch.utils.data.Sampler):
 
     Used this tutorial to code this class:
     https://www.scottcondron.com/jupyter/visualisation/audio/2020/12/02/dataloaders-samplers-collate.html
+
+    Raises an exception when there are less than P classes with at least K images
     """
 
     def __init__(self, P: int, K: int, dataset: torch.utils.data.Dataset):
@@ -28,14 +34,14 @@ class CustomSampler(torch.utils.data.Sampler):
         self.dataset = dataset
         self.labels = self.dataset.targets
 
-        # We precomputate this list of lists to speed things up
-        # Also, this list is not freezed, we remove elements of it as we add them
+        # We precomputate a dict having lists of indixes, to speed things up
+        # Also, this dict is not freezed, we remove elements of it as we add them
         # to the index sequence
-        # At each new epoch, this list is generated again
-        # `self.list_of_classes[4]` has all the indixes corresponding to elements with class 4
-        # Thus, `self.list_of_classes[4][0]` has the index of the first element with class 4
-        # TODO -- this should be "private", thats `_list_of_classes`
-        self.list_of_classes: Optional[List[List[int]]] = None
+        # At each new epoch, this dict is generated again
+        # `self.dict_of_classes[4]` has all the indixes corresponding to elements with class 4
+        # Thus, `self.dict_of_classes[4][0]` has the index of the first element with class 4
+        # TODO -- this should be "private", thats `_dict_of_classes`
+        self.dict_of_classes: Optional[Dict[int, List[int]]] = None
 
         # We are going to build a list of indexes that we iter sequentially
         # Each epoch we generate a new random sequence respecting P - K sampling
@@ -50,7 +56,11 @@ class CustomSampler(torch.utils.data.Sampler):
         # Some methods need to iterate over all possible values of classes
         # So we should compute this list of classes
         # We are assuming that targets are numeric values
-        self.classes: List[int] = self.__compute_list_of_classes(self.labels)
+        self.classes: List[int] = self.__compute_list_with_unique_classes(
+            # This if else expression makes sure that the method gets a torch.Tensor
+            # Depending on the dataset, we can have self.labels to be a List[int]
+            torch.Tensor(self.labels) if type(self.labels) is list else self.labels
+        )
 
     def __iter__(self) -> Iterator:
 
@@ -59,7 +69,6 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # Return iterator to that index list
         return iter(self.index_list)
-
 
     def __len__(self) -> int:
         """
@@ -96,14 +105,24 @@ class CustomSampler(torch.utils.data.Sampler):
         list_of_indixes: List[int] = []
 
         # Re-generate the list of indixes splitted by class
-        self.list_of_classes = None
-        self.list_of_classes = self.__precompute_list_of_classes()
+        self.dict_of_classes = None
+        self.dict_of_classes = utils.precompute_dict_of_classes(self.labels)
 
         # Classes that have more than `self.K` elements, so can be used for sampling
         # We start with all classes and make an starting clean (because certain class can have
         # less than `self.K` elements in the start)
         available_classes = self.classes
         available_classes = self.remove_empty_classes(available_classes)
+
+        # Log and do some debugging
+        # If first clean lets us with less than `self.P` classes, we have a problem
+        file_logger.debug(
+            f"After first cleaning, there are {len(available_classes)} available_classes"
+        )
+        if len(available_classes) < self.P:
+            err_msg = f"After first cleaning, we have {len(available_classes)} classes with at least `self.k` = {self.K} images, less than `self.P` = {self.P}"
+            file_logger.error(err_msg)
+            raise Exception(err_msg)
 
         # Make minibatches while there are at least `self.P` classes with at least `self.K` elements
         # each class
@@ -124,6 +143,15 @@ class CustomSampler(torch.utils.data.Sampler):
         # Before returning the list, change `self.len`
         self.len = len(list_of_indixes)
 
+        # Log some info about the process
+        file_logger.debug(f"Generated `list_of_indixes` is {list_of_indixes}")
+
+        # Make some debugging
+        if self.len == 0:
+            err_msg = "CustomSampler.generate_index_sequence has produced and empty sequence of index to iterate"
+            file_logger.error(err_msg)
+            raise Exception(err_msg)
+
         return list_of_indixes
 
     def remove_empty_classes(self, class_list: List[int]) -> List[int]:
@@ -131,7 +159,16 @@ class CustomSampler(torch.utils.data.Sampler):
         Remove classes from a given list of classes that have less than `self.K` elements
         """
 
-        return [curr_class for curr_class in class_list if len(self.list_of_classes[curr_class]) >= self.K]
+        return [
+            curr_class for curr_class in class_list
+            if
+                # We remove classes that have less than self.K elements
+                # But some classes could not be in the dict, so check first if they're stored
+                # in the dict first, to avouid `KeyError 0`
+                self.dict_of_classes.get(curr_class) is not None and
+                len(self.dict_of_classes[curr_class]) >= self.K
+        ]
+
 
     def __new_batch(self, classes: List[int]) -> List[int]:
         """
@@ -149,39 +186,18 @@ class CustomSampler(torch.utils.data.Sampler):
             for _ in range(self.K):
 
                 # Choose a random image of this class
-                curr_idx_position = random.randint(0, len(self.list_of_classes[curr_class]) - 1)
-                curr_idx = self.list_of_classes[curr_class][curr_idx_position]
+                curr_idx_position = random.randint(0, len(self.dict_of_classes[curr_class]) - 1)
+                curr_idx = self.dict_of_classes[curr_class][curr_idx_position]
 
                 # Then, this image is no longer available
-                del self.list_of_classes[curr_class][curr_idx_position]
+                del self.dict_of_classes[curr_class][curr_idx_position]
 
                 # Add chosen image to the batch
                 batch.append(curr_idx)
 
         return batch
 
-    def __precompute_list_of_classes(self) -> List[List[int]]:
-        """
-        Computes a list containing list. Each list contains the positions of elements of given class
-        ie. class_positions[i] contains all positions of elements of i-th class
-
-        We assume that class are numeric values. That's to say, string classes won't work
-
-        # TODO -- copied this from BaseTripletLoss, maybe refactor
-        # TODO -- REFACTOR -- also used in the notebook, refactor this!
-        """
-
-        # Init list of lists
-        class_positions = [[] for _ in self.classes]
-
-        # We walk the dataset and assign each element to their position
-        for idx, label in enumerate(self.labels):
-            class_positions[label].append(idx)
-
-        return class_positions
-
-
-    def __compute_list_of_classes(self, labels: torch.Tensor) -> List[int]:
+    def __compute_list_with_unique_classes(self, labels: torch.Tensor) -> List[int]:
         """
         Given a tensor containing all labels, computes a list with the classes. That's to say,
         a list with the unique values of the tensor
@@ -189,6 +205,9 @@ class CustomSampler(torch.utils.data.Sampler):
         For example, given torch.Tensor([1, 1, 2, 3, 1, 4]), [1, 2, 3, 4] should be returned
 
         We are also sorting the classes, but this is not need for most of the methods
+
+        TODO -- maybe is repeated in BaseTripletLoss, so might need a refactor. Not quite sure
+                about this
         """
 
         # Use torch func to get the list of classes
@@ -197,6 +216,9 @@ class CustomSampler(torch.utils.data.Sampler):
         # We want to work with vanilla python list
         unique_labels: List[int] = list(unique_labels)
 
+        # Even though we make the annotation that `unique_labels` is `List[int]`, it can be a
+        # `List[torch.Tensor]`, so with this check we make sure that we have a `List[int]`
+        if type(unique_labels[0]) is torch.Tensor:
+            unique_labels = [int(x) for x in unique_labels]
+
         return unique_labels
-
-
