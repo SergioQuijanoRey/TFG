@@ -7,9 +7,12 @@ CURRENT_NOTEBOOK := "LFW Notebook.ipynb"
 SSH_ALIAS := "ugr"
 SSH_DATA_PATH := "/mnt/homeGPU/squijano/TFG/"
 
+# Anaconda parameters
+ANACONDA_ENV_NAME := "squijano"
+
 # Default command that list all the available commands
 default:
-	@just --list
+	@just --list --unsorted
 
 
 # == GOOGLE COLAB ==
@@ -122,3 +125,17 @@ type_lint:
     mypy src/benchmarks || echo "🏮Benchmarks are not well typed"
     mypy src/tests || echo "🏮Unit Tests are not well typed"
     mypy src/integration_tests || echo "🏮Integration Tests are not well typed"
+
+
+# == ANACONDA ENVIROMENT ==
+# ==============================================================================
+
+# Activate the conda enviroment and then export it into a `enviroment.yml` file
+conda_export:
+    conda activate {{ANACONDA_ENV_NAME}}
+    conda env export > enviroment.yml
+
+# Use a `enviroment.yml` file to create a conda enviroment
+conda_import:
+    conda env create -f environment.yml
+    conda env list
