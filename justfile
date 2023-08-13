@@ -65,6 +65,8 @@ upload_uni:
         --exclude 'tmp' \
         --exclude 'cached_models' \
         --exclude 'cached_augmented_dataset.pt' \
+        --exclude 'data' \
+        --exclude 'src/data' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server
@@ -82,6 +84,8 @@ download_uni:
         --exclude 'tmp' \
         --exclude 'cached_models' \
         --exclude 'cached_augmented_dataset.pt' \
+        --exclude 'data' \
+        --exclude 'src/data' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
 # Create a remote file system, so we can work easily on the server
