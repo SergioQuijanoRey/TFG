@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  integration_tests:
+  run_some_notebooks:
 
     runs-on: ubuntu-latest
 
@@ -34,4 +34,4 @@ jobs:
 
     - name: Run certain notebooks
       run: |
-        jupyter nbconvert --execute "src/FG-Net Notebook.ipynb" --to "html"
+        jupyter nbconvert --execute "src/FG-Net Notebook.ipynb" --to "notebook"
