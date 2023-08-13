@@ -4,7 +4,7 @@ Module for displaying visualizations that are not included in tensorboard
 
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 from collections import Counter
 import torch
 
@@ -243,3 +243,32 @@ def plot_how_many_images_per_class(dataset: torch.utils.data.Dataset, cut: int, 
     plt.xlabel("Images per class")
     plt.ylabel("Number of classes having that number of images")
     plt.show()
+
+# TODO -- lacks documentation!
+def plot_histogram(
+    values: List[float],
+    num_bins: int,
+    title: str,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    figsize: Tuple[int, int] = (8, 6)
+):
+
+    # Make plots bigger
+    plt.figure(figsize = figsize, dpi = 80)
+
+    # Get the data needed for the plot
+    counts, bins = np.histogram(values, bins = num_bins)
+
+    # Set the plotting data
+    plt.hist(bins[:-1], bins, weights = counts)
+
+    # Set the title of the plot
+    plt.title(title)
+
+    # Set labels for the axis if given as parameters
+    if xlabel is not None: plt.xlabel(xlabel)
+    if ylabel is not None: plt.ylabel(ylabel)
+
+    # And finally show the plot
+    plt.plot()
