@@ -88,7 +88,7 @@ GLOBALS['K'] = 2     # Number of images sampled for each selected class
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Epochs for hard triplets, online training
-GLOBALS['TRAINING_EPOCHS'] = 500
+GLOBALS['TRAINING_EPOCHS'] = 50
 
 # Learning rate for hard triplets, online training
 GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
@@ -239,9 +239,10 @@ GLOBALS['RANDOM_SEED'] = 123456789
 # But in lib code we cannot import properly the modules
 
 import sys
+sys.path.append(GLOBALS['BASE_PATH'])
 sys.path.append(os.path.join(GLOBALS['BASE_PATH'], "src"))
 sys.path.append(os.path.join(GLOBALS['BASE_PATH'], "src/lib"))
-sys.path.append(GLOBALS['BASE_PATH'])
+
 
 # Importing the modules we are going to use
 # ==============================================================================
@@ -418,15 +419,12 @@ datasets.download_fg_dataset(
 #
 # As mentioned before, we have to use our custom implementation for pytorch
 # `Dataset` class
-dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = None)
-raise Exception("OK")
 
+print("=> Wrapping the raw data into a `FGDataset")
 
 # Transformations that we want to apply when loading the data
-# Now we are only transforming images to tensors (pythorch only works with tensors)
-# But we can apply here some normalizations
 transform = transforms.Compose([
-    transforms.Resize((250, 250), antialias=True),
+
     # First, convert to a PIL image so we can resize
     transforms.ToPILImage(),
 
@@ -445,29 +443,21 @@ transform = transforms.Compose([
         (0.5, 0.5, 0.5)
      ),
 ])
+dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = transform)
 
-# Load the dataset
-# torchvision has a method to download and load the dataset
-# TODO -- look what's the difference between this dataset and LFWPairs
-train_dataset = torchvision.datasets.LFWPeople(
-    root = GLOBALS['DATA_PATH'],
-    split = "train",
-    download = True,
-    transform = transform,
-)
+## Splitting the dataset
+# ==============================================================================
 
-test_dataset = torchvision.datasets.LFWPeople(
-    root = GLOBALS['DATA_PATH'],
-    split = "test",
-    download = True,
-    transform = transform,
-)
+# TODO -- This split has to be done in a more considerate way
+# TODO -- split 80 / 20 for training / testing, having in testing only IDs that
+#         are not present in the training set
+# TODO -- For validation, I think we can do the usual split
 
-# Train -> train / validation split
 # This function returns a `WrappedSubset` so we can still have access to
 # `targets` attribute. With `Subset` pytorch class we cannot do that
+print("=> Splitting the dataset")
+train_dataset, test_dataset = split_dataset.split_dataset(dataset, 0.9)
 train_dataset, validation_dataset = split_dataset.split_dataset(train_dataset, 0.8)
-
 
 ## Use our custom sampler
 # ==============================================================================
@@ -476,6 +466,7 @@ train_dataset, validation_dataset = split_dataset.split_dataset(train_dataset, 0
 #     - For each minibatch, select $P$ random classes. For each selected class, select $K$ random images
 # - Thus, each minibatch has a size of $P \times K$
 
+print("=> Putting the dataset into dataloaders")
 
 # New dataloaders that use our custom sampler
 train_loader = torch.utils.data.DataLoader(
@@ -508,8 +499,11 @@ test_loader = torch.utils.data.DataLoader(
 # Data augmentation
 # ==============================================================================
 #
-# - As we've seen before, the main problem with this dataset is that most of the classes have only one or two images associated
-# - So we're going to apply data augmentation to have at least a minimun number of images per class
+# TODO -- DOCS -- this documentation is no longer correct!
+# - As we've seen before, the main problem with this dataset is that most of the
+# classes have only one or two images associated
+# - So we're going to apply data augmentation to have at least a minimun number
+# of images per class
 #
 # **Alternatives to do this**:
 #
@@ -542,6 +536,8 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == True:
 # Or if the cached dataset was done for other number of images (ie. for 4 when
 # now we want 32)
 if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.min_number_of_images != GLOBALS['K']:
+
+    print("=> Performing data augmentation")
 
     # Select the data augmentation mechanism
     AugmentationClass = LazyAugmentatedDataset if GLOBALS['LAZY_DATA_AUGMENTATION'] is True else AugmentatedDataset
@@ -812,8 +808,8 @@ def objective(trial):
     except Exception as e:
 
         # Show that cross validation failed for this combination
-        msg = "Could not run succesfully k-fold cross validation for this combination of parameters"
-        msg = msg + f"\nError was: {e}"
+        msg = "Could not run succesfully k-fold cross validation for this combination of parameters\n"
+        msg = msg + f"Error was: {e}\n"
         print(msg)
         file_logger.warn(msg)
 
@@ -851,6 +847,7 @@ if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
 # ==============================================================================
 
 
+print("=> Selecting the network model")
 net = None
 if GLOBALS['NET_MODEL'] == "ResNet18":
     net = ResNet18(GLOBALS['EMBEDDING_DIMENSION'])
@@ -886,6 +883,8 @@ print(net)
 ## Defining the loggers we want to use
 # ==============================================================================
 
+
+print("=> Creating the training loggers that we are going to use")
 
 # Define the loggers we want to use
 triplet_loss_logger = TripletLoggerOnline(
@@ -965,7 +964,7 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
     # To measure the time it takes to train
     ts = time.time()
 
-    # Run the training with or without profiling
+    # Run the training with the profiling
     if GLOBALS['PROFILE_TRAINING'] is True:
         training_history = cProfile.run(
             f"""train_model_online(
@@ -977,11 +976,12 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
                 name = NET_MODEL,
                 logger = logger,
                 snapshot_iterations = None,
-                gradient_clipping = GRADIENT_CLIPPING
+                gradient_clipping = GRADIENT_CLIPPING,
             )""",
             GLOBALS['PROFILE_SAVE_FILE']
         )
 
+    # Run the training without the profiling
     else:
 
         training_history = train_model_online(
@@ -993,7 +993,7 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
             name = GLOBALS['NET_MODEL'],
             logger = logger,
             snapshot_iterations = None,
-            gradient_clipping = GLOBALS['GRADIENT_CLIPPING']
+            gradient_clipping = GLOBALS['GRADIENT_CLIPPING'],
         )
 
     # Compute how long it took
