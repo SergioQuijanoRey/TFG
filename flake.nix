@@ -79,6 +79,10 @@
                 pkgs.act
             ];
 
+
+            # Add some paths to PYTHONPATH
+            PYTHONPATH = "${custom_python_env}/${custom_python_env.sitePackages}:.:./src:./src/lib";
+
             shellHook = ''
                 # Log that we're in a custom enviroment
                 echo "❄️  Running custom dev enviroment with python and other packages"
