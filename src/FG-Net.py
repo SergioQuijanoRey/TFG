@@ -164,6 +164,10 @@ GLOBALS['GRADIENT_CLIPPING'] = 100
 # We use k = 1 and k = this value
 GLOBALS['ACCURACY_AT_K_VALUE'] = 5
 
+# Images in this dataset have different shapes. So this parameter fixes one shape
+# so we can normalize the images to have the same shape
+GLOBALS['IMAGE_SHAPE'] = (300, 300)
+
 ## Section parameters
 # ==============================================================================
 
@@ -423,10 +427,22 @@ raise Exception("OK")
 # But we can apply here some normalizations
 transform = transforms.Compose([
     transforms.Resize((250, 250), antialias=True),
+    # First, convert to a PIL image so we can resize
+    transforms.ToPILImage(),
+
+    # TODO -- Document
+    transforms.Grayscale(num_output_channels = 3),
+
+    # Images have different shapes, so this normalization is needed
+    transforms.Resize(GLOBALS['IMAGE_SHAPE'], antialias=True),
+
+    # Pytorch only work with tensors
     transforms.ToTensor(),
+
+    # Some normalization
     transforms.Normalize(
-         (0.5, 0.5, 0.5),
-         (0.5, 0.5, 0.5)
+        (0.5, 0.5, 0.5),
+        (0.5, 0.5, 0.5)
      ),
 ])
 
@@ -538,10 +554,9 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
         # Otherwise, we could end with a lot of repeated images
         transform = transforms.Compose([
 
-            # NOTE: LFW images have shape `(3, 250, 250)`. With this, we generate
-            # new images, so they have to have the same width and height that the
-            # rest of the images!
-            transforms.RandomResizedCrop(size=(250, 250), antialias = True),
+            # NOTE: We have normalized our images to be (3, 300, 300), so new
+            # randomly generated images have to have the same shape
+            transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
             transforms.RandomRotation(degrees=(0, 20)),
             transforms.RandomAutocontrast(),
         ])
@@ -657,8 +672,9 @@ def objective(trial):
 
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
+        # Again, we want to end with the normalized shape
         transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=(250, 250), antialias = True),
+            transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
             transforms.RandomRotation(degrees=(0, 45)),
             transforms.RandomAutocontrast(),
         ])
@@ -692,7 +708,7 @@ def objective(trial):
                 # Remember that the trasformation has to be random type
                 # Otherwise, we could end with a lot of repeated images
                 transform = transforms.Compose([
-                    transforms.RandomResizedCrop(size=(250, 250), antialias = True),
+                    transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
                     transforms.RandomRotation(degrees=(0, 45)),
                     transforms.RandomAutocontrast(),
                 ])
