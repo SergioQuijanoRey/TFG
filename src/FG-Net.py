@@ -74,8 +74,8 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 
 # Parameters of P-K sampling
-GLOBALS['P'] = 34    # Number of classes used in each minibatch
-GLOBALS['K'] = 2     # Number of images sampled for each selected class
+GLOBALS['P'] = 10    # Number of classes used in each minibatch
+GLOBALS['K'] = 4     # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -99,15 +99,15 @@ GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
 #
 # `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
 # minibatches
-GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
+GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 20
 
 # Which percentage of the training and validation set we want to use for the logging
-GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1 / 10
-GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 2 / 3
+GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 9 / 10
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 9 / 10
 
 # Choose which model we're going to use
-# Can be "ResNet18", "LightModel", "LFWResNet18" or "LFWLightModel"
-GLOBALS['NET_MODEL'] = "LFWResNet18"
+# Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel"
+GLOBALS['NET_MODEL'] = "FGLightModel"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
@@ -125,7 +125,7 @@ GLOBALS['NUMBER_OF_FOLDS'] = 8
 GLOBALS['MARGIN'] = 0.5
 
 # Dim of the embedding calculated by the network
-GLOBALS['EMBEDDING_DIMENSION'] = 8
+GLOBALS['EMBEDDING_DIMENSION'] = 3
 
 # Number of neighbours considered in K-NN
 # K-NN used for transforming embedding task to classification task
@@ -305,7 +305,7 @@ from lib.trainers import train_model_offline, train_model_online
 from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, RankAtKLogger, LocalRankAtKLogger
 from lib.models import *
 from lib.visualizations import *
-from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter
+from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter, FGLigthModel
 from lib.loss_functions import MeanTripletBatchTripletLoss, BatchHardTripletLoss, BatchAllTripletLoss, AddSmallEmbeddingPenalization
 from lib.embedding_to_classifier import EmbeddingToClassifier
 from lib.sampler import CustomSampler
@@ -857,6 +857,8 @@ elif GLOBALS['NET_MODEL'] == "LFWResNet18":
     net = LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
 elif GLOBALS['NET_MODEL'] == "LFWLightModel":
     net = LFWLightModel(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "FGLightModel":
+    net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
 else:
     raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
