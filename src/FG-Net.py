@@ -747,6 +747,8 @@ def objective(trial):
             net = LFWResNet18(embedding_dimension = embedding_dimension)
         elif net_election == "LFWLightModel":
             net = LFWLightModel(embedding_dimension = embedding_dimension)
+        elif net_election == "FGLightModel":
+            net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
         else:
             raise ValueError("String for net election is not valid")
 
