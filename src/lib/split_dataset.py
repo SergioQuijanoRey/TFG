@@ -68,3 +68,21 @@ def split_dataset(
     second_dataset = WrappedSubset(second_subset)
 
     return first_dataset, second_dataset
+
+def split_dataset_disjoint_classes(
+    dataset: torch.utils.data.Dataset,
+    first_element_percentage: float
+) -> Tuple[WrappedSubset, WrappedSubset]:
+    """
+    Sample split as `split_dataset`, but with one important property:
+
+    Targets of the two new datasets are disjoint. That is to say, if we found
+    one target value in one dataset, we are sure that there is no elemnt in the
+    other dataset with the same target
+
+    For example, in our problem, that means that the second dataset only contains
+    persons that are not present in the first dataset
+
+    NOTE: due to that behaviour, the obtained percentage is not going to be exact
+    """
+    return split_dataset(dataset, first_element_percentage)
