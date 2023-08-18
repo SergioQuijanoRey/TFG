@@ -211,7 +211,6 @@ class LFWLightModel(torch.nn.Module):
         self.should_permute = should_permute
 
 
-# TODO -- remove spanish docs and comments!
 class FGLigthModel(torch.nn.Module):
     """
     Very light model. Used mainly to test ideas with a fast model. For FG-Net dataset
