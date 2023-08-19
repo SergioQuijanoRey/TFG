@@ -92,29 +92,45 @@ def split_dataset_disjoint_classes(
     while second dataset tends to be smaller
     """
 
+    # Compute the desired min size for the first split
     first_min_size = int(len(dataset) * first_element_percentage)
-    first_indixes: List[int] = []
 
     # Remove repeated targets
     available_targets = list(set(dataset.targets))
 
+    # We are going to do a lot of searches on the target list
+    # So keep a copy of it inside an `np.array` for more speed
+    np_targets = np.array(dataset.targets)
+
+    # The indixes of the first dataset
+    # We are working with numpy for speed reasons
+    first_indixes: np.array = np.array([])
+
     while len(first_indixes) < first_min_size:
-        print(f"Another loop with {len(first_indixes)=}")
 
         # Choose a new target and remove it from available targets
-        current_target = random.choice(available_targets)
+        current_target = int(random.choice(available_targets))
         available_targets.remove(current_target)
 
-        # Add elements corresponding to that target
-        first_indixes = first_indixes + [
-            idx for idx, (element, target) in enumerate(dataset)
-            if target == current_target
-        ]
+        # Search for the new indixes
+        new_indixes = np.argwhere(np_targets == current_target)
+
+        # Add them to our list
+        # We have to check if the list is empty, because concatenating to an
+        # empty list returns a list of floats instead of integers :(
+        if len(first_indixes) == 0:
+            first_indixes = new_indixes
+        else:
+            first_indixes = np.concatenate((first_indixes, new_indixes), axis = None)
+
 
     # Get the indixes of the second dataset
-    print("Computing second indixes")
-    second_indixes = [idx for idx in range(len(dataset)) if idx not in first_indixes]
-    print("Ended with second indixes!")
+    # That is, in math set notation, `np_targets - first_indixes`
+    second_indixes = np_targets[~np.isin(np_targets, first_indixes)]
+
+    # Convert both `np.arrays` to normal python lists
+    first_indixes = first_indixes.tolist()
+    second_indixes = second_indixes.tolist()
 
     # Split in two datasets using our computed indixes for the datasets
     first_dataset = WrappedSubset(
