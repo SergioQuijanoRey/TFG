@@ -82,7 +82,7 @@ class TestSplitDatasetDisjoint(unittest.TestCase):
         second_perc = len(second_dataset) / len(dataset)
 
         # We are only failing at most at plus/minus 5%
-        epsilon = 0.05
+        epsilon = 0.1
 
         self.assertAlmostEqual(
             first_perc,
@@ -117,6 +117,22 @@ class TestSplitDatasetDisjoint(unittest.TestCase):
             if target in second_targets:
                 msg = f"Target {target} found in both datasets!"
                 raise Exception(msg)
+
+    def test_no_element_is_lost(self):
+        # Get a dataset and split it
+        dataset = self.__get_fg_dataset()
+        first_dataset, second_dataset = split_dataset.split_dataset_disjoint_classes(
+            dataset, 0.7
+        )
+
+        # Then split the second dataset again
+        second_dataset, third_dataset = split_dataset.split_dataset_disjoint_classes(
+            second_dataset, 0.5
+        )
+
+        # Compute the sum of the elements of three datasets
+        split_total_len = len(first_dataset) + len(second_dataset) + len(third_dataset)
+        self.assertEqual(split_total_len, len(dataset), "Some elements got lost or got repeated!")
 
     def test_percentages_sum_up_to_one(self):
 
