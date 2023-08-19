@@ -80,8 +80,24 @@ class TestSplitDatasetDisjoint(unittest.TestCase):
         # The percentage is not going to be accurate, but it should respect a bit
         first_perc = len(first_dataset) / len(dataset)
         second_perc = len(second_dataset) / len(dataset)
-        self.assertGreater(first_perc, 0.6, "First dataset is way too small")
-        self.assertLess(second_perc, 0.4, "Second dataset is way too big")
+
+        # We are only failing at most at plus/minus 5%
+        epsilon = 0.05
+
+        self.assertAlmostEqual(
+            first_perc,
+            0.7,
+            places = None,
+            msg = "First dataset is way too small",
+            delta = epsilon
+        )
+        self.assertAlmostEqual(
+            second_perc,
+            0.3,
+            places = None,
+            msg = "Second dataset is way too big",
+            delta = epsilon
+        )
 
     def test_fg_net_disjoint(self):
 
