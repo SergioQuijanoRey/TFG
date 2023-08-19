@@ -448,16 +448,24 @@ dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = trans
 ## Splitting the dataset
 # ==============================================================================
 
-# TODO -- This split has to be done in a more considerate way
-# TODO -- split 80 / 20 for training / testing, having in testing only IDs that
-#         are not present in the training set
-# TODO -- For validation, I think we can do the usual split
-
 # This function returns a `WrappedSubset` so we can still have access to
 # `targets` attribute. With `Subset` pytorch class we cannot do that
+# This split function returns subsets with disjoint classes. That is to say,
+# if there is one person in one dataset, that person cannot appear in the
+# other datset. Thus, percentages may vary a little
+#
+# NOTE: in the second split, we specify validation as first dataset. That's because
+# our algorithm is biased towards producing bigger first dataset. Otherwise, we
+# can end with an empty validation dataset
 print("=> Splitting the dataset")
-train_dataset, test_dataset = split_dataset.split_dataset(dataset, 0.9)
-train_dataset, validation_dataset = split_dataset.split_dataset(train_dataset, 0.8)
+train_dataset, test_dataset = split_dataset.split_dataset_disjoint_classes(dataset, 0.9)
+validation_dataset, train_dataset = split_dataset.split_dataset_disjoint_classes(train_dataset, 0.1)
+
+print("--> Dataset sizes:")
+print(f"\tTrain dataset: {len(train_dataset) / len(dataset) * 100}%")
+print(f"\tValidation dataset: {len(validation_dataset) / len(dataset) * 100}%")
+print(f"\tTest dataset: {len(test_dataset) / len(dataset) * 100}%")
+print("")
 
 ## Use our custom sampler
 # ==============================================================================
