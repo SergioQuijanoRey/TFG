@@ -1022,12 +1022,24 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
 # In case we skipped training, load the model from cache
 else:
 
+    # Choose the function to construct the new network
+    if GLOBALS['NET_MODEL'] == "ResNet18":
+        net_func = lambda: ResNet18(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "LightModel":
+        net_func = lambda: LightModel(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "LFWResNet18":
+        net_func = lambda: LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "LFWLightModel":
+        net_func = lambda: LFWLightModel(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "FGLightModel":
+        net_func = lambda: FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+    else:
+        raise Exception("Parameter 'NET_MODEL' has not a valid value")
+
     # Load the model from cache
     net = filesystem.load_model(
         os.path.join(GLOBALS['MODEL_CACHE_FOLDER'], "online_model_cached"),
-
-        # TODO -- BUG -- we are not taking in consideration `GLOBALS['NET_MODEL']`
-        lambda: LFWResNet18(GLOBALS['EMBEDDING_DIMENSION'])
+        net_func
     )
 
     # Load the network in corresponding mem device (cpu -> ram, gpu -> gpu mem
