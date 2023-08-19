@@ -428,7 +428,8 @@ transform = transforms.Compose([
     # First, convert to a PIL image so we can resize
     transforms.ToPILImage(),
 
-    # TODO -- Document
+    # Some images are colored, other images are black and white
+    # So convert all the images to black and white, but having three channels
     transforms.Grayscale(num_output_channels = 3),
 
     # Images have different shapes, so this normalization is needed
@@ -507,11 +508,14 @@ test_loader = torch.utils.data.DataLoader(
 # Data augmentation
 # ==============================================================================
 #
-# TODO -- DOCS -- this documentation is no longer correct!
-# - As we've seen before, the main problem with this dataset is that most of the
-# classes have only one or two images associated
-# - So we're going to apply data augmentation to have at least a minimun number
-# of images per class
+#  - Sometimes we have a `K` value way too big. In that case, some classes might have
+#  less than `K` images, and thus, they cannot be used.
+#
+#  - For tackling this problem, we can perform data augmentation to assure that every
+#  class has at least `K` images
+#
+# - In this dataset is not a big problem, in contrast with what happens in the
+#   LFW dataset
 #
 # **Alternatives to do this**:
 #
@@ -702,7 +706,7 @@ def objective(trial):
         #
         # We only perform data augmentation in the training fold
         #
-        # TODO -- this can affect the optimization process, but otherwise most
+        # NOTE -- this can affect the optimization process, but otherwise most
         # of the tries will fail because of this problem
         if fold_type is hptuning.FoldType.TRAIN_FOLD:
             fold_dataset_augmented = LazyAugmentatedDataset(
