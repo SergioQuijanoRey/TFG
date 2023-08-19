@@ -308,7 +308,6 @@ def __get_portion_of_dataset_and_embed_fast(
 
     return embeddings, targets
 
-# TODO -- BUG -- fails when using GPU memory!
 def __get_portion_of_dataset_and_embed_slow(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
@@ -336,7 +335,6 @@ def __get_portion_of_dataset_and_embed_slow(
 
     return embeddings, targets
 
-# TODO -- PERF -- this function is taking a lot of time
 def compute_cluster_sizes_metrics(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
@@ -430,7 +428,6 @@ def compute_intracluster_distances(
 
     return class_distances
 
-# TODO -- PERF -- this takes too much time to compute
 def compute_intercluster_metrics(
         data_loader: torch.utils.data.DataLoader,
         net: torch.nn.Module,
@@ -582,7 +579,9 @@ def rank_accuracy(
     `network` should be a embedding network, this function takes care of wrapping
     it with `RetrievalAdapter`
 
-    `data_loader` should be a loader implementing our P-K custom sampling
+    `data_loader` should be a loader implementing our P-K custom sampling. If we
+    don't use P-K sampling, it still should work as we are getting a portion of
+    the dataset and embedding (`__get_portion_of_dataset_and_embed`)
 
     NOTE: we are making the queries with all the data available, not within batches
     """
@@ -666,6 +665,8 @@ def local_rank_accuracy(
 
     NOTE: this computes the same as `rank_accuracy`. But this function queries
     against the batch of the element we are looking at, instead of the whole dataset
+
+    NOTE: here we MUST use P-K sampling, because of the local nature of the algorithm
     """
 
     # Wrap the network into a RetrievalAdapter
