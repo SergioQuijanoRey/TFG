@@ -65,9 +65,19 @@ def download_fg_dataset(path: str, url: str, can_skip_download: bool = False):
 
     print("Succesful download")
 
-# TODO -- properly document this class
-# TODO -- say that we are not using all the metadata that the dataset has
 class FGDataset(torch.utils.data.Dataset):
+    """
+    FG-Net dataset is not in the pytorch or torchvision packages. So we have
+    to write this class so we can access the data with the pytorch API
+
+    NOTE: FG-Net data has some metadata that we are not using (face landmarks)
+
+    NOTE: FG-Net data has age information, that we don't use in the training script,
+    but we do use it in the EDA jupyter notebook. For this reason, we have an
+    attribute `self.exploration_mode`. If true, `self.__getitem__` returns a dict
+    with the image, age and id. If false, it returns a tuple with the image and id
+    """
+
     def __init__(self, path: str, transform = None):
 
         # Path of the dir where all the images are stored
