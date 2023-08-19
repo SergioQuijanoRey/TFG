@@ -117,3 +117,31 @@ class TestSplitDatasetDisjoint(unittest.TestCase):
             if target in second_targets:
                 msg = f"Target {target} found in both datasets!"
                 raise Exception(msg)
+
+    def test_percentages_sum_up_to_one(self):
+
+        # Get a dataset and split it
+        dataset = self.__get_fg_dataset()
+        first_dataset, second_dataset = split_dataset.split_dataset_disjoint_classes(
+            dataset, 0.7
+        )
+
+        # Then split the second dataset again
+        second_dataset, third_dataset = split_dataset.split_dataset_disjoint_classes(
+            second_dataset, 0.5
+        )
+
+        # Compute the percentages
+        first_perc = len(first_dataset) / len(dataset)
+        second_perc = len(second_dataset) / len(dataset)
+        third_perc = len(third_dataset) / len(dataset)
+
+        # Check that percentages sum up to one
+        sum_perc = first_perc + second_perc + third_perc
+        self.assertAlmostEqual(
+            sum_perc,
+            1.0,
+            places = None,
+            msg = f"Percentages don't sum up to one!\n{first_perc=} :: {second_perc=} :: {third_perc=}",
+            delta = 0.01,
+        )
