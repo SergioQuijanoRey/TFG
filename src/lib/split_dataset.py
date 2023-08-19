@@ -113,20 +113,28 @@ def split_dataset_disjoint_classes(
         available_targets.remove(current_target)
 
         # Search for the new indixes
-        new_indixes = np.argwhere(np_targets == current_target)
+        current_indixes = np.argwhere(np_targets == current_target)
 
         # Add them to our list
         # We have to check if the list is empty, because concatenating to an
         # empty list returns a list of floats instead of integers :(
         if len(first_indixes) == 0:
-            first_indixes = new_indixes
+            first_indixes = current_indixes
         else:
-            first_indixes = np.concatenate((first_indixes, new_indixes), axis = None)
-
+            first_indixes = np.concatenate((first_indixes, current_indixes), axis = None)
 
     # Get the indixes of the second dataset
-    # That is, in math set notation, `np_targets - first_indixes`
-    second_indixes = np_targets[~np.isin(np_targets, first_indixes)]
+    # Iterate over the available targets (which are targets that have been not
+    # used in the first dataset) and get their indixes
+    second_indixes = np.array([])
+    for current_target in available_targets:
+        current_indixes = np.argwhere(np_targets == current_target)
+
+        # Again, same problem with numpy empty lists!
+        if len(second_indixes) == 0:
+            second_indixes = current_indixes
+        else:
+            second_indixes = np.concatenate((second_indixes, current_indixes), axis = None)
 
     # Convert both `np.arrays` to normal python lists
     first_indixes = first_indixes.tolist()
