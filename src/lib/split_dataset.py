@@ -1,5 +1,8 @@
 import torch
-from typing import Tuple
+import numpy as np
+
+import random
+from typing import Tuple, List
 
 class WrappedSubset(torch.utils.data.Dataset):
     """
@@ -84,5 +87,41 @@ def split_dataset_disjoint_classes(
     persons that are not present in the first dataset
 
     NOTE: due to that behaviour, the obtained percentage is not going to be exact
+
+    NOTE: our algorithm is biased, first dataset tends to be bigger than expected
+    while second dataset tends to be smaller
     """
-    return split_dataset(dataset, first_element_percentage)
+
+    first_min_size = int(len(dataset) * first_element_percentage)
+    first_indixes: List[int] = []
+
+    # Remove repeated targets
+    available_targets = list(set(dataset.targets))
+
+    while len(first_indixes) < first_min_size:
+        print(f"Another loop with {len(first_indixes)=}")
+
+        # Choose a new target and remove it from available targets
+        current_target = random.choice(available_targets)
+        available_targets.remove(current_target)
+
+        # Add elements corresponding to that target
+        first_indixes = first_indixes + [
+            idx for idx, (element, target) in enumerate(dataset)
+            if target == current_target
+        ]
+
+    # Get the indixes of the second dataset
+    print("Computing second indixes")
+    second_indixes = [idx for idx in range(len(dataset)) if idx not in first_indixes]
+    print("Ended with second indixes!")
+
+    # Split in two datasets using our computed indixes for the datasets
+    first_dataset = WrappedSubset(
+        torch.utils.data.Subset(dataset, first_indixes)
+    )
+    second_dataset = WrappedSubset(
+        torch.utils.data.Subset(dataset, second_indixes)
+    )
+
+    return first_dataset, second_dataset
