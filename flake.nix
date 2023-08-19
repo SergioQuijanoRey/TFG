@@ -1,5 +1,4 @@
 {
-    # TODO -- use a proper description for the project!
     description = "Flake to handle some tasks and dependencies for this project";
     inputs = {
         nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
