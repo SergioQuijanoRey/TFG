@@ -75,7 +75,7 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 # Parameters of P-K sampling
 GLOBALS['P'] = 10    # Number of classes used in each minibatch
-GLOBALS['K'] = 4     # Number of images sampled for each selected class
+GLOBALS['K'] = 2     # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -102,8 +102,8 @@ GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
 GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 20
 
 # Which percentage of the training and validation set we want to use for the logging
-GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 9 / 10
-GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 9 / 10
+GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 1
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel"
@@ -460,7 +460,7 @@ dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = trans
 # can end with an empty validation dataset
 print("=> Splitting the dataset")
 train_dataset, test_dataset = split_dataset.split_dataset_disjoint_classes(dataset, 0.9)
-validation_dataset, train_dataset = split_dataset.split_dataset_disjoint_classes(train_dataset, 0.1)
+validation_dataset, train_dataset = split_dataset.split_dataset_disjoint_classes(train_dataset, 0.3)
 
 print("--> Dataset sizes:")
 print(f"\tTrain dataset: {len(train_dataset) / len(dataset) * 100}%")
@@ -490,9 +490,9 @@ train_loader = torch.utils.data.DataLoader(
 validation_loader = torch.utils.data.DataLoader(
     validation_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    shuffle = True,
     num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
+    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], validation_dataset),
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
@@ -568,9 +568,26 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
             transforms.RandomRotation(degrees=(0, 20)),
             transforms.RandomAutocontrast(),
         ])
-
     )
 
+    validation_dataset_augmented = AugmentationClass(
+        base_dataset = validation_dataset,
+        min_number_of_images = GLOBALS['K'],
+
+        # Remember that the trasformation has to be random type
+        # Otherwise, we could end with a lot of repeated images
+        transform = transforms.Compose([
+
+            # NOTE: We have normalized our images to be (3, 300, 300), so new
+            # randomly generated images have to have the same shape
+            transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
+            transforms.RandomRotation(degrees=(0, 20)),
+            transforms.RandomAutocontrast(),
+        ])
+    )
+
+    # TODO -- augmented dataset also for validation, in case we think that the
+    #         CustomSampler is a good idea for the validation dataset
     # Save the augmented dataset to cache
     torch.save(train_dataset_augmented, GLOBALS['AUGMENTED_DATASET_CACHE_FILE'])
 
@@ -581,6 +598,14 @@ train_loader_augmented = torch.utils.data.DataLoader(
     num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
     sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], train_dataset_augmented)
+)
+
+validation_loader_augmented = torch.utils.data.DataLoader(
+    validation_dataset_augmented,
+    batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
+    num_workers = GLOBALS['NUM_WORKERS'],
+    pin_memory = True,
+    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], validation_dataset_augmented)
 )
 
 
@@ -596,6 +621,8 @@ if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is True:
     # Otherwise, train will crash due to lack of RAM
     del train_dataset
     del train_loader
+    del validation_dataset
+    del validation_loader
 
     try_to_clean_memory()
 
@@ -988,7 +1015,7 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
                 path = os.path.join(BASE_PATH, 'tmp'),
                 parameters = parameters,
                 train_loader = train_loader_augmented,
-                validation_loader = validation_loader,
+                validation_loader = validation_loader_augmented,
                 name = NET_MODEL,
                 logger = logger,
                 snapshot_iterations = None,
@@ -1005,7 +1032,7 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
             path = os.path.join(GLOBALS['BASE_PATH'], "tmp"),
             parameters = parameters,
             train_loader = train_loader_augmented,
-            validation_loader = validation_loader,
+            validation_loader = validation_loader_augmented,
             name = GLOBALS['NET_MODEL'],
             logger = logger,
             snapshot_iterations = None,
@@ -1115,7 +1142,7 @@ with torch.no_grad():
     train_silh = metrics.silhouette(train_loader_augmented, net)
     print(f"Silhouette in training loader: {train_silh}")
 
-    validation_silh = metrics.silhouette(validation_loader, net)
+    validation_silh = metrics.silhouette(validation_loader_augmented, net)
     print(f"Silhouette in validation loader: {validation_silh}")
 
     test_silh = metrics.silhouette(test_loader, net)
