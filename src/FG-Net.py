@@ -111,6 +111,7 @@ GLOBALS['NET_MODEL'] = "FGLightModel"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
+# TODO -- delete this, we are going to perform a search in the number of epochs
 GLOBALS['HYPERPARAMETER_TUNING_EPOCHS'] = 20
 
 # Number of tries in the optimization process
@@ -176,7 +177,7 @@ GLOBALS['IMAGE_SHAPE'] = (300, 300)
 
 
 # Skip hyper parameter tuning for online training
-GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = True
+GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = False
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
@@ -668,9 +669,14 @@ if GLOBALS['ADD_NORM_PENALTY']:
 # define it here
 #
 # The function that takes a trained net, and the loader for the validation
-# fold, and produces the loss value that we want to optimize
+# fold, and produces the loss value or other metric that we want to optimize
 def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
-    return metrics.silhouette(validation_fold, net)
+    return metrics.rank_accuracy(
+        k = 1,
+        data_loader = validation_fold,
+        network = net,
+        max_examples = len(validation_fold)
+    )
 
 def objective(trial):
     """Optuna function that is going to be used in the optimization process"""
@@ -678,16 +684,25 @@ def objective(trial):
     # Fixed parameters
     # This parameters were explored using previous hp tuning experiments
     # Fixing the parameters lets us explore other parameters in a better way
-    learning_rate = 0.00005
-    net_election = "LFWResNet18"
-    softplus = True
-    margin = 0.5
-    use_norm_penalty = True
-    norm_penalty = 0.6
-    normalization_election = True
-    p = 34
-    k = 2
-    embedding_dimension = 8
+    # TODO -- we don't have fixed parameters
+
+    # Parameters that we are exploring
+    p = trial.suggest_int("P", 2, 500)
+    k = trial.suggest_int("K", 2, 10)
+    net_election = trial.suggest_categorical(
+        "Network",
+        ["LFWResNet18", "LFWLightModel", "FGLigthModel"]
+    )
+    normalization_election = trial.suggest_categorical(
+        "UseNormalization", [True, False]
+    )
+    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 20)
+    learning_rate = trial.suggest_float("Learning rate", 0.0000001, 0.1)
+    margin = trial.suggest_float("Margin", 0.001, 1.0)
+    softplus = trial.suggest_categorical("Use Softplus", [True, False])
+    use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
+    if use_norm_penalty is True:
+        norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
 
     # Log that we are going to do k-fold cross validation and the values of the
     # parameters. k-fold cross validation can be really slow, so this logs are
@@ -755,6 +770,8 @@ def objective(trial):
 
         # In the same line, we only use our custom sampler for the training fold
         # Otherwise, we use a normal sampler
+        # NOTE: depending on the `loss_function`, maybe validation loader has to
+        # have our CustomSampler
         if fold_type is hptuning.FoldType.TRAIN_FOLD:
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
