@@ -56,14 +56,34 @@
         ];
         custom_python_env = pkgs.${python}.withPackages custom_python_packages;
 
-      in {
+        # Declare the latex enviroment (base enviroment plus additional packages)
+        custom_tex_env = (pkgs.texlive.combine {
 
-        # Packages that we use in `nix develop`
-        devShell = pkgs.mkShell {
-            buildInputs = [
-                # Use our custom python enviroment
-                custom_python_env
+            # Base latex env
+            inherit (pkgs.texlive) scheme-medium
 
+            # Packages that I need for my thesis template to compile
+            koma-script
+            xpatch
+            cabin
+            fontaxes
+            inconsolata
+            xurl
+            upquote
+
+            # Extra packages that we want
+            amsmath
+            hyperref
+            cancel
+            esvect
+            pgf
+            tikz-cd
+            ;
+        });
+
+        # Packages that we are going to use in both shells, for coding and for
+        # writing the Latex thesis
+        shared_packages = [
                 # Pretty terminal experience
                 pkgs.zsh
                 pkgs.starship
@@ -76,11 +96,34 @@
 
                 # For launching github actions locally
                 pkgs.act
+        ];
+
+      in {
+
+        # Packages that we use in `nix develop`
+        devShells.default = pkgs.mkShell {
+            buildInputs = shared_packages ++ [
+                # Use our custom python enviroment
+                custom_python_env
             ];
 
 
             # Add some paths to PYTHONPATH
             PYTHONPATH = "${custom_python_env}/${custom_python_env.sitePackages}:.:./src:./src/lib";
+
+            shellHook = ''
+                # Log that we're in a custom enviroment
+                echo "❄️  Running custom dev enviroment with python and other packages"
+            '';
+        };
+
+        # Second devshell that we use when writing the Latex thesis
+        # Can be run using `nix develop .#writing`
+        devShells.writing = pkgs.mkShell {
+            buildInputs = shared_packages ++ [
+                # Use our custom latex enviroment
+                custom_tex_env
+            ];
 
             shellHook = ''
                 # Log that we're in a custom enviroment
