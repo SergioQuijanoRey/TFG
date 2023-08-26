@@ -211,6 +211,64 @@ class LFWLightModel(torch.nn.Module):
         self.should_permute = should_permute
 
 
+class FGLigthModel(torch.nn.Module):
+    """
+    Very light model. Used mainly to test ideas with a fast model. For FG-Net dataset
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(FGLigthModel, self).__init__()
+
+        # Embedding dimension that the network is going to compute
+        self.embedding_dimension = embedding_dimension
+
+        # Basic structure for the network
+        self.conv1 = nn.Conv2d(in_channels = 3, out_channels = 4, kernel_size = 3)
+        self.conv2 = nn.Conv2d(in_channels = 4, out_channels = 8, kernel_size = 3)
+        self.conv3 = nn.Conv2d(in_channels = 8, out_channels = 16, kernel_size = 3)
+        self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
+        self.conv5 = nn.Conv2d(in_channels = 32, out_channels = 32, kernel_size = 3)
+        self.conv6 = nn.Conv2d(in_channels = 32, out_channels = 32, kernel_size = 3)
+        self.fc = nn.Linear(in_features = 36992, out_features = self.embedding_dimension)
+        self.should_permute = True
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+
+        # We have input tensors with shape (1, DATALOADER_BACH_SIZE, 28, 28)
+        # and we wnat to work with shapes (DATALOADER_BACH_SIZE, 1, 28, 28)
+        #
+        # We use `permute` instead of `reshape` because we want this code to work
+        # with different values for `DATALOADER_BATCH_SIZE`
+        if self.should_permute is True:
+            x = torch.permute(x, (1, 0, 2, 3))
+
+        # Go trought the conv blocks and some max pools
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.max_pool2d(x, 2)
+
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = F.max_pool2d(x, 2)
+
+        x = F.relu(self.conv5(x))
+        x = F.relu(self.conv6(x))
+        x = F.max_pool2d(x, 2)
+
+
+        # Flatten for future fully connected layers
+        x = torch.flatten(x, 1)
+
+        # Fully connected that gets the output with the proper dimension
+        x = self.fc(x)
+
+        return x
+
+    def set_permute(self, should_permute: bool):
+        self.should_permute = should_permute
+
+
 class RandomNet(torch.nn.Module):
     """
     Random net that we are going to use in some tests and benchmarks

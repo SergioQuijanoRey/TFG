@@ -13,22 +13,6 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
-# TODO -- use metrics module to calculate this metrics
-def test_model(model: nn.Module, test_loader: torch.utils.data.DataLoader, loss_function, online = False):
-    """
-    Loads a neural net to make predictions
-
-    Parameters:
-    ===========
-    model: model that we want to test
-    test_loader: pytorch data loader wrapping test data
-    loss_function: loss funct used to evaluate the model
-    """
-    metric = metrics.calculate_mean_triplet_loss_offline
-
-    test_loss = metric(model, test_loader, loss_function)
-    print(f"Test Loss: {test_loss}")
-
 def test_model_online(model: nn.Module, test_loader: torch.utils.data.DataLoader, loss_function, online = False):
     """
     Loads a neural net to make predictions

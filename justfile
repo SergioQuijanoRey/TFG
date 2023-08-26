@@ -3,6 +3,10 @@
 # with Google Colab
 CURRENT_NOTEBOOK := "LFW Notebook.ipynb"
 
+# The current script
+# We are using this script to run the training / evaluation
+CURRENT_SCRIPT := "src/FG-Net.py"
+
 # Uni server parameters
 SSH_ALIAS := "ugr"
 SSH_DATA_PATH := "/mnt/homeGPU/squijano/TFG/"
@@ -65,6 +69,10 @@ upload_uni:
         --exclude 'tmp' \
         --exclude 'cached_models' \
         --exclude 'cached_augmented_dataset.pt' \
+        --exclude 'data' \
+        --exclude 'src/data' \
+        --exclude 'src/lib/__pycache__' \
+        --exclude 'training.log' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server
@@ -82,6 +90,10 @@ download_uni:
         --exclude 'tmp' \
         --exclude 'cached_models' \
         --exclude 'cached_augmented_dataset.pt' \
+        --exclude 'data' \
+        --exclude 'src/data' \
+        --exclude 'src/lib/__pycache__' \
+        --exclude 'training.log' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
 # Create a remote file system, so we can work easily on the server
@@ -92,14 +104,14 @@ remote_fs:
 # == LOCAL TASKS ==
 # ==============================================================================
 
+# Run the current script
+run:
+    python {{CURRENT_SCRIPT}}
+
+
 # Runs all the benchmarks, using shell.nix
 benchmarks:
     #!/usr/bin/env zsh
-
-    # We need to add some paths to PYTHONPATH
-    # Otherwise, imports will not work properly
-    export PYTHONPATH=$PYTHONPATH:./
-    export PYTHONPATH=$PYTHONPATH:./src
 
     # Iterate over all files and run the benchmarks
     for file in src/benchmarks/*.py

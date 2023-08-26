@@ -14,7 +14,7 @@ conda activate /mnt/homeGPU/squijano/TFG/custom_env_squijano
 export TFHUB_CACHE_DIR=.
 
 # Launch the python process
-MAIN_FILE="./src/LFW Notebook.py"
+MAIN_FILE="./src/FG-Net.py"
 python "$MAIN_FILE" || mail -s "Proceso fallido" sergioquijano@correo.ugr.es <<< "El proceso no se ha ejecutado correctamente"
 
 # Notify process has finished succesfully
