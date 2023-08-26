@@ -44,12 +44,15 @@ GLOBALS['LIB_PATH'] = os.path.join(GLOBALS['BASE_PATH'], "lib")
 
 # Path where we store training / test data
 GLOBALS['DATA_PATH'] = os.path.join(GLOBALS['BASE_PATH'], "data")
+GLOBALS['CACD_DATA_PATH'] = os.path.join(GLOBALS['BASE_PATH'], "data/CACD")
 
 # Dataset has images and metadata. Here we store the path to the img dir
 GLOBALS['IMAGE_DIR_PATH'] = os.path.join(GLOBALS['DATA_PATH'], "FGNET/images")
+GLOBALS['CACD_IMAGE_DIR_PATH'] = os.path.join(GLOBALS['CACD_DATA_PATH'], "CACD2000")
 
-# URL where the dataset is stored
+# URL where the datasets are stored
 GLOBALS['DATASET_URL'] = "http://yanweifu.github.io/FG_NET_data/FGNET.zip"
+GLOBALS['CACD_DATASET_URL'] = "https://drive.google.com/file/d/1hYIZadxcPG27Fo7mQln0Ey7uqw1DoBvM/view"
 
 # Dir with all cached models
 # This cached models can be loaded from disk when training is skipped
@@ -75,7 +78,7 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 # Parameters of P-K sampling
 GLOBALS['P'] = 10    # Number of classes used in each minibatch
-GLOBALS['K'] = 2     # Number of images sampled for each selected class
+GLOBALS['K'] = 10    # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -88,7 +91,7 @@ GLOBALS['K'] = 2     # Number of images sampled for each selected class
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Epochs for hard triplets, online training
-GLOBALS['TRAINING_EPOCHS'] = 50
+GLOBALS['TRAINING_EPOCHS'] = 500
 
 # Learning rate for hard triplets, online training
 GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
@@ -99,15 +102,15 @@ GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
 #
 # `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
 # minibatches
-GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 20
+GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
 
 # Which percentage of the training and validation set we want to use for the logging
-GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 1
+GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 0.2
 GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 1
 
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel"
-GLOBALS['NET_MODEL'] = "FGLightModel"
+GLOBALS['NET_MODEL'] = "LFWResNet18"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
@@ -177,7 +180,7 @@ GLOBALS['IMAGE_SHAPE'] = (300, 300)
 
 
 # Skip hyper parameter tuning for online training
-GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = False
+GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = True
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
@@ -415,15 +418,22 @@ datasets.download_fg_dataset(
     can_skip_download = True
 )
 
+datasets.download_cacd_dataset(
+    GLOBALS['CACD_DATA_PATH'],
+    GLOBALS['CACD_DATASET_URL'],
+    can_skip_download = True,
+    can_skip_extraction = True,
+)
+
 ## Dataset loading
 # ==============================================================================
 #
 # As mentioned before, we have to use our custom implementation for pytorch
 # `Dataset` class
 
-print("=> Wrapping the raw data into a `FGDataset")
 
 # Transformations that we want to apply when loading the data
+# TODO -- we are using the same transform for both datasets
 transform = transforms.Compose([
 
     # First, convert to a PIL image so we can resize
@@ -443,9 +453,14 @@ transform = transforms.Compose([
     transforms.Normalize(
         (0.5, 0.5, 0.5),
         (0.5, 0.5, 0.5)
-     ),
+    ),
 ])
-dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = transform)
+
+print("=> Wrapping the raw data into a `FGDataset")
+fgnet_dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = transform)
+
+print("=> Wrapping the raw data into `CACDDataset`")
+cacd_dataset = datasets.CACDDataset(path = GLOBALS['CACD_IMAGE_DIR_PATH'], transform = transform)
 
 ## Splitting the dataset
 # ==============================================================================
@@ -455,18 +470,13 @@ dataset = datasets.FGDataset(path = GLOBALS['IMAGE_DIR_PATH'], transform = trans
 # This split function returns subsets with disjoint classes. That is to say,
 # if there is one person in one dataset, that person cannot appear in the
 # other datset. Thus, percentages may vary a little
-#
-# NOTE: in the second split, we specify validation as first dataset. That's because
-# our algorithm is biased towards producing bigger first dataset. Otherwise, we
-# can end with an empty validation dataset
 print("=> Splitting the dataset")
-train_dataset, test_dataset = split_dataset.split_dataset_disjoint_classes(dataset, 0.9)
-validation_dataset, train_dataset = split_dataset.split_dataset_disjoint_classes(train_dataset, 0.3)
+train_dataset, validation_dataset = split_dataset.split_dataset_disjoint_classes(cacd_dataset, 0.8)
+test_dataset = fgnet_dataset
 
 print("--> Dataset sizes:")
-print(f"\tTrain dataset: {len(train_dataset) / len(dataset) * 100}%")
-print(f"\tValidation dataset: {len(validation_dataset) / len(dataset) * 100}%")
-print(f"\tTest dataset: {len(test_dataset) / len(dataset) * 100}%")
+print(f"\tTrain dataset: {len(train_dataset) / len(cacd_dataset) * 100}%")
+print(f"\tValidation dataset: {len(validation_dataset) / len(cacd_dataset) * 100}%")
 print("")
 
 ## Use our custom sampler
@@ -498,11 +508,11 @@ validation_loader = torch.utils.data.DataLoader(
 
 # TODO -- here I don't know if use default sampler or custom sampler
 test_loader = torch.utils.data.DataLoader(
-  test_dataset,
-  batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-  shuffle = True,
-  num_workers = GLOBALS['NUM_WORKERS'],
-  pin_memory = True,
+    test_dataset,
+    batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
+    shuffle = True,
+    num_workers = GLOBALS['NUM_WORKERS'],
+    pin_memory = True,
 )
 
 
