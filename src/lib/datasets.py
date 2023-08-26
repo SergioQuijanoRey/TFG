@@ -259,7 +259,7 @@ def download_cacd_dataset(
     file_B = get_size(tmp_file)
     file_GB = file_B / (1024 * 1024 * 1024)
 
-    if file_GB > 3.4 and can_skip_download is True:
+    if file_GB > 3.0 and can_skip_download is True:
         print("Skipping the download, files are already downloaded")
 
     else:
@@ -278,7 +278,7 @@ def download_cacd_dataset(
     file_B = get_size(path)
     file_GB = file_B / (1024 * 1024 * 1024)
 
-    if file_GB > 3.4 and can_skip_extraction is True:
+    if file_GB > 3.0 and can_skip_extraction is True:
         print("Skipping the extraction, files already extracted")
     else:
         # Extract the dataset contents
@@ -290,6 +290,7 @@ def download_cacd_dataset(
 
 
 # TODO -- shares a lot of code with FG-Net dataset
+# TODO -- DOCS
 class CACDDataset(torch.utils.data.Dataset):
     """
     TODO -- add docs
