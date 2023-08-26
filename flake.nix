@@ -35,6 +35,9 @@
             # Basic library for computation
             numpy
 
+            # Downloading some datasets from google drive (CACD dataset)
+            gdown
+
             # Hyperparameter tuning
             # TODO -- uncomment
             # optuna
