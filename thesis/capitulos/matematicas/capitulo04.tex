@@ -1,0 +1,28 @@
+\chapter{Modelización de las redes neuronales} \label{ch:modelizacion}
+
+A partir de las herramientas matemáticas que hemos introducido en \customref{ch:matematicas_fundamentales}, buscamos desarrollar una modelización matemática de las redes neuronales con las que se suele trabajar en la práctica. Para que sea una \textbf{buena modelización}, esta modelización debería cumplir que:
+
+\begin{itemize}
+    \item Sea lo más parecida a los modelos que se usan en la práctica
+    \item Permita obtener resultados interesantes
+\end{itemize}
+
+Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
+
+\begin{itemize}
+    \item Redes neuronales no profundas, a partir
+    \todo{no se que nombre le dan a cada una de las redes en el paper!}
+    \item Redes convolucionales profundas, a partir de los \textit{circuitos convolucionales aritméticos}
+\end{itemize}
+
+Creemos que la modelización es muy cercana a las redes usadas en la práctica. Principalmente, porque tiene en cuenta las tres propiedades características de una red convolucional:
+
+\begin{enumerate}
+    \item Localidad
+    \item Compartición de parámetros, que junto a la localidad, da lugar a la convolución
+    \item \textit{Pooling}
+\end{enumerate}
+\todo{Esto ya lo digo antes en la introducción. No sé si aquí sería buen momento para desarrollar lo que significa cada cosa o si es mejor quitarlo de alguna parte}
+
+Además, los \textit{circuitos convolucionales aritméticos} son equivalentes a las redes conocidas como \textit{SimNets}, lo que reafirma el hecho de que la modelización es muy buena.
+

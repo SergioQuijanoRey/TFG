@@ -1,67 +1,40 @@
-\chapter{Modelización de las redes neuronales} \label{ch:modelizacion}
+\chapter{Modelización de la tarea de aprendizaje}
 
-A partir de las herramientas matemáticas que hemos introducido en \customref{ch:matematicas_fundamentales}, buscamos desarrollar una modelización matemática de las redes neuronales con las que se suele trabajar en la práctica. Para que sea una buena modelización, debería cumplirse que:
+La tarea de aprendizaje que consideramos es la de clasificación. Durante todo el desarrollo, pensaremos en la \textbf{clasificación de imágenes}. En este caso, el enfoque que más éxito ha tenido históricamente es el uso de redes convolucionales profundas y, más actualmente, el uso del modelo \entrecomillado{transformer}.
 
-\begin{itemize}
-    \item Sea lo más parecida a los modelos que se usan en la práctica
-    \item Permita obtener resultados interesantes
-\end{itemize}
-
-Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
-
-% TODO -- no se que nombre le dan a cada una de las redes en el paper
-\begin{itemize}
-    % TODO -- hay que darle un nombre a esto
-    \item Redes neuronales no profundas, a partir
-    \item Redes convolucionales profundas, a partir de los \textit{circuitos convolucionales aritméticos}
-\end{itemize}
-
-Creemos que la modelización es muy cercana a las redes usadas en la práctica. Principalmente, porque tiene en cuenta las tres propiedades características de una red convolucional:
-
-\begin{enumerate}
-    \item Localidad
-    \item Compartición de parámetros, que junto a la localidad, da lugar a la convolución
-    \item \textit{Pooling}
-\end{enumerate}
-
-Además, los \textit{circuitos convolucionales aritméticos} son equivalentes a las redes conocidas como \textit{SimNets}, lo que reafirma el hecho de que la modelización es muy buena.
-
-\section{Tarea de aprendizaje}
-
-La tarea de aprendizaje que consideramos es la de clasificación. Durante todo el desarrollo, pensaremos en la clasificación de imágenes. En este caso, el enfoque que más éxito ha tenido históricamente es el uso de redes convolucionales profundas.
-
-Dado un elemento $X = (\mathbf{x_1}, \ldots, \mathbf{x_N})$, donde $\mathbf{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \}$.
+Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \} = \deltaset{Y}$.
 
 Con esto, podemos ver que los datos de entrada viven en el espacio
 
 $$\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (R^s)^N$$
 
-Esta representación de los datos de entrada es natural en muchas situaciones. En el caso de las imágenes, podemos considerar cada vector $\mathbf{x_i}$ como un conjunto de \textit{pixels} de la imagen. Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Podemos incluso considerar \textit{pixels} que aparezcan en más de un vector (es decir, vectores $\mathbf{x_i}$ que se intersequen). Por ejemplo, podemos considerar $\mathbf{x_i}$ como la fila o columna $i$-ésima de la imagen.
+Esta representación de los datos de entrada es natural en muchas situaciones. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen. Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Podemos incluso considerar \textit{pixels} que aparezcan en más de un vector. Por ejemplo, podemos considerar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
 
-Para decidir la etiqueta de un elemento, consideramos $Y$ funciones de puntuación
+Por ejemplo, el trabajo que presenta el conocido modelo  de deep learning \textit{VIT} propone una arquitectura \entrecomillado{transformer} a la que que se le pasa \entrecomillado{patches} de la imagen para poder explotar el mecanismo de atención: \entrecomillado{we split an image into patches and provide the sequence of linear embeddings of these patches as an input to a Transformer} \footnote{\cite{matematicas:vit}}
+\todo{No sé si así está bien referenciado el trabajo al que me refiero}
+
+Para decidir la etiqueta de un elemento, consideramos $Y$ \textbf{funciones de puntuación}:
 
 $$\{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y} \}$$
 
 Con esto, dado un elemento $X \in \mathcal{X}$, lo clasificaremos buscando la etiqueta cuya función de puntuación sea máxima, es decir:
 
-$$label(X) := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
+$$\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
 
-Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de funciones $\mathcal{X} \to \R$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\Gamma_{restringido} \subset \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
+Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de funciones $\mathcal{X} \to \R$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subset \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
 
 \section{Espacio de hipótesis general}
 
 \subsection{Justificación para la representación de las funciones de puntuación} \label{sec:justificacion_func_repr}
 
-% TODO -- desarrollar el apéndice 6 donde se justifica que esta ecuación es lo
-% suficientemente general
-TODO -- desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general
+\todo{Desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general}
 
 \subsection{Representación de las funciones de puntuación} \label{sec:repr_funciones_puntuacion}
 
 Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
 \begin{equation} \label{eq:puntuacion_general}
-    h_y(\mathbf{x_1}, \ldots, \mathbf{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\mathbf{x_i})
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
 \end{equation}
 
 Explicamos ahora algunos detalles sobre esta ecuación, que será central en nuestro trabajo.
@@ -81,36 +54,46 @@ Algunas funciones de representación usuales son:
 \end{itemize}
 
 % TODO -- no he justificado que haya funciones de representacion linealmente independientes
-El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumatoria en \eqref{eq:puntuacion_general}, es claro que tiene orden $N$ y dimensión $M$ en cada modo. Por lo comentado en \customref{sec:justificacion_func_repr}, normalmente consideramos funciones de representación linealmente independientes.
+El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumatoria en \eqref{eq:puntuacion_general}, es claro que tiene orden $N$ y dimensión $M$ en cada modo. Es decir, $\mathcal{A} \in \espaciotensores{N}{M}$.
 
-Estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de representación $h_y, y \in \mathcal{Y}$, lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$.
+Por lo comentado en \customref{sec:justificacion_func_repr}, normalmente consideramos funciones de representación linealmente independientes.
+\todo{Comentar, en base a lo que digamos en la sección que habla de totalidad, lind, que las funciones producto también seran totales, lind}
+\todo{Habrá que decir que, en el bullet list de arriba, ya sabemos que son funciones lind y creo que totales}
 
 La tarea de aprendizaje ahora será aprender los valores de los parámetros $\theta_1, \ldots, \theta_M$ y los valores de los tensores de coeficientes $\mathcal{A}^1, \ldots, \mathcal{A}^Y$.
 
 \begin{observacion}
-    Notar que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\mathbf{x_i}$ solo participan en el productorio que involucra computar $f_{\theta_{d_i}}(\mathbf{x_i})$.
+
+    Estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de representación $h_y, y \in \mathcal{Y}$, lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$.
+
+
+    Notar además que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\nv{x_i}$ solo participan en el productorio que involucra computar $f_{\theta_{d_i}}(\mathbf{x_i})$.
 
     Por tanto, podemos considerar como paso inicial el cómputo de los valores
 
-    $$\{f_{\theta_d}(x_i) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
+    $$\{f_{\theta_d}(\nv{x_i}) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
 
     % Lo de los M canales lo tengo mas dudoso, porque no es necesariamente igual
     % que en una capa convolucional de machine learning
-    Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los valores $\mathbf{x_i}$ para nada más. Con esto, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores. Podemos considerar dicha capa como una \textbf{primera capa convolucional} con $M$ canales, a la que llamaremos \textbf{capa de representación}.
+    Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los valores $\nv{x_i}$ para nada más. Con esto, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores. Podemos considerar dicha capa como una \textbf{primera capa convolucional} con $M$ canales, a la que llamaremos \textbf{capa de representación}.
 
-    Y como ya hemos comentado, estamos usando las mismas funciones de representación para las $Y$ funciones de puntuación. Por tanto, en todas las funciones de puntuación, la capa de representación será la misma.
+    Y como ya hemos comentado, estamos usando las mismas funciones de representación para las $Y$ funciones de puntuación. Por tanto, fijados los parámetros $\theta_i$, en todas las funciones de puntuación la capa de representación será la misma.
 \end{observacion}
 
 \begin{observacion}
-    Si consideramos el espacio de funciones generado por la base
+    Sabemos, por lo comentado en \customref{sec:justificacion_func_repr}, que al trabajar con \textit{wavelets}, \textit{RBFs} y neuronas, podemos extraer un conjunto numerable de funciones que sea total y linealmente independiente. También gracias a \customref{sec:justificacion_func_repr}, que por tanto el siguiente espacio de funciones es total y linealmente independiente:
 
-    $$\{(\mathbf{x_1}, \ldots, \mathbf{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\mathbf{x_i}) / d_i \in \deltaset{M} \forall i \in \deltaset{N}\}$$
+    $$\{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\nv{x_i}) \dspace / \dspace d_i \in \deltaset{M} \dspace \forall i \in \deltaset{N}\}$$
 
-    entonces el tensor $\mathcal{A}^y$ nos da los coeficientes en dicha base de la función de puntuación $h_y$.
+    Por tanto, actúa de forma parecida a una base de un espacio vectorial. Teniendo en cuenta este comportamiento similar, podemos pensar que el tensor $\mathcal{A}^y$ nos da los coeficientes de la función de puntuación $h_y$ en dicha base.
+
+    \todo{Tengo que desarrollar bien esa sección para justificar todas estas cosas que estoy diciendo}
 \end{observacion}
 
-Como ya hemos dicho, los tensores de coeficientes tienen orden $N$ y dimensión $M$ en cada modo. Por tanto, cada tensor tiene $M^N$ valores reales, que deberemos aprender. Esto supone un reto, lo que \textbf{motiva uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje de los tensores de coeficientes sea más factible.
+Como ya sabemos, como $\mathcal{A} \in \espaciotensores{N}{M}$, tenemos que optimizar el valor de $M^N$ valores reales a través del proceso de aprendizaje. Esto supone un reto, que \textbf{motiva el uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje del tensor de coeficientes sea más factible.
+\todo{Tengo que comentar en la introducción que el número de elementos de un tensor N, M es M elevado a N}
 
+% TODO -- me quedo aqui
 \section{Modelo CP}
 
 Como ya hemos comentado en \customref{sec:repr_funciones_puntuacion}, buscaremos descomponer el tensor de coeficientes $\mathcal{A}^y$ en la ecuación \eqref{eq:puntuacion_general}, para que el aprendizaje de sus coeficientes sea computacionalmente factible.
