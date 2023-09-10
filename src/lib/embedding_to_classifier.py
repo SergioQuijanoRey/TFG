@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 
-import core
+import src.lib.core as core
 
 # TODO -- trasnlate documentation to english
 class EmbeddingToClassifier:
@@ -163,6 +163,7 @@ class EmbeddingToClassifier:
         # Solo hacemos este plot cuando la dimension del
         # embedding es 2
         if self.embedding_dimension != 2:
+            print(f"Skipping the scatter plot, as we have {self.embedding_dimension} dimensions")
             return
 
         # Tomamos los datos en el formato adecuado para hacer el plot

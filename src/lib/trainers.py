@@ -2,21 +2,24 @@
 Code for different types of training
 """
 
+
+import logging
+import os
+from typing import List, Dict, Union
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import wandb
 from torch.utils.data import DataLoader
 
-import os
+import src.lib.filesystem as filesystem
+import src.lib.utils as utils
+from src.lib.core import get_device, get_datetime_str
+from src.lib.train_loggers import TrainLogger, SilentLogger
 
-import filesystem
-from train_loggers import TrainLogger, SilentLogger
-from core import get_device, get_datetime_str
 
-import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
-
-import wandb
 
 def train_model_offline(
     net: nn.Module,
@@ -145,21 +148,18 @@ def train_model_offline(
     # Return the training hist
     return training_history
 
-# TODO -- BUG -- this takes too long to train
-#                I think it's because of the metrics we compute to log info in the middle of the
-#                training
-# TODO -- also all the infrastructure around training, metrics, loggers is very complex and not
-#         easy to use
 def train_model_online(
     net: nn.Module,
     path: str,
     parameters: dict,
     train_loader: DataLoader,
-    validation_loader: DataLoader = None,
+    validation_loader: DataLoader,
+    logger: TrainLogger,
     name: str = "Model",
-    logger: TrainLogger = None,
-    snapshot_iterations: int = None
-) -> dict:
+    snapshot_iterations: Union[int, None] = None,
+    gradient_clipping: Union[float, None] = None,
+    fail_fast: bool = False,
+) -> Dict[str, List[float]]:
     """
     Trains and saves a neural net
 
@@ -178,9 +178,14 @@ def train_model_online(
                        This MUST NOT be in the form of triplets: (anchor, positive, negative)
     name: name of the model, in order to save it
     train_logger: to log data about trainning process
-                  Default logger is silent logger
+                  A `SilentLogger` can always be used
     snapshot_iterations: at how many iterations we want to take an snapshot of the model
                          If its None, no snapshots are taken
+    gradient_clipping: if its None, no gradient clipping is performed
+                       if its a Float value, we clip the gradients to that value
+    fail_fast: if it's True, when something goes wrong, it raises an exception
+               as soon as possible. List of things that can go wrong:
+                1. Running loss is NaN
     """
 
     # Get parameters from the dic parameter
@@ -195,19 +200,12 @@ def train_model_online(
     device = get_device()
     net.to(device)
 
-    # Check if no logger is given
-    if logger is None:
-        print("==> No logger given, using Silent Logger")
-        logger = SilentLogger()
-
     # Printing where we're training
     print(f"==> Training on device {device}")
     print("")
 
-    # Dict where we are going to save the training history
+    # Dict where we are going to save the values of the metrics returned by the logger
     training_history = dict()
-    training_history["loss"] = []
-    training_history["val_loss"] = []
 
     # For controlling the logging
     # Loggers need to know how many single elements we have seen
@@ -241,15 +239,45 @@ def train_model_online(
             file_logger.debug(f"Obtained running loss at {i} iteration of epoch {epoch} is {loss}")
 
             # Backward + Optimize
+            # Clip the gradient if that is specified
+            # Gradient Clipping is performed after backward and before step
             loss.backward()
+
+            if gradient_clipping is not None:
+                torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm = gradient_clipping)
+
             optimizer.step()
 
             # Update the number counter for seen elements
             how_may_elements_seen += len(labels)
             epoch_iteration += len(labels)
 
-            file_logger.debug(f"In iteration {i} of epoch {epoch} {len(labels)} elements have been seen")
+            # Log the running loss
+            file_logger.debug(f"In iteration {i} of epoch {epoch}, {len(labels)} elements have been seen")
             wandb.log({"Running loss": loss})
+
+            # If running loss is NaN, and caller specified to fail fast, raise
+            # an informative exception
+            if fail_fast is True and torch.isnan(loss):
+                msg = "Failing fast because obtained loss is NaN"
+
+                file_logger.error(msg)
+                raise Exception(msg)
+
+            # Log the norm of the embeddings. Start by computing the norm of
+            # each embedding in the batch
+            embeddings_norm = utils.norm_of_each_row(outputs)
+
+            # We have a list of norms, of len the used batch size. Compute some
+            # stats and log them
+            norm_metrics = {
+                "Embeddings norm, min": torch.min(embeddings_norm),
+                "Embeddings norm, max": torch.max(embeddings_norm),
+                "Embeddings norm, mean": torch.mean(embeddings_norm),
+                "Embeddings norm, std": torch.std(embeddings_norm, unbiased = False),
+            }
+            wandb.log(norm_metrics)
+            file_logger.debug(f"In iteration {i} of epoch {epoch}, embedding norms have the following metrics:\n{norm_metrics}")
 
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):
@@ -257,16 +285,23 @@ def train_model_online(
                 file_logger.info("Started logging loss information")
 
                 # Log and return loss from training and validation
-                training_loss, validation_loss = logger.log_process(
+                logger_metrics = logger.log_process(
                     train_loader,
                     validation_loader,
                     epoch,
                     epoch_iteration
                 )
 
-                # Save loss of training and validation sets
-                training_history["loss"].append(training_loss)
-                training_history["val_loss"].append(validation_loss)
+                # Save the metrics returned by the logger
+                for metric_key, metric_value in logger_metrics.items():
+
+                    # Check if this is the first time we access this metric
+                    # In that case, create at this key a list with that element
+                    if training_history.get(metric_key) is None:
+                        training_history[metric_key] = [metric_value]
+
+                    # Oterwise, append to the existing list
+                    training_history[metric_key].append(metric_value)
 
             else:
                 print(f"[{epoch} / {epoch_iteration}]")
@@ -283,7 +318,6 @@ def train_model_online(
 
     print("Finished training")
     file_logger.info("Finished training")
-
 
     # Save the model -- use name + date stamp to save the model
     file_logger.info("Saving the trained model in disk")

@@ -4,7 +4,9 @@ Module for displaying visualizations that are not included in tensorboard
 
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Tuple, List
+from typing import Tuple, List, Optional
+from collections import Counter
+import torch
 
 def is_black_and_white(img: np.ndarray) -> bool:
     """Checks if a given image is in color or in black & white format"""
@@ -38,6 +40,7 @@ def show_img(img: np.ndarray, color_format_range = (0, 255)):
     # This is specially useful when working in Jupyter Notebooks
     plt.show()
 
+# TODO -- DOCS -- spanish documentation!
 def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = (0, 255), columns: int = 4, figsize: Tuple[int, int] = None):
     """
     Shows multiple images in one figure, using rows & cols layout
@@ -70,7 +73,7 @@ def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = 
         # Añado la imagen a la posicion especificada
         # Tenemos que cambiar los canales si la imagen es tricolor, pues
         # estamos usando formato cv2 BGR
-        if is_black_and_white(img) == True:
+        if is_black_and_white(img) is True:
             plt.imshow(img)
         else:
             plt.imshow(img[:,:,::-1])
@@ -82,6 +85,7 @@ def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = 
     # Mostramos la composicion y espero en caso de estar en local
     plt.show()
 
+# TODO -- DOCS -- spanish documentation!
 def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[str], columns: int = 4, figsize: Tuple[int, int] = None):
     """
     Muestra varias imagenes con sus respectivos titulos en una misma ventana
@@ -128,7 +132,7 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
         # Añado la imagen a la posicion especificada
         # Tenemos que cambiar los canales si la imagen es tricolor, pues
         # estamos usando formato cv2 BGR
-        if is_black_and_white(img) == True:
+        if is_black_and_white(img) is True:
             plt.imshow(img)
         else:
             plt.imshow(img[:,:,::-1])
@@ -139,3 +143,132 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
 
     # Mostramos la composicion y espero en caso de estar en local
     plt.show()
+
+
+# TODO -- document that this is a special function for `show_images_with_titles_same_window`
+# in case we are using PIL images!
+def PIL_show_images_with_titles_same_window(images: List[np.ndarray], titles: List[str], columns: int = 4, figsize: Tuple[int, int] = None):
+    """
+    Muestra varias imagenes con sus respectivos titulos en una misma ventana
+
+    Inspirado en
+        https://stackoverflow.com/questions/46615554/how-to-display-multiple-images-in-one-figure-correctly/46616645
+    En ese enlace, se generan un numero fijado de imagenes. En mi caso, añado
+    la funcionalidad de fijar el numero de columnas y variar el numero de filas
+    segun la cantidad de imagenes que pasemos en la lista
+
+    Tuve un problema con un espaciado demasiado grande entre columnas, que resolvi gracias a:
+        https://stackoverflow.com/a/41011910
+
+
+    @param images: lista de imagenes que queremos representar
+    @param titles: titulos respectivos de las imagenes que queremos representar
+                   Debe tener el mismo tamaño que la lista de imagenes
+    @param figsize: tamaño de cada imagen. Si no se especifica (None) se da un
+                    valor por defecto
+    """
+
+    # Comprobacion de seguridad
+    if len(images) != len(titles):
+        err_msg = "La lista de imagenes debe tener el mismo tamaño que la lista de titulos\n"
+        err_msg += f"{len(images)} imagenes, {len(titles)} titulos"
+        raise Exception(err_msg)
+
+    # Tamaño de cada imagen que mostramos en el mosaico
+    # Si no se pasa por parametro el valor, tomamos un figsize por defecto
+    if figsize is None: figsize = (15, 15)
+    fig = plt.figure(figsize=figsize)
+
+    # Calculamos el numero de filas necesarias para nuestras imagenes que depende
+    # de la cantidad de imagenes que tengamos y del numero de columnas establecido
+    rows = len(images) // columns + 1
+
+    # Recorro las imagenes junto con los titulos y las voy colocando en el mosaico
+    for index, (img, title) in enumerate(zip(images, titles)):
+        # Añado el subplot del mosaico para esta imagen concreta en
+        # la posicion que le corresponde
+        # Ademas le estamos pasando los titulos dados por parametro
+        fig.add_subplot(rows, columns, index + 1, title = title)
+
+        # Añado la imagen a la posicion especificada
+        # Tenemos que cambiar los canales si la imagen es tricolor, pues
+        # estamos usando formato cv2 BGR
+        plt.imshow(img)
+
+    # Para el espaciado entre filas
+    # Esta es la orden que menciono en el enlace al problema con el espaciado
+    plt.subplots_adjust(top = 0.5, bottom=0.2, hspace=0.5, wspace=0.5)
+
+    # Mostramos la composicion y espero en caso de estar en local
+    plt.show()
+
+
+def plot_how_many_images_per_class(dataset: torch.utils.data.Dataset, cut: int, fig_size: (int, int) = (15, 15)):
+    """
+    Bar plot, where we show how many classes have certain number of images
+
+    This is useful to see, for example, how many classes have less than K images associated, and
+    thus, are going to be problematic in P-K sampling
+
+    Using this function I've seen that most of the LFW classes have only one image associated
+
+    @param dataset: the dataset that we're exploring
+    @param cut: where we want to stop plotting
+           i.e. if cut is 30, classes that have more or equal than 30 images
+           associated are not represented in the plot
+    """
+
+    # First we count how many images has each class
+    how_many_images_per_class = Counter(dataset.targets)
+
+    # Now we count how many classes have certain count
+    # For example, how many classes have count of 1 image, of 2 images, ...
+    how_many_clases_have_certain_count = Counter(how_many_images_per_class.values())
+
+    # Get labels and values for the plot
+    # Note that we're sorting the labels, because the labels indicate number
+    # of images per class and we want that in increasing order
+    labels, values = zip(*sorted(how_many_clases_have_certain_count.items()))
+
+    # Filter using the cut value
+    labels, values = labels[:cut], values[:cut]
+
+    # Plot the distribution
+    indexes = np.arange(len(labels))
+    width = 3
+
+    plt.figure(figsize=fig_size)
+    plt.bar(indexes, values, width)
+    plt.xticks(indexes + width * 0.5, labels)
+    plt.xlabel("Images per class")
+    plt.ylabel("Number of classes having that number of images")
+    plt.show()
+
+# TODO -- lacks documentation!
+def plot_histogram(
+    values: List[float],
+    num_bins: int,
+    title: str,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+    figsize: Tuple[int, int] = (8, 6)
+):
+
+    # Make plots bigger
+    plt.figure(figsize = figsize, dpi = 80)
+
+    # Get the data needed for the plot
+    counts, bins = np.histogram(values, bins = num_bins)
+
+    # Set the plotting data
+    plt.hist(bins[:-1], bins, weights = counts)
+
+    # Set the title of the plot
+    plt.title(title)
+
+    # Set labels for the axis if given as parameters
+    if xlabel is not None: plt.xlabel(xlabel)
+    if ylabel is not None: plt.ylabel(ylabel)
+
+    # And finally show the plot
+    plt.plot()

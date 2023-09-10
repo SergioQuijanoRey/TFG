@@ -1,19 +1,19 @@
-# Github action for installing dependencies using conda enviroment dump, and
-# running unit tests
-
-name: Install dependencies and run unit tests using conda enviroment dump
+# Github action for installing depende0cies using conda dump, and running
+# some notebooks so we are sure that they still run even though we make changes
+# in the `.py` code
+name: Install dependencies and run some notebooks
 
 on:
   push:
     branches: [ "*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "*" ]
 
 permissions:
   contents: read
 
 jobs:
-  unit_tests:
+  run_some_notebooks:
 
     runs-on: ubuntu-latest
 
@@ -32,6 +32,6 @@ jobs:
         environment-file: enviroment.yml
         auto-activate-base: false
 
-    - name: Test with unitttest module
+    - name: Run certain notebooks
       run: |
-        conda run python -m unittest src/test/*.py
+        jupyter nbconvert --execute "src/FG-Net Notebook.ipynb" --to "notebook"
