@@ -3,6 +3,8 @@
 
 \chapter{Herramientas matemáticas fundamentales} \label{ch:matematicas_fundamentales}
 
+En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas y no aportan nada nuevo al estudio que hacemos sobre las redes neuronales, por lo que el lector puede pasar directamente a \customref{ch:modelizacion}
+
 \section{Tensores}
 
 \subsection{Notación}
@@ -10,20 +12,20 @@
 % TODO -- en la pagina 23 se añade una notacion que parece ser muy comoda
 % TODO -- Tau_{N, M} el espacio euclídeo de los tensores con entradas reales, orden N y dimensión M en todos los modos
 
-Seguiremos en parte la notación del trabajo principal \cite{matematicas:principal}, aunque introducimos pequeños cambios.
+Seguiremos en parte la notación del \textit{paper} de referencia \cite{matematicas:principal}, aunque introducimos varios cambios por claridad, para no confundir en las fórmulas escalares, vectores y tensores.
 
-Denotaremos a los vectores con tipografía en negrita, tal que $\mathbf{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $v_i$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$.
+Denotaremos a los vectores con flechas sobre las letras que los identifican, tal que $\nv{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $\nv{v_i}$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$.
 
 Para denotar a los tensores (que introduciremos más adelante), usaremos la tipografía caligráfica. Por ejemplo $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor (más adelante, en \customref{sec:deftensor}, veremos que significa esto) serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
 
-Al espacio de matrices de dimensiones $p, q$ lo denotaremos, como es usual, como $\matrices{p}{q}$.
+Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo (de nuevo, \customref{sec:deftensor}) lo denotaremos por $\espaciotensores{N}{M}$. Al espacio de matrices de dimensiones $p, q$ lo denotaremos, como es usual, como $\espaciomatrices{p}{q}$.
 
-Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\mathbf{v}_1, \ldots, \mathbf{v}_N$, denotaremos su producto tensorial $\mathbf{v}_1 \otimes \ldots \otimes {v}_N$ como $\otimes_{i = 1}^N \mathbf{v}_i$.
+Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\nv{v_1}, \ldots, \nv{v_N} \in \R^{M_1}, \ldots, \R^{M_N}$, denotaremos su producto tensorial $\nv{v_1} \otimes \ldots \otimes \nv{v_N}$ como $\otimes_{i = 1}^N \nv{v_i}$.
 
 Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
 
-% TODO -- tengo que referenciar o bien los videos que he seguido o un texto que haga un desarollo similar
 \subsection{Definición del producto tensorial} \label{sec:deftensor}
+\todo{Tengo que referenciar algún recurso sobre esto. Yo lo he visto a partir de unos vídeos}
 
 Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa. Especificaremos esto en \customref{sec:cociente_prod_formal}
 
@@ -31,8 +33,6 @@ Para la construcción del producto tensorial de espacios vectoriales, necesitare
 
 \subsubsection{Producto formal de dos espacios vectoriales}
 
-% TODO -- la notacion span es americana, buscar la española en los apuntes de
-% geometria I
 \begin{definicion}[Producto formal de dos espacios vectoriales]
     Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales reales. Se define su \textbf{producto formal} como:
 
@@ -50,12 +50,14 @@ Para la construcción del producto tensorial de espacios vectoriales, necesitare
 \end{definicion}
 
 Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar tomando combinaciones lineales finitas, $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial.
+\todo{Realmente no sé si esto es claro, por culpa de estar usando $*$, pero seguramente sea directo comprobarlo}
 
 Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
 
 \begin{ejemplo} \label{ej:prod_formal}
+\todo{No sé si estos ejemplos sobran del documento al ser muy simples. Los he introducido porque los usé al principio para entender mejor los tensores, pero ahora no sé si tiene sentido dejar esto aquí}
 
-Sea $\Omega := R^2 \ast R^3$. Entonces tenemos que:
+Sea $\Omega := \R^2 \ast \R^3$. Entonces tenemos que:
 
 \begin{equation}
     \Omega = span \{
@@ -91,50 +93,54 @@ Por cómo hemos definido el producto formal de dos espacios vectoriales, tenemos
 Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que ciertas propiedades deseables no se cumplen, en general, en el producto formal:
 
 \begin{enumerate}
-    \item $c [v \ast w] = (cv) \ast w$
-    \item $c[v \ast w] = v \ast (cw)$
-    \item $(v_1 + v_2) \ast w = v_1 \ast w + v_2 \ast w$
-    \item $v \ast (w_1 + w_2) = v \ast w_1 + v \ast w_2$
+    \item $c [\nv{v} \ast \nv{w}] = (c\nv{v}) \ast \nv{w}$
+    \item $c[\nv{v} \ast \nv{w}] = \nv{v} \ast (c\nv{w})$
+    \item $(\nv{v_1} + \nv{v_2}) \ast \nv{w} = \nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}$
+    \item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$
 
-    Donde estamos tomando $v, v_1, v_2 \in \mathbb{V}, w, w_1, w_2 \in \mathbb{W}$
+Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$
 \end{enumerate}
 
-Estas igualdades representan las propiedades que queremos que se cumplan, para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan una especie de asociatividad, mientras que 3 y 4 nos da la propiedad distributiva.
+Estas igualdades representan las propiedades que queremos que se cumplan, para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan una especie de asociatividad, mientras que 3 y 4 nos dan la propiedad distributiva.
 
 Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir estas propiedades. Para ello definimos:
 
 \begin{equation}
 \begin{split}
     I := span\{& \\
-               & (cv) \ast w - c(v \ast w), \\
-               & v \ast (cw) - c(v \ast w), \\
-               & (v_1 + v_2) \ast w - (v_1 \ast w + v_2 \ast w), \\
-               & v \ast (w_1 + w_2) - (v \ast w_1 + v \ast w_2), \\
+               & (c\nv{v}) \ast \nv{w} - c(\nv{v} \ast \nv{w}), \\
+               & \nv{v} \ast (c\nv{w}) - c(\nv{v} \ast \nv{w}), \\
+               & (\nv{v_1} + \nv{v_2}) \ast \nv{w} - (\nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}), \\
+               & \nv{v} \ast (\nv{w_1} + \nv{w_2}) - (\nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}): \\
+               & \\
+               & \nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}; \dspace \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}; \dspace c \in \R \\
 \}&
 \end{split}
 \end{equation}
 
+que claramente también es un espacio vectorial.
+
 Con esto, ya podemos definir el producto tensorial:
 
 \begin{definicion}[Producto tensorial]
-    Dados dos espacios vectoriales $\mathbb{V}, \mathbb{W}$, se define su \textbf{producto tensorial} como:
+    Dados dos espacios vectoriales $\mathbb{V}, \mathbb{W}$, se define su \textbf{producto tensorial} $\mathbb{V} \otimes \mathbb{W}$ como:
 
     $$\mathbb{V} \otimes \mathbb{W} := (\mathbb{V} \ast \mathbb{W}) / I$$
 
-    con lo que dados $v \in \mathbb{V}, w \in \mathbb{W}$, tenemos que
+    con lo que dados $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$, tenemos que
 
-    $$v \otimes w = v \ast w + I$$
+    $$\nv{v} \otimes \nv{w} = \nv{v} \ast \nv{w} + I$$
 \end{definicion}
 
 A partir de esta definición, son directas las siguientes propiedades:
 
 % TODO -- creo que falta la distributividad respecto (v1 * v2) * w
 \begin{proposicion} \label{prop:tensores_propiedades}
-    Sean $v, v_1, v_2 \in \mathbb{V}, w \in \mathbb{W}, \lambda \in \R$, entonces son ciertas:
+    Sean $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w} \in \mathbb{W}, \lambda \in \R$, entonces son ciertas:
     \begin{enumerate}
-        \item $\lambda [v \otimes w] = (\lambda v) \otimes w$
-        \item $\lambda [v \otimes w] = v \otimes (\lambda w)$
-        \item $v \otimes (w_1 + w_2) = v \otimes w_1 + v \otimes w_2$
+        \item $\lambda [\nv{v} \otimes \nv{w}] = (\lambda \nv{v}) \otimes \nv{w}$
+        \item $\lambda [\nv{v} \otimes \nv{w}] = \nv{v} \otimes (\lambda \nv{w})$
+        \item $\nv{v} \otimes (\nv{w_1} + \nv{w_2}) = \nv{v} \otimes \nv{w_1} + \nv{v} \otimes \nv{w_2}$
     \end{enumerate}
 \end{proposicion}
 
@@ -143,18 +149,18 @@ A partir de esta definición, son directas las siguientes propiedades:
 
     \begin{equation}
     \begin{split}
-        (cv) \otimes w &\eqtext{def} (cv) \ast w + I = \ldots \ \text{usando que} \quad a + I = a + i + I, \quad \forall i \in I \\
-        \ldots &= (cv) \ast w + (c(v \ast w) - cv \ast w) + I = \ldots \\
-        \ldots &= \cancel{(cv) \ast w} + c(v \ast w) - \cancel{cv \ast w} + I = \ldots \\
-        \ldots &= c(v \ast w) + I = c (v \otimes w) \\
+        (c\nv{v}) \otimes \nv{w} &\eqtext{def} (c\nv{v}) \ast \nv{w} + I = \ldots \ \text{usando que} \quad \nv{a} + I = \nv{a} + \nv{i} + I, \quad \forall \nv{i} \in I \\
+        \ldots &= (c\nv{v}) \ast \nv{w} + (c(\nv{v} \ast \nv{w}) - c\nv{v} \ast \nv{w}) + I = \ldots \\
+        \ldots &= \cancel{(c\nv{v}) \ast \nv{w}} + c(\nv{v} \ast \nv{w}) - \cancel{c\nv{v} \ast \nv{w}} + I = \ldots \\
+        \ldots &= c(\nv{v} \ast \nv{w}) + I = c (\nv{v} \otimes \nv{w}) \\
     \end{split}
     \end{equation}
 
     $\customqed$
     $\newline$
-    2. TODO
+    2. \todo{Escribir esta demostración o decir que es muy parecida}
     $\newline$
-    3. TODO
+    3. \todo{Escribir esta demostración o decir que es muy parecida}
 \end{proof}
 
 También sabemos que por ser $\mathbb{V} \ast \mathbb{W}$ un espacio vectorial, y al definir el producto tensorial como un cociente, $\mathbb{V} \otimes \mathbb{W}$ es también un espacio vectorial.
@@ -356,7 +362,7 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
     \end{split}
     \end{equation}
 
-    De nuevo, sabemos que $\R^2 \otimes \R^2 \cong \R^4$. La expresión anterior, sin embargo, nos invita a considerar el espacio $\Omega$ como $\R^2 \otimes \R^2 \cong \R^4 \cong \matrices{2}{2}$, con lo que con un adecuado isomorfismo, podemos expresar:
+    De nuevo, sabemos que $\R^2 \otimes \R^2 \cong \R^4$. La expresión anterior, sin embargo, nos invita a considerar el espacio $\Omega$ como $\R^2 \otimes \R^2 \cong \R^4 \cong \espaciomatrices{2}{2}$, con lo que con un adecuado isomorfismo, podemos expresar:
 
     $$\gamma = \begin{bmatrix}
         \lambda_{11} & \lambda_{12} \\
@@ -472,7 +478,7 @@ Como ya se ha comentado en \customref{ch:introduccion}, las descomposiciones ten
 \begin{proposicion}[Producto tensorial de dos vectores]
     Sean $\mathbf{v} \in R^{N}, \mathbf{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
 
-    $$\mathbf{v} \otimes \mathbf{w} = \mathbf{v} \mathbf{w}^T \in \matrices{N}{M}$$
+    $$\mathbf{v} \otimes \mathbf{w} = \mathbf{v} \mathbf{w}^T \in \espaciomatrices{N}{M}$$
 
     Además, esta matriz es de rango uno.
 \end{proposicion}
