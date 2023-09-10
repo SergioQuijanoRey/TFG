@@ -1,6 +1,5 @@
-% DEFINICIÓN DE COMANDOS Y ENTORNOS
-
-% CONJUNTOS DE NÚMEROS
+% == Comandos de la plantilla ==
+% ==============================================================================
 
 \newcommand{\N}{\mathbb{N}}     % Naturales
 \newcommand{\R}{\mathbb{R}}     % Reales
@@ -24,7 +23,8 @@
 \theoremstyle{remark}
 \newtheorem{observacion}{Observación}[chapter]
 
-% MIS COMANDOS (Sergio Quijano)
+% == Mis comandos propios ==
+% ==============================================================================
 
 % Comando que uso para expresar el conjunto {1, ..., n}
 \newcommand{\deltaset}[1]{\Delta_{#1}}
@@ -33,7 +33,10 @@
 \newcommand{\customref}[1]{''\ref{#1}, \nameref{#1}"}
 
 % Espacio de matrices pxq
-\newcommand{\matrices}[2]{\mathbb{M}_{#1 \times #2}}
+\newcommand{\espaciomatrices}[2]{\mathbb{M}_{#1 \times #2}}
+
+% Espacio de tensores de orden N, #1 y de dimension M, #2 en cada modo
+\newcommand{\espaciotensores}[2]{\mathcal{T}_{#1, #2}}
 
 % Un mejor simbolo para QED
 % Hago el renew para que \begin{proof} \end{proof} muestre este simbolo como a mi me gusta
@@ -66,3 +69,12 @@
 % Espacio de tensores de orden N (#1) y dimension M (#2) en cada modo
 \DeclareMathOperator*{\MediumOtimes}{\text{\raisebox{0.25ex}{\scalebox{0.8}{$\bigotimes$}}}}
 \newcommand{\esptensores}[2]{\overset{#1} \MediumOtimes \R^{#2}}
+
+% Notacion para los vectores
+% En el paper usan negrita, pero yo quiero usar una flechita encima
+% Con este comand, si luego quiero cambiar la notación para los vectores (ie. volver
+% a usar la notacion del paper) el cambio es sencillo
+%
+% NOTE: para poder usarse tiene que estar en un bloque de matematicas, por ejemplo:
+% `$\nv{x}$`
+\newcommand{\nv}[1]{\overrightarrow{#1}}
