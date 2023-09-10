@@ -6,7 +6,7 @@ texfile := "./libro.tex"
 trash := "trash"
 
 # PDF program
-pdf_program := "evince"
+pdf_program := "zathura"
 
 # Shows all recepies available in this justfile
 default:
