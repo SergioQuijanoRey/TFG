@@ -113,3 +113,34 @@ Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sa
 \begin{observacion}
     Esta proposición nos sirve para tener una cota superior del número de sumandos necesarios para realizar la descomposición. No hemos ganado nada respecto al trabajo previo. Seguimos teniendo el problema de considerar $M^N$ elementos, problema que ya vimos en \customref{sec:justificacion_func_repr}
 \end{observacion}
+
+Veamos ahora cómo podemos aplicar esta descomposición conjunta en nuestra ecuación \customref{eq:puntuacion_general}. Partimos de las dos ecuaciones:
+
+\begin{equation}
+\begin{split}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) \\
+    \mathcal{A}^y &= \sum_{z = 1}^Z a_z^y \cdot \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}} \\
+\end{split}
+\end{equation}
+
+Ahora, sustituimos la segunda ecuación en la primera:
+
+\begin{equation}
+\begin{split}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, \ldots, d_N = 1}^{M} (\sum_{z = 1}^Z a_z^y \cdot \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}}) \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
+    \ldots &=  \sum_{z = 1}^Z \dspace \sum_{d_1, \ldots, d_N = 1}^{M} a_z^y \cdot \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
+    \ldots &=  \sum_{z = 1}^Z a_z^y \sum_{d_1, \ldots, d_N = 1}^{M} \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
+    \ldots &=  \sum_{z = 1}^Z a_z^y \sum_{d_1, \ldots, d_N = 1}^{M} \dspace \prod_{i = 1}^N \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}} \cdot f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
+    \ldots &=  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d_1, \ldots, d_N = 1}^{M}  \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}} \cdot f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
+    \ldots &=  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})
+\end{split}
+\end{equation}
+\todo{Tengo que desarrollar en papel bien este desarrollo que no tengo nada claro. El último paso no lo tengo controlado. Es la eq. (3) del paper de referencia}
+
+Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
+
+\begin{equation}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})
+\end{equation}
+
+\section{Modelo HT}
