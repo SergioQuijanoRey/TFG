@@ -591,17 +591,36 @@ Estamos ya en condiciones de introducir nuestra primera descomposición tensoria
     Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros, es decir:
 
     \begin{equation} \label{eq:cp_decomp}
-        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i}^{(1)} \otimes \ldots \nv{v_i}^{(N)},
-        \dspace \nv{v_i}^{(k)} \in,\R^{M_k}, \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
+        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \ldots \nv{v_i^{(N)}}; \qquad
+        \dspace \nv{v_i^{(k)}} \in,\R^{M_k}, \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
     \end{equation}
 \end{proposicion}
 
 A la descomposición anterior se le llama \textbf{descomposición \textit{CANDECOMP/PARAFAC}}, o abreviadamente, \textbf{descomposición \textit{CP}}
 
+\begin{observacion}
+    Esto descomposición es equivalente a:
+
+    \begin{equation} \label{eq:cp_decomp}
+        \mathcal{A} = \sum_{i = 1}^Z \lambda_i \cdot \nv{v_i^{(1)}} \otimes \ldots \nv{v_i^{(N)}}; \qquad
+        \dspace \nv{v_i^{(k)}} \in \R^{M_k}, \lambda_i \in \R \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
+    \end{equation}
+
+    Puesto que podemos considerar:
+
+    \begin{equation}
+        \nv{w_i^{(1)}} := \lambda_i \cdot \nv{v_i^{(1)}} \in \R^{M_1}
+    \end{equation}
+
+    y, usando de nuevo las propiedades del producto tensorial:
+
+    \begin{equation}
+        \lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}}
+    \end{equation}
+\end{observacion}
+
 \begin{proof}
-
-\todo{Hay que demostrarlo. Está más adelante en mis notas}
-
+    \todo{Hacer esta demostración. Más adelante hacemos otra en el que vemos que podemos hacerlo con $M^N$ sumandos. Pero ahí usamos $\espaciotensores{N}{M}$, aquí las dimensiones varían!}
 \end{proof}
 
 \begin{observacion}
