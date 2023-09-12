@@ -139,8 +139,54 @@ Ahora, sustituimos la segunda ecuación en la primera:
 
 Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
 
-\begin{equation}
+\begin{equation} \label{eq:cp_model}
     h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})
 \end{equation}
+
+Veamos cómo esta ecuación se relaciona con un modelo usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en \customref{sec:repr_funciones_puntuacion}, el primer paso de nuestro modelo puede considerarse computar la capa de representación, esto es, los valores
+
+$$\{f_{\theta_d}(\nv{x_i}) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
+
+Una vez hecho esto, en \eqref{eq:cp_model} podemos ver $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $d$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
+
+\begin{equation}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i)
+\end{equation}
+
+Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado.
+
+Escrito así, también es claro que el productorio está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps}. Es un \textit{pooling} de tipo producto que nos devuelve un escalar. De nuevo, re-escribimos la ecuación:
+
+\begin{equation}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace ProdPooling( Conv(i) )
+\end{equation}
+
+Y con esto, vemos que la sumatoria final está combinando los escalares producidos por la convolución seguida del \textit{pooling} de forma lineal. Esto es, una \textit{linear dense layer} sobre dichos $Z$ escalares.
+
+En resumen, tras computar la capa de representación, nuestro modelo tiene una capa oculta sobre la que aplicamos \textit{pooling}, que combinamos en una capa densa. Y por tanto, es razonable considerar este modelo con lo que se conoce comúnmente como una \textbf{red \textit{shallow}}.
+
+Podemos representar este modelo gráficamente como sigue:
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    squarenode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
+]
+    \node [squarenode] (entrada) {\textbf{Datos de entrada}\\ \\ $X = (\nv{x_1}, \ldots, \nv{x_N})$};
+    \node [squarenode]  (repr) [right=2.5cm of entrada] {\textbf{Capa de representación}\\ \\ $f_{\theta_d}(\nv{x_i})$};
+    \node [squarenode] (convoluciones) [below=2.5cm of repr] {\textbf{\textit{Feature maps}}\\ \\ $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$};
+    \node [squarenode] (pooling) [left=2.5cm of convoluciones] {\textbf{Escalares tras el pooling}\\ \\ $\prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$};
+    \node [squarenode] (denselayer) [below=2.5cm of pooling] {\textbf{Resultado tras dense Layer}\\ \\$h_y(\nv{x_1}, \ldots, \nv{x_N})$};
+
+    \draw[-stealth] (entrada.east) -- node[text width=2.0cm,midway,above,align=center]{$f_d$} (repr.west);
+    \draw[-stealth] (repr.south) -- node[text width=2.0cm,midway,right,align=center]{Convoluciones $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot $} (convoluciones.north);
+    \draw[-stealth] (convoluciones.west) -- node[text width=2.0cm,midway,above,align=center]{Pooling $\prod_{i = 1}^N$} (pooling.east);
+    \draw[-stealth] (pooling.south) -- node[text width=2.0cm,midway,right,align=center]{Dense layer $\sum_{z = 1}^Z a_z^y$} (denselayer.north);
+\end{tikzpicture}
+\caption{Representación gráfica del modelo \textit{CP}}
+\end{figure}
+
+
+
 
 \section{Modelo HT}
