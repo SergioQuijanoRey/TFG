@@ -173,20 +173,28 @@ Podemos representar este modelo gráficamente como sigue:
     squarenode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
 ]
     \node [squarenode] (entrada) {\textbf{Datos de entrada}\\ \\ $X = (\nv{x_1}, \ldots, \nv{x_N})$};
-    \node [squarenode]  (repr) [right=2.5cm of entrada] {\textbf{Capa de representación}\\ \\ $f_{\theta_d}(\nv{x_i})$};
-    \node [squarenode] (convoluciones) [below=2.5cm of repr] {\textbf{\textit{Feature maps}}\\ \\ $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$};
-    \node [squarenode] (pooling) [left=2.5cm of convoluciones] {\textbf{Escalares tras el pooling}\\ \\ $\prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$};
-    \node [squarenode] (denselayer) [below=2.5cm of pooling] {\textbf{Resultado tras dense Layer}\\ \\$h_y(\nv{x_1}, \ldots, \nv{x_N})$};
+    \node [squarenode]  (repr) [right=2.0cm of entrada] {\textbf{Capa de representación}\\ \\ $f_{\theta_d}(\nv{x_i})$};
+    \node [squarenode] (convoluciones) [below=2.0cm of repr] {\textbf{\textit{Feature maps}}\\ \\ $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$};
+    \node [squarenode] (pooling) [left=2.0cm of convoluciones] {\textbf{$Z$ Escalares tras el pooling}\\ \\ $\prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$};
+    \node [squarenode] (denselayer) [below=2.0cm of pooling] {\textbf{Puntuación para la etiqueta $y$} \\ \\$h_y(\nv{x_1}, \ldots, \nv{x_N})$};
 
     \draw[-stealth] (entrada.east) -- node[text width=2.0cm,midway,above,align=center]{$f_d$} (repr.west);
     \draw[-stealth] (repr.south) -- node[text width=2.0cm,midway,right,align=center]{Convoluciones $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot $} (convoluciones.north);
     \draw[-stealth] (convoluciones.west) -- node[text width=2.0cm,midway,above,align=center]{Pooling $\prod_{i = 1}^N$} (pooling.east);
     \draw[-stealth] (pooling.south) -- node[text width=2.0cm,midway,right,align=center]{Dense layer $\sum_{z = 1}^Z a_z^y$} (denselayer.north);
+
 \end{tikzpicture}
 \caption{Representación gráfica del modelo \textit{CP}}
 \end{figure}
 
+\begin{observacion}
+    Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización. De esta forma, una convolución detecta los mismos patrones independientemente de donde se encuentren estos situados en la imagen.
 
+    Esta variación de coeficientes dependiendo de la localización vienen dada por la dependencia en $i$ de $\sum_{d = 1}^M \omega_d^{z ,i}$.
 
+    Por tanto, para forzar el deseado \textit{coefficient sharing} basta con imponer en nuestro modelo que $w_d^{z, i} = w_d^{z, i'}; \dspace \forall i, i' \in \deltaset{N}$.
+\end{observacion}
+
+\todo{Más tarde, en la sección 3.3 del paper de referencia, se habla más en profundidad de esto}
 
 \section{Modelo HT}
