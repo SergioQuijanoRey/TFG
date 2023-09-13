@@ -1,6 +1,6 @@
 \chapter{Modelización de la tarea de aprendizaje} \label{ch:tarea_aprendizaje}
 
-\section{Planteamiento del problema}
+\section{Planteamiento del problema} \label{seq:planteamiento_problema}
 
 La tarea de aprendizaje que consideramos es la de clasificación. Durante todo el desarrollo, pensaremos en la \textbf{clasificación de imágenes}. En este caso, el enfoque que más éxito ha tenido históricamente es el uso de redes convolucionales profundas y, más actualmente, el uso del modelo \entrecomillado{transformer}.
 
@@ -8,7 +8,7 @@ Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ 
 
 Con esto, podemos ver que los datos de entrada viven en el espacio
 
-$$\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (R^s)^N$$
+$$\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N$$
 
 Esta representación de los datos de entrada es natural en muchas situaciones. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen. Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Podemos incluso considerar \textit{pixels} que aparezcan en más de un vector. Por ejemplo, podemos considerar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
 
@@ -29,7 +29,7 @@ Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de fun
 
 Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ en \customref{sec:repr_funciones_puntuacion}, que conformarán el espacio de hipótesis sobre el que trabajaremos.
 
-\subsection{Preliminares sobre los espacios $L^2$}
+\subsection{Preliminares sobre los espacios $L^2$} \label{sec:preliminares_funcional}
 
 A continuación, introduciremos algunos conceptos sobre espacios de funciones que serán fundamentales en la justificación de la elección de las funciones $h_y$. Empezamos introduciendo el siguiente espacio de funciones, que es de sobra conocido:
 
@@ -72,7 +72,7 @@ Y ahora, introducimos el siguiente espacio de funciones:
 \end{definicion}
 \todo{\textbf{CUIDADO} Revisar que esto es correcto porque lo estoy haciendo de cabeza mientras escribo el Latex}
 
-A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, escribiendo $L^2$ cuando esto no de lugar a confusión. Sabemos de sobra que este espacio es de Hilbert, considerando la norma:
+A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, escribiendo $L^2$ cuando esto no de lugar a confusión. Sabemos de sobra que este espacio es de Hilbert, considerando el producto escalar:
 
 \begin{equation}
     \innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu
@@ -96,7 +96,6 @@ Todos estos son conceptos que conocemos del grado. A partir de ahora introducimo
 
 \end{proposicion}
 
-
 \begin{definicion}
 
     Un subconjunto $\mathcal{F} \subseteq L^2$ se dice \textbf{linealmente independiente} cuando todos sus subconjuntos finitos son linealmente independientes.
@@ -119,7 +118,45 @@ Todos estos son conceptos que conocemos del grado. A partir de ahora introducimo
 \end{proposicion}
 \todo{Añadir la referencia del paper Hackbusch}
 
+\begin{proposicion}
+
+    Si los espacios $\mathbb{V}_1, \ldots, \mathbb{V}_N$ son espacios de Hilbert, podemos dotar de forma natural al espacio $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ de un producto escalar, siendo así $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ un espacio de Hilbert
+
+\end{proposicion}
+
+\begin{proposicion}
+    Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(1)}_{\alpha_1}} \otimes \ldots \otimes  \nv{v^{(N)}_{\alpha_N}}  \} \subseteq \mathbb{V}_1 \otimes \ldots \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
+\end{proposicion}
+
+\begin{teorema}
+    La siguiente función induce un isomorfismo entre espacios de Hilbert:
+
+    \begin{equation}
+    \begin{split}
+        \MediumOtimes^{N} L^2(\R^s) &\to L^2((\R^s)^N) \\
+        f_1(\nv{x}) \otimes \ldots \otimes f_N(\nv{x}) &\mapsto \prod_{i = 1}^N f_i(\nv{x_i})
+    \end{split}
+    \end{equation}
+
+    Así, tenemos identificadas las funciones que vienen dadas como producto tensorial con funciones que vienen dadas como producto punto a punto.
+\end{teorema}
+
+
 \subsection{Justificación para la representación de las funciones de puntuación} \label{sec:justificacion_func_repr}
+
+Recordemos que, como ya hemos introducido en \customref{seq:planteamiento_problema}, nuestros datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$, y que tenemos que tomar la etiqueta cuya función de puntuación $\{h_y: \mathcal{X} = (\R^s)^N \to \R \dspace / \dspace y \in \mathcal{Y} \}$ sea máxima.
+
+Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ en el que mover nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
+
+En \customref{sec:preliminares_funcional} hemos visto:
+
+\begin{enumerate}
+    \item Tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, (tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas), entonces el conjunto
+    \todo{\textbf{Estoy dejando esta frase a medias}}
+    \item
+    \item
+\end{enumerate}
+
 
 \todo{Desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general}
 
