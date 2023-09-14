@@ -84,10 +84,10 @@ Todos estos son conceptos que conocemos del grado. A partir de ahora introducimo
     Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$
 \end{definicion}
 
-\begin{proposicion}
-    Sea $\mathcal{F} \subseteq L^2$. Entonces podemos aproximar arbitrariamente bien cualquier función $g \in L^2$ usando combinaciones lineales finitas, es decir:
+\begin{proposicion} \label{prop:conjuntos_totales_epsilon_aproximacion}
+    Sea $\mathcal{F} \subseteq L^2$ total. Entonces podemos aproximar arbitrariamente bien cualquier función $g \in L^2$ usando combinaciones lineales finitas, es decir:
 
-    \begin{equation}
+    \begin{equation} \label{eq:conjuntos_totales_epsilon_aproximacion}
     \begin{split}
         \forall \varepsilon > 0 \dspace \exists f_1, \ldots, f_n \in \mathcal{F} \dspace \exists c_1, \ldots c_n \in \R:\\
         \int | (\sum_{i = 1}^n c_i \cdot f_i) - g| < \varepsilon \\
@@ -143,6 +143,7 @@ Todos estos son conceptos que conocemos del grado. A partir de ahora introducimo
 
 
 \subsection{Justificación para la representación de las funciones de puntuación} \label{sec:justificacion_func_repr}
+\todo{No estoy muy contento con cómo he escrito esta sección. Está algo liosa}
 
 Recordemos que, como ya hemos introducido en \customref{seq:planteamiento_problema}, nuestros datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$, y que tenemos que tomar la etiqueta cuya función de puntuación $\{h_y: \mathcal{X} = (\R^s)^N \to \R \dspace / \dspace y \in \mathcal{Y} \}$ sea máxima.
 
@@ -150,31 +151,77 @@ Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} 
 
 En \customref{sec:preliminares_funcional} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, (tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas), entonces el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total (y por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$).
 
-Con ello, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in \mathcal{H}$, podemos aproximar dicha función de puntuación arbitrariamente bien con combinaciones lineales finitas.
+Con ello, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in L^2((R^s)^N$, podemos aproximar dicha función de puntuación arbitrariamente bien con combinaciones lineales finitas. Planteemos esto de forma más clara.
 
-Partamos de un conjunto $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total. Por tanto, el conjunto inducido $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$ es total también. Consideramos una función de puntuación $h_y \in \mathcal{H}$ que queremos aproximar usando el conjunto de funciones producto punto a punto. Sabemos que, fijado un $\varepsilon > 0$, podemos tomar una combinación lineal finita que aproxime con un error menor que $\varepsilon$.
+En primer lugar, partimos de un conjunto $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ total. Por tanto, el conjunto inducido $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N} \subseteq L^2((R^s)^N$ es total también.
 
-Reflejamos este hecho de forma que sea más útil en la búsqueda de nuestro modelo. Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita contable. Podemos considerar que tenemos $N$ sucesiones. Sabemos por tanto que existe un tensor formal $\mathcal{A}^y \in \espaciotensores{N}{\N}$ con todas las entradas cero, salvo un conjunto finito, de forma que:
+En segundo lugar, consideramos una función de puntuación $h_y \in L^2((R^s)^N$ que queremos aproximar usando el conjunto de funciones producto punto a punto.
+
+Para ello, fijamos una cota de error $\varepsilon > 0$. Gracias a \customref{prop:conjuntos_totales_epsilon_aproximacion}, sabemos que  podemos tomar una combinación lineal finita que aproxime con un error menor que $\varepsilon$.
+
+\begin{observacion}
+    Si modificamos la cota de error $\varepsilon$, es razonable pensar que el número de elementos de la combinación lineal crezca. Y de momento no tenemos control sobre cómo es este crecimiento en el número de sumandos.
+\end{observacion}
+
+Reflejamos este planteamiento de forma que sea más útil en la búsqueda de nuestro modelo. Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita contable (podemos considerar que tenemos $N$ sucesiones). Usando la expresión dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion} podemos expresar la combinación lineal usando un tensor formal $\mathcal{A}^y \in \espaciotensores{N}{\N}$ con todas las entradas cero, salvo un conjunto finito, de forma que:
 
 \begin{equation} \label{eq:hipotesis_en_general}
     h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} A^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i})
 \end{equation}
-\todo{Añadir algunos comentarios. Especificar que $\approx$ es una forma vaga de fijar que estamos moviendo epsilon y segun su valor tenemos que hacer mas o menos ceros en la ecuacion. Hablar del soporte finito?}
-\todo{Mal organizado. Plantear bien el problema. Partimos de tener un conjunto total que induce otro total. Fijamos un error epsilon y entonces tenemos una combinacion lineal finita de menos error. Y eso, haciendolo vago, se traduce en la ecuacion}
 
-Por tanto, \eqref{eq:hipotesis_en_general} define un modelo universal, puesto que dada cualquier función de representación $h_y$, podemos aproximarla arbitrariamente bien con combinaciones lineales en nuestro conjunto de funciones total.
+\begin{observacion}
 
-Ahora, debemos escoger familias de funciones que sean totales. Algunas de las más utilizadas son:
+    La idea de cercanía que denota $\approx$ viene perfectamente dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion}. Además, y como ya hemos comentado, el número de entradas no nulas del tensor dependerá del valor de $\varepsilon$. Pero esta ecuación no da problemas porque la relación entre estos dos elementos viene implícita.
+
+\end{observacion}
+
+Por tanto, \eqref{eq:hipotesis_en_general} define un modelo universal, puesto que cualquier función de representación $h_y$ puede ser aproximada arbitrariamente bien con combinaciones lineales en nuestro conjunto de funciones total.
+
+\subsection{Elección de la familia de funciones de representación}
+
+
+Como ha quedado más que justificado en \customref{sec:justificacion_func_repr}, el siguiente paso es escoger familias de funciones que sean totales. Algunas de las más utilizadas son:
 
 \begin{enumerate}
     \item Wavelets
-    \item Gaussianas
+    \item Gaussianas con matriz de covarianzas diagonal
+
+        \begin{equation}
+            f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
+        \end{equation}
+
+        donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
+
     \item Neuronas
+
+        \begin{equation}
+            f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
+        \end{equation}
+
+        donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$ y $\sigma$ la función de activación de la neurona, por ejemplo una \textit{sigmoide} o una \textit{ReLU}
+
+
 \end{enumerate}
 
-\todo{Desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general}
+Las dos últimas son las más usadas en la práctica. En ambas, podemos tomar un subconjunto numerable que siga siendo total, basta con restringir que los coeficientes tomen valores en los racionales racionales \footnote{Para las Gaussianas, consultar \cite{matematicas:gaussianas_totales}} \footnote{Para las neuronas, consultar \cite{matematicas:principal}}.
+
+De hecho, en \cite{matematicas:principal} se prueba que para las Gaussianas y neuronas se puede tomar un número finito de funciones ${f_1, \ldots, f_M}$. Es más, en el caso de estar trabajando con imágenes, proponen que basta con tomar $M$ entorno a 100.
+
+Usando este hecho, tomaremos $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2(\R^s)$ total en la ecuación \eqref{eq:hipotesis_en_general}. Con ello, ahora es suficiente tomar $\mathcal{A}^y \in \espaciotensores{N}{M}$, llegando a:
+
+\begin{equation}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+\end{equation}
+
+\begin{observacion}
+
+    Nada nos impide tomar la familia de funciones $\{f_{\theta_d}: d \in \deltaset{M}\}$ de forma que sea también linealmente independiente. Como comentamos en \customref{sec:preliminares_funcional}, la familia de funciones producto punto a punto inducida, $
+        \{ (\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N \}$, será también linealmente independiente, y se comportará como si fuera una \entrecomillado{base} del espacio $L^2((R^s)^N)$. Y por tanto, una función de puntuación $h_y$ determina unívocamente un tensor de coeficientes $\mathcal{A}^y$
+
+\end{observacion}
 
 \subsection{Representación de las funciones de puntuación} \label{sec:repr_funciones_puntuacion}
+\todo{Algunas cosas ya las he comentado en la sección anterior}
 
 Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
