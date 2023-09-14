@@ -148,15 +148,29 @@ Recordemos que, como ya hemos introducido en \customref{seq:planteamiento_proble
 
 Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ en el que mover nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
 
-En \customref{sec:preliminares_funcional} hemos visto:
+En \customref{sec:preliminares_funcional} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, (tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas), entonces el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total (y por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$).
+
+Con ello, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in \mathcal{H}$, podemos aproximar dicha función de puntuación arbitrariamente bien con combinaciones lineales finitas.
+
+Partamos de un conjunto $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total. Por tanto, el conjunto inducido $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$ es total también. Consideramos una función de puntuación $h_y \in \mathcal{H}$ que queremos aproximar usando el conjunto de funciones producto punto a punto. Sabemos que, fijado un $\varepsilon > 0$, podemos tomar una combinación lineal finita que aproxime con un error menor que $\varepsilon$.
+
+Reflejamos este hecho de forma que sea más útil en la búsqueda de nuestro modelo. Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita contable. Podemos considerar que tenemos $N$ sucesiones. Sabemos por tanto que existe un tensor formal $\mathcal{A}^y \in \espaciotensores{N}{\N}$ con todas las entradas cero, salvo un conjunto finito, de forma que:
+
+\begin{equation} \label{eq:hipotesis_en_general}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} A^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i})
+\end{equation}
+\todo{Añadir algunos comentarios. Especificar que $\approx$ es una forma vaga de fijar que estamos moviendo epsilon y segun su valor tenemos que hacer mas o menos ceros en la ecuacion. Hablar del soporte finito?}
+\todo{Mal organizado. Plantear bien el problema. Partimos de tener un conjunto total que induce otro total. Fijamos un error epsilon y entonces tenemos una combinacion lineal finita de menos error. Y eso, haciendolo vago, se traduce en la ecuacion}
+
+Por tanto, \eqref{eq:hipotesis_en_general} define un modelo universal, puesto que dada cualquier función de representación $h_y$, podemos aproximarla arbitrariamente bien con combinaciones lineales en nuestro conjunto de funciones total.
+
+Ahora, debemos escoger familias de funciones que sean totales. Algunas de las más utilizadas son:
 
 \begin{enumerate}
-    \item Tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, (tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas), entonces el conjunto
-    \todo{\textbf{Estoy dejando esta frase a medias}}
-    \item
-    \item
+    \item Wavelets
+    \item Gaussianas
+    \item Neuronas
 \end{enumerate}
-
 
 \todo{Desarrollar el apéndice 6 donde se justifica que esta ecuación es lo suficientemente general}
 
