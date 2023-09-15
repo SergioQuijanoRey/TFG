@@ -82,10 +82,43 @@ Este problema tiene, además de los problemas comunes de la visión por computad
             \item Factores extrínsecos como el ambiente o los hábitos de vida
         \end{itemize}
     Además, algunas características de la cara cambian drásticamente con el paso de los años. Por ejemplo, la textura (pensar por ejemplo en la aparición de arrugas, lunares, vello, \ldots), cambios en la forma de la cara (por ejemplo, por un cambio en el peso corporal)
+
+    \item Tenemos que trabajar con identidades que nunca hemos visto en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, también ocurre esto (por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo). Sin embargo la diferencia radica en que, en nuestro problema, el modelo debe saber identificar identidades, mientras que en el segundo caso, el modelo debe saber identificar categorías. Siguiendo con esta analogía, sería como pedirle al modelo clasificador que, dados dos tipos de objetos que nunca ha visto (por ejemplo, aviones), sepa asignarles la misma categoría
 \end{itemize}
 
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{informatica/messi_niño}
+        \caption{Edad temprana}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/messi_joven}
+        \caption{Edad joven}
+    \end{subfigure}%
 
-% TODO -- seguir por aqui
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/messi_adulto}
+        \caption{Edad adulta}
+        \label{img:messi_adulto}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/messi_rubio}
+        \caption{Otra imágene ne la edad adulta, pocos años después}
+    \end{subfigure}
+
+    \caption{Lionel Messi en cuatro momentos distintos de su vida}
+    \label{img:messi_cuatro_edades}
+
+\end{figure}
+
+Por poner un ejemplo, fijémonos en \customref{img:messi_cuatro_edades} \footnotemark. Estas cuatro imágenes reflejan perfectamente los problemas que hemos planteado previamente. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara
+\footnotetext{Imágenes extraídas de \url{https://tinyurl.com/2x4fkxjx}, \url{https://tinyurl.com/y4ubnz3v}, \url{https://tinyurl.com/ywek233h} y \url{https://tinyurl.com/yqrf78w8}}
+
 % TODO -- \cite{informatica:tecnica_sintesis_aifr} comenta que las bases de datos no son de calidad
 % TODO -- comentar los dos enfoques, generar sintéticamente vs aprender de bases de datos
 % TODO -- comentar las fortalezas de haber empleado un modelo que computa un embedding
