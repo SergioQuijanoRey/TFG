@@ -227,6 +227,122 @@ Además, en este \textit{dataset} no tenemos información sobre las edades de lo
 
 \subsection{\textit{FG-Net}}
 
+La \textbf{tercera base de datos} con la que trabajamos es \textit{FG-Net dataset}. La fuente original de este conjunto de datos ya no está operativa, y ahora estos datos se ofrecen en \cite{informatica:fgnet_dataset}. Este conjunto de datos se compone de 1002 imágenes de 82 individuos distintos. Es el \textit{dataset} más popular sobre \textit{AIFR} \cite{informatica:best_fgnet_model}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_fgnet}
+    \caption{Muestra de ejemplo del \textit{dataset} \textit{FG-Net}. Imagen extraída de \url{https://paperswithcode.com/dataset/fg-net}}
+\end{figure}
+
+Este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}. Por tanto, y como indicamos en \customref{isec:datasets_customs}, realizamos una implementación de \lstinline{torch.utils.data.Dataset} propia, para poder trabajar con estos datos.
+
+Dicho conjunto de datos se compone de:
+
+\begin{itemize}
+    \item Un conjunto de imágenes. Los nombres de las imágenes deben ser procesados para extraer la identidad y edad de cada individuo
+    \item Anotaciones de las imágenes. Estas anotaciones se componen de 68 puntos anotados por cada imagen
+    \item Un archivo de \textit{Matlab} con 10 \textit{folds}, que el autor usa en \cite{informatica:yanweifu_work}
+\end{itemize}
+
+Optamos por trabajar únicamente con las imágenes, puesto que por las técnicas que estamos usando, no sabríamos aprovechar las anotaciones realizadas sobre los datos.
+
+Y de nuevo, este \textit{dataset} presenta un salto de calidad respecto al anterior, por los siguientes motivos:
+
+\begin{itemize}
+    \item Trabajamos con un conjunto de datos cuya dificultad principal es la de la varianza en la edad. Esto se alinea por completo con el problema que queremos resolver
+    \item El número de imágenes por individuo es mucho mejor que en \textit{LFW}, como muestran \customref{img:fgnet_images_per_class} y \customref{table:fgnet_images_per_class}
+    \item Tenemos información sobre la distribución de la edad de nuestros individuos, que estudiamos en \customref{img:fgnet_histograma_edad} y en \customref{table:fgnet_estadisticas_edad}
+\end{itemize}
+
+A continuación, mostramos algunas características fundamentales del \textit{dataset}, empezando por la \textbf{distribución de número de imágenes por individuo}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/fgnet_images_per_class}
+    \caption{Distribución del número de imágenes por cada individuo}
+    \label{img:fgnet_images_per_class}
+\end{figure}
+
+Dicha distribución queda mejor explicada con las siguientes estadísticas:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{Valor} \\
+    \hline
+
+    Media             & 12.22 \\
+    Desviación típica & 2.15  \\
+    Mínimo            & 6.00 \\
+    Máximo            & 18.00 \\
+    $Q1 \%$           & 11.00 \\
+    $Q2 \%$           & 12.00 \\
+    $Q3 \%$           & 13.00 \\
+
+    \hline
+
+\end{tabular}
+\caption{Datos estadísticos sobre la distribución del número de imágenes por usuario}
+\label{table:fgnet_images_per_class}
+\end{table}
+
+Tanto los estadísticos como la gráfica de la distribución dejan claro que, al menos en lo que respecta al número de imágenes por individuo, este conjunto de datos es mucho mejor. Como mínimo tenemos 6 imágenes por individuo, algo impensable en el conjunto de datos \textit{LFW}, donde apenas había individuos con más de dos imágenes. En segundo lugar, la media y los cuartiles nos muestran que la mayoría de los datos tienen entre 10 y 13 imágenes, lo que supone un muy buen dato.
+
+Veamos ahora la \textbf{distribución de la edad de los individuos}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/fgnet_distribucion_edades}
+    \caption{Histograma de la variable edad en nuestro \textit{dataset}}
+    \label{img:fgnet_histograma_edad}
+\end{figure}
+
+Que complementamos con las siguientes estadísticas
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{Valor} \\
+    \hline
+
+    Media  & 15.84 \\
+    Mínimo & 0 \\
+    Máximo & 69 \\
+    Moda   & 18 \\
+
+    \hline
+
+\end{tabular}
+
+    \caption{Algunas estadísticas sobre la distribución de la edad en nuestro conjunto de datos}
+    \label{table:fgnet_estadisticas_edad}
+\end{table}
+
+El histograma \customref{img:fgnet_histograma_edad} nos muestra una distribución asímetrica, con una mayor concentración de individuos en edades bajas. Esto puede ser un problema a la hora de generalizar un modelo entrenado sobre estos datos, en el caso de que por ejemplo trabajemos con personas de una edad más adulta. Observando el histograma se observa un pico de frecuencia entorno a los 20 años. La moda nos indica que dicho pico se produce, en efecto, en los 18 años. Parece ser que dicha edad es un momento especial en el que se registran más fotografías de lo usual.
+
+El rango de edades es muy amplio, yendo desde los 0 años (en \textit{LFW} ya comentábamos el problema que suponía no tener imágenes de niños) hasta los 69 años.
+
+Por tanto, la calidad, en lo que distribución de edades se refiere, parece excelente. Aún así, podemos estudiar una distribución que nos dará una información todavía más profunda: el \textbf{rango de edad por individuo}. Calculamos, para cada individuo, la diferencia entre su edad más avanzada menos su edad más temprana. Con esto, podemos mostrar dicha distribución en la siguiente figura:
+
+% TODO -- seguir por aqui, viendo del notebook las distribuciones de rangos de edad
+
+Sin embargo, se presentan los siguientes inconvenientes:
+\todo{Comentar que son muy pocas imagenes como para entrenar}
+\todo{Comentar que \cite{informatica:yanweifu_work} dice que es el conjunto mas dificil para entrenar. Además, en este paper veo que lo usual es usar este conjunto para evaluar, y usar uno mas grande para entrenar}
+
+\begin{itemize}
+    \item
+    \item
+    \item
+\end{itemize}
+
+
+
+
+
 \subsection{\textit{CACD}}
 
 \section{Descripción de los objetivos}
@@ -239,6 +355,7 @@ Por todo esto, los objetivos del presente trabajo son los siguientes:
     \item Implementar todos los módulos necesarios para poder aplicar técnicas \textit{online} de cómputo del \textit{triplet loss}
     \item Realizar un estudio de los \textit{datasets} disponibles
     \item Comparar los resultados obtenidos con otros trabajos del mismo ámbito
+    \item Los \textit{scripts} con los que el autor genera las anotaciones de los datos
 \end{enumerate}
 
 \section{Planificación} \label{isec:planificacion}
