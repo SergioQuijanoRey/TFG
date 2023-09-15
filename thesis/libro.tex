@@ -253,9 +253,11 @@
 % --------------------------------------------------------------------
 \mainmatter % activa la numeración de capítulos, resetea la numeración de las páginas y usa números arábigos
 
-\setpartpreamble[c][0.75\linewidth]{%
-	\bigskip % Deja un espacio vertical en la parte superior
-  Si el trabajo se divide en diferentes partes es posible incluir al inicio de cada una de ellas un breve resumen que indique el contenido de la misma. Esto es opcional.
+\setpartpreamble[c][0.75\linewidth]{
+    % Deja un espacio vertical en la parte superior
+	\bigskip
+
+    En esta primera parte del trabajo, introduciremos dos modelizaciones matemáticas muy cercanas a los modelos reales que se usan en la práctica del aprendizaje automático. Un modelo será no profundo (\entrecomillado{shallow})  y otro será profundo. Demostraremos que los modelos profundos son más eficientes que los modelos no profundos.
 }
 \part{Primera parte}
 
@@ -264,10 +266,16 @@
 \input{capitulos/matematicas/capitulo03}
 \input{capitulos/matematicas/capitulo04}
 
-% Añadir tantos capítulos como sea necesario
+\setpartpreamble[c][0.75\linewidth]{
+    % Deja un espacio vertical en la parte superior
+	\bigskip
 
+    En esta segunda parte del trabajo, introduciremos un nuevo método para computar el \entrecomillado{Triplet Loss}. Aplicaremos este nuevo método a una tarea de reconocimiento facial invariante a cambios de edad, y justificaremos por qué esta técnica parece no ser adecuada para resolver este problema
+    \todo{Revisar esta brevísima introducción porque la escribo al principio. Igual cuando lleve más escrito este enfoque ha cambiado}
+}
 \cleardoublepage\part{Segunda parte}
-% \input{capitulos/capitulo02}
+
+\input{capitulos/informatica/capitulo01}
 
 % -------------------------------------------------------------------
 % BACKMATTER
