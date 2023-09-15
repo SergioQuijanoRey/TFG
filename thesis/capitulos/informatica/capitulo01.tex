@@ -144,13 +144,90 @@ Y para finalizar, comentaremos los \textbf{dos enfoques principales usados para 
 
 Como se comentará en \customref{isec:planificacion}, teniendo en cuenta que íbamos a tener que realizar un gran número de implementaciones, decidimos iterar sobre varias bases de datos.
 
-La \textbf{primera base de datos} que consideramos es la más que conocida \entrecomillado{MNIST} \cite{informatica:mnist}. Esta base de datos se compone de 70000 imágenes $28 \times 28$ de dígitos, del 0 al 9, escritos a mano. No tiene ningún interés para el trabajo que vamos a realizar. Sin embargo, escogemos esta base de datos como punto de partida por:
+\subsection{MNIST}
+
+La \textbf{primera base de datos} que consideramos es la más que conocida \entrecomillado{MNIST} \cite{informatica:mnist}. Esta base de datos se compone de 70000 imágenes $28 \times 28$ de dígitos, del 0 al 9, escritos a mano. No tiene ningún interés para el trabajo que vamos a realizar. Sin embargo, escogemos esta base de datos como punto de partida porque:
 
 \begin{itemize}
     \item Es una base de datos muy pequeña, por lo que nuestras implementaciones no tendrán ningún tipo de problemas de rendimiento
     \item Es una base de datos muy sencilla, no tenemos que preocuparnos de procesar las imágenes de ninguna forma
     \item No tenemos que realizar ninguna implementación para trabajar con ella, puesto que podemos usar el paquete \lstinline{torchvision}, que se encarga de la descarga del conjunto de datos y su disposición en un objeto de tipo \lstinline{torch.utils.data.Dataset}
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{informatica/ejemplo_mnist}
+    \caption{Muestra de ejemplo de los dígitos del \textit{dataset} \textit{MNIST}}
+\end{figure}
+
+
+\subsection{Labeled Faces in the Wild}
+
+La \textbf{segunda base de datos} con la que trabajamos es \textit{Labeled Faces in the Wild} (\textit{LFW}) \cite{informatica:lfw_dataset}. La base de datos se compone de algo más de 13000 imágenes de caras extraídas de la web, en la que aparecen 5749 individuos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{informatica/ejemplo_lfw}
+    \caption{Muestra de ejemplo del \textit{dataset} \textit{LFW}. Imagen tomada de \url{https://paperswithcode.com/dataset/lfw}}
+\end{figure}
+
+En este caso damos un salto de calidad en cuanto a lo adecuada que es la base de datos a nuestro problema. Principalmente:
+
+\begin{itemize}
+    \item Estamos trabajando con imágenes faciales
+    \item El tamaño del \textit{dataset} ha aumentado considerablemente. Como veremos más adelante, en \customref{isec:optimizacion_codigo}, esto ya hace que tengamos que plantearnos optimizaciones de nuestros módulos de código
+    \item La tarea de \textit{retrieval} ya tiene sentido (esto no ocurría al trabajar con dígitos manuscritos)
+\end{itemize}
+
+Aunque tenemos una serie de \textbf{problemas con esta base de datos}, que motiva el uso de las dos últimas bases de datos:
+
+\begin{itemize}
+    \item En primer lugar, y como se indica en \cite{informatica:lfw_dataset}, esta base de datos está pensada para resolver una tarea de verificación. Aunque nos centremos en computar un \textit{embedding} (tarea que deberíamos poder resolver sin problemas), la propia institución ya nos está advirtiendo sobre lo inadecuada de la base de datos
+    \item Hay grupos que no están propiamente representados. Por ejemplo, apenas hay niños o personas por encima de los 80 años. Las mujeres y ciertos grupos étnicos están infrarrepresentados. En nuestro caso, es \textbf{especialmente grave la infrarrepresentación de ciertos grupos de edad}
+    \item Más tarde introduciremos, en \customref{ich:fundamentos_teoricos}, la función de pérdida \textit{triplet loss} y las técnicas para computarla de forma \textit{online}, usando \textit{P-K sampling}. Para esto, es fundamental que cada individuo tenga el máximo número de fotografías. De nada nos sirve, por ejemplo, tener una base de datos enorme pero con solo una fotografía por persona. En este sentido, y como indica \cite{informatica:lfw_dataset}, solo 1680 individuos tienen dos fotografías o más. Esto hace que tomar valores altos en el \textit{P-K sampling} sea imposible, y que por ello, tengamos que recurrir al aumentado de datos. Como comentaremos en \customref{isec:aumentado_datos}, esto será un reto importante de cara a mantener un rendimiento aceptable
+    \item Este \textit{dataset} no introduce ninguna forma de trabajar la invarianza a cambios de edad, por lo que, en última instancia, no es adecuado para nuestros propósitos
+\end{itemize}
+
+De hecho, en la siguiente figura podemos observar la distribución del número de imágenes por cada individuo:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/lfw_images_per_class}
+    \caption{Distribución del número de imágenes por cada individuo. En el eje horizontal, tenemos el número de imágenes por cada individuo. En vertical, la cantidad de individuos que tienen un cierto número de imágenes}
+\end{figure}
+
+Podemos ver que la mayoría de individuos solo tienen una imagen o dos. Teniendo en cuenta que casi siempre trabajamos usando al menos tres imágenes por clase, queda clara la necesidad de usar aumento de datos, que introduciremos en \customref{isec:aumentado_datos}. Adelantándonos a lo que presentaremos en el aumento de datos, veámos cómo queda esta distribución tras forzar que cada individuo tenga al menos un número dado de datos:
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=.7\linewidth]{informatica/lfw_forzar_3}
+        \caption{Forzando 3 imágenes por individuo }
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=.7\linewidth]{informatica/lfw_forzar_5}
+        \caption{Forzando 5 imágenes por individuo}
+    \end{subfigure}
+
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=.7\linewidth]{informatica/lfw_forzar_10}
+        \caption{Forzando 10 imágenes por individuo }
+    \end{subfigure}
+
+    \caption{Distribuciones de imágenes por individuo tras aplicar \textit{dataset augmentation} para que cada clase tenga al menos $n$ individuos}
+    \label{img:distribuciones_forzar_data_augmentation}
+\end{figure}
+
+Las distribuciones que se muestran en \customref{img:distribuciones_forzar_data_augmentation} muestran una propiedad clara: haciendo aumento de datos, la mayoría de individuos basan la variedad de sus imágenes en el aumento de datos. Además, esto ocurre por muy bajo que sea el número de imágenes por individuo que queramos obtener, como muestran las tres distribuciones prácticamente idénticas. Esto ya indica que seguramente los resultados obtenidos no sean demasiado buenos, puesto que la mayoría de imágenes de un individuo serán una o dos \entrecomillado{repetidas} (aunque apliquemos transformaciones propias del aumento de datos). Los posibles problemas que esto supone se agravan aún más al estar usando \textit{triplet loss} (\customref{isec:triplet_loss}).
+
+Además, en este \textit{dataset} no tenemos información sobre las edades de los individuos en cada una de sus imágenes, así que no podemos hacer un estudio en más profundidad en este aspecto.
+
+\subsection{\textit{FG-Net}}
+
+\subsection{\textit{CACD}}
 
 \section{Descripción de los objetivos}
 \todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
