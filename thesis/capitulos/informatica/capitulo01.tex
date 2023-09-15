@@ -1,3 +1,6 @@
+% !TeX root = ../../libro.tex
+% !TeX encoding = utf8
+
 \chapter{Introducción}
 
 % TODO -- estructura que le quiero dar al trabajo
@@ -20,3 +23,25 @@
 
 % 1. Dar prioridad al resumen, introduccion (descripcion del problema, motivacion, objetivos) y las conclusiones (**"deben estar perfectas"**)
 % 2. Introducir una figura de SCOPUS
+
+Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \footnote{Esta nueva técnica se introduce en \cite{matematicas:principal}}. Introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Evitando así tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples.
+
+Esta situación plantea una serie de \textbf{problemas}:
+
+\begin{itemize}
+    \item La nueva técnica de aprendizaje automático se plantea en un \textbf{ambiente completamente distinto} al de \textit{AIFR}. Por tanto, no disponemos de literatura en la que se expongan resultados obtenidos de aplicar estas técnicas a nuestro ámbito de trabajo
+    \item Esta técnica cambia fundamentalmente la forma de generar \textit{batches} de datos. Y por tanto, modifica en esencia muchas partes primarias del proceso de aprendizaje. Por ejemplo, el ciclo de entrenamiento, el cálculo de métricas durante el entrenamiento, el acceso a los datos. Es por este motivo que hemos tenido que realizar \textbf{implementaciones personalizadas de casi todos estos elementos}, sin poder hacer uso de la mayoría de implementaciones que ofrecen las librerías de aprendizaje automático. Esto supone un \textbf{consumo de tiempo mayor}, teniendo en cuenta que hay que prestar \textbf{especial atención a la optimización y validación} mediante \textit{tests} de estos nuevos módulos
+    \item Como comentaremos en \customref{ich:conclusiones}, este trabajo \textbf{no ha dado buenos resultados en la práctica}, comparado con otras técnicas más establecidas en el ámbito del \textit{AIFR}. Sin literatura que aplique nuestras nuevas técnicas en nuestro ámbito, tenemos que \textbf{basarnos en todo el trabajo realizado para estudiar el por qué} de este mal comportamiento.
+\end{itemize}
+
+\section{Descripción del problema}
+
+\section{Motivación del problema}
+
+\section{Descripción de la base de datos usada}
+
+\section{Descripción de los objetivos}
+
+\section{Planificación}
+
+\section{}
