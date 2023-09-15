@@ -43,7 +43,7 @@ Por otro lado, el ámbito de aplicación de un modelo capaz de reconocer caras i
 
 \section{Descripción del problema} \label{ich:descrp_problema}
 
-Como ya se ha comentado, trabajaremos un problema de reconocimiento facial invariante a la edad (\textit{AIFR}, de sus singlas en inglés \entrecomillado{Age-Invariant Face Recognition}), con la idea principal de introducir una variación sobre la función de pérdida \textit{Triplet Loss} para poder generar \textit{batches} de datos de forma \textit{online}. En esta sección nos centraremos en presentar el problema \textit{AIFR}, la nueva técnica de cómputo de la función de pérdida será explorada en profundidad en \customref{ich:triplet_loss}.
+Como ya se ha comentado, trabajaremos un problema de reconocimiento facial invariante a la edad (\textit{AIFR}, de sus singlas en inglés \entrecomillado{Age-Invariant Face Recognition}), con la idea principal de introducir una variación sobre la función de pérdida \textit{Triplet Loss} para poder generar \textit{batches} de datos de forma \textit{online}. En esta sección nos centraremos en presentar el problema \textit{AIFR}, la nueva técnica de cómputo de la función de pérdida será explorada en profundidad en \customref{isec:triplet_loss}.
 
 El \textbf{problema de reconocimiento facial invariante a la edad} es el siguiente: dada una imagen de una persona a una cierta edad, ser capaces de discriminar entre imágenes de otras personas y de la persona de la que disponemos la primera imagen, teniendo en cuenta cambios significativos en las edades de las personas que aparecen en las imágenes.
 
@@ -62,6 +62,11 @@ Este problema se puede aún especificar más, en las siguientes tareas:
         \begin{itemize}
             \item Un escenario es, por ejemplo, comprobar la imagen del pasaporte y la imagen obtenida de las cámaras de los puestos de control de acceso automático
         \end{itemize}
+
+    \item Clasificación: habiendo entrenado sobre un conjunto de individuos prefijado, dada una imagen de entrada, identificar al individuo que aparece en dicha imagen como alguno de aquellos vistos durante el entrenamiento
+        \begin{itemize}
+            \item Esto fuerza a que solo podamos trabajar con un número prefijado de personas, y no con personas arbitrarias que nunca hayamos visto antes. Esta restricción hace que sea la tarea menos interesante (y quizás, la más sencilla de resolver), y por tanto, es inusual encontrar trabajos que usen técnicas relacionadas con las que más adelante presentado para intentar resolver estos problemas
+        \end{itemize}
 \end{itemize}
 
 Por lo tanto, realmente nuestra tarea es la de realizar \textit{retrieval} de imágenes faciales invariantes a cambios en la edad. Sin embargo, en adelante, salvo que induzca a confusión, nos referiremos a esta tarea simplemente como \textit{AIFR}, sin especificar que estamos realizando concretamente \textit{retrieval} y no otras de las tareas que ya hemos detallado
@@ -69,21 +74,23 @@ Por lo tanto, realmente nuestra tarea es la de realizar \textit{retrieval} de im
 Este problema tiene, además de los problemas comunes de la visión por computador, las siguientes \textbf{dificultades específicas} \cite{informatica:challenges_retrieval}:
 
 \begin{itemize}
-    \item Invarianzas: en nuestro problema esto es especialmente relevante. Al trabajar con imágenes tomadas en, potencialmente, instantes de tiempo muy variados, las características de la imagen pueden variar considerablemente.
+    \item \textbf{Invarianzas}: en nuestro problema esto es especialmente relevante. Al trabajar con imágenes tomadas en, potencialmente, instantes de tiempo muy variados, las características de la imagen pueden variar considerablemente.
         \begin{itemize}
             \item Pensemos, por ejemplo, en fotografías pasadas que fueron tomadas en blanco y negro, en contraste con fotografías más actuales en color
             \item O problemas más relevantes (pues el anterior es fácil de solventar), como cambios relevantes en características de la cámara con la que se toman las fotografías
         \end{itemize}
-    \item Distractores: nuestro modelo se debe centrar en estudiar las caras que aparezcan en la imagen, ignorando otros elementos, como los que puedan aparecer en el fondo de las imágenes
-    \item Eficiencia: a la hora de que nuestro modelo reciba una \textit{query}, desconocemos el tamaño de la base de datos sobre la que tenemos que operar. Por tanto, nuestro modelo deberá ser eficiente para poder trabajar con grandes bases de datos sin que el tiempo de respuesta se vea gravemente afectado
-    \item Problemas asociados al envejecimiento: cómo varía la cara con el paso de los años es un proceso muy complejo. Algunos de los factores que afectan a este envejecimiento \cite{informatica:tecnica_sintesis_aifr} son:
+    \item \textbf{Distractores}: nuestro modelo se debe centrar en estudiar las caras que aparezcan en la imagen, ignorando otros elementos, como los que puedan aparecer en el fondo de las imágenes
+    \item \textbf{Eficiencia}: a la hora de que nuestro modelo reciba una \textit{query}, desconocemos el tamaño de la base de datos sobre la que tenemos que operar. Por tanto, nuestro modelo deberá ser eficiente para poder trabajar con grandes bases de datos sin que el tiempo de respuesta se vea gravemente afectado
+    \item Problemas asociados al bold{envejecimiento}: cómo varía la cara con el paso de los años es un proceso muy complejo. Algunos de los factores que afectan a este envejecimiento \cite{informatica:tecnica_sintesis_aifr} son:
         \begin{itemize}
             \item Factores intrínsecos como la genética o la etnia
             \item Factores extrínsecos como el ambiente o los hábitos de vida
         \end{itemize}
     Además, algunas características de la cara cambian drásticamente con el paso de los años. Por ejemplo, la textura (pensar por ejemplo en la aparición de arrugas, lunares, vello, \ldots), cambios en la forma de la cara (por ejemplo, por un cambio en el peso corporal)
 
-    \item Tenemos que trabajar con identidades que nunca hemos visto en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, también ocurre esto (por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo). Sin embargo la diferencia radica en que, en nuestro problema, el modelo debe saber identificar identidades, mientras que en el segundo caso, el modelo debe saber identificar categorías. Siguiendo con esta analogía, sería como pedirle al modelo clasificador que, dados dos tipos de objetos que nunca ha visto (por ejemplo, aviones), sepa asignarles la misma categoría
+\item Tenemos que trabajar con \textbf{identidades que nunca hemos visto} en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, también ocurre esto (por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo). Sin embargo la diferencia radica en que, en nuestro problema, el modelo debe saber identificar identidades, mientras que en el segundo caso, el modelo debe saber identificar categorías. Siguiendo con esta analogía, sería como pedirle al modelo clasificador que, dados dos tipos de objetos que nunca ha visto (por ejemplo, aviones), sepa asignarles la misma categoría
+
+\item Aunque desarrollemos esto más tarde en \customref{isec:base_datos_usada}, los \textbf{\textit{datasets} de \textit{AIFR} son escasos y presentan problemas} \cite{informatica:tecnica_sintesis_aifr}. Algunas de estas bases de datos son muy pequeñas. Otras, son de un tamaño más grande, pero presentan mucha menos variabilidad en los rangos de edad. Y por supuesto, muchas de estas bases de datos presentan problemas de representatividad (etnia, sexo).
 \end{itemize}
 
 \begin{figure}[H]
@@ -92,6 +99,7 @@ Este problema tiene, además de los problemas comunes de la visión por computad
         \centering
         \includegraphics[width=0.6\linewidth]{informatica/messi_niño}
         \caption{Edad temprana}
+        \label{img:messi_pequeño}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
@@ -116,16 +124,33 @@ Este problema tiene, además de los problemas comunes de la visión por computad
 
 \end{figure}
 
-Por poner un ejemplo, fijémonos en \customref{img:messi_cuatro_edades} \footnotemark. Estas cuatro imágenes reflejan perfectamente los problemas que hemos planteado previamente. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara
+Por poner un ejemplo, fijémonos en \customref{img:messi_cuatro_edades} \footnotemark. Estas cuatro imágenes reflejan perfectamente los problemas que hemos planteado previamente. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeño}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador, como por ejemplo, cambios en la pose, iluminación, \ldots
 \footnotetext{Imágenes extraídas de \url{https://tinyurl.com/2x4fkxjx}, \url{https://tinyurl.com/y4ubnz3v}, \url{https://tinyurl.com/ywek233h} y \url{https://tinyurl.com/yqrf78w8}}
 
-% TODO -- \cite{informatica:tecnica_sintesis_aifr} comenta que las bases de datos no son de calidad
-% TODO -- comentar los dos enfoques, generar sintéticamente vs aprender de bases de datos
-% TODO -- comentar las fortalezas de haber empleado un modelo que computa un embedding
+Y aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer ahora unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding}.
 
-\section{Motivación del problema}
+Por tanto, usando dicho fundamento, podríamos haber resuelto también alguno de los otros problemas que ya hemos mencionado, por ejemplo, el de verificación. Sin embargo, para acotar el alcance de este trabajo, hemos decidido centrarnos en \textit{retrieval}.
 
-\section{Descripción de la base de datos usada}
+Además, por cómo hemos diseñado el código (basado en adaptadores, como explicamos en \customref{ich:implementacion}), la adaptación del modelo a una nueva tarea es inmediato, y en teoría, si el modelo inicial es competente, el modelo adaptado también debería serlo.
+
+Y para finalizar, comentaremos los \textbf{dos enfoques principales usados para resolver problemas de \textit{AIFR}}:
+
+\begin{enumerate}
+    \item El primer enfoque es aplicar modelos generativos adversarios (\textit{GAN}). Por ejemplo, el \textit{Age Invariant Model} o \textit{AIM} propuesto en \cite{informatica:tecnica_sintesis_aifr}.
+    \item El segundo enfoque es directamente trabajar sobre una base de datos que presente la suficiente variabilidad en la edad de los individuos, y desarrollar un modelo que realice nuestra tarea. Este enfoque casi siempre pasa por computar un \textit{embedding}. Este será el enfoque que sigamos.
+\end{enumerate}
+
+\section{Descripción de la base de datos usada} \label{isec:base_datos_usada}
+
+Como se comentará en \customref{isec:planificacion}, teniendo en cuenta que íbamos a tener que realizar un gran número de implementaciones, decidimos iterar sobre varias bases de datos.
+
+La \textbf{primera base de datos} que consideramos es la más que conocida \entrecomillado{MNIST} \cite{informatica:mnist}. Esta base de datos se compone de 70000 imágenes $28 \times 28$ de dígitos, del 0 al 9, escritos a mano. No tiene ningún interés para el trabajo que vamos a realizar. Sin embargo, escogemos esta base de datos como punto de partida por:
+
+\begin{itemize}
+    \item Es una base de datos muy pequeña, por lo que nuestras implementaciones no tendrán ningún tipo de problemas de rendimiento
+    \item Es una base de datos muy sencilla, no tenemos que preocuparnos de procesar las imágenes de ninguna forma
+    \item No tenemos que realizar ninguna implementación para trabajar con ella, puesto que podemos usar el paquete \lstinline{torchvision}, que se encarga de la descarga del conjunto de datos y su disposición en un objeto de tipo \lstinline{torch.utils.data.Dataset}
+\end{itemize}
 
 \section{Descripción de los objetivos}
 \todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
@@ -139,5 +164,12 @@ Por todo esto, los objetivos del presente trabajo son los siguientes:
     \item Comparar los resultados obtenidos con otros trabajos del mismo ámbito
 \end{enumerate}
 
-\section{Planificación}
-\todo{Escribir al final porque la planificación ha sido un desastre al haberme encontrado con tantos problemas}
+\section{Planificación} \label{isec:planificacion}
+
+Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para las técnicas sobre las que queremos estudiar. Esto supone que deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código. Por tanto, decidimos realizar un desarrollo en varias etapas, iterando sobre distintas bases de datos, de menor complejidad (estructura de los datos, facilidad de trabajo con ellos, tamaño) e interés, hasta los datos más complejos y relevantes para nuestro estudio.
+
+Esto ha permitido poder centrarnos en el desarrollo de los módulos, sin preocuparnos de los problemas que podrían introducir distintas bases de datos. Una vez realizada una implementación inicial junto con su validación a partir de una base sólida de \textit{tests}, se itera sobre bases de datos más complejas, en busca de analizar posibles problemas de rendimiento. Y así es como acaba ocurriendo, como plasmamos en \customref{isec:optimizacion_codigo}.
+
+Una vez analizados y resuelto los puntos débiles en temas de rendimiento (evitando así realizar optimizaciones prematuras e irrelevantes que ralentizasen el desarrollo de código), pasamos a tratar con las bases de datos que realmente nos interesan. Así, en este punto, tenemos prácticamente toda la base de código desarrollada, pudiendo centrarnos únicamente en la experimentación.
+
+\todo{Todavía le faltan partes}
