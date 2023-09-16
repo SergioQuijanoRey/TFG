@@ -130,9 +130,9 @@ con lo que obtendríamos un modelo totalmente inservible. Para evitar eso, intro
 
 Buscamos que el término de la izquierda sea lo más negativo posible, por lo buscamos minimizar la siguiente función de pérdida:
 
-\begin{equation}
+\begin{equation} \label{ieq:triplet_loss_single_entry}
 \begin{split}
-    \mathcal{L}_{tri}(A, P, N) & := max \{D_{A, P} - D_{A, N} + \alpha, 0 \} = \ldots \\
+    \mathcal{L}_{tri}(\theta; A, P, N) & := max \{D_{A, P} - D_{A, N} + \alpha, 0 \} = \ldots \\
     \ldots &= ReLU(D_{A, P} - D_{A, N} + \alpha)
 \end{split}
 \end{equation}
@@ -144,6 +144,63 @@ Minimizando esta función de pérdida, lo que haremos será atraer elementos de 
     \includegraphics[width=0.8\textwidth]{informatica/triplet_loss_learning}
     \caption{Ejemplo gráfico del proceso de aprendizaje deseado con \textit{triplet loss}. Imagen extraída de \cite{informatica:facenet}}
 \end{figure}
+
+Sin embargo, en \eqref{ieq:triplet_loss_single_entry} trabajamos con una sola entrada de tres datos. A diferencia de un \textit{dataset} con datos etiquetados clásico (de la forma \lstinline{(entrada, valor de etiqueta)}), tenemos datos de la forma \lstinline{(imagen, identificador de individuo, edad)}. Esto supone un \textbf{problema} a resolver: cómo generamos \textit{batches} con triples de la forma \lstinline{(ancla, positivo, negativo)} para poder aplicar \eqref{ieq:triplet_loss_single_entry}. Introducimos algunas soluciones propuestas a este problema en \customref{isec:batching}
+
+\section{Generación de \textit{batches}} \label{isec:batching}
+
+Como ya hemos comentado, la tarea que debemos resolver ahora es la de generación de \textit{batches} adecuados para poder emplear \eqref{ieq:triplet_loss_single_entry} como función de pérdida a minimizar.
+
+Por tanto, dado un conjunto de datos de la forma \lstinline{(imagen, identificador, edad)}, debemos obtener un conjunto de datos de la forma \lstinline{(img. ancla, img. positivo, img. negativo)}. Este último conjunto de datos puede ser una lista de triples o conjuntos de \textit{mini-batches}. Como vamos a trabajar con \textit{mini-batches}, podemos simplemente muestrear aleatoriamente y sin remplazo de la lista de triples, repitiendo el muestreo tras cada época completada.
+
+\subsection{Enfoque \textit{offline}}
+
+Este es el enfoque que se ha venido usando previo a \cite{informatica:facenet}, que introduce un enfoque \textit{online} que luego otros trabajos como \cite{informatica:principal} han ido mejorando.
+
+En este enfoque, el ciclo de aprendizaje se divide en \textbf{varios pasos}.
+
+En primer lugar, se realiza un minado \textit{offline} de los triples. Es decir, se obtiene una primera lista (o conjunto de \textit{mini-batches}) de la forma \lstinline{(img. ancla, img.positivo, img.negativo)}. Una forma de hacer esto sería, por ejemplo, generar los triples de forma aleatoria, generar todos los posibles triples, $\ldots\dspace$ Aunque estas ideas no suelen funcionar en la práctica. Otra forma más efectiva es seleccionar los triples en base de algún estudio estadístico. O usar la red que vamos a optimizar, para identificar aquellos triples en los que tiene más dificultad de distinguir.
+
+En segundo lugar, realizamos el aprendizaje sobre dicho conjunto de triples. En algunos casos, realizamos el entrenamiento completo sobre dicho conjunto inicial. En otros casos, principalmente cuando usamos la red para el minado de triples, pasadas algunas épocas de entrenamiento volvemos a generar otra vez la lista de triples. Así, triples que antes la red no identificaba propiamente, ahora sí que los identifica y podemos buscar triples más interesantes (lo que se conoce como \entrecomillado{network snapshots} \cite{informatica:facenet}).
+
+Una vez computado una lista de triples $(a, p, n) \in \Omega$, la función de pérdida \eqref{ieq:triplet_loss_single_entry} se implementa de forma natural como en cualquier otro ámbito de \textit{mini-batching}:
+
+\begin{equation}
+    \mathcal{L}_{tri}^{offline}(\theta; \Omega) := \frac{1}{\#\Omega} \sum_{(a, p, n) \in \Omega} \mathcal{L}_{tri}(\theta; a, p, n)
+\end{equation}
+
+Este enfoque supone una serie de \textbf{problemas}:
+
+\begin{itemize}
+    \item Estamos dividiendo el proceso de aprendizaje en dos etapas, la de minado de triples y la de aprendizaje sobre estos triples. Esto añade complejidad a nuestro \textit{pipeline}
+    \item La adecuada elección de triples es fundamental. Si elegimos triples demasiado fáciles, la red no aprenderá nada nuevo, pues es muy fácil distinguir los ejemplos presentados. Sin embargo, si solo mostramos triples complicados, el modelo se centrará en aprender ejemplos extraordinarios y no sabrá distinguir el grueso de ejemplos más sencillos
+        \begin{itemize}
+            \item Además, generalmente los modelos aprenden rápidamente a distinguir la mayoría de ejemplos en los que las diferencias son relativamente evidentes. Por tanto, en pocas iteraciones la mayoría de triples son demasiado sencillos, lo que agrava mucho este problema
+        \end{itemize}
+    \item Lo ideal sería disponer de alguna forma de ajustar la complejidad de los triples presentados. Podemos confiar en que al ir re-generando la lista de triples, la complejidad vaya aumentando. Pero el algoritmo de minado debería tener alguna forma de controlar el énfasis que se hace en la búsqueda de combinaciones difíciles, lo que añade aún más complejidad al sistema
+    \item El minado supone realizar un proceso de búsqueda, que es \textbf{muy lento} (evaluar de alguna forma todos los posibles triples supondría al menos $O(n^3)$). Lo ideal sería disponer de algún método que se basará en muestrear aleatoriamente de nuestra lista de \lstinline{(imagen, identidad, edad)} (proceso que es muy rápido) y generar rápidamente triples interesantes (esto es lo que hacemos en \customref{isubs:triples_online})
+\end{itemize}
+
+\subsection{Enfoque \textit{online}} \label{isubs:triples_online}
+
+La idea común será implementar el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio de todos los datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Sin embargo, ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales (muestreo y selección de triples):
+
+\begin{enumerate}
+    \item La ventaja más obvia es que, suponiendo que el tamaño de la muestra es significativamente mucho más pequeño que el tamaño de todo el conjunto de datos, la generación de triples consumirá menos potencialmente tiempo y serán más efectivas
+        \begin{itemize}
+            \item Tendríamos que estudiar el tiempo del minado \textit{offline} en contraste a la suma de todos los tiempos de minado en cada muestreo
+            \item Sin embargo, el tiempo usado es más eficiente. Porque en cada paso estamos usando la red actualizada. En el minado \textit{offline} podemos gastar muchísimo tiempo en encontrar triples difíciles que, tras entrenar en pocos ejemplos previos, acaben siendo sencillos, y por tanto, cuando la red vea estos ejemplos, ya sean totalmente inútiles
+        \end{itemize}
+    \item Se facilita en gran parte el ajuste de la dificultad. Podemos buscar triples realmente difíciles, pero como solo se tiene acceso a una pequeña muestra, estamos controlando la dificultad. Aquí podemos variar el tamaño de las muestras para buscar un punto medio entre ejemplos muy difíciles o ejemplos demasiado sencillos. Y todo esto sin contar con el factor de que vamos a usar la red para la elección de los triples, como comentaremos más adelante
+\end{enumerate}
+
+Desarrollada esta visión de forma general, veamos cómo se implementa cada una de las partes, siguiendo las técnicas introducidas en \cite{informatica:principal}.
+
+\subsection{\textit{P-K sampling} y funciones de pérdida asociadas}
+
+% TODO -- seguir por aquí
+% TODO -- abrir el paper de referencia por la pagina 3, https://arxiv.org/pdf/1703.07737.pdf
+% TODO - abrir tambien el paper de facenet: https://arxiv.org/pdf/1503.03832.pdf
 
 \subsection{Ventajas}
 
