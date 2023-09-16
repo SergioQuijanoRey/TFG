@@ -1,7 +1,7 @@
 % !TeX root = ../../libro.tex
 % !TeX encoding = utf8
 
-\chapter{Introducción}
+\chapter{Introducción} \label{ich:introduccion}
 
 % TODO -- estructura que le quiero dar al trabajo
 % 1. Introduccion
@@ -92,6 +92,8 @@ Este problema tiene, además de los problemas comunes de la visión por computad
 
 \item Tenemos que trabajar con \textbf{identidades que nunca hemos visto} en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, también ocurre esto (por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo). Sin embargo la diferencia radica en que, en nuestro problema, el modelo debe saber identificar identidades, mientras que en el segundo caso, el modelo debe saber identificar categorías. Siguiendo con esta analogía, sería como pedirle al modelo clasificador que, dados dos tipos de objetos que nunca ha visto (por ejemplo, aviones), sepa asignarles la misma categoría
 
+\item Nuestro modelo debe identificar como similares (véase \customref{isec:embeddings}) imágenes de la misma persona, aunque sea en momentos muy distintos. Y debe identificar como no similares imágenes de personas distintas. Es muy fácil que ocurra que la imagen de la misma persona en dos edades alejadas parezca más distinta que las imágenes de dos personas distintas pero de la misma edad. Por ejemplo, esto se puede ver en \customref{img:messi_distintos_otro_adulto}
+
 \item Aunque desarrollemos esto más tarde en \customref{isec:base_datos_usada}, los \textbf{\textit{datasets} de \textit{AIFR} son escasos y presentan problemas} \cite{informatica:tecnica_sintesis_aifr}. Algunas de estas bases de datos son muy pequeñas. Otras, son de un tamaño más grande, pero presentan mucha menos variabilidad en los rangos de edad. Y por supuesto, muchas de estas bases de datos presentan problemas de representatividad (etnia, sexo).
 \end{itemize}
 
@@ -99,7 +101,7 @@ Este problema tiene, además de los problemas comunes de la visión por computad
 \centering
     \begin{subfigure}{0.5\textwidth}
         \centering
-        \includegraphics[width=0.6\linewidth]{informatica/messi_niño}
+        \includegraphics[width=0.5\linewidth]{informatica/messi_niño}
         \caption{Edad temprana}
         \label{img:messi_pequeño}
     \end{subfigure}%
@@ -111,7 +113,7 @@ Este problema tiene, además de los problemas comunes de la visión por computad
 
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.8\linewidth]{informatica/messi_adulto}
+        \includegraphics[width=0.6\linewidth]{informatica/messi_adulto}
         \caption{Edad adulta}
         \label{img:messi_adulto}
     \end{subfigure}%
@@ -129,7 +131,34 @@ Este problema tiene, además de los problemas comunes de la visión por computad
 Por poner un ejemplo, fijémonos en \customref{img:messi_cuatro_edades} \footnotemark. Estas cuatro imágenes reflejan perfectamente los problemas que hemos planteado previamente. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeño}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador, como por ejemplo, cambios en la pose, iluminación, \ldots
 \footnotetext{Imágenes extraídas de \url{https://tinyurl.com/2x4fkxjx}, \url{https://tinyurl.com/y4ubnz3v}, \url{https://tinyurl.com/ywek233h} y \url{https://tinyurl.com/yqrf78w8}}
 
-Y aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer ahora unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding}.
+Veámos otro ejemplo:
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{informatica/messi_niño}
+        \caption{Messi en una edad temprana}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/messi_adulto}
+        \caption{Messi en edad adulta}
+    \end{subfigure}
+
+    \begin{subfigure}{.8\textwidth}
+        \centering
+        \includegraphics[width=0.6\linewidth]{informatica/doble_messi}
+        \caption{Riza Perestes, ciudadano iraní. Imagen extraída de \url{https://www.insideworldsoccer.com/2017/04/riza-perestes-iran-soccer-fan-lionel-messi-lookalike.html?m=0}}
+    \end{subfigure}
+
+\caption{Lionel Messi en dos momentos distintos de su vida, y un Riza Perestes, ciudadano iraní con gran parecido}
+\label{img:messi_distintos_otro_adulto}
+\end{figure}
+
+En este ejemplo vemos un problema que hemos comentado previamente: tenemos más parecido entre dos personas distintas pero de la misma edad, que entre la misma persona pero a distintas edades. En este caso el parecido es extraordinario, pero es razonable que nuestro modelo tenga dificultades en asignar mayor parecido a las dos imágenes de distintas edades, que a la imagen de otro individuo con barba y corte de pelo parecido.
+
+Ahora, aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer ahora unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding}.
 
 Por tanto, usando dicho fundamento, podríamos haber resuelto también alguno de los otros problemas que ya hemos mencionado, por ejemplo, el de verificación. Sin embargo, para acotar el alcance de este trabajo, hemos decidido centrarnos en \textit{retrieval}.
 
@@ -249,7 +278,7 @@ Dicho conjunto de datos se compone de:
     \item Un archivo de \textit{Matlab} con 10 \textit{folds}, que el autor usa en \cite{informatica:yanweifu_work}
 \end{itemize}
 
-Optamos por trabajar únicamente con las imágenes, puesto que por las técnicas que estamos usando, no sabríamos aprovechar las anotaciones realizadas sobre los datos. Gracias a los nombres de los archivos podemos almacenar también información sobre las edades de los individuos, información que nos va a ser muy relevante.
+Optamos por trabajar únicamente con las imágenes, puesto que por las técnicas que estamos usando, no sabríamos aprovechar las anotaciones realizadas sobre los datos. Otros trabajos conocidos como \cite{informatica:facenet} usan esta forma de proceder. Gracias a los nombres de los archivos podemos almacenar también información sobre las edades de los individuos, información que nos va a ser muy relevante.
 
 Y de nuevo, este \textit{dataset} presenta un salto de calidad respecto al anterior, por los siguientes motivos:
 
@@ -425,7 +454,7 @@ De nuevo, este conjunto de datos no se ofrece en ninguna librería conocida de \
     \item Información sobre cada imagen: identificador de la celebridad, edad de la celebridad en la imagen, año en el que se tomó la imagen y \textit{landmarks} faciales
 \end{itemize}
 
-De nuevo, trabajamos únicamente con el conjunto de datos de imágenes, sin anotaciones. De los propios nombres de los archivos podemos extraer el identificador de la celebridad y la edad que tiene en cada una de sus imágenes. Este conjunto de datos mantiene algunas de las características que deseábamos y trae otras nuevas:
+De nuevo, trabajamos únicamente con el conjunto de datos de imágenes, sin anotaciones (como se hace, por ejemplo, en \cite{informatica:facenet}). De los propios nombres de los archivos podemos extraer el identificador de la celebridad y la edad que tiene en cada una de sus imágenes. Este conjunto de datos mantiene algunas de las características que deseábamos y trae otras nuevas:
 
 \begin{itemize}
     \item En primer lugar, tenemos varianza en la edad de los individuos, que es fundamental para resolver nuestro problema

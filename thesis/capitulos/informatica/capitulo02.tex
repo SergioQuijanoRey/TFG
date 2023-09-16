@@ -2,7 +2,7 @@
 
 En esta sección introduciremos algunos \textbf{conceptos teóricos} sobre los que se basará nuestro trabajo, y por tanto, conviene conocer para entender este trabajo.
 
-\section{\textit{Embeddings}}
+\section{\textit{Embeddings}} \label{isec:embeddings}
 
 Nuestro trabajo busca desarrollar un modelo de aprendizaje automático que aprenda un \textit{embedding}. Un \textit{embedding} no es más que un mapeo desde un cierto espacio $X$ de datos de entrada (en nuestro caso, podemos considerar $X$ como el espacio de imágenes en las que aparecen caras) a un espacio vectorial $\R^N$. En la mayoría de casos, la dimensión del espacio de llegada $N$ es menor que la dimensión del espacio $X$.
 
@@ -48,8 +48,6 @@ Además, será deseable que $f_{\theta}$ sea una función continua (en casi cual
     \begin{equation}
         vector("rey") - vector("hombre") + vector("mujer") = vector("reiina")
     \end{equation}
-
-
 \end{ejemplo}
 
 \begin{ejemplo}
@@ -64,13 +62,88 @@ Además, será deseable que $f_{\theta}$ sea una función continua (en casi cual
     \end{figure}
 
     Por ejemplo, un modelo que quiera resolver esta tarea podría aprender a mapear personas con exactamente la misma ropa a puntos cercanos.
+\end{ejemplo}
+
+\begin{ejemplo}
+
+    Y para finalizar, consideremos nuestra tarea en concreto. Buscamos que las imágenes de la misma persona, aunque hayan pasado los años, se transformen en vectores cercanos. Y al contrario, que imágenes de dos personas distintas estén lo más lejos posible.
+
+    Esto es especialmente complicado, como ya hemos comentando en \customref{ich:descrp_problema}, porque por ejemplo, nuestro modelo debe ver como más cercanos imágenes de un niño y un adulto con barba (ambos siendo la misma persona) que dos imágenes de dos adultos con barba (siendo distintas personas), como hemos mostrado claramente en \customref{img:messi_distintos_otro_adulto}
 
 \end{ejemplo}
 
-
-
-
 \section{\textit{Triplet Loss}} \label{isec:triplet_loss}
+
+Nuestro objetivo es ahora justificar el uso de \textit{triplet loss} como una función de pérdida que permita a nuestro modelo aprender un \textit{embedding} semántico.
+
+Recordemos que estamos trabajando con funciones de la forma:
+
+\begin{equation}
+\begin{split}
+    f_{\theta}: X & \to \R^N \\
+    x & \mapsto f_{\theta}(x)
+\end{split}
+\end{equation}
+
+y con una métrica:
+
+\begin{equation}
+\begin{split}
+    D: X \times X & \to [0, \infty) \\
+    x, y & \mapsto D(x, y)
+\end{split}
+\end{equation}
+
+Para ser más concisos, usaremos la notación $D_{i, j} := D(f_{\theta}(x_i), f_{\theta}(x_j))$.
+
+Como su nombre indica, \textit{triplet loss} trabajará sobre triples. Esto es, trabajaremos con:
+
+\begin{enumerate}
+    \item Una imagen de un individuo concreto, a la que llamaremos \textbf{\textit{anchor}} o ancla
+    \item Otra imagen distinta, pero del mismo individuo, a la que llamaremos \textbf{positivo}
+    \item Una imagen de un individuo distinto, a la que llamaremos \textbf{negativo}
+\end{enumerate}
+
+En este caso, queremos que la distancia entre el \textit{embedding} del ancla y el positivo (que podemos denotar $D_{A, P}$) sea mucho menor que la distancia entre el \textit{embedding} del ancla y el negativo (denotamos $D_{A, N}$). Por tanto, lo que realmente queremos es que:
+
+\begin{equation}
+    D_{A, P} \leq D_{A, N}
+\end{equation}
+
+o lo que es lo mismo,
+
+\begin{equation}
+    D_{A, P} - D_{A, N} \leq 0
+\end{equation}
+
+Una forma trivial de hacer que esa ecuación se cumpla, es haciendo que
+
+\begin{equation}
+    f(x) = \vec{0}; \dspace \forall x \in X
+\end{equation}
+
+con lo que obtendríamos un modelo totalmente inservible. Para evitar eso, introducimos un término $\alpha > 0$ que se conoce como \textbf{margen}, llegando a:
+
+\begin{equation}
+    D_{A, P} - D_{A, N} + \alpha \leq 0
+\end{equation}
+
+Buscamos que el término de la izquierda sea lo más negativo posible, por lo buscamos minimizar la siguiente función de pérdida:
+
+\begin{equation}
+\begin{split}
+    \mathcal{L}_{tri}(A, P, N) & := max \{D_{A, P} - D_{A, N} + \alpha, 0 \} = \ldots \\
+    \ldots &= ReLU(D_{A, P} - D_{A, N} + \alpha)
+\end{split}
+\end{equation}
+
+Minimizando esta función de pérdida, lo que haremos será atraer elementos de la misma clase entre sí, y alejar elementos de clases distintas. Este proceso se refleja en la siguiente imagen:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/triplet_loss_learning}
+    \caption{Ejemplo gráfico del proceso de aprendizaje deseado con \textit{triplet loss}. Imagen extraída de \cite{informatica:facenet}}
+\end{figure}
 
 \subsection{Ventajas}
 
