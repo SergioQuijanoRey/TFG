@@ -245,15 +245,17 @@ Dicho conjunto de datos se compone de:
     \item Un archivo de \textit{Matlab} con 10 \textit{folds}, que el autor usa en \cite{informatica:yanweifu_work}
 \end{itemize}
 
-Optamos por trabajar únicamente con las imágenes, puesto que por las técnicas que estamos usando, no sabríamos aprovechar las anotaciones realizadas sobre los datos.
+Optamos por trabajar únicamente con las imágenes, puesto que por las técnicas que estamos usando, no sabríamos aprovechar las anotaciones realizadas sobre los datos. Gracias a los nombres de los archivos podemos almacenar también información sobre las edades de los individuos, información que nos va a ser muy relevante.
 
 Y de nuevo, este \textit{dataset} presenta un salto de calidad respecto al anterior, por los siguientes motivos:
 
 \begin{itemize}
     \item Trabajamos con un conjunto de datos cuya dificultad principal es la de la varianza en la edad. Esto se alinea por completo con el problema que queremos resolver
     \item El número de imágenes por individuo es mucho mejor que en \textit{LFW}, como muestran \customref{img:fgnet_images_per_class} y \customref{table:fgnet_images_per_class}
-    \item Tenemos información sobre la distribución de la edad de nuestros individuos, que estudiamos en \customref{img:fgnet_histograma_edad} y en \customref{table:fgnet_estadisticas_edad}
+    \item Tenemos información sobre la distribución de la edad de nuestros individuos, que estudiamos en \customref{isubsubs:fgnet_dist_edades} y en \customref{isubsubs:fgnet_rango_edades}
 \end{itemize}
+
+\subsubsection{Distribución del número de imágenes por individuo}
 
 A continuación, mostramos algunas características fundamentales del \textit{dataset}, empezando por la \textbf{distribución de número de imágenes por individuo}:
 
@@ -290,6 +292,8 @@ Dicha distribución queda mejor explicada con las siguientes estadísticas:
 
 Tanto los estadísticos como la gráfica de la distribución dejan claro que, al menos en lo que respecta al número de imágenes por individuo, este conjunto de datos es mucho mejor. Como mínimo tenemos 6 imágenes por individuo, algo impensable en el conjunto de datos \textit{LFW}, donde apenas había individuos con más de dos imágenes. En segundo lugar, la media y los cuartiles nos muestran que la mayoría de los datos tienen entre 10 y 13 imágenes, lo que supone un muy buen dato.
 
+\subsubsection{Distribución de edad de los individuos} \label{isubsubs:fgnet_dist_edades}
+
 Veamos ahora la \textbf{distribución de la edad de los individuos}:
 
 \begin{figure}[H]
@@ -325,25 +329,78 @@ El histograma \customref{img:fgnet_histograma_edad} nos muestra una distribució
 
 El rango de edades es muy amplio, yendo desde los 0 años (en \textit{LFW} ya comentábamos el problema que suponía no tener imágenes de niños) hasta los 69 años.
 
-Por tanto, la calidad, en lo que distribución de edades se refiere, parece excelente. Aún así, podemos estudiar una distribución que nos dará una información todavía más profunda: el \textbf{rango de edad por individuo}. Calculamos, para cada individuo, la diferencia entre su edad más avanzada menos su edad más temprana. Con esto, podemos mostrar dicha distribución en la siguiente figura:
+Por tanto, la calidad, en lo que distribución de edades se refiere, parece excelente. Aún así, podemos estudiar una distribución que nos dará una información todavía más profunda: el rango de edad por individuo.
 
-% TODO -- seguir por aqui, viendo del notebook las distribuciones de rangos de edad
+\subsubsection{Distribución del rango de edad por individuo} \label{isubsubs:fgnet_rango_edades}
 
-Sin embargo, se presentan los siguientes inconvenientes:
-\todo{Comentar que son muy pocas imagenes como para entrenar}
-\todo{Comentar que \cite{informatica:yanweifu_work} dice que es el conjunto mas dificil para entrenar. Además, en este paper veo que lo usual es usar este conjunto para evaluar, y usar uno mas grande para entrenar}
+Estudiamos ahora el \textbf{rango de edad por individuo}. Para calcular este, computamos para cada individuo la diferencia entre su edad más avanzada menos su edad más temprana. Veamos este rango de edad gráficamente para todos los individuos:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/fgnet_rangos_edad_individuales}
+    \caption{Rangos de edad para todos los individuos. Los individuos están ordenados en primera instancia por su edad más baja, y en segunda instancia, por su edad más alta.}
+    \label{img:fgnet_rangos_individuales}
+\end{figure}
+
+De esta forma es complicado sacar información de los datos. Así que mostremos la distribución de los rangos de edad:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/fgnet_distribucion_rangos_edad}
+    \caption{Distribución del rango de edad. En el eje horizontal tenemos los rangos de edad. En el eje vertical, la cantidad de individuos que presentan dicho rango de edad en sus imágenes}
+    \label{img:fgnet_rangos_distribucion}
+\end{figure}
+
+Esta distribución se complementa con los siguientes datos estadísticos:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{Valor} \\
+    \hline
+
+    Media             & 27.80 \\
+    Desviación Típica & 11.75 \\
+    Mínimo            & 11.00 \\
+    $Q_1 \%$          & 18.00 \\
+    $Q_2 \%$          & 26.50 \\
+    $Q_3 \%$          & 37.75 \\
+    Máximo            & 55.00 \\
+
+    \hline
+
+\end{tabular}
+\caption{Datos estadísticos sobre la distribución de los rangos de edad}
+\label{table:fgnet_rangos_estadisticas}
+\end{table}
+
+En base a estos datos, podemos observar:
 
 \begin{itemize}
-    \item
-    \item
-    \item
+    \item El rango mínimo de edad es de 11 años. Esto es, dado cualquier individuo del conjunto de datos, tenemos aseguradas imágenes que difieren en al menos 11 años. El máximo rango es de 55 años. Esto supone una gran riqueza en los datos, y a la vez, una gran dificultad a la hora de trabajar la invarianza a los cambios de edad
+    \item De media tenemos un rango de aproximadamente 27 años. Y la mayoría de nuestros datos se encuentran dentro de unas diferencias de edad de entre 18 y 37 años (aproximadamente). De nuevo, esto marca la calidad en cuanto a rangos de edad se refiere
+    \item En \customref{img:fgnet_rangos_individuales} podemos ver claramente que la mayoría de individuos tienen imágenes en rangos de edad que podemos considerar bajos (por debajo de 10 años)
 \end{itemize}
 
+\subsubsection{Inconvenientes}
 
+Sin embargo, se presentan los siguientes \textbf{inconvenientes}:
 
+\begin{enumerate}
+    \item Partimos de trabajar con únicamente 1002 imágenes. Aunque lo hemos intentado, esta cantidad de datos no nos es suficiente para entrenar un modelo lo suficientemente potente de reconocimiento facial. Y mucho menos es suficiente para entrenar y además validar
+    \item Como se comenta en \cite{informatica:best_fgnet_model}, este es el \textit{dataset} más famoso, pero a la vez, más complicado de resolver, en el ámbito de \textit{AIFR}. Esta complejidad ha quedado de sobra explicada en esta sección a través del estudio realizado, principalmente, sobre la distribución de edad y de rangos de edad
+    \item Una forma de proceder común \cite{informatica:best_fgnet_model} es entrenar un modelo sobre un conjunto de datos mucho mayor, y usar este conjunto de datos únicamente para validar el modelo entrenado. Esta aproximación nos parece muy correcta por los siguientes motivos:
+        \begin{itemize}
+            \item En primer lugar, siempre es una buena idea comprobar que nuestro modelo generaliza correctamente, no solo sobre un subconjunto de datos de nuestro conjunto de trabajo original, sino sobre un conjunto de datos completamente nuevo
+            \item En segundo lugar, hemos visto que la calidad de los datos en cuanto a rangos de edad es excelente, y supone un reto complejo. Por tanto, si obtenemos un modelo entrenado sobre otro conjunto de datos, que consigue un buen rendimiento en este, podemos estar bastante seguros de que nuestro modelo generalizará adecuadamente
+            \item En tercer lugar, este proceso se asemeja bastante al uso que se le dará al modelo en la práctica, recibiendo imágenes de identidades nunca vistas con particularidades en el rango de edad que desconocemos a priori
+        \end{itemize}
+\end{enumerate}
 
+Es por tanto que, siguiendo el procedimiento propuesto en \cite{informatica:best_fgnet_model}, usaremos este \textit{dataset} para validar el modelo entrenado sobre un conjunto de datos mucho mayor, en este caso, \customref{isec:dataset_cacd}.
 
-\subsection{\textit{CACD}}
+\subsection{\textit{CACD}} \label{isec:dataset_cacd}
 
 \section{Descripción de los objetivos}
 \todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
