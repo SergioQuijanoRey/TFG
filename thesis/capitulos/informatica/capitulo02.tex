@@ -1,3 +1,87 @@
 \chapter{Fundamentos teóricos} \label{ich:fundamentos_teoricos}
 
+En esta sección introduciremos algunos \textbf{conceptos teóricos} sobre los que se basará nuestro trabajo, y por tanto, conviene conocer para entender este trabajo.
+
+\section{\textit{Embeddings}}
+
+Nuestro trabajo busca desarrollar un modelo de aprendizaje automático que aprenda un \textit{embedding}. Un \textit{embedding} no es más que un mapeo desde un cierto espacio $X$ de datos de entrada (en nuestro caso, podemos considerar $X$ como el espacio de imágenes en las que aparecen caras) a un espacio vectorial $\R^N$. En la mayoría de casos, la dimensión del espacio de llegada $N$ es menor que la dimensión del espacio $X$.
+
+Más formalmente, buscamos aprender una función
+
+\begin{equation}
+\begin{split}
+    f_{\theta}: X & \to \R^N \\
+    x & \mapsto f_{\theta}(x)
+\end{split}
+\end{equation}
+
+que tomamos de una familia paramétrica de funciones $\{f_{\theta}: \theta \in \Theta \}$. En el caso de nuestro problema, podemos pensar en la familia de los modelos profundos de redes convolucionales ($\theta$ estaría por tanto compuesto por todos los coeficientes que determinan dicho modelo convolucional, luego podríamos pensar en $\Theta \subseteq \R^M$ donde $M$ es el número de coeficientes del modelo).
+
+El criterio para escoger una función u otra de mapeo es que este deberá ser \textbf{semántico}. En el espacio de llegada $\R^N$ tenemos una métrica:
+
+\begin{equation}
+\begin{split}
+    D: X \times X & \to [0, \infty) \\
+    x, y & \mapsto D(x, y)
+\end{split}
+\end{equation}
+
+Por ejemplo, la métrica euclídea. Queremos que \textbf{datos semánticamente relacionados en $X$ sean mapeados a vectores en $\R^N$ cercanos} por la métrica que fijemos. Del mismo modo, datos semánticamente distintos deberán ser mapeados a vectores distantes.
+
+Además, será deseable que $f_{\theta}$ sea una función continua (en casi cualquier ámbito podemos considerar $X = \R^M$ para algún valor de $M$). Por ejemplo, en el caso de las imágenes, un ligero cambio en un \textit{píxel} de la imagen no debería producir un vector muy distanciado del original. En muchas ocasiones, al estar buscando que el \textit{embedding} sea semántico, esta restricción inducirá en menor o mayor medida dicha continuidad.
+
+\begin{ejemplo}
+    Consideremos que queremos computar un \textit{embedding} para representar palabras.
+
+    Este problema es \textbf{especialmente relevante} en el ámbito del lenguaje natural. Esto es así porque, si queremos trabajar con texto usando modelos de aprendizaje automático, deberemos primero convertir dicho texto a una representación numérica. Usar, por ejemplo, el código binario que codifica dicho texto no parece muy buena idea, porque este mapeo no es semántico ni continuo.
+
+    En este caso, queremos que palabras con una semántica parecida se transformen a vectores cercanos. Por ejemplo, la distancia entre los \textit{embeddings} de las palabras \entrecomillado{ciudad}, \entrecomillado{pueblo} debería ser mucho menor que la distancia entre los \textit{embeddings} de las palabras \entrecomillado{papel}, \entrecomillado{odio}. Esta idea se puede visualizar en la siguiente representación:
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{informatica/word2vec_example}
+        \caption{Ejemplo de un \textit{embedding} semántico, computado por el modelo \textit{word2vec} \cite{informatica:word2vec}, de palabras en francés. Imagen extraída de \url{https://cran.r-project.org/web/packages/word2vec/readme/README.html}}
+    \end{figure}
+
+    En el caso concreto de \cite{informatica:word2vec}, que propone el conocido modelo \textit{word2vec}, se consigue que el \textit{embedding} tenga cierta \entrecomillado{estructura algebraica}, pudiendo computar, por ejemplo:
+
+    \begin{equation}
+        vector("rey") - vector("hombre") + vector("mujer") = vector("reiina")
+    \end{equation}
+
+
+\end{ejemplo}
+
+\begin{ejemplo}
+    Veamos ahora un ejemplo mucho más cercano con el problema que queremos resolver. Por ejemplo, el problema de re-identificación (ambiente en el que se proponen las nuevas técnicas de cómputo del \textit{triplet loss} \cite{informatica:principal}).
+
+    En este caso, queremos que las imágenes de una persona en una escena, se transformen a vectores cercanos, como muestra la siguiente representación:
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{informatica/embedding_paper_principal}
+        \caption{Imagen extraída de \cite{informatica:principal}. Se representa una proporción del \textit{dataset} \textit{Market-1501} tras aplicar el \textit{embedding} aprendido y posteriormente \textit{t-SNE}}
+    \end{figure}
+
+    Por ejemplo, un modelo que quiera resolver esta tarea podría aprender a mapear personas con exactamente la misma ropa a puntos cercanos.
+
+\end{ejemplo}
+
+
+
+
 \section{\textit{Triplet Loss}} \label{isec:triplet_loss}
+
+\subsection{Ventajas}
+
+A diferencia de otros enfoques basados en usar funciones de pérdida auxiliares (y que fuerzan que la red solo pueda funcionar comparando pares de imágenes), el cómputo del \textit{embedding} es directo una vez entrenado el modelo, siendo muy fácil de adaptar a tareas de \textit{clustering}, \textit{retrieval}, verificación, \ldots \cite{informatica:principal}
+
+Estamos usando un modelo convolucional junto con nuestra función de pérdida para computar directamente el \textit{embedding} deseado, sin funciones de pérdida intermedias que en tiempo de evaluación nunca vamos a usar (\textit{end-to-end learning}) \cite{informatica:principal}
+
+\cite{informatica:principal} comenta que triplet loss es bastante poco popular
+
+
+\subsection{\textit{Triplet Loss} clásico}
+
+
+
