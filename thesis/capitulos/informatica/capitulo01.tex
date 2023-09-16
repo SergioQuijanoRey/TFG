@@ -414,6 +414,7 @@ Este \textit{dataset} se compone de 163446 imágenes de 2000 celebridades en eda
     \centering
     \includegraphics[width=0.8\textwidth]{informatica/cacd_example}
     \caption{Muestra de ejemplo del \textit{dataset} \textit{CACD}, imagen extraída de \cite{informatica:paper_cacd}. En la parte superior, tenemos anotadas los años de nacimiento de los individuos. En la parte izquierda, tenemos anotados los años en los que las imágenes fueron tomadas}
+    \label{img:cacd_imagenes_ejemplo}
 \end{figure}
 
 De nuevo, este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}, por lo que realizamos otra implementación de \lstinline{torch.utils.data.Dataset}, como desarrollamos en \customref{isec:datasets_customs}. El conjunto de datos se compone de:
@@ -544,13 +545,161 @@ Por tanto es totalmente innecesario mostrar el histograma de los rangos de edad.
 
 \subsubsection{Inconvenientes}
 
-% TODO -- seguir aqui
-% TODO -- los rangos de edad son muy pequeños
-% TODO -- no tenemos personas por debajo de 14 años (creo que era ese valo)
+Todo esto muestra los siguientes \textbf{inconvenientes}:
+
+\begin{itemize}
+    \item En primer lugar, los rangos de edad son muy pequeños y nada variables. Por ejemplo, viendo \customref{img:cacd_imagenes_ejemplo} las dos personas asociadas a las dos últimas columnas, podemos observar que hay poca variabilidad por el paso de los años. Además, nuestro modelo siempre va a trabajar con diferencias de como mucho 9 años, no sabemos cómo puede comportarse cuando presentemos imágenes con mayor diferencia en años
+    \item En segundo lugar, y como comentaremos detalladamente en \label{isec:comparaciones_datasets}, el conjunto de entrenamiento y de validación son muy distintos (por ejemplo, no tenemos imágenes de personas por debajo de 14 años), y por tanto es realmente complicado que el modelo generalice. Sin embargo, de ser así, estaremos bastante seguros de haber construido un modelo robusto
+\end{itemize}
 
 \subsection{Comparación de los \textit{datasets} \textit{FG-Net} y \textit{CACD}} \label{isec:comparaciones_datasets}
 
-Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:dataset_cacd}, usaremos el segundo \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos.
+Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:dataset_cacd}, usaremos el segundo \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos. Repasaremos los apartados de estudio realizados en los dos últimos \textit{datasets}, comparando los resultados de ambos.
+
+
+\subsubsection{Distribución del número de imágenes por individuo}
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/fgnet_images_per_class}
+        \caption{\textit{FG-Net}}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/cacd_images_per_class}
+        \caption{\textit{CACD}}
+    \end{subfigure}
+\caption{Distribución del número de imágenes por individuo en los \textit{datsets} \textit{FG-Net} y \textit{CACD} }
+\end{figure}
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{\textit{Estadística}} & \textbf{\textit{FG-Net}} & \textbf{\textit{CACD}} \\
+    \hline
+
+    Media             & 12.22 & 81.72  \\
+    Desviación típica & 2.15  & 19.51  \\
+    Mínimo            & 6.00  & 22.00  \\
+    Máximo            & 18.00 & 68.00  \\
+    $Q1 \%$           & 11.00 & 81.00  \\
+    $Q2 \%$           & 12.00 & 95.00  \\
+    $Q3 \%$           & 13.00 & 139.00 \\
+
+    \hline
+
+\end{tabular}
+\caption{Datos estadísticos sobre la distribución del número de imágenes por individuo, en los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
+\end{table}
+
+Podemos ver, a partir de los datos, que:
+
+\begin{itemize}
+    \item El número de imágenes por individuo es ampliamente superior en \textit{CACD} que en \textit{FG-Net}. Un claro indicador de esto es que el valor máximo en \textit{FG-Net} está por debajo del máximo en \textit{CACD}. Este hecho puede ayudar a solventar algunos de los problemas sobre la diferencia en la distribución de la edad que plantea \textit{FG-Net}
+    \item La desviación típica es mucho menor en \textit{FG-Net}. Por lo tanto, en cuanto a cuántas imágenes podemos encontrar por cada individuo, quizás \textit{CACD} introduzca algo más de dificultad, aunque esto no nos parece un factor realmente relevante
+    \item A la hora de entrenar, vamos a poder usar valores mucho más altos de $K$ en \textit{CACD} (véase \customref{ich:fundamentos_teoricos} para más detalles). Y este valor, en validación, se puede reducir (o directamente ignorar) para actuar sobre \textit{FG-Net}
+    \item La distribución en \textit{CACD} parece seguir una distribución normal, mientras que en \textit{FG-Net}, a priori, no se ve de forma tan clara. Aunque como ya hemos comentado previamente, no estamos interesados en comprobar estas hipótesis
+\end{itemize}
+
+\subsubsection{Distribución de edad de los individuos} \label{isubsubs:conjunta_fgnet_cacd_edades}
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/fgnet_distribucion_edades}
+        \caption{\textit{FG-Net}}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/cacd_distribucion_edades}
+        \caption{\textit{CACD}}
+    \end{subfigure}
+    \caption{Distribuciones de las edades en los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
+    \label{img:conjunta_fgnet_cacd_edades}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{\textit{FG-Net}} & \textbf{\textit{CACD}} \\
+    \hline
+
+    Media  & 15.84 & 38.03 \\
+    Mínimo & 0     & 14    \\
+    Máximo & 69    & 62    \\
+    Moda   & 18    & 37    \\
+
+    \hline
+
+\end{tabular}
+    \caption{Estadísticas sobre la distribución de la edad en los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
+    \label{table:conjunta_fgnet_cacd_estadisticas_edad}
+\end{table}
+
+A partir de estos datos, podemos ver que:
+
+\begin{itemize}
+    \item Las formas de las dos distribuciones de datos, tal y como se aprecia en \customref{img:conjunta_fgnet_cacd_edades}, son completamente distintas. Por un lado, en \textit{FG-Net} tenemos una distribución muy asimétrica, acumulando la mayor parte de la densidad en edades bajas, entre 0 y 20 años. En \textit{CACD}, tenemos una distribución más o menos simétrica
+    \item El dominio en \textit{FG-Net} es mucho más amplio, con una edad mínima 14 años menor, y una edad máxima 7 años mayor
+    \item Por tanto, era razonable pensar que íbamos a tener una población mucho más adulta en \textit{CACD}, como muestran tanto los histogramas como el valor de la media y moda en \customref{table:conjunta_fgnet_cacd_estadisticas_edad}
+    \item La concentración en edades bajas en \textit{FG-Net} puede presentar un \textbf{serio problema} a la hora de que un modelo entrenado sobre \textit{CACD} funcione correctamente
+\end{itemize}
+
+
+\subsubsection{Distribución del rango de edad por individuo}
+
+\begin{figure}
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/fgnet_rangos_edad_individuales}
+        \caption{\textit{FG-Net}}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/cacd_rangos_individuales}
+        \caption{\textit{CACD}}
+    \end{subfigure}
+\caption{Rangos de edad para todos los individuos, en los \textit{datasets} \textit{FG-Net} y \textit{CACD}. Los individuos están ordenados en primera instancia por su edad más baja, y en segunda instancia, por su edad más alta.}
+\label{img:conjunta_fgnet_rangos_edades_individuales}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{\textit{FG-Net}} & \textbf{\textit{CACD}} \\
+    \hline
+
+    Media             & 27.80 & 8.99 \\
+    Desviación Típica & 11.75 & 0.11 \\
+    Mínimo            & 11.00 & 7.00 \\
+    $Q_1 \%$          & 18.00 & 9.00 \\
+    $Q_2 \%$          & 26.50 & 9.00 \\
+    $Q_3 \%$          & 37.75 & 9.00 \\
+    Máximo            & 55.00 & 9.00 \\
+
+    \hline
+
+\end{tabular}
+\caption{Datos estadísticos sobre la distribución de los rangos de edad, para los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
+    \label{table:conjunta_fgnet_estadisticas_rangos_edad}
+\end{table}
+
+A partir de estos datos, podemos observar que:
+
+\begin{itemize}
+    \item Como muestran tanto \customref{img:conjunta_fgnet_rangos_edades_individuales} como \customref{table:conjunta_fgnet_estadisticas_rangos_edad}, \textit{FG-Net} presenta una variabilidad en los rangos de edad que es prácticamente inexistente en \textit{CACD} (en la que salvo 15 individuos, el rango de edad siempre es de 15 años)
+    \item Este problema se ve agravado cuando nos damos cuenta que la mayoría de individuos en \textit{FG-Net} tienen un rango de edades entre 18 y casi 38 años, que contrasta con el rango de 9 años constante en \textit{CACD}. Si el rango en \textit{CACD} fuese constante pero superior, al menos la falta de variabilidad podría no notarse tanto
+    \item Para \textit{FG-Net} tenía sentido mostrar el histograma de la distribución de rangos, en \customref{img:fgnet_rangos_distribucion}. Sin embargo, en \textit{CACD}, como no teníamos variabilidad, no mostramos dicho histograma
+    \item Así que las dificultades que veíamos en \customref{isubsubs:conjunta_fgnet_cacd_edades} se ven agravadas al estudiar la distribución de los rangos de edad
+\end{itemize}
 
 \section{Descripción de los objetivos}
 \todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
@@ -561,6 +710,7 @@ Por todo esto, los objetivos del presente trabajo son los siguientes:
     \item Realizar una revisión del estado del arte en el ámbito del \textit{AIFR}
     \item Implementar todos los módulos necesarios para poder aplicar técnicas \textit{online} de cómputo del \textit{triplet loss}
     \item Realizar un estudio de los \textit{datasets} disponibles
+        \todo{No sé que sentido tiene hablar de esto aquí cuando acabamos de mirar todos los datasets que vamos a usar (aunque no todos los datasets disponibles)}
     \item Comparar los resultados obtenidos con otros trabajos del mismo ámbito
     \item Los \textit{scripts} con los que el autor genera las anotaciones de los datos
 \end{enumerate}
