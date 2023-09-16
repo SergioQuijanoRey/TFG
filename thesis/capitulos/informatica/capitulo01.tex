@@ -41,6 +41,8 @@ Esta situación plantea una serie de \textbf{problemas}:
 
 Por otro lado, el ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la informática forense. Es muy interesante disponer de un modelo que reconozca caras de sospechosos que llevan en busca un tiempo, o de personas que han desaparecido hace un tiempo y de la que no se disponen imágenes actuales. También para verificar fotografías en documentos de identidad, como pasaportes \cite{informatica:tecnica_sintesis_aifr}.
 
+Y aunque entraremos en detalle en \customref{ich:implementacion}, todo el desarrollo del código y de la presente memoria se ha relaizado en un repositorio abierto de \textit{Github}, en \url{https://github.com/SergioQuijanoRey/TFG}. Allí se pueden consultar todas las ramas desarrolladas, \textit{pull requests}, \textit{issues} y la integración continua con \textit{Github Actions}.
+
 \section{Descripción del problema} \label{ich:descrp_problema}
 
 Como ya se ha comentado, trabajaremos un problema de reconocimiento facial invariante a la edad (\textit{AIFR}, de sus singlas en inglés \entrecomillado{Age-Invariant Face Recognition}), con la idea principal de introducir una variación sobre la función de pérdida \textit{Triplet Loss} para poder generar \textit{batches} de datos de forma \textit{online}. En esta sección nos centraremos en presentar el problema \textit{AIFR}, la nueva técnica de cómputo de la función de pérdida será explorada en profundidad en \customref{isec:triplet_loss}.
@@ -139,6 +141,7 @@ Y para finalizar, comentaremos los \textbf{dos enfoques principales usados para 
     \item El primer enfoque es aplicar modelos generativos adversarios (\textit{GAN}). Por ejemplo, el \textit{Age Invariant Model} o \textit{AIM} propuesto en \cite{informatica:tecnica_sintesis_aifr}.
     \item El segundo enfoque es directamente trabajar sobre una base de datos que presente la suficiente variabilidad en la edad de los individuos, y desarrollar un modelo que realice nuestra tarea. Este enfoque casi siempre pasa por computar un \textit{embedding}. Este será el enfoque que sigamos.
 \end{enumerate}
+\todo{\cite{informatica:paper_cacd} habla en la página 3 de \url{http://www.sirius.umiacs.io/papers/chen14tmm.pdf} de las aproximaciones al problema!}
 
 \section{Descripción de la base de datos usada} \label{isec:base_datos_usada}
 
@@ -225,7 +228,8 @@ Las distribuciones que se muestran en \customref{img:distribuciones_forzar_data_
 
 Además, en este \textit{dataset} no tenemos información sobre las edades de los individuos en cada una de sus imágenes, así que no podemos hacer un estudio en más profundidad en este aspecto.
 
-\subsection{\textit{FG-Net}}
+\subsection{\textit{FG-Net}} \label{isec:fgnet}
+\todo{Ajustar el tamaño de las imágenes para que cuadren mejor los párrafos}
 
 La \textbf{tercera base de datos} con la que trabajamos es \textit{FG-Net dataset}. La fuente original de este conjunto de datos ya no está operativa, y ahora estos datos se ofrecen en \cite{informatica:fgnet_dataset}. Este conjunto de datos se compone de 1002 imágenes de 82 individuos distintos. Es el \textit{dataset} más popular sobre \textit{AIFR} \cite{informatica:best_fgnet_model}.
 
@@ -286,7 +290,7 @@ Dicha distribución queda mejor explicada con las siguientes estadísticas:
     \hline
 
 \end{tabular}
-\caption{Datos estadísticos sobre la distribución del número de imágenes por usuario}
+\caption{Datos estadísticos sobre la distribución del número de imágenes por individuo}
 \label{table:fgnet_images_per_class}
 \end{table}
 
@@ -383,7 +387,7 @@ En base a estos datos, podemos observar:
     \item En \customref{img:fgnet_rangos_individuales} podemos ver claramente que la mayoría de individuos tienen imágenes en rangos de edad que podemos considerar bajos (por debajo de 10 años)
 \end{itemize}
 
-\subsubsection{Inconvenientes}
+\subsubsection{Inconvenientes} \label{isubsubs:fgnet_inconvenientes}
 
 Sin embargo, se presentan los siguientes \textbf{inconvenientes}:
 
@@ -401,6 +405,152 @@ Sin embargo, se presentan los siguientes \textbf{inconvenientes}:
 Es por tanto que, siguiendo el procedimiento propuesto en \cite{informatica:best_fgnet_model}, usaremos este \textit{dataset} para validar el modelo entrenado sobre un conjunto de datos mucho mayor, en este caso, \customref{isec:dataset_cacd}.
 
 \subsection{\textit{CACD}} \label{isec:dataset_cacd}
+
+La \textbf{cuarta y última base de datos} con la que trabajamos es \entrecomillado{Cross-Age Celebrity Dataset} o \textit{CACD}. Como su propio nombre sugiere, se trata de una base de datos de celebridades en distintos momentos de su vida. Podemos acceder a estos datos en \cite{informatica:cacd_dataset}. El proceso de construcción de este conjunto de datos se especifica en \cite{informatica:paper_cacd}. En el momento de la publicación era el \textit{dataset} sobre \textit{AIFR} más grande.
+
+Este \textit{dataset} se compone de 163446 imágenes de 2000 celebridades en edades que van desde los 16 hasta los 62 años \cite{informatica:paper_cacd}. Dichas imágenes fueron recolectadas de internet realizando búsquedas de ciertos individuos entre los años 2004 y 20013. Sabiendo la fecha de nacimiento de la celebridad, y el año de búsqueda, se computa la edad de dicha celebridad en cada imagen.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/cacd_example}
+    \caption{Muestra de ejemplo del \textit{dataset} \textit{CACD}, imagen extraída de \cite{informatica:paper_cacd}. En la parte superior, tenemos anotadas los años de nacimiento de los individuos. En la parte izquierda, tenemos anotados los años en los que las imágenes fueron tomadas}
+\end{figure}
+
+De nuevo, este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}, por lo que realizamos otra implementación de \lstinline{torch.utils.data.Dataset}, como desarrollamos en \customref{isec:datasets_customs}. El conjunto de datos se compone de:
+
+\begin{itemize}
+    \item Las imágenes de las celebridades
+    \item Información sobre las celebridades: nombre, identificador en la base de datos, año de nacimiento, posicionamiento en la página \url{IMBD.com}, y si la celebridad aparece o no en el \textit{dataset} \textit{LFW}
+    \item Información sobre cada imagen: identificador de la celebridad, edad de la celebridad en la imagen, año en el que se tomó la imagen y \textit{landmarks} faciales
+\end{itemize}
+
+De nuevo, trabajamos únicamente con el conjunto de datos de imágenes, sin anotaciones. De los propios nombres de los archivos podemos extraer el identificador de la celebridad y la edad que tiene en cada una de sus imágenes. Este conjunto de datos mantiene algunas de las características que deseábamos y trae otras nuevas:
+
+\begin{itemize}
+    \item En primer lugar, tenemos varianza en la edad de los individuos, que es fundamental para resolver nuestro problema
+    \item El tamaño del conjunto de datos ahora es elevado, con lo que podemos plantearnos el aprendizaje de un modelo lo suficientemente potente
+    \item El número de imágenes por individuo es excelente, aún mejor que en \textit{FG-Net}, como mostraremos en \customref{isubsubs:cacd_images_per_indv}
+\end{itemize}
+
+Además, como hemos comentado en \customref{isubsubs:fgnet_inconvenientes}, usaremos este \textit{dataset} en conjunto con \textit{FG-Net}. Sobre este conjunto de datos se realizará principalmente el entrenamiento, usando \textit{FG-Net} únicamente para validar el modelo obtenido.
+
+Como hacíamos en \customref{isec:fgnet}, realizaremos un pequeño estudio de este conjunto de datos.
+
+\subsubsection{Distribución del número de imágenes por individuo} \label{isubsubs:cacd_images_per_indv}
+
+Veamos la \textbf{distribución del número de imágenes por cada individuo}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/cacd_images_per_class}
+    \caption{Distribución del número de imágenes por cada individuo}
+    \label{img:cacd_distr_images_per_class}
+\end{figure}
+
+De nuevo, complementamos con las siguientes estadísticas de la distribución:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{Valor} \\
+    \hline
+
+    Media             & 81.72  \\
+    Desviación típica & 19.51  \\
+    Mínimo            & 22.00  \\
+    $Q_1 \%$          & 68.00  \\
+    $Q_2 \%$          & 81.00  \\
+    $Q_3 \%$          & 95.00  \\
+    Máximo            & 139.00 \\
+    \hline
+
+\end{tabular}
+\caption{Datos estadísticos sobre la distribución del número de imágenes por individuo}
+\end{table}
+
+Podemos ver en \customref{img:cacd_distr_images_per_class}, que la distribución de imágenes por cada individuo parece seguir una distribución normal. Sin embargo, no nos interesa comprobar dicha hipótesis, pues es un hecho del que no vamos a aprovecharnos. Como mínimo, cada celebridad tiene 22 imágenes asociadas. Esto supone todavía una mejora respecto a \textit{FG-Net}. Llegamos a tener 139 imágenes por individuo como máximo. La mayoría de individuos tienen entre 68 y 95 imágenes asociadas. Por tanto, a la hora de establecer los valores del \textit{P-K sampling}, podemos tomar valores relativamente altos de $K$ (consultar \customref{ich:fundamentos_teoricos}).
+
+\subsubsection{Distribución de edad de los individuos}
+
+Veamos ahora la \textbf{distribución de edad de los individuos}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/cacd_distribucion_edades}
+    \caption{Histograma de la variable edad en nuestro \textit{dataset}}
+\end{figure}
+
+Complementamos con las siguientes estadísticas:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{Valor} \\
+    \hline
+
+    Media  & 38.03 \\
+    Mínimo & 14    \\
+    Máximo & 62    \\
+    Moda   & 37    \\
+
+    \hline
+
+\end{tabular}
+\caption{Algunas estadísticas sobre la distribución de la edad en nuestro conjunto de datos}
+\end{table}
+
+Esta vez tenemos una distribución más simétrica de las edades, con una media de aproximadamente 38 años. Las edad mínima es de 14 años, muy alejada de los 0 años de \textit{FG-Net} (\customref{table:fgnet_estadisticas_edad}). Esto puede suponer algunos problemas a la hora de entrenar un modelo en \textit{CACD} y que generalice correctamente en \textit{FG-Net}. No entraremos en comparaciones más profundas, pues esto lo haremos en \customref{isec:comparaciones_datasets}.
+
+\subsubsection{Distribución del rango de edad por individuo}
+
+Veamos ahora los \textbf{rangos de edad} de cada uno de los individuos del conjunto de datos:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/cacd_rangos_individuales}
+    \caption{Rangos de edad para todos los individuos. Los individuos están ordenados en primera instancia por su edad más baja, y en segunda instancia, por su edad más alta.}
+\end{figure}
+
+Esta gráfica ahora no es tan clara como cuando la presentábamos para \textit{FG-Net} en \customref{img:fgnet_rangos_distribucion}, así que procedemos a hacer unas observaciones. En primer lugar, como se han recolectado los datos buscando imágenes correspondientes al periodo 2004-2013, el rango de edad siempre va a ser de 9 años. Esto lo vamos a comprobar posteriormente. Por esto mismo, y por el ordenamiento en base a la edad más baja de cada individuo, estamos visualizando la distribución de las edades. Es decir, fijándonos en el punto más bajo de cada línea, estamos viendo a aquellos individuos que en 2004 tenían cierta edad. Así que se pueden visualizar, de una forma poco conveniente, los grupos de edad presentes en nuestra base de datos.
+
+Confirmemos esto viendo las estadísticas sobre la distribución de los rangos de edad:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|l|}
+    \hline
+    \textbf{Estadística} & \textbf{Valor} \\
+    \hline
+
+    Media             & 8.99 \\
+    Desviación típica & 0.11 \\
+    Mínimo            & 7.00 \\
+    $Q_1 \%$          & 9.00 \\
+    $Q_2 \%$          & 9.00 \\
+    $Q_3 \%$          & 9.00 \\
+    Máximo            & 9.00 \\
+
+    \hline
+
+\end{tabular}
+    \caption{Datos estadísticos sobre la distribución de los rangos de edad}
+\end{table}
+
+Vemos que prácticamente todos los individuos tienen un rango de edad de nueve años. Podemos ver que tenemos un valor mínimo de 7 años. Por tanto, sabemos que tenemos algunos casos de individuos que no tienen cierta banda inicial o final de edades. Esto puede deberse a defunciones antes del 2013, o que el individuo era muy joven y no se disponían de imágenes suyas alrededor de 2004. Realizando una simple consulta sobre la base de datos, vemos que únicamente 15 individuos, de los 2000 individuos que componen la base de datos, tienen un rango de edad distinto a 9 años. Esto hace que sea completamente insignificativo.
+
+Por tanto es totalmente innecesario mostrar el histograma de los rangos de edad.
+
+\subsubsection{Inconvenientes}
+
+% TODO -- seguir aqui
+% TODO -- los rangos de edad son muy pequeños
+% TODO -- no tenemos personas por debajo de 14 años (creo que era ese valo)
+
+\subsection{Comparación de los \textit{datasets} \textit{FG-Net} y \textit{CACD}} \label{isec:comparaciones_datasets}
+
+Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:dataset_cacd}, usaremos el segundo \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos.
 
 \section{Descripción de los objetivos}
 \todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
