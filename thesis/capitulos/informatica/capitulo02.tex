@@ -307,6 +307,66 @@ A pesar de esto, a raíz de trabajar con estas nuevas técnicas, identificamos l
 
 \section{Función de distancia}
 
+En todos los conceptos que hemos ido introduciendo la función de distancia
+
+
+\begin{equation}
+    D: X \times X \to [0, \infty)
+\end{equation}
+
+ha estado presente, pero todavía no hemos introducido ninguna función concreta. En el ambiente de \textit{AIFR} se suele usar la distancia euclídea al cuadrado, esto es:
+
+\begin{equation}
+    D(x_i, x_j) := ||f_{\theta}(x_i) - f_{\theta}(x_j)||^2_2
+\end{equation}
+
+Sin embargo, motivados por \cite{informatica:principal}, decidimos usar la distancia euclídea usual. En este trabajo se afirma que, en base a la experimentación, de esta forma se obtienen entrenamientos más estables. Además, usando la distancia euclídea usual, el margen es más fácil de interpretar, porque marca la diferencia de distancias, y no la diferencia de cuadrados de distancias. Por lo tanto, en base a dicho trabajo, decidimos tomar:
+
+\begin{equation}
+        D(x_i, x_j) := ||f_{\theta}(x_i) - f_{\theta}(x_j)||_2
+\end{equation}
+
+\section{Márgenes suaves}
+
+En \customref{isec:triplet_loss} hemos justificado por qué es necesario introducir un término $\alpha$ para controlar el margen y evitar que nuestro modelo aprenda a colapsar todas las entradas al vector $\vec{0}$. Con esto llegamos a la ecuación \eqref{ieq:triplet_loss_single_entry}.
+
+En dicha función de pérdida, el propósito de $x \mapsto max\{0, x + \alpha\}$ (conocida comúnmente como \textit{hinge function}), es no corregir ejemplos que, en vista del margen $\alpha$ establecido, ya son correctos. Pero puede ser que estemos interesados en afinar aún más ejemplos que, para dicho valor del margen, sean correctos. Con esto conseguiríamos, principalmente, seguir acercando imágenes del mismo individuo lo máximo posible \cite{informatica:principal}.
+
+Es por esto que se propone en \cite{informatica:principal} usar la función \textbf{\textit{softplus}}:
+
+\begin{equation}
+    x \mapsto ln(1 + exp(x))
+\end{equation}
+
+Dicha función puede verse como una versión suavizada de la función \textit{hinge}. Decae exponencialmente, por lo que ejemplos correctos se penalizarán exponencialmente menos cuanto más cercanos estén, pero contrasta con la función \textit{hinge} que presenta un salto o corte fuerte. Por tanto, se suele decir que estamos usando un \textbf{margen suave}.
+
+Además, una fuerte ventaja de esta función es que \textbf{desechamos el hiperparámetro $\alpha$}, el cual ya no tenemos que fijar a través de algún método (como podría ser el \textit{hyperparameter tuning}).
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/desmos_hinge}
+        \caption{Función \textit{hinge} con $\alpha = 2$}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/desmos_softplus}
+        \caption{Función \textit{softplus}}
+    \end{subfigure}
+
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/desmos_conjunta}
+        \caption{En azul, \textit{hinge} con $alpha = 0$. En rojo, \textit{softplus}}
+    \end{subfigure}
+
+
+\caption{Gráfica de las dos funciones para trabajar con los márgenes, y una gráfica conjunta que muestra su similitud}
+    \label{img:graficas_margenes}
+\end{figure}
+
+Las gráficas mostradas en \customref{img:graficas_margenes} nos sirven para visualizar de forma sencilla todo lo que hemos comentado. La función \textit{softplus} actúa como una \textit{hinge} suavizada. El hecho de que se parezcan tanto cuando hacemos que el margen de \textit{hinge} sea cero, nos hace pensar que va a actuar como una \textit{hinge} en la que no hay margen, y por lo tanto, acercando elementos de la misma clase todo lo que pueda.
 
 \section{Métricas}
 
