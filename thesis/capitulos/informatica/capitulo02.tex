@@ -153,7 +153,7 @@ Como ya hemos comentado, la tarea que debemos resolver ahora es la de generació
 
 Por tanto, dado un conjunto de datos de la forma \lstinline{(imagen, identificador, edad)}, debemos obtener un conjunto de datos de la forma \lstinline{(img. ancla, img. positivo, img. negativo)}. Este último conjunto de datos puede ser una lista de triples o conjuntos de \textit{mini-batches}. Como vamos a trabajar con \textit{mini-batches}, podemos simplemente muestrear aleatoriamente y sin remplazo de la lista de triples, repitiendo el muestreo tras cada época completada.
 
-\subsection{Enfoque \textit{offline}}
+\subsection{Enfoque \textit{offline}} \label{isubs:enfoque_offline_minado_triples}
 
 Este es el enfoque que se ha venido usando previo a \cite{informatica:facenet}, que introduce un enfoque \textit{online} que luego otros trabajos como \cite{informatica:principal} han ido mejorando.
 
@@ -169,6 +169,17 @@ Una vez computado una lista de triples $(a, p, n) \in \Omega$, la función de p�
     \mathcal{L}_{tri}^{offline}(\theta; \Omega) := \frac{1}{\#\Omega} \sum_{(a, p, n) \in \Omega} \mathcal{L}_{tri}(\theta; a, p, n)
 \end{equation}
 
+\begin{observacion}
+
+Normalmente, en la literatura sobre aprendizaje automático, se ignora el término $\frac{1}{\#\Omega}$ y se supone que siempre estamos dividiendo por el número de sumandos, con lo que nuestra función de error suele escribirse como:
+
+\begin{equation}
+    \mathcal{L}_{tri}^{offline}(\theta; \Omega) := \sum_{(a, p, n) \in \Omega} \mathcal{L}_{tri}(\theta; a, p, n)
+\end{equation}
+
+
+\end{observacion}
+
 Este enfoque supone una serie de \textbf{problemas}:
 
 \begin{itemize}
@@ -183,7 +194,9 @@ Este enfoque supone una serie de \textbf{problemas}:
 
 \subsection{Enfoque \textit{online}} \label{isubs:triples_online}
 
-La idea común será implementar el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio de todos los datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Sin embargo, ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales (muestreo y selección de triples):
+La idea común será implementar el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio sobre los datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Repetimos este proceso hasta agotar todos las entradas de nuestro \textit{dataset}, completando así una época de entrenamiento.
+
+Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales (muestreo y selección de triples):
 
 \begin{enumerate}
     \item La ventaja más obvia es que, suponiendo que el tamaño de la muestra es significativamente mucho más pequeño que el tamaño de todo el conjunto de datos, la generación de triples consumirá menos potencialmente tiempo y serán más efectivas
@@ -196,11 +209,93 @@ La idea común será implementar el siguiente proceso. En primer lugar, realizar
 
 Desarrollada esta visión de forma general, veamos cómo se implementa cada una de las partes, siguiendo las técnicas introducidas en \cite{informatica:principal}.
 
-\subsection{\textit{P-K sampling} y funciones de pérdida asociadas}
+\subsection{Muestreo de los datos con \textit{P-K sampling}}
 
-% TODO -- seguir por aquí
-% TODO -- abrir el paper de referencia por la pagina 3, https://arxiv.org/pdf/1703.07737.pdf
-% TODO - abrir tambien el paper de facenet: https://arxiv.org/pdf/1503.03832.pdf
+La \textbf{idea principal del muestreo} es lo que definiremos como \textbf{\textit{P-K sampling}}. Como ya hemos comentado en \customref{isubs:triples_online}, nuestra tarea ahora es generar un \textit{batch} de elementos de la forma \lstinline{(imagen, identidad, edad)}. En una segunda etapa, otro algoritmo decide como generar triples a partir de estos datos.
+
+El algoritmo de muestreo \textit{P-K sampling} es muy sencillo. En cada muestreo, seleccionamos aleatoriamente $P$ identidades de individuos (o clases, en un ambiente más general en el que no necesariamente estemos trabajando con imágenes de personas). Por cada una de las identidades, seleccionamos aleatoriamente $K$ imágenes. Por tanto, obtenemos una lista de $P \cdot K$ imágenes, o lo que podemos llamar, un \textbf{\textit{P-K batch}}. Para poder obtener triples interesantes en la siguiente etapa, parece que lo deseable es que ambas selecciones aleatorias (muestreos) sean sin repetición.
+
+El hecho de tener $K$ imágenes por cada uno de los individuos seleccionados es lo que va a permitir al algoritmo de generación de triples obtener rápidamente triples interesantes.
+
+Queda aquí claro los problemas que introduce este muestreo: si queremos muestrear $K$ imágenes de cada individuo sin repetición, cada individuo debe tener asociadas al menos $K$ imágenes. Así que a la hora de trabajar con un \textit{dataset}, siempre deberíamos comprobar la distribución del número de imágenes por individuo, como hemos hecho en \customref{isec:base_datos_usada}.
+
+\subsection{Selección de triples y funciones de pérdida}
+
+Una vez que tenemos un \textit{batch} de $P \cdot K$ elementos, deberemos seleccionar triples de ellos. Una vez se especifica cómo se seleccionan los triples, usando \eqref{ieq:triplet_loss_single_entry}, inducimos de forma natural y directa una cierta función de pérdida que actúa sobre estos \textit{P-K batches}.
+
+\begin{observacion}
+
+    Vamos a trabajar con $P \cdot K$ elementos, cada uno correspondiendo a una clase en concreto. Por tanto, indexaremos los elementos de la forma $x_k^p$ donde $p$ marca el identificador del individuo, y $k$ marca a cuál de las $K$ imágenes del individuo $p$ nos estamos refiriendo
+
+\end{observacion}
+
+\subsubsection{\textit{Batch Hard}} \label{isubsubs:batch_hard}
+
+La primera idea es iterar sobre todos los elementos del \textit{P-K batch}, obteniendo así $P \cdot K$ anclas. Por cada ancla, seleccionamos el positivo y negativo \textbf{más complicado dentro de \textit{P-K batch}}. Por tanto, queda claro que \textbf{estamos usando la red para seleccionar triples difíciles} en cada \textit{batch} generado.
+
+Esto introduce la siguiente función de pérdida, a la que llamaremos \textbf{\textit{Batch Hard}}:
+
+\begin{equation}
+    \mathcal{L}_{BH}(\theta, \hat{\Omega}) := \comentarencima{\sum_{p = 1}^P \sum_{k = 1}^K}{\text{todas las anclas}} [
+        \comentarencima{\max_{k' = 1, \ldots, K} D(f_{\theta}(x_k^p), f_{\theta}(x_{k'}^p))}{\text{positivo más complicado}}
+        - \comentarencima{\min_{\substack{p' = 1, \ldots, P \\ p' \neq p \\ k' = 1, \ldots, K}} D(f_{\theta}(x_k^p), f_{\theta}(x_{k'}^{p'}))}{\text{negativo más complicado}}
+        + \alpha]_+
+\end{equation}
+
+donde $[x]_+ := max \{0, x\} = ReLU(x)$ y $\hat{\Omega}$ se refiere a un \textit{P-K batch}. No olvidemos que no estamos escribiendo la división por el número de sumandos, $P \cdot K$.
+
+Estamos generando \textbf{triples moderados}, porque estamos buscando los triples más difíciles, pero dentro de un \textit{batch} relativamente pequeño comparado a el total del conjunto de datos. Por tanto, estamos ajustando la dificultad de los triples cómodamente, resolviendo el problema que comentábamos en \customref{isubs:enfoque_offline_minado_triples}. Aumentando el valor de $P, K$, aumentamos el espacio de búsqueda, y por tanto podremos encontrar triples mucho más difíciles. Sin embargo, hay que tener siempre en cuenta el coste en tiempo de cómputo.
+
+Queda claro que, gracias al proceso de \textit{P-K sampling}, ahora es factible realizar una búsqueda de triples interesantes en profundidad, basándonos en el estado más actualizado de la red para calcular la dificultad de los triples. Esta búsqueda extensiva no habría sido posible si la planteásemos sobre todo el conjunto de datos.
+
+\subsubsection{\textit{Batch All}} \label{isubsubs:batch_all}
+
+Motivados por lo comentado en \customref{isubsubs:batch_hard}, podemos plantearnos usar todas los posibles triples dentro de un \textit{P-K batch} como un enfoque que ahora cobra más sentido (ya hemos comentado en \customref{isubs:enfoque_offline_minado_triples} que realizar esto sobre todo el conjunto de datos no parece una buena idea).
+
+Realizar esto introduce la función de pérdida que llamaremos \textbf{\textit{Batch All}}:
+
+\begin{equation} \label{ieq:batch_all}
+    \mathcal{L}_{BA}(\theta; \hat{\Omega}) :=
+    \comentarencima{\sum_{p = 1}^{P} \sum_{k = 1}^K}{\text{todas anclas}}
+    \comentardebajo{\sum_{\substack{k' = 1 \\ k' \neq k}}^{K}}{\text{todas pos.}}
+    \comentarencima{\sum_{\substack{p' = 1 \\ p' \neq p}}^P \sum_{n = 1}^K}{\text{todas neg.}} \dspace[
+        D(f_{\theta}(x_k^p),f_{\theta}(x_{k'}^p)) - D(f_{\theta}(x_k^p),f_{\theta}(x_{n}^{p'})) + \alpha
+    ]_+
+\end{equation}
+
+Está claro que, por el número de sumandos, esta aproximación es viable gracias a que nuestro \textit{P-K sampling} reduce mucho el número de elementos sobre los que operamos. Dicho número de sumandos viene dado por:
+
+\begin{equation}
+    P \cdot K \cdot (K - 1) \cdot (P - 1) \cdot K = P^2 - P + K^3 - K^2 \approx P^2 + K^3
+\end{equation}
+
+Esta aproximación sería completamente inviable sobre un número muy elevado de elementos. Pensemos, por ejemplo, en las 163446 imágenes de \textit{CACD}.
+
+\subsubsection{Mejoras introducidas a partir de la experimentación}
+
+En \cite{informatica:principal}, a raíz de observar los resultados de la experimentación, señalan algunos puntos débiles en las dos funciones de pérdida que introducen a partir del \textit{P-K sampling}.
+
+Principalmente, en \customref{isubsubs:batch_all}, podemos ver un posible fallo en la función de pérdida \eqref{ieq:batch_all}. Si se da el caso de que la mayoría de triples generados son fáciles (hecho muy probable al estar generando todas las combinaciones de triples), los escasos triples que realmente son difíciles se desvanecerán. Esto porque la mayoría de términos serán cero (al estar aplicando $[x]_+$). Y los pocos términos que no son cero, se dividen por el número total de elementos, que ya hemos visto que es elevado.
+
+Por tanto, una mejora sencilla a esta función de pérdida es dividir únicamente por el número de sumandos no nulos. Esta mejora la podemos aplicar también a \textit{batch hard}, obteniendo dos nuevas funciones de pérdida, a las que llamaremos $\mathcal{L}_{BA \neq 0}$ y $\mathcal{L}_{BH \neq 0}$.
+
+\subsubsection{Algunas observaciones y conclusiones}
+
+En primer lugar, cabe destacar que, como señalan \cite{informatica:principal}, las dos nuevas funciones de pérdida introducidas equivalen al planteamiento clásico de \textit{triplet loss} si entrenásemos indefinidamente.
+\todo{End to end learning sin usar funciones auxiliares que introducen gran complejidad. Estamos optimizando directamente el embedding}
+\todo{No hay un paso adicional en el ciclo de aprendizaje, mas simplicidad}
+\todo{Regularizamos la dificultad de los triples}
+\todo{Aceleramos los computos. La red aprende sobre batches actualizados al maximo por la ultima snapshot de la red}
+\todo{Hemos podido controlar los triples que realmente no estan aportando nada}
+\todo{Inconveniente: tenemos que controlar los valores P, K, hiperparametros muy importatnes que tendremos que hipertunear}
+\todo{Inconveniente: tenemos que tener cuidado con el tamaño de P*K por los tiempos de computo. tambien, memoria ram que puede overflowear}
+\todo{Inconveniente: triplet loss poco popular, por lo que ha habido mas estudio en otras areas, mirar el cite de la seccion ventajas}
+\todo{Inconveniente: si queremos usar K grande, el dataset lo tiene que permitir, hemos visto este problema en lfw}
+
+
+% TODO -- seguir por aqui
+% TODO -- borrar la siguiente seccion e incluirla en esta que estamos escribiendo
+
 
 \subsection{Ventajas}
 
@@ -210,8 +305,11 @@ Estamos usando un modelo convolucional junto con nuestra función de pérdida pa
 
 \cite{informatica:principal} comenta que triplet loss es bastante poco popular
 
-
-\subsection{\textit{Triplet Loss} clásico}
-
+\section{Función de distancia}
 
 
+\section{Métricas}
+
+\todo{Hablar de rank@k, distancias intracluster, intercluster, silhouette, ...}
+
+\section{Hablar de la tarea de retrieval?}
