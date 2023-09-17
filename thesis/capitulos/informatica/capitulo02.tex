@@ -147,6 +147,8 @@ Minimizando esta función de pérdida, lo que haremos será atraer elementos de 
 
 Sin embargo, en \eqref{ieq:triplet_loss_single_entry} trabajamos con una sola entrada de tres datos. A diferencia de un \textit{dataset} con datos etiquetados clásico (de la forma \lstinline{(entrada, valor de etiqueta)}), tenemos datos de la forma \lstinline{(imagen, identificador de individuo, edad)}. Esto supone un \textbf{problema} a resolver: cómo generamos \textit{batches} con triples de la forma \lstinline{(ancla, positivo, negativo)} para poder aplicar \eqref{ieq:triplet_loss_single_entry}. Introducimos algunas soluciones propuestas a este problema en \customref{isec:batching}
 
+Por otro lado, este enfoque plantea algunas \textbf{ventajas}. La principal es que, a diferencia de otros enfoques basados en usar funciones de pérdida auxiliares (y que suelen fuerzan que la red solo pueda funcionar comparando pares de imágenes), el cómputo del \textit{embedding} es directo usando esta función de pérdida (\textit{end to end learning}). Optimizamos directamente la propiedad semántica del \textit{embedding} que deseamos obtener. Una vez entrenado el modelo es directo adaptar el modelo a tareas de \textit{clustering}, \textit{retrieval}, verificación, \ldots \cite{informatica:principal}
+
 \section{Generación de \textit{batches}} \label{isec:batching}
 
 Como ya hemos comentado, la tarea que debemos resolver ahora es la de generación de \textit{batches} adecuados para poder emplear \eqref{ieq:triplet_loss_single_entry} como función de pérdida a minimizar.
@@ -282,30 +284,26 @@ Por tanto, una mejora sencilla a esta función de pérdida es dividir únicament
 \subsubsection{Algunas observaciones y conclusiones}
 
 En primer lugar, cabe destacar que, como señalan \cite{informatica:principal}, las dos nuevas funciones de pérdida introducidas equivalen al planteamiento clásico de \textit{triplet loss} si entrenásemos indefinidamente.
-\todo{End to end learning sin usar funciones auxiliares que introducen gran complejidad. Estamos optimizando directamente el embedding}
-\todo{No hay un paso adicional en el ciclo de aprendizaje, mas simplicidad}
-\todo{Regularizamos la dificultad de los triples}
-\todo{Aceleramos los computos. La red aprende sobre batches actualizados al maximo por la ultima snapshot de la red}
-\todo{Hemos podido controlar los triples que realmente no estan aportando nada}
-\todo{Estamos usando una versión de la red muy actualizada}
-\todo{Inconveniente: tenemos que controlar los valores P, K, hiperparametros muy importatnes que tendremos que hipertunear}
-\todo{Inconveniente: tenemos que tener cuidado con el tamaño de P*K por los tiempos de computo. tambien, memoria ram que puede overflowear}
-\todo{Inconveniente: triplet loss poco popular, por lo que ha habido mas estudio en otras areas, mirar el cite de la seccion ventajas}
-\todo{Inconveniente: si queremos usar K grande, el dataset lo tiene que permitir, hemos visto este problema en lfw}
-\todo{ULTAINCONVENIENTE: hay que reimplementar muchas partes del pipeline!}
 
+El desarrollo que hemos realizado justifica las siguientes \textbf{ventajas} de los nuevos métodos:
 
-% TODO -- seguir por aqui
-% TODO -- borrar la siguiente seccion e incluirla en esta que estamos escribiendo
+\begin{itemize}
+    \item El uso del \textit{P-K sampling} y las dos nuevas funciones de pérdida (con las variantes técnicas) permiten realizar el aprendizaje de forma usual, sin añadir un paso adicional en el bucle de aprendizaje, evitando así la gran complejidad añadida del minado \textit{offline}
+    \item Además, conseguimos un manejo preciso de la dificultad de los triples obtenidos. Controlando el valor de $\{P, K\}$, controlamos el espacio de búsqueda y, en definitiva, la dificultad. Todo esto de forma cómoda y sin introducir apenas complejidad en nuestro \textit{pipeline}
+    \item Aunque no lo hemos comprobado, pensamos que esto acelera los tiempos de cómputo, al estar realizando el minado de triples sobre \textit{batches} de tamaño considerablemente reducidos
+    \item Y aunque no mejorásemos el tiempo de computo, lo que sí sabemos que mejoramos es la eficacia del minado de triples. El minado de triples usa una red mucho más actualizada, para generar una lista mucho más pequeña que probablemente no se degrade tanto como la generada por un minado \textit{offline} sobre todo el conjunto de datos, mucho más grande
+    \item Es más, estamos controlando el efecto de los triples demasiado sencillos, que no tendremos en cuenta a la hora de dividir los sumandos en la función de pérdida
+\end{itemize}
 
+A pesar de esto, a raíz de trabajar con estas nuevas técnicas, identificamos los siguientes \textbf{inconvenientes}:
 
-\subsection{Ventajas}
-
-A diferencia de otros enfoques basados en usar funciones de pérdida auxiliares (y que fuerzan que la red solo pueda funcionar comparando pares de imágenes), el cómputo del \textit{embedding} es directo una vez entrenado el modelo, siendo muy fácil de adaptar a tareas de \textit{clustering}, \textit{retrieval}, verificación, \ldots \cite{informatica:principal}
-
-Estamos usando un modelo convolucional junto con nuestra función de pérdida para computar directamente el \textit{embedding} deseado, sin funciones de pérdida intermedias que en tiempo de evaluación nunca vamos a usar (\textit{end-to-end learning}) \cite{informatica:principal}
-
-\cite{informatica:principal} comenta que triplet loss es bastante poco popular
+\begin{itemize}
+    \item Introducimos dos hiperparámetros, $\{P, K\}$, que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \customref{isec:hp_tuning}
+    \item Tenemos que tener mucho cuidado con valores elevados de $\{P, K\}$, por dos motivos. El primero, y como ya hemos comentado, valores altos implicarán que los tiempos de cómputo para la generación de triples crecerán rápidamente. El segundo es que el tamaño de los \textit{batches} crecerán considerablemente, llegando a colapsar la memoria disponible de la \textit{GPU}
+    \item Hemos comprobado en la práctica que es realmente fácil colapsar la memoria \textit{GPU}, usando modelos profundos como \textit{ResNet50} con valores de $P \cdot K > 200$. Esto supone que, aunque no estuviéramos limitados por el tiempo de cómputo, el colapso de la memoria limita el conjunto de valores que $\{P, K\}$ puede tomar, restringiendo fundamentalmente la experimentación que podemos realizar con estos valores
+    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo (por esto, hemos realizado este estudio en \customref{isec:base_datos_usada} para nuestras bases de datos). Se pueden explorar técnicas como el aumentado de datos para aumentar el número de imágenes por individuo, pero solo serán efectivas si dicha distribución es buena para empezar
+    \item Tanto por el formato de los datos con los que hemos trabajado, como por el cambio fundamental realizado en el \textit{sampling} de los datos, hemos tenido que realizar un \textbf{esfuerzo considerable de implementación}, al no poder basarnos en la mayor parte de los casos en código implementado por alguna biblioteca de aprendizaje automático. Esto se ve reflejado en \customref{ich:implementacion}
+\end{itemize}
 
 \section{Función de distancia}
 
