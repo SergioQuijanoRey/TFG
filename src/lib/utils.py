@@ -116,3 +116,6 @@ def login_wandb():
 
     dotenv.load_dotenv()
     wandb.login(key = os.environ["WANDB_API_KEY"])
+
+def torch_list_remove_entry(data: torch.Tensor, n: int) -> torch.Tensor:
+    return torch.cat((data[:n], data[n + 1:]), dim = 0)
