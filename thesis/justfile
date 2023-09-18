@@ -1,0 +1,46 @@
+# Where the main .tex file is stored
+texfile := "./libro.tex"
+
+# The command that we want to use to rm files
+# For example, "rm"
+trash := "trash"
+
+# PDF program
+pdf_program := "zathura"
+
+# Shows all recepies available in this justfile
+default:
+	just --list
+
+# Compiles the latex document
+compile:
+    # We run pdflatex this way so references work well
+    pdflatex "{{texfile}}"
+    bibtex "{{trim_end_match(texfile, '.tex')}}"
+    pdflatex "{{texfile}}"
+    pdflatex "{{texfile}}"
+
+# Compiles the project from zero
+clean_compile:
+    # Remove all artifacts, including final PDF
+    just clean
+    {{trash}} {{trim_end_match(texfile, ".tex")}}.pdf || echo "PDF file already removed"
+
+    # Now compile
+    just compile
+
+# Cleans all the artifacts created during compilation
+clean:
+    {{trash}} *.log || echo "All .log files already removed"
+    {{trash}} *.aux || echo "All .aux files already removed"
+    {{trash}} *.toc || echo "All .toc files already removed"
+    {{trash}} *.out || echo "All .out files already removed"
+    {{trash}} *.lof || echo "All .lof files already removed"
+    {{trash}} *.lol || echo "All .lol files already removed"
+    {{trash}} *.lot || echo "All .lot files already removed"
+    {{trash}} *.bbl || echo "All .bbl files already removed"
+    {{trash}} *.blg || echo "All .blg files already removed"
+
+# Opens the generated PDF file
+view:
+    {{pdf_program}} {{trim_end_match(texfile, ".tex")}}.pdf &

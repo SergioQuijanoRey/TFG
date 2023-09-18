@@ -1,0 +1,654 @@
+% !TeX root = ../../libro.tex
+% !TeX encoding = utf8
+
+\chapter{Herramientas matemáticas fundamentales} \label{ch:matematicas_fundamentales}
+
+En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas y no aportan nada nuevo al estudio que hacemos sobre las redes neuronales, por lo que el lector puede pasar directamente a \customref{ch:modelizacion}
+
+\section{Tensores}
+
+\subsection{Notación}
+
+% TODO -- en la pagina 23 se añade una notacion que parece ser muy comoda
+% TODO -- Tau_{N, M} el espacio euclídeo de los tensores con entradas reales, orden N y dimensión M en todos los modos
+
+Seguiremos en parte la notación del \textit{paper} de referencia \cite{matematicas:principal}, aunque introducimos varios cambios por claridad, para no confundir en las fórmulas escalares, vectores y tensores.
+
+Denotaremos a los vectores con flechas sobre las letras que los identifican, tal que $\nv{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $\nv{v_i}$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$.
+
+Para denotar a los tensores (que introduciremos más adelante), usaremos la tipografía caligráfica. Por ejemplo $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor (más adelante, en \customref{sec:deftensor}, veremos que significa esto) serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
+
+Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo (de nuevo, \customref{sec:deftensor}) lo denotaremos por $\espaciotensores{N}{M}$. Al espacio de matrices de dimensiones $p, q$ lo denotaremos, como es usual, como $\espaciomatrices{p}{q}$.
+
+Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\nv{v_1}, \ldots, \nv{v_N} \in \R^{M_1}, \ldots, \R^{M_N}$, denotaremos su producto tensorial $\nv{v_1} \otimes \ldots \otimes \nv{v_N}$ como $\otimes_{i = 1}^N \nv{v_i}$.
+
+Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
+
+\subsection{Definición del producto tensorial} \label{sec:deftensor}
+\todo{Tengo que referenciar algún recurso sobre esto. Yo lo he visto a partir de unos vídeos}
+
+Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa. Especificaremos esto en \customref{sec:cociente_prod_formal}
+
+Para la construcción del producto tensorial de espacios vectoriales, necesitaremos primero introducir conceptos previos que serán fundamentales en la construcción del objeto matemático que buscamos.
+
+\subsubsection{Producto formal de dos espacios vectoriales}
+
+\begin{definicion}[Producto formal de dos espacios vectoriales]
+    Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales reales. Se define su \textbf{producto formal} como:
+
+    \begin{equation}
+        \mathbb{V} \ast \mathbb{W} := span_{\mathbb{R}} \{v \ast w / v \in \mathbb{V}, w \in \mathbb{W} \}
+    \end{equation}
+
+    Donde $span$ denota el conjunto formado por todas las combinaciones lineales finitas de los elementos del conjunto, es decir,
+
+    \begin{equation}
+        span_{\mathbb{R}}(A) := \{ \sum_{k = 1}^n \alpha_i a_i / n \in \N, \alpha_i \in \R, a_i \in A \}
+    \end{equation}
+
+    Hay que tener en cuenta que en $v \ast w$, $\ast$ es un símbolo con el que no sabemos operar. Por tanto, ahora mismo no sabemos simplificar muchas expresiones en este espacio.
+\end{definicion}
+
+Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar tomando combinaciones lineales finitas, $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial.
+\todo{Realmente no sé si esto es claro, por culpa de estar usando $*$, pero seguramente sea directo comprobarlo}
+
+Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
+
+\begin{ejemplo} \label{ej:prod_formal}
+\todo{No sé si estos ejemplos sobran del documento al ser muy simples. Los he introducido porque los usé al principio para entender mejor los tensores, pero ahora no sé si tiene sentido dejar esto aquí}
+
+Sea $\Omega := \R^2 \ast \R^3$. Entonces tenemos que:
+
+\begin{equation}
+    \Omega = span \{
+        \begin{pmatrix}
+            a \\
+            b
+        \end{pmatrix}
+        \ast
+        \begin{pmatrix}
+            x \\
+            y \\
+            z
+        \end{pmatrix}
+        / a, b, x, y, z \in \R
+    \}
+\end{equation}
+
+Un elemento de dicho espacio puede ser
+
+$$
+2 \left[ \begin{pmatrix}1 \\ 2\end{pmatrix} \ast \begin{pmatrix}3 \\ 2 \\ 1 \end{pmatrix} \right]
+- 3 \left[ \begin{pmatrix}1 \\ 0\end{pmatrix} \ast \begin{pmatrix}1 \\ 2 \\ 3 \end{pmatrix} \right]
+$$
+
+Notar que no sabemos cómo meter los escalares $2, -3$ en los elementos del producto formal.
+
+Por cómo hemos definido el producto formal de dos espacios vectoriales, tenemos que $dim(\R^2 \ast \R^3) = \infty$
+
+\end{ejemplo}
+
+\subsubsection{Producto tensorial a partir del producto formal} \label{sec:cociente_prod_formal}
+
+Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que ciertas propiedades deseables no se cumplen, en general, en el producto formal:
+
+\begin{enumerate}
+    \item $c [\nv{v} \ast \nv{w}] = (c\nv{v}) \ast \nv{w}$
+    \item $c[\nv{v} \ast \nv{w}] = \nv{v} \ast (c\nv{w})$
+    \item $(\nv{v_1} + \nv{v_2}) \ast \nv{w} = \nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}$
+    \item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$
+
+Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$
+\end{enumerate}
+
+Estas igualdades representan las propiedades que queremos que se cumplan, para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan una especie de asociatividad, mientras que 3 y 4 nos dan la propiedad distributiva.
+
+Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir estas propiedades. Para ello definimos:
+
+\begin{equation}
+\begin{split}
+    I := span\{& \\
+               & (c\nv{v}) \ast \nv{w} - c(\nv{v} \ast \nv{w}), \\
+               & \nv{v} \ast (c\nv{w}) - c(\nv{v} \ast \nv{w}), \\
+               & (\nv{v_1} + \nv{v_2}) \ast \nv{w} - (\nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}), \\
+               & \nv{v} \ast (\nv{w_1} + \nv{w_2}) - (\nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}): \\
+               & \\
+               & \nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}; \dspace \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}; \dspace c \in \R \\
+\}&
+\end{split}
+\end{equation}
+
+que claramente también es un espacio vectorial.
+
+Con esto, ya podemos definir el producto tensorial:
+
+\begin{definicion}[Producto tensorial]
+    Dados dos espacios vectoriales $\mathbb{V}, \mathbb{W}$, se define su \textbf{producto tensorial} $\mathbb{V} \otimes \mathbb{W}$ como:
+
+    $$\mathbb{V} \otimes \mathbb{W} := (\mathbb{V} \ast \mathbb{W}) / I$$
+
+    con lo que dados $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$, tenemos que
+
+    $$\nv{v} \otimes \nv{w} = \nv{v} \ast \nv{w} + I$$
+\end{definicion}
+
+A partir de esta definición, son directas las siguientes propiedades:
+
+% TODO -- creo que falta la distributividad respecto (v1 * v2) * w
+\begin{proposicion} \label{prop:tensores_propiedades}
+    Sean $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w} \in \mathbb{W}, \lambda \in \R$, entonces son ciertas:
+    \begin{enumerate}
+        \item $\lambda [\nv{v} \otimes \nv{w}] = (\lambda \nv{v}) \otimes \nv{w}$
+        \item $\lambda [\nv{v} \otimes \nv{w}] = \nv{v} \otimes (\lambda \nv{w})$
+        \item $\nv{v} \otimes (\nv{w_1} + \nv{w_2}) = \nv{v} \otimes \nv{w_1} + \nv{v} \otimes \nv{w_2}$
+    \end{enumerate}
+\end{proposicion}
+
+\begin{proof} $\newline \newline$
+    1.
+
+    \begin{equation}
+    \begin{split}
+        (c\nv{v}) \otimes \nv{w} &\eqtext{def} (c\nv{v}) \ast \nv{w} + I = \ldots \ \text{usando que} \quad \nv{a} + I = \nv{a} + \nv{i} + I, \quad \forall \nv{i} \in I \\
+        \ldots &= (c\nv{v}) \ast \nv{w} + (c(\nv{v} \ast \nv{w}) - c\nv{v} \ast \nv{w}) + I = \ldots \\
+        \ldots &= \cancel{(c\nv{v}) \ast \nv{w}} + c(\nv{v} \ast \nv{w}) - \cancel{c\nv{v} \ast \nv{w}} + I = \ldots \\
+        \ldots &= c(\nv{v} \ast \nv{w}) + I = c (\nv{v} \otimes \nv{w}) \\
+    \end{split}
+    \end{equation}
+
+    $\customqed$
+    $\newline$
+    2. \todo{Escribir esta demostración o decir que es muy parecida}
+    $\newline$
+    3. \todo{Escribir esta demostración o decir que es muy parecida}
+\end{proof}
+
+También sabemos que por ser $\mathbb{V} \ast \mathbb{W}$ un espacio vectorial, y al definir el producto tensorial como un cociente, $\mathbb{V} \otimes \mathbb{W}$ es también un espacio vectorial.
+
+Ahora, enunciamos un importante teorema que nos ayudará a entender la naturaleza del producto vectorial:
+
+\begin{teorema}[Base del espacio vectorial \textit{producto tensorial}] \label{th:base_prod_tensorial}
+    Sean $\mathbb{B}_{\mathbb{V}} = \{\nv{v_1}, \ldots, \nv{v_n}\}$, $\mathbb{B}_{\mathbb{W}} = \{\nv{w_1}, \ldots, \nv{w_m}\}$ bases de $\mathbb{V}, \mathbb{W}$ respectivamente, entonces:
+
+    $$\mathbb{B}_{\mathbb{V} \otimes \mathbb{W}} := \{\nv{v_i} \otimes \nv{w_j} / i \in \deltaset{n}, j \in \deltaset{m}\}$$
+
+    es una base del espacio vectorial $\mathbb{V} \otimes \mathbb{W}$, y por lo tanto:
+
+    $$dim(\mathbb{V} \otimes \mathbb{W}) = dim(\mathbb{V}) \cdot dim(\mathbb{W})$$
+\end{teorema}
+
+\begin{proof} $\newline$
+    % En el video esta la prueba, pero no la tengo copiada
+    \todo{Escribir esta prueba. En la página 20 de mis notas tengo probado que es sistema de generadores, falta ver la independencia lineal}
+\end{proof}
+
+Notar que podríamos haber usado este teorema como forma de definir el producto tensorial de dos espacios vectoriales. Sin embargo, limitaríamos esta construcción a espacios vectoriales que admitiesen una base.
+
+Una consecuencia inmediata es que, en caso de que $\mathbb{V}, \mathbb{W}$ admitan base, todo tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se escribe de la forma:
+
+\begin{equation}
+    \gamma = \sum_{\substack{\nv{v_i} \in \mathbb{V}\\ \nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} \otimes \nv{w_i}, \dspace\dspace c_i \in \R \dspace \forall i \in \deltaset{n}
+\end{equation}
+
+La expresión anterior motiva la siguiente definición:
+
+\begin{definicion}[Tensor puro]
+    Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$ tales que $\gamma = \nv{v} \otimes \nv{w}$.
+    \todo{¿Esto no habría que hacerlo con el producto tensorial de n vectores, en general?}
+\end{definicion}
+
+Otra consecuencia del \customref{th:base_prod_tensorial} es que, en general, $v \otimes w \neq w \otimes v$, en el caso en el que tengan sentido las dos operaciones.
+
+Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $v \otimes \vv{0_w} = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
+
+\begin{proposicion}
+    Sean $\mathbb{V}, \mathbb{W}$ espacios vectoriales sobre $\R$. Sean $v \in \mathbb{V}, w \in \mathbb{W}$. Entonces se verifica:
+
+    \begin{enumerate}
+        \item $v \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+        \item $\nv{0_{\mathbb{V}}} \otimes w = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+    \end{enumerate}
+\end{proposicion}
+\begin{proof}
+    Empezamos con la primera igualdad. Sabemos que en un espacio vectorial (como es el caso del producto tensorial) se verifica que:
+
+    \begin{equation} \label{eq:dem_tensor_cero}
+        \nv{v} + \nv{w} = \nv{w} \then \nv{v} = \nv{0}
+    \end{equation}
+
+    Veamos esto ahora con nuestro primer candidato a cero del espacio vectorial producto tensorial:
+
+    \begin{equation}
+    \begin{split}
+        \nv{v} \otimes \nv{0_\mathbb{W}} + \nv{v} \otimes \nv{w} \eqtext{3.} \nv{v} \otimes (\nv{0_\mathbb{W}} + \nv{w}) = \nv{v} \otimes (\nv{w}) \then \nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}
+    \end{split}
+    \end{equation}
+
+    La demostración para $\vv{0_{\mathbb{V}}} \otimes w = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$ es completamente análoga.
+
+    \todo{En la pagina 18 de mis apuntes veo otra forma de demostrar esto, usando las propiedades 1, 2 en vez de usando la 3}
+
+\end{proof}
+
+Con esto podemos pasar a ver algunos ejemplos:
+
+\begin{ejemplo}
+    Sea $\Omega := \R^2 \otimes \R^3$.
+
+    En primer lugar, sabemos que $dim(\Omega) = 2 \cdot 6$. Por ser un espacio vectorial real, de dimensión $6$, sabemos que $\Omega \cong \R^6$.
+
+    Ahora, consideramos las bases usuales de $\R^2, \R^3$, y usando el teorema \ref{th:base_prod_tensorial}, construimos una base, que podríamos considerar la base usual para el producto tensorial:
+
+    \begin{equation}
+    \begin{split}
+    \mathbb{B}_{\Omega} = \{& \\
+        & \begin{pmatrix}1 \\ 0 \end{pmatrix} \otimes \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix}1 \\ 0 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix},
+        \begin{pmatrix}1 \\ 0 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}, \\
+        & \begin{pmatrix}0 \\ 1 \end{pmatrix} \otimes \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix},
+        \begin{pmatrix}0 \\ 1 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix},
+        \begin{pmatrix}0 \\ 1 \end{pmatrix} \otimes \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \\
+    & \}
+    \end{split}
+    \end{equation}
+
+    Ahora, retomamos una operación del \ref{ej:prod_formal} (solo que esta vez con el producto tensorial, y no con el producto formal):
+
+    $$
+    2 \left[ \begin{pmatrix}1 \\ 2\end{pmatrix} \otimes \begin{pmatrix}3 \\ 2 \\ 1 \end{pmatrix} \right]
+    - 3 \left[ \begin{pmatrix}1 \\ 0\end{pmatrix} \otimes \begin{pmatrix}1 \\ 2 \\ 3 \end{pmatrix} \right]
+    $$
+
+    Tenemos distintas formas para desarrollar esta expresión, por ejemplo:
+
+    \todo{Desarrollar algo esta expresión}
+
+\end{ejemplo}
+
+A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes de hacer el producto tensorial, siendo uno de los dos espacios un cierto $\R^N$. Empezamos con el siguiente ejemplo:
+
+\begin{ejemplo}
+    Sea $\mathbb{V}$ un espacio vectorial real y considero $\Omega := \R \otimes \mathbb{V}$.
+
+    Comienzo considerando un tensor de la forma $\gamma = a(x \otimes \nv{u}) + b(y \otimes \nv{v})$ con $a, b \in \R, x, y \in \R, \nv{u}, \nv{v} \in \mathbb{V}$. Usando las propiedades de los tensores (\ref{prop:tensores_propiedades}), desarrollo esta expresión:
+
+    \begin{equation}
+    \begin{split}
+        a(x \otimes \nv{u}) + b(y \otimes \nv{v}) &\eqtext{2.} \\
+        = & x \otimes (a\nv{u}) + y \otimes (b\nv{v}) \eqtext{2} \ldots \text{ usando que }  x,y \in \R \ldots \\
+        \ldots = & 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} \\
+        = & 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = \\
+        = & 1 \otimes \nv{w} \quad \text{con } \nv{w} := (ax)\nv{u} + (by), \quad \text{luego }\nv{w} \in \mathbb{V}
+    \end{split}
+    \end{equation}
+
+    Esto sirve como prueba del siguiente resultado:
+
+    \begin{proposicion}
+        Sea $\gamma \in \R \otimes \mathbb{V}$ con $\mathbb{V}$ un espacio vectorial real. Entonces:
+
+        \begin{equation}
+            \gamma \text{ tensor puro} \implies \exists \nv{v} \in \mathbb{V}: \gamma = 1 \otimes \nv{v}
+        \end{equation}
+    \end{proposicion}
+
+    Buscamos extender este resultado para un tensor cualquiera (no necesariamente puro) del espacio $\R \otimes \mathbb{V}$:
+
+    \begin{proposicion}
+        Sea $\gamma \in \R \otimes \mathbb{V}$. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$
+    \end{proposicion}
+    \begin{proof}
+        Usando \ref{th:base_prod_tensorial}, podemos expresar:
+
+        \begin{equation}
+            \gamma = \sum_{\substack{\nv{v_i} \in \mathbb{V}\\ \nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} \otimes \nv{w_i}, \dspace\dspace c_{i} \in \R \dspace \forall i \in \deltaset{n}
+        \end{equation}
+
+        Usando ahora la proposición anterior en los tensores puros de la sumatoria, podemos re-escribir como:
+
+        \begin{equation}
+        \begin{split}
+            \gamma &= \sum_{\substack{\nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot 1 \otimes \nv{w_i} \eqtext{2.} \\
+            & = \sum_{\substack{\nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} 1 \otimes (c_{i} \cdot \nv{w_i}) \eqtext{3.} \\
+            & = 1 \otimes ( \sum_{\substack{\nv{w_i} \in \mathbb{W} \\ i \in \deltaset{n}}} c_{i} \cdot \nv{w_i} ) = \\
+            & = 1 \otimes \nv{w} \dspace\dspace \text{con } \nv{w} := \sum_{\substack{\nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \nv{w_i} \implies \nv{w} \in \mathbb{V}
+        \end{split}
+        \end{equation}
+
+    \end{proof}
+
+
+    Con esto, podemos pasar al siguiente resultado que nos permitirá ver de una forma mucho más clara en que espacio nos encontramos:
+
+    \begin{proposicion}
+        $\R \otimes \mathbb{V} \isomorfismo{\text{vec}} \mathbb{V}$
+    \end{proposicion}
+    \begin{proof}
+        Basta con considerar
+
+        \begin{equation}
+        \begin{split}
+            \phi: \R \otimes \mathbb{V} &\to \mathbb{V} \\
+            \nv{v} = 1 \otimes \nv{w} \in \mathbb{V} &\mapsto \nv{w}
+        \end{split}
+        \end{equation}
+
+        Veamos, aunque sea prácticamente inmediato, que $\phi$ es biyectiva y lineal:
+
+        Inyectividad: $\phi(1 \otimes \nv{w_1}) = \phi(1 \otimes \nv{w_2}) \underset{def.\ \phi}{\iif} \nv{w_1} = \nv{w_2}$
+
+        Sobreyectividad: $\nv{w} \in \mathbb{V} \then \phi(1 \otimes \nv{w}) = \nv{w}$
+
+        Linealidad 1. $\phi(1 \otimes \nv{w_1} + 1 \otimes \nv{w_2}) \eqtext{3.} \phi(1 \otimes (\nv{w_1} + \nv{w_2})) = \nv{w_1} + \nv{w_2}$
+
+        Linealidad 2. $\phi(\lambda (1 \otimes \nv{w})) \eqtext{2.} \phi(1 \otimes (\lambda \nv{w})) = \lambda \nv{w}$
+
+    \end{proof}
+\end{ejemplo}
+
+\begin{ejemplo} \label{ejemplo:R2xR2}
+    Consideramos ahora el espacio $\Omega := \R^2 \otimes R^2$. Por tanto, sabemos que los tensores puros de este espacio son de la forma:
+
+    $$\begin{pmatrix} a \\ b \end{pmatrix} \otimes \begin{pmatrix} c \\ d \end{pmatrix}$$
+
+    Tomando ahora la base usual de $\R^2$, cualquier tensor de $\gamma \in \Omega$ se puede expresar como:
+
+    \begin{equation}
+    \begin{split}
+        \gamma &= \lambda_{11} \vectordd{1}{0} \otimes \vectordd{1}{0} + \lambda_{12} \vectordd{1}{0} \otimes \vectordd{0}{1} + \ldots \\
+        \ldots &+ \lambda_{21} \vectordd{0}{1} \otimes \vectordd{1}{0} + \lambda_{22} \vectordd{0}{1} \otimes \vectordd{0}{1}
+    \end{split}
+    \end{equation}
+
+    De nuevo, sabemos que $\R^2 \otimes \R^2 \cong \R^4$. La expresión anterior, sin embargo, nos invita a considerar el espacio $\Omega$ como $\R^2 \otimes \R^2 \cong \R^4 \cong \espaciomatrices{2}{2}$, con lo que con un adecuado isomorfismo, podemos expresar:
+
+    $$\gamma = \begin{bmatrix}
+        \lambda_{11} & \lambda_{12} \\
+        \lambda_{21} & \lambda_{22}
+    \end{bmatrix}$$
+
+    Para ello basta con considerar el isomorfismo:
+
+    \begin{equation}
+        \phi: \R \otimes \mathbb{V} \to \mathbb{V}
+    \end{equation}
+
+    de forma que:
+
+    $$\phi(\vectordd{1}{0} \otimes \vectordd{1}{0}) = \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix}$$
+    $$\phi(\vectordd{1}{0} \otimes \vectordd{0}{1}) = \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix}$$
+    $$\phi(\vectordd{0}{1} \otimes \vectordd{1}{0}) = \begin{bmatrix} 0 & 0 \\ 1 & 0 \end{bmatrix}$$
+    $$\phi(\vectordd{0}{1} \otimes \vectordd{0}{1}) = \begin{bmatrix} 0 & 0 \\ 0 & 1 \end{bmatrix}$$
+
+    A partir de este isomorfismo, podemos dar cierto significado al producto de tensores puros:
+
+    \begin{equation}
+    \begin{split}
+        \gamma &:= \vectordd{a}{b} \otimes \vectordd{c}{d} = \left( a \cdot \vectordd{1}{0} + b \cdot \vectordd{0}{1} \right) \otimes \left( c \cdot \vectordd{1}{0} + d \cdot \vectordd{0}{1} \right) = \ldots \\
+        \ldots &= ac \vectordd{1}{0} \otimes \vectordd{1}{0} + ad \vectordd{1}{0} \otimes \vectordd{0}{1} + bc \vectordd{0}{1} \otimes \vectordd{1}{0} + bd \vectordd{0}{1} \otimes \vectordd{0}{1} \underset{\phi}{\cong} \ldots \\
+        \ldots & \underset{\phi}{\cong} \begin{bmatrix} ac & ad \\ bc & bd \end{bmatrix}
+    \end{split}
+    \end{equation}
+
+    Es decir:
+
+    \begin{equation}
+    \begin{split}
+        \phi\left( \vectordd{a}{b} \otimes \vectordd{c}{d} \right) & = \begin{bmatrix} ac & ad \\ bc & bd \end{bmatrix} = \\
+        & = \vectordd{a}{d} \begin{pmatrix} c & d \end{pmatrix}
+    \end{split}
+    \end{equation}
+
+    O lo que es lo mismo:
+
+    \begin{equation}
+    \begin{split}
+        \phi(v \otimes w) = v w^T
+    \end{split}
+    \end{equation}
+
+    Esto coincide con la forma de definir los tensores que se hace en \cite{matematicas:principal}, y que introducimos en \customref{sec:otra_forma_tensores}.
+\end{ejemplo}
+
+Veamos ahora un ejemplo que nos clarifique la naturaleza del espacio $\R^N \otimes \mathbb{V}$:
+
+\begin{ejemplo}
+    Sea ahora $\Omega := \R^N \otimes \mathbb{V}$, con $N$ un natural cualquiera y $\mathbb{V}$ un espacio vectorial real. Consideramos su base usual:
+
+    $$\mathbb{B}_{\R^N} := \left\{\vectorn{1}{0}{0}, \vectorn{0}{1}{0}, \ldots, \vectorn{0}{0}{1} \right\} = \left\{\nv{e_1}, \nv{e_2}, \ldots, \nv{e_N} \right\}$$
+
+    Ahora, veamos cómo podemos manipular un tensor cualquiera del espacio $\Omega$:
+
+    \begin{equation}
+    \begin{split}
+        \nv{v} \otimes \nv{w} &= (\lambda_1 \nv{e_1} + \lambda_2 \nv{e_2} + \ldots \lambda_N \nv{e_N}) \otimes \nv{w} \eqtext{3.} \ldots \\
+        \ldots &= \lambda_1 \nv{e_1} \otimes \nv{w} + \lambda_2 \nv{e_2} \otimes \nv{w} + \ldots \lambda_N \nv{e_N} \otimes \nv{w} \eqtext{1., 2.} \ldots \\
+        \ldots &= \nv{e_1} \otimes \lambda_1 \nv{w} + \nv{e_2} \otimes \lambda_2 \nv{w} + \ldots \nv{e_N} \otimes \lambda_N \nv{w} = \ldots \\
+        \ldots &= \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \ldots \nv{e_N} \otimes \nv{w_N} \qquad \text{con} \dspace \nv{w_i} = \lambda_i \nv{w} \in \mathbb{V}
+    \end{split}
+    \end{equation}
+
+    Por lo tanto, tenemos que $\forall \nv{v} \in \R^N$, $\forall \nv{w} \in \mathbb{V}$, $\exists \nv{w_1}, \ldots \nv{w_N} \in \mathbb{V}$ tal que:
+
+    $$\nv{v} \otimes \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \ldots + \nv{e_N} \otimes \nv{w_N}$$
+
+    Luego, como hemos hecho en un ejemplo anterior, podemos definir el siguiente isomorfimso:
+
+    \begin{equation}
+    \begin{split}
+        \phi: \R^N \otimes \mathbb{V} &\to \mathbb{V}^N \\
+        \nv{v} \otimes \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \ldots + \nv{e_N} \otimes \nv{w_N} &\mapsto \vectorn{\nv{w_1}}{\nv{w_2}}{\nv{w_N}}
+    \end{split}
+    \end{equation}
+
+
+\end{ejemplo}
+
+\subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
+
+Por lo visto anteriormente, tenemos una forma más concreta de entender los tensores.
+\todo{Esta frase es rara. Especificar lo que hemos visto anteriormente}
+
+Podemos ver un tensor $\mathcal{A} \in \R^{M_1, \ldots, M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $idx \in \deltaset{M_i}$. Usaremos
+
+Con esta visión, podemos desarrollar los siguientes conceptos básicos sobre tensores:
+
+\begin{itemize}
+    \item Modos: cada una de las entradas $d_1, \ldots, d_N$ que podemos usar para indexar los elementos del tensor
+    \item Orden: el número de modos del tensor. En el caso de nuestro tensor $\mathcal{A}$, tenemos $N$ modos, y por tanto ese es su orden
+    \item Dimensión: el número de valores que puede tomar cada uno de los modos. Por lo tanto, si en el primer modo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que el modo $i$-ésimo tiene dimensión $M$.
+        \begin{itemize}
+            \item Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos
+            \item Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero en ocasiones se abusa del lenguaje
+        \end{itemize}
+\end{itemize}
+
+Ahora, respecto al \textbf{producto tensorial}, por los isomorfismos que hemos introducido previamente, podemos ver el producto tensorial entre dos tensores reales de una forma más sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P, Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
+\todo{Tenemos que desarrollar estos isomorfismos o dejarlos indicados!}
+
+
+$$(A \otimes B)d_1, \ldots d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}$$
+
+En el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}, \nv{v} \in \R^{N_2}$, tenemos que $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$. Esto coincide con lo que vimos en \customref{ejemplo:R2xR2}, a partir de un isomorfismo natural.
+
+\subsection{Propiedad Universal del producto tensorial}
+
+El siguiente teorema será de gran utilidad a la hora de entender la naturaleza del producto tensorial entre dos espacios vectoriales.
+
+\begin{teorema}[Propiedad Universal del producto tensorial] Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales. Su producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial con una aplicación bilineal:
+
+\begin{equation}
+\begin{split}
+    \otimes : \mathbb{V} \times \mathbb{W} &\to \mathbb{V} \otimes \mathbb{V} \\
+    \nv{v}, \nv{w} & \mapsto \nv{v} \otimes \nv{w}
+\end{split}
+\end{equation}
+
+de forma que:
+
+\begin{equation}
+    \forall h: \mathbb{V} \times \mathbb{W} \to \mathbb{Z} \text{  bilineal  } \exists! \hat{h}: \mathbb{V} \otimes \mathbb{W} \to \mathbb{Z} \text{  lineal, verificando que: }
+\end{equation}
+
+\begin{equation}
+    h = \hat{h} \circ \otimes
+\end{equation}
+
+es decir:
+
+\begin{equation}
+    h(\nv{u}, \nv{v}) = \hat{h}(\nv{u} \otimes \nv{v}); \dspace \forall \nv{u} \in \mathbb{V}, \forall \nv{v} \in \mathbb{W}
+\end{equation}
+
+Esto se resume en que el siguiente diagrama es conmutativo:
+
+\begin{equation}
+\begin{tikzcd}
+    \mathbb{V} \times \mathbb{W} \ar{r}{h} \ar{d}[left]{\otimes} & \mathbb{Z} \\
+    \mathbb{V} \otimes \mathbb{W} \ar[dashed]{ur}[right, below]{\hat{h}}
+\end{tikzcd}
+\end{equation}
+
+\end{teorema}
+
+Es decir, dada una aplicación bilineal en el producto cartesiano de dos espacios vectoriales, podemos asociar unívocamente una aplicación lineal en el producto tensorial de los dos espacios vectoriales. Esto sigue siendo cierto para aplicaciones multilineales en el producto cartesiano de un número arbitrario de espacios vectoriales.
+
+Este teorema, que se puede probar a partir de todo lo que hemos visto hasta ahora, \textbf{sirve para dar una definición no constructiva del producto tensorial} de dos espacios vectoriales. A diferencia de lo que pasaba con la definición alternativa que se puede dar usando \customref{th:base_prod_tensorial}, esta definición no depende de ninguna base, y por lo tanto es igual de general que la definición por la que hemos optado.
+
+\subsection{Descomposición CANDECOMP/PARAFAC}
+\todo{Esta sección igual debería colocarla más adelante, porque no es del todo introductoria. Podría considerar que forma parte del paper, aunque realmente no sé cómo de conocida es la descomposición como para poder considerarse introducción}
+
+Como ya se ha comentado en \customref{ch:introduccion}, las descomposiciones tensoriales van a ser fundamentales en este estudio. Las descomposiciones tensoriales buscan, en general, expresar un tensor cualquiera como función de otros tensores más sencillos, o incluso en función de vectores.
+
+La primera descomposición con la que trabajamos (y la más sencilla de las dos que usamos) es la descomposición \textit{CANDECOMP/PARAFAC}. Para ello, comenzamos estudiando la siguiente propiedad:
+
+\begin{proposicion}[Producto tensorial de dos vectores]
+    Sean $\nv{v} \in R^{N}, \nv{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
+
+    $$\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T \in \espaciomatrices{N}{M}$$
+
+    Además, esta matriz es de rango uno o cero (este último caso cuando alguno de los dos vectores es $\vec{0}$)
+\end{proposicion}
+
+\begin{proof}
+
+Sean $\nv{v} = (v_1, \ldots, v_N)$ y $\nv{w} = (w_1, \ldots, w_M)$, ambos no nulos. Entonces, usando la expresión del producto tensorial que introducimos en \customref{sec:otra_forma_tensores}, tenemos que:
+
+\begin{equation}
+    \nv{v} \otimes \nv{w} = (v_i w_j)_{i \in \deltaset{N},\ j \in \deltaset{M}}
+\end{equation}
+
+O lo que es lo mismo:
+
+\begin{equation}
+    \nv{v} \otimes \nv{w} = \begin{pmatrix}
+        v_1 w_1 & v_1 w_2 & \ldots & v_1 w_M \\
+        v_2 w_1 & v_2 w_2 & \ldots & v_1 w_M \\
+        \vdots  & \vdots & & \vdots \\
+        v_N w_1 & v_N w_2 & \ldots & v_N w_M \\
+    \end{pmatrix}
+\end{equation}
+
+Que claramente se corresponde con la expresión de $\nv{v} \nv{w}^T$. Además, es claro que la fila $i$-ésima viene dada por el vector fila
+
+$$(v_i w_1, v_i w_2, \ldots, v_i w_M) = v_i (w_1, \ldots, w_M) = v_i \nv{w}^T$$
+
+Por tanto, todas las filas son combinación lineal de una de las filas.
+
+En el caso de que alguno de los dos vectores sea $\vec{0}$, tenemos que la matriz $\nv{v} \otimes \nv{w}$ es la matriz de ceros, y por tanto su rango es cero.
+
+Estudiado ese caso, ahora podemos suponer $\nv{v}, \nv{w} \neq \vec{0}$, y por tanto se debe cumplir que $\exists i_0 \in \deltaset{N}: v_{i_0} \neq 0$. Esa será la fila que escogemos para expresar el resto de filas como combinación lineal de esta, aprovechando de que es no nula. Dicha fila se puede expresar como $v_{i_0} \nv{w}^T$. La fila $i$-ésima se puede expresar como $v_i \nv{w}^T$. Y por tanto:
+
+\begin{equation}
+\begin{split}
+    v_i \nv{w}^T = \lambda \cdot v_{i_0} \nv{w}^T \iif & \lambda = \frac{v_i}{v_{i_0}} \\
+                                                               & \lambda \neq 0 \iif v_i \neq 0
+\end{split}
+\end{equation}
+
+Con esto sabemos que $rank(\nv{v} \otimes \nv{w}) \leq 1$, pero podría darse el caso de que el rango fuese cero aún siendo $\nv{v}, \nv{w} \neq \vec{0}$. Sin embargo, esto no es posible. Como $\nv{v}, \nv{w} \neq \vec{0}$, entonces $\exists i_0 \in \deltaset{N}, \exists j_0 \in \deltaset{M}$ de modo que $v_{i_0}, w_{j_0} \neq 0$. Por tanto, el menor de orden 1 asociado a la fila $i_0$-ésima y columna $j_0$-ésima tiene el valor $v_{i_0} w_{j_0} \neq 0$, y con ello, $rank(\nv{v} \otimes \nv{w}) \geq 1$.
+
+\end{proof}
+
+\begin{observacion}
+    Estamos escribiendo la igualdad $\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T$ sin definir lo que significa la igualdad entre un tensor de orden 2 y una matriz. Sin embargo, esta igualdad es totalmente natural. Decimos que un tensor de orden dos y una matriz son iguales cuando las dimensiones de la matriz y las dos dimensiones del tensor coinciden, y cuando las entradas de ambos coinciden.
+\end{observacion}
+
+Con esto, hemos caracterizado a aquellos tensores que se expresan como producto tensorial de dos vectores. Podemos generalizar esto al producto tensorial de $N$ vectores:
+
+\begin{definicion}[Tensores puros]
+    Un tensor $\mathcal{A}$ se dice que es \textbf{puro} (o también \textbf{elemental}) cuando es de la forma $\mathcal{A} = \otimes_{i = 1}^N \nv{v}^{(i)}$ con $\nv{v}^{(i)} \in \R^{N_i},\ \forall i \in \deltaset{N}$.
+\end{definicion}
+\todo{Esta definición está repetida de otra que ya teníamos}
+
+\begin{observacion}
+    A diferencia de lo que pasaba anteriormente, ahora no tenemos una forma tan directa de comparar estos tensores (de orden $N$) con matrices. Esto motiva en parte las siguientes herramientas que vamos a introducir.
+\end{observacion}
+
+Estamos ya en condiciones de introducir nuestra primera descomposición tensorial:
+
+\begin{proposicion}[\textbf{Descomposición \textit{CP}}]
+    Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros, es decir:
+
+    \begin{equation} \label{eq:cp_decomp}
+        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \ldots \nv{v_i^{(N)}}; \qquad
+        \dspace \nv{v_i^{(k)}} \in,\R^{M_k}, \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
+    \end{equation}
+\end{proposicion}
+
+A la descomposición anterior se le llama \textbf{descomposición \textit{CANDECOMP/PARAFAC}}, o abreviadamente, \textbf{descomposición \textit{CP}}
+
+\begin{observacion}
+    Esto descomposición es equivalente a:
+
+    \begin{equation} \label{eq:cp_decomp}
+        \mathcal{A} = \sum_{i = 1}^Z \lambda_i \cdot \nv{v_i^{(1)}} \otimes \ldots \nv{v_i^{(N)}}; \qquad
+        \dspace \nv{v_i^{(k)}} \in \R^{M_k}, \lambda_i \in \R \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
+    \end{equation}
+
+    Puesto que podemos considerar:
+
+    \begin{equation}
+        \nv{w_i^{(1)}} := \lambda_i \cdot \nv{v_i^{(1)}} \in \R^{M_1}
+    \end{equation}
+
+    y, usando de nuevo las propiedades del producto tensorial:
+
+    \begin{equation}
+        \lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}}
+    \end{equation}
+\end{observacion}
+
+\begin{proof}
+    \todo{Hacer esta demostración. Más adelante hacemos otra en el que vemos que podemos hacerlo con $M^N$ sumandos. Pero ahí usamos $\espaciotensores{N}{M}$, aquí las dimensiones varían!}
+\end{proof}
+
+\begin{observacion}
+    Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
+\end{observacion}
+
+\begin{observacion}
+
+En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. Esto motivará la definición que haremos más adelante de \textit{rango CP}. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
+\todo{Escribir el valor de Z cuando hagamos la demostración}
+
+\end{observacion}
+
+\begin{definicion}[Rango \textit{CP}]
+    Dado un tensor $\mathcal{A}$, se define su rango \textit{CP} como el mínimo valor de $Z$ para el cual la ecuación \eqref{eq:cp_decomp} se mantiene
+\end{definicion}
+
+Una propiedad interesante es la siguiente:
+
+\begin{proposicion}[]
+    Para un tensor de orden dos (que podemos ver como una matriz, por los isomorfismos previamente introducidos), su rango \textit{CP} coincide con el rango matricial usual
+\end{proposicion}
+
+\begin{proof}
+
+\todo{TODO -- hay que demostrarlo}
+
+\end{proof}
+\section{Teoría de la medida}
+
+\endinput

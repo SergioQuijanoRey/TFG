@@ -78,6 +78,8 @@
             esvect
             pgf
             tikz-cd
+            tikzmark
+            todonotes
             ;
         });
 

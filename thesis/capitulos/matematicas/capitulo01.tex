@@ -1,0 +1,51 @@
+% !TeX root = ../../libro.tex
+% !TeX encoding = utf8
+
+\chapter{Introducción}\label{ch:introduccion}
+
+El objetivo de este trabajo, desde la perspectiva de las matemáticas, es \textbf{analizar las redes neuronales profundas, basadas en convoluciones, y explicar por qué estas funcionan mejor que las redes neuronales no profundas}, conocidas en la literatura como redes neuronales \textit{``shallow"}.
+
+% TODO -- aqui habria que introducir algunas referencias de trabajos que esten
+% analizando las redes neuronales pero que no tengan en cuenta estas
+% particularidades. Por ejemplo, en la introduccion del paper de referencia
+% comentan muchos trabajos que estudian el depth efficiency pero para redes
+% muy concretas que no tienen nada que ver con las usadas en la practica
+%
+Este mejor comportamiento es muy conocido en la práctica, pero pocos son los trabajos que han analizado formalmente esta diferencia entre ambos tipos de redes. Además, \textbf{en la mayoría de trabajos de este tipo, no se han tenido en cuenta propiedades fundamentales de las redes profundas ni de las redes convolucionales}. Además, suelen ser trabajos en los que se muestran ejemplos concretos de funciones implementables (de forma eficiente) con redes profundas pero no con redes no profundas, sin dar ningún tipo de información sobre cómo de frecuente ocurre esto. En base a esto, las \textbf{principales fortalezas de este trabajo respecto a otros} es que consideramos:
+\todo{Aquí he copiado una frase de la introducción del trabajo, que quizás debería referenciar propiamente}
+\todo{Debería referenciar algunos trabajos que estudien las redes neuronales como ya he comentado. Por ejemplo, en la introducción del paper de referencia comentan muchos trabajos que estudian el depth efficiency pero para redes muy concretas que no tienen nada que ver con las usadas en la práctica. Podría tomar esas referencias para mi trabajo}
+
+\begin{itemize}
+    \item La diferencia jerárquica entre ambos tipos de redes
+    \item Propiedades fundamentales de las redes convolucionales. Esto es:
+        \begin{itemize}
+            \item Compartición de los coeficientes en las convoluciones
+            \item Localidad de la operación de convolución
+            \item Uso de la operación de \textit{pooling}
+        \end{itemize}
+    \item Un estudio de lo frecuente que es tener funciones que sean implementables (de forma eficiente) por redes profundas, pero no por redes no profundas
+\end{itemize}
+\todo{Desarrollar más qué significan estas propiedades. En la introducción del paper se explica esto más o menos}
+
+El desarrollo que hacemos en el presente trabajo puede resumirse en los siguientes \textbf{objetivos}:
+
+\begin{enumerate}
+    \item Modelar matemáticamente la tarea de aprendizaje. Para esto, modelamos los datos de entrada, la tarea a resolver y el espacio de hipótesis en el que buscaremos la mejor solución
+    \item Modelar los dos tipos de redes neuronales (profundas y no profundas) a través de dos tipos de descomposiciones tensoriales:
+        \begin{enumerate}
+            \item Descomposición \textit{CP}, que equivale al uso de redes no profundas
+            \item Descomposición \textit{HT}, que equivale al uso de redes profundas
+        \end{enumerate}
+    \item Demostrar dos resultados centrales que nos muestran la superioridad de las redes profundas, en lo que se conoce como \textit{depth efficiency}, a través de las ya mencionadas descomposiciones tensoriales
+    \todo{Debería hablar más sobre lo que dicen en concreto los resultados, aunque sea en un lenguaje sencillo y de forma resumida}
+\end{enumerate}
+
+Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas de las herramientas que usaremos serán:
+
+\begin{itemize}
+    \item Teoría básica sobre tensores
+    \item Teoría de la medida
+    \item Álgebra de matrices
+\end{itemize}
+
+\endinput
