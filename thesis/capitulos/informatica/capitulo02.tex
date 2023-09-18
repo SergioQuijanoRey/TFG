@@ -281,7 +281,7 @@ Principalmente, en \customref{isubsubs:batch_all}, podemos ver un posible fallo 
 
 Por tanto, una mejora sencilla a esta función de pérdida es dividir únicamente por el número de sumandos no nulos. Esta mejora la podemos aplicar también a \textit{batch hard}, obteniendo dos nuevas funciones de pérdida, a las que llamaremos $\mathcal{L}_{BA \neq 0}$ y $\mathcal{L}_{BH \neq 0}$.
 
-\subsubsection{Algunas observaciones y conclusiones}
+\subsubsection{Algunas observaciones y conclusiones} \label{isubsubs:observaciones_conclusiones_pksampling}
 
 En primer lugar, cabe destacar que, como señalan \cite{informatica:principal}, las dos nuevas funciones de pérdida introducidas equivalen al planteamiento clásico de \textit{triplet loss} si entrenásemos indefinidamente.
 
@@ -401,7 +401,7 @@ Como ya hemos comentado en \customref{isec:triplet_loss}, un problema que puede 
 
 En \customref{isubsubs:mejoras_sumandos_no_nulos} ya hemos introducido la noción de sumandos nulos. Estos sumandos nulos pueden llegar a ser nocivos para el aprendizaje de la red. Si demasiados triples no aportan valor a la función de pérdida, o bien no estamos aprovechando los ciclos de entrenamiento (en el caso de que estemos usando $\mathcal{L}_{BH \neq 0}, \mathcal{L}_{BA \neq 0}$) o bien  la red puede que no aprenda de los sumandos no nulos (en el caso de que estemos usando $\mathcal{L}_{BH}, \mathcal{L}_{BA}$). Por tanto, vamos a registrar el porcentaje de sumandos no nulos en la función de pérdida, en cada \textit{P-K batch}.
 
-\subsection{\textit{Rank@k accuracy}}
+\subsection{\textit{Rank@k accuracy}} \label{isubs:rank_at_k}
 
 A diferencia de un modelo de clasificación que trabaja con datos de la forma \lstinline{(features, etiqueta)}, no podemos calcular un valor de \textit{accuracy}. Estamos tratando de resolver una tarea de \textit{retrieval}, por tanto, dada una imagen \textit{key} y una base de datos, buscamos las $k$  mejores imágenes dentro de la base de datos. Esto es, las $k$ imágenes que nuestro modelo identifica como las más similares a la identidad de la \textit{key} (gracias a nuestra función de distancia en el \textit{embedding}).
 
