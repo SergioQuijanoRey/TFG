@@ -64,7 +64,7 @@ Como lenguaje de programación usaremos \lstinline{Python}, en su versión 3.10.
 
 \begin{enumerate}
     \item El gestor de paquetes y entornos \textbf{\lstinline{Conda}} \cite{informatica:conda_web}. Este gestor nos permite instalar fácilmente paquetes de \lstinline{Python} en entornos virtuales, evitando así instalarlos a nivel de sistema (lo que puede provocar conflictos con versiones de paquetes usados en otros proyectos). Además, permite generar un archivo \lstinline{enviroment.yml} que especifica exactamente qué paquetes están instalados y con qué versión. A partir de dicho fichero podremos reproducir el entorno de desarrollo en diferentes máquinas (por ejemplo, tenemos en mismo entorno de desarrollo en nuestro ordenador portátil y en los servidores donde se ejecutan los entrenamientos). Junto con el uso de contenedores \lstinline{docker} (enfoque que consideramos muy complejo), es la única alternativa que tenemos para configurar nuestro entorno de desarrollo en los servidores \textit{nGPU}
-    \item \textbf{\lstinline{nix}} \cite{informatica:nixos_web}. Dicha tecnología se compone de un lenguaje funcional puro, que se usa en su gestor de paquetes reproducible y declarativo. Usamos esta tecnología en nuestro ordenador por su robustez: durante los meses de desarrollo, algunas librerías se rompen en sus últimas versiones. Con \lstinline{nix} podemos volver cómodamente a versiones previas de todo el entorno de desarollo (\entrecomillado{rollback}). Esto se puede conseguir también con \lstinline{Conda} pero es mucho más complicado
+    \item \textbf{\lstinline{nix}} \cite{informatica:nixos_web}. Dicha tecnología se compone de un lenguaje funcional puro, que se usa en su gestor de paquetes reproducible y declarativo. Usamos esta tecnología en nuestro ordenador por su robustez: durante los meses de desarrollo, algunas librerías se rompen en sus últimas versiones. Con \lstinline{nix} podemos volver cómodamente a versiones previas de todo el entorno de desarollo (\entrecomillado{rollback}). Esto se puede conseguir también con \lstinline{Conda} pero es mucho más complicado. Además, permite especificar paquetes de \lstinline{Python}, paquetes de \LaTeX usados para producir esta memoria y paquetes de \textit{Linux}
 \end{enumerate}
 
 Como sistema operativo, hemos usado:
@@ -113,25 +113,37 @@ En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
             \item \textit{Scripts} de \lstinline{Python}, usados principalmente para entrenar y validar modelos
         \end{itemize}\end{itemize}
 
+\section{Diagramas de paquetes, de clases, \ldots}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/diagrama_paquetes}
+    \caption{Diagrama de paquetes de nuestra librería. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}.}
+\end{figure}
+
 \section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
 
-\section{Optimización del código} \label{isec:optimizacion_codigo}
 
-\section{Aumentado de datos} \label{isec:aumentado_datos}
+\section{Módulos relevantes}
 
-\section{Implementaciones propias de \textit{Datasets}} \label{isec:datasets_customs}
+Por la extensión del proyecto, no entraremos a comentar cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos aquellos módulos más relevantes
 
-\section{Normalización}
+\subsection{\textit{P-K sampling}}
+
+\subsection{Aumentado de datos} \label{isec:aumentado_datos}
+
+\subsection{Implementaciones propias de \textit{Datasets}} \label{isec:datasets_customs}
+
+\subsection{Normalización}
 
 Esto se usa en \cite{informatica:facenet}
 
-\section{\textit{Hyperparameter Tuning}} \label{isec:hp_tuning}
+\subsection{\textit{Hyperparameter Tuning}} \label{isec:hp_tuning}
 
-\section{Separación de datos teniendo en cuenta obtener clases disjuntas}
+\subsection{Separación de datos teniendo en cuenta obtener clases disjuntas}
 
-\section{Estructuración del código}
-\todo{Comentar estructura de carpetas, una libreria de la que consumen los notebooks y los scripts, ...}
-
-\section{Logging de métricas} \label{isec:loggin_metricas}
+\subsection{Logging de métricas} \label{isec:loggin_metricas}
 
 
+
+\section{Optimización del código} \label{isec:optimizacion_codigo}
