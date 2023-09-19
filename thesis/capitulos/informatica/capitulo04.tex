@@ -1,21 +1,21 @@
 \chapter{Implementación} \label{ich:implementacion}
 
-Las nuevas técnicas que introducimos implican un esfuerzo considerable en la implementación de módulos de código, sin poder usar muchas de las implementaciones que se ofrecen en las principales librerías de aprendizaje automático. Esta imposibilidad de usar las implementaciones de las librerías se debe, principalmente, al uso de \textit{P-K sampling}, como hemos comentado en \customref{isubsubs:observaciones_conclusiones_pksampling}.
+Las nuevas técnicas que introducimos implican un esfuerzo considerable en la implementación de módulos de código. Como comentamos en \customref{isubsubs:observaciones_conclusiones_pksampling}, el uso de \textit{P-K sampling} provoca que no podamos usar librerías de aprendizaje automático para realizar tareas comunes, como muestreo de datos, funciones de pérdida, métricas, \ldots
 
 Por tanto, en esta sección explicaremos todo el trabajo de implementación realizado.
 
-\section{Control de versiones e integración continua}
+\section{Control de versiones y buenas prácticas}
 
-Para el control de versiones, usamos \textit{Git} con \textit{Github}. Todo el desarrollo del trabajo, tanto el desarrollo de código como la escritura de la presente memoria, se han realizado en un repositorio abierto alojado en \cite{informatica:repogithub}.
+Para el control de versiones, usamos \textit{Git} con \textit{Github}. Todo el desarrollo del trabajo, tanto la implementación de código como la escritura de la presente memoria, se ha realizado en un repositorio abierto alojado en \cite{informatica:repogithub}.
 
 Gracias al uso de \textit{Github} hemos podido implementar fácilmente una serie de buenas prácticas de desarrollo, entre las cuales se encuentran:
 
 \begin{itemize}
-    \item El uso de \textit{issues} para especificar las necesidades del proyecto en cada momento, los errores encontrados durante el uso de la base de código, \ldots. Véase por ejemplo \url{https://github.com/SergioQuijanoRey/TFG/issues/14}, donde especificamos una necesidad y proponemos una solución. Además, se pueden ver todos los \textit{commits} que tratan con dicha \textit{issue}
-    \item Gracias a estar usando \textit{issues}, trabajamos con la metodología de \textit{feature branches}. En esta metodología, por cada nueva característica a implementar, se crea una \textit{branch} de \textit{Git} para introducir los cambios. Una vez se implementa y valida dicha característica, el código de la nueva \textit{branch} se fusiona en la rama principal \cite{informatica:feature_branches}. Como se puede ver en \cite{informatica:repogithub}, el nombre de cada \textit{feature branches} referencia al identificador de la \textit{issue} generado por \textit{Github}
-    \item El fusionado de \textit{feature branches} a la rama principal se realiza por medio de \textit{pull requests}. En cada \textit{pull request} podemos revisar el código una última vez antes de fusionarlo en la rama principal. Además, sirven como forma de localizar los cambios de alto nivel introducidos en nuestra base de código. En nuestro caso, los \textit{commits} individuales pueden ser muy granulares, y revisando la lista de todos los \textit{commits} realizados podemos perder el foco sobre la tarea de alto nivel que tratan de resolver. Por ejemplo, en una \textit{pull request} como \url{https://github.com/SergioQuijanoRey/TFG/pull/57} podemos ver que, para introducir las dos variantes de \textit{Rank@K accuracy} (véase \customref{isubs:rank_at_k}) empleamos 53 \textit{commits}.
-    \item El uso de \textit{Github Actions} para ejecutar ciertas tareas tras realizar una subida de \textit{commits} al repositorio (\entrecomillado{push}) o antes de aceptar una \textit{pull request}. Principalmente, hemos usado estas \entrecomillado{actions} para lanzar todos los \textit{tests} unitarios en \textit{push} y lanzar todos los \textit{tests} de integración antes de cada \textit{pull request}. El objetivo de esta base de \textit{tests} se especifica en \customref{isec:test_suite}
-    \item El uso de \textit{Github Projects}, con los que podemos usar una tabla tipo \entrecomillado{Kanban} para organizar las tareas pendientes. Dicha forma de organizarnos ha sido ya comentada en \customref{isec:planificacion}.
+    \item El uso de \textbf{\textit{issues}} para especificar las necesidades del proyecto en cada momento, los errores encontrados durante el proceso de implementación, \ldots. Véase por ejemplo \url{https://github.com/SergioQuijanoRey/TFG/issues/14}, donde especificamos una necesidad y proponemos una solución. Además, se pueden ver todos los \textit{commits} que tratan con dicha \textit{issue}
+    \item Gracias a estar usando \textit{issues}, trabajamos con la metodología de \textbf{\textit{feature branches}}. En esta metodología, por cada nueva característica a implementar, se crea una \textit{branch} de \textit{Git} para introducir los cambios. Una vez se implementa y valida dicha característica, el código de la nueva \textit{branch} se fusiona en la rama principal \cite{informatica:feature_branches}. Como se puede ver en \cite{informatica:repogithub}, el nombre de cada \textit{feature branch} referencia al identificador de la \textit{issue} con la que estamos trabajando
+    \item El fusionado de \textit{feature branches} a la rama principal se realiza por medio de \textbf{\textit{pull requests}}. En cada \textit{pull request} podemos revisar el código una última vez antes de fusionarlo en la rama principal. Además, sirven como forma de localizar los cambios de alto nivel introducidos en nuestra base de código. En nuestro caso, los \textit{commits} individuales pueden llegar a ser demasiado granulares, y revisando la lista de todos los \textit{commits} realizados podemos perder el foco sobre la tarea de alto nivel que tratan de resolver. Por ejemplo, en una \textit{pull request} como \url{https://github.com/SergioQuijanoRey/TFG/pull/57} podemos ver que, para introducir las dos variantes de \textit{Rank@K accuracy} (véase \customref{isubs:rank_at_k}) empleamos 53 \textit{commits}.
+    \item El uso de \textbf{\textit{Github Actions}} para ejecutar ciertas tareas tras realizar una subida de \textit{commits} al repositorio (\entrecomillado{push}) o antes de aceptar una \textit{pull request}. Principalmente, hemos usado estas \entrecomillado{actions} para lanzar todos los \textit{tests} unitarios tras cada \textit{push} al repositorio y lanzar todos los \textit{tests} de integración antes de cada \textit{pull request}. El objetivo de esta base de \textit{tests} se especifica en \customref{isec:test_suite}
+    \item El uso de \textbf{\textit{Github Projects}}, que nos ofrecen una tabla tipo \entrecomillado{Kanban} para organizar las tareas pendientes. Dicha forma de organizarnos ha sido ya comentada en \customref{isec:planificacion}.
 \end{itemize}
 
 \section{Entorno de ejecución}
@@ -171,6 +171,10 @@ Para la gestión de entornos de \lstinline{Python} usaremos dos tecnologías.
     \item \lstinline{nix} \cite{informatica:nixos_web}. Dicha tecnología se compone de un lenguaje funcional puro, que se usa en su gestor de paquetes reproducible y declarativo. Usamos esta tecnología en nuestro ordenador por su robustez: durante los meses de desarrollo, algunos paquetes se rompen en sus últimas versiones, y con \lstinline{nix} podemos volver cómodamente a versiones previas en las que no tenemos los cambios que rompen dichos paquetes. Esto se puede conseguir también con \lstinline{conda} pero es mucho más complicado
 \end{enumerate}
 
+
+\section{Estructura de código}
+
+% TODO -- siguiente paso
 
 
 \section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
