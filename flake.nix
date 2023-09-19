@@ -24,6 +24,10 @@
             torchvision-bin
             scikit-learn
 
+            # Loading matlab files
+            scipy
+            h5py
+
             # Visualizations
             matplotlib
             seaborn
@@ -38,14 +42,14 @@
             # Downloading some datasets from google drive (CACD dataset)
             gdown
 
-            # Hyperparameter tuning
-            # TODO -- uncomment
-            # optuna
-
             # Loggin
             wandb
             tqdm
             python-dotenv
+
+            # Generate visualizations about the code structure
+            pydeps
+            pylint
 
             # LSP Packages
             python-lsp-server
@@ -81,8 +85,8 @@
             esvect
             pgf
             tikz-cd
-            ;
-        });
+            todonotes
+        ;});
 
         # Packages that we are going to use in both shells, for coding and for
         # writing the Latex thesis
@@ -99,6 +103,9 @@
 
                 # For launching github actions locally
                 pkgs.act
+
+                # Needed for using pyreverse (package exposed in pylint)
+                pkgs.graphviz
         ];
 
       in {
@@ -114,7 +121,16 @@
             # Add some paths to PYTHONPATH
             PYTHONPATH = "${custom_python_env}/${custom_python_env.sitePackages}:.:./src:./src/lib";
 
+            # To install some packages using pip
             shellHook = ''
+                if [ ! -d ".venv" ]; then
+                    python3 -m venv .venv;
+                fi
+                source .venv/bin/activate;
+
+                # Install some packages that are not present in nix repos
+                pip install optuna
+
                 # Log that we're in a custom enviroment
                 echo "❄️  Running custom dev enviroment with python and other packages"
             '';

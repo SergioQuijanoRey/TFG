@@ -76,6 +76,7 @@ upload_uni:
         --exclude 'src/data' \
         --exclude 'src/lib/__pycache__' \
         --exclude 'training.log' \
+        --exclude '.venv' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server
@@ -97,6 +98,7 @@ download_uni:
         --exclude 'src/data' \
         --exclude 'src/lib/__pycache__' \
         --exclude 'training.log' \
+        --exclude '.venv' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
 # Create a remote file system, so we can work easily on the server
