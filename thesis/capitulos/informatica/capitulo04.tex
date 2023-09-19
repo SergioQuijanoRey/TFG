@@ -37,72 +37,28 @@ Durante la implementación del código y el proceso de experimentación, hemos t
             \item El \textit{hardware} que se pone a disposición del usuario se asigna dinámicamente, en base al consumo previo de recursos del usuario y a la demanda actual. Por tanto, no podemos obtener una especificación estática de los recursos de los que disponemos \cite{informatica:google_colab_faq}. Tampoco existe documentación oficial donde se especifique qué \textit{hardware} se ofrece, cuotas de consumo, \ldots\; Sin embargo, accediendo a un \textit{Notebook}, podemos ejecutar algunos comandos para ver los recursos que nos ofrecen en un momento dado \footnote{Dichos comandos son ejecutados el 18 de Septiembre de 2023}
 
                 \begin{itemize}
-                    \item El comando \lstinline{df -h} nos muestra la siguiente información sobre el sistema de ficheros:
+                    \item El comando \lstinline{df -h} nos muestra que tenemos disponibles 50GB de memoria permanente. Sin embargo, esto no es una limitación porque podemos conectar nuestra cuenta de usuario de \textit{Google} para acceder a todos los datos almacenados en \textit{Google Drive}
                     \item El comando \lstinline{cat /proc/cpuinfo} nos muestra que estamos usando una \textit{CPU} \entrecomillado{Intel ( R ) Xeon ( R ) @ 2.20 GHz}
-                    \item El comando \lstinline{cat /proc/meminfo} nos muestra la siguiente información:
-
-MemTotal:       13294252 kB
-MemFree:         4619912 kB
-MemAvailable:   12329164 kB
-Buffers:          216900 kB
-Cached:          7474684 kB
-SwapCached:            0 kB
-Active:          2474124 kB
-Inactive:        5659936 kB
-Active(anon):       1008 kB
-Inactive(anon):   442712 kB
-Active(file):    2473116 kB
-Inactive(file):  5217224 kB
-Unevictable:           0 kB
-Mlocked:               0 kB
-SwapTotal:             0 kB
-SwapFree:              0 kB
-Dirty:               192 kB
-Writeback:             0 kB
-AnonPages:        442676 kB
-Mapped:           270840 kB
-Shmem:              1244 kB
-KReclaimable:     344332 kB
-Slab:             410888 kB
-SReclaimable:     344332 kB
-SUnreclaim:        66556 kB
-KernelStack:        4320 kB
-PageTables:         7900 kB
-NFS_Unstable:          0 kB
-Bounce:                0 kB
-WritebackTmp:          0 kB
-CommitLimit:     6647124 kB
-Committed_AS:    1979220 kB
-VmallocTotal:   34359738367 kB
-VmallocUsed:        9252 kB
-VmallocChunk:          0 kB
-Percpu:             1296 kB
-HardwareCorrupted:     0 kB
-AnonHugePages:         0 kB
-ShmemHugePages:        0 kB
-ShmemPmdMapped:        0 kB
-FileHugePages:         0 kB
-FilePmdMapped:         0 kB
-CmaTotal:              0 kB
-CmaFree:               0 kB
-HugePages_Total:       0
-HugePages_Free:        0
-HugePages_Rsvd:        0
-HugePages_Surp:        0
-Hugepagesize:       2048 kB
-Hugetlb:               0 kB
-DirectMap4k:       76600 kB
-DirectMap2M:     3065856 kB
-DirectMap1G:    12582912 kB
-
-                    \end{lstlisting}
+                    \item El comando \lstinline{cat /proc/meminfo} nos muestra que disponemos de aproximadamente 12GB de memoria \textit{RAM}
+                    \item Sabemos que podemos acceder a \textit{TPUs} de \textit{Google}, pero no disponemos de ningún comando para acceder a las especificaciones de esta
                 \end{itemize}
-            \item Sabemos que podemos acceder a \textit{TPUs} de \textit{Google}, pero no disponemos de ningún comando para acceder a las especificaciones de esta
         \end{itemize}
 
-    \item Los servidores \textit{nGPU} de la Universidad de Granada.
+    \item Los \textbf{clúster de servidores GPU de la Universidad de Granada, \textit{nGPU}}.
+        \begin{itemize}
+            \item Estos servidores se encuentran en el Centro de Procesado de Datos (\textit{CPD}) Santa Lucía. Para trabajar con estos servidores, accedemos por \lstinline{ssh} a un nodo cabecera, y usando el programa \lstinline{slurm}, enviamos trabajos a los distintos nodos que componen el \textit{CPD}.
+            \item Hemos usado estos servidores tanto para lanzar \textit{Notebooks} en los que realizamos principalmente análisis exploratorio de datos, como para lanzar \textit{scripts} de \lstinline{Python} usados principalmente para llevar a cabo el entrenamiento y validación de modelos
+            \item Los nodos \textit{Titan} y \textit{Atenea}, los dos nodos que hemos usado mayoritariamente, disponen del siguiente \textit{hardware}:
+                \begin{itemize}
+                    \item Dos \textit{Intel® Xeon® E5-2630}, cada uno
+                    \item Memoria \textit{RAM} de 128 Gb \textit{DDR4}
+                    \item Memoria permantente de 2,7TB
+                    \item El nodo \textit{Titan} dispone de tres \textit{GPUs} \textit{GTX Titan X Pascal} y una \textit{GPU} \textit{GTX Titan Xp}, mientras que el nodo \textit{Atenea} dispone de cuatro \textit{GPUs} \textit{GTX Titan Xp}
+                \end{itemize}
+        \end{itemize}
 
 \end{enumerate}
+\todo{Esto debería ir a materiales}
 
 Como lenguaje de programación usaremos \lstinline{Python}, en su versión 3.10.2.
 
