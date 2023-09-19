@@ -4,7 +4,7 @@ Las nuevas técnicas que introducimos implican un esfuerzo considerable en la im
 
 Por tanto, en esta sección explicaremos todo el trabajo de implementación realizado.
 
-\section{Control de versiones y buenas prácticas}
+\section{Control de versiones y buenas prácticas} \label{isec:github_buenas_practicas}
 
 Para el control de versiones, usamos \textit{Git} con \textit{Github}. Todo el desarrollo del trabajo, tanto la implementación de código como la escritura de la presente memoria, se ha realizado en un repositorio abierto alojado en \cite{informatica:repogithub}.
 
@@ -67,12 +67,51 @@ Como lenguaje de programación usaremos \lstinline{Python}, en su versión 3.10.
     \item \textbf{\lstinline{nix}} \cite{informatica:nixos_web}. Dicha tecnología se compone de un lenguaje funcional puro, que se usa en su gestor de paquetes reproducible y declarativo. Usamos esta tecnología en nuestro ordenador por su robustez: durante los meses de desarrollo, algunas librerías se rompen en sus últimas versiones. Con \lstinline{nix} podemos volver cómodamente a versiones previas de todo el entorno de desarollo (\entrecomillado{rollback}). Esto se puede conseguir también con \lstinline{Conda} pero es mucho más complicado
 \end{enumerate}
 
+Como sistema operativo, hemos usado:
+
+\begin{itemize}
+    \item En nuestro entorno de desarrollo, la distribución de \textit{Linux} \textit{NixOS} en su versión 23.11
+    \item En \textit{Google Colab}, la distribución de \textit{Linux} \textit{Ubuntu} en su versión 22.04.2 \textit{LTS} \footnote{Comprobamos esta versión ejecutando el comando \lstinline{lsb_release -d} el 19 de Septiembre de 2023}
+    \item En los servidores \textit{nGPU}, la distribución de \textit{Linux} \textit{Ubuntu} en su versión 20.04.5 \textit{LTS}
+\end{itemize}
 
 
-\section{Estructura de código}
+\section{Estructura de carpetas del proyecto}
 
-% TODO -- siguiente paso
+Por la extensión de la base de código, es necesario que comentemos la estructura de carpetas del proyecto. En el directorio raíz tenemos los siguientes ficheros relevantes:
 
+\begin{itemize}
+    \item \lstinline{flake.nix} y \lstinline{flake.lock} especifican el entorno de desarrollo usando el gestor \textit{nix}. El fichero \lstinline{enviroment.yml} especifica el entorno de desarrollo usando el gestor \textit{Conda}
+    \item Los ficheros \lstinline{interactive_slurm.sh} y \lstinline{launch_server_process.sh} son dos \textit{scripts Bash} que usamos para lanzar procesos en los servidores \textit{nGPU}. El primero lo utilizamos para entrar en una terminal de forma interactiva. El segundo, para lanzar un \textit{script} de \lstinline{Python} para que ejecute el aprendizaje y validación de un modelo
+    \item \lstinline{justfile} especifica tareas para ejecutarse con la herramienta \lstinline{just} \cite{informatica:just}. Dicha herramienta es parecida a \lstinline{make}. La usamos para definir tareas como:
+        \begin{itemize}
+            \item Sincronizar las bases de código entre los tres entornos distintos con los que hemos trabajado
+            \item Ejecutar ciertos \textit{scripts}
+            \item Ejecutar la \textit{suite} de pruebas y los \textit{benchmarks}
+            \item Ejecutar ciertos análisis estáticos sobre la base de código (usando \lstinline{mypy} y \lstinline{ruff})
+            \item \ldots
+        \end{itemize}
+    \item \lstinline{optuna_queries.sql} define las consultas \lstinline{SQL} necesarias para vigilar el proceso de \textit{hyperparameter tuning}, que especificaremos en \customref{isec:hp_tuning}
+\end{itemize}
+
+En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
+
+\begin{itemize}
+    \item \lstinline{.github/workflows} en el que definimos las \textit{Github Actions} que ejecutamos (véase \customref{isec:github_buenas_practicas})
+    \item \lstinline{thesis} donde desarrollamos los documentos que componen la presente memoria
+    \item \lstinline{src} donde realizamos todo el desarrollo de código. Este a su vez se divide en los siguientes subdirectorios:
+        \begin{itemize}
+            \item \lstinline{lib}, donde implementamos toda la librería que usamos en los \textit{Notebooks} y en los \textit{scripts} de entrenamiento. Implementan tareas varias, como el cálculo de funciones de pérdida, el \textit{P-K sampling}, métricas, bucles de entrenamiento, el sistema de \textit{logging}, \ldots
+            \item \lstinline{test} e \lstinline{integration_tests} donde alojamos toda la \textit{suite} de pruebas unitarias y de integración, para validar las implementaciones realizadas en nuestra librería
+            \item \lstinline{benchmarks} donde alojamos los \textit{benchmarks} empleados en \customref{isec:optimizacion_codigo}
+            \item \lstinline{profiling} contiene los datos generados en los \textit{benchmarks} y el proceso explicado de optimización basado en datos
+        \end{itemize}
+    \item En \lstinline{src} tenemos algunos ficheros relevantes:
+
+        \begin{itemize}
+            \item \textit{Jupyter Notebooks} donde realizamos análisis exploratorios de distintas bases de datos
+            \item \textit{Scripts} de \lstinline{Python}, usados principalmente para entrenar y validar modelos
+        \end{itemize}\end{itemize}
 
 \section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
 
