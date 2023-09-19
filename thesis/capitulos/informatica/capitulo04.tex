@@ -20,85 +20,27 @@ Gracias al uso de \textit{Github} hemos podido implementar fácilmente una serie
 
 \section{Entorno de ejecución}
 
-Durante la implementación del código y el proceso de experimentación, hemos trabajado en tres entornos distintos:
+Durante la implementación del código y el proceso de experimentación, hemos trabajado en tres entornos de desarrollo y ejecución distintos:
 
 \begin{enumerate}
-    \item El entorno de desarrollo local, nuestro ordenador portátil. Lo hemos usado principalmente para implementar el código y ejecutar algunos \textit{tests}. Por su baja potencia, no lo hemos usado ni para lanzar los \textit{Notebooks} de \textit{Jupyter} sobre los que realizamos la exploración de datos, ni para lanzar los \textit{scripts} de aprendizaje. Por tanto, no resulta interesante mostrar sus especificaciones
+    \item El entorno de \textbf{desarrollo local}, nuestro ordenador portátil. Lo hemos usado principalmente para implementar el código y ejecutar algunos \textit{tests}. Por su baja potencia, no lo hemos usado ni para lanzar los \textit{Notebooks} de \textit{Jupyter} sobre los que realizamos la exploración de datos, ni para lanzar los \textit{scripts} de aprendizaje. Por tanto, no resulta interesante mostrar sus especificaciones
 
-    \item En fases tempranas del proyecto hemos ejecutado nuestro código en \textit{Google Colab}. \textit{Google Colab} permite ejecutar, a través de una interfaz \textit{web}, \textit{Notebooks} de \lstinline{Python}.
+    \item En fases tempranas del proyecto hemos escrito y ejecutado código en \textbf{\textit{Google Colab}}. Esta plataforma nos permite ejecutar, a través de una interfaz \textit{web}, \textit{Notebooks} de \lstinline{Python}.
 
         \begin{itemize}
-            \item Además, otorga de forma limitada algunos recursos como acceso a cómputo \textit{GPU}.
+            \item Además, otorga de forma limitada algunos recursos como acceso a cómputo \textit{TPU}. Las \textit{Tensor Processing Units} o \textit{TPUs} son tecnología \textit{hardware} propietaria de \textit{Google}, que busca optimizar el entrenamiento e inferencia de modelos de IA \cite{informatica:google_tpu}.
 
             \item Los \textit{Notebooks} vienen con la mayoría de bibliotecas de aprendizaje automático pre-instaladas. Esto es una gran ventaja al inicio del desarrollo, puesto que evitamos enfrentarnos a la complejidad de configurar un entorno de ejecución \lstinline{Python} con las librerías necesarias
 
-            \item Sin embargo, rápidamente tenemos que abandonar este entorno, por dos motivos: el acceso a recursos es demasiado limitado, y solo poder usar código escrito en \textit{Notebooks} es una restricción importante.
+            \item Sin embargo, rápidamente tenemos que abandonar este entorno por dos motivos: el acceso a recursos es demasiado limitado, y solo poder usar código escrito en \textit{Notebooks} es una restricción importante.
 
-            \item El \textit{hardware} que se pone a disposición del usuario se asigna dinámicamente, en base al consumo de recursos previo de este usuario y a la demanda actual. Por tanto, no podemos obtener una especificación de este mismo \cite{informatica:google_colab_faq}. Sin embargo, accediendo a un \textit{Notebook}, podemos ejecutar algunos comandos para ver los recursos que nos ofrecen en un momento dado \footnote{Dichos comandos son ejecutados el 18 de Septiembre de 2023}
+            \item El \textit{hardware} que se pone a disposición del usuario se asigna dinámicamente, en base al consumo previo de recursos del usuario y a la demanda actual. Por tanto, no podemos obtener una especificación estática de los recursos de los que disponemos \cite{informatica:google_colab_faq}. Tampoco existe documentación oficial donde se especifique qué \textit{hardware} se ofrece, cuotas de consumo, \ldots\; Sin embargo, accediendo a un \textit{Notebook}, podemos ejecutar algunos comandos para ver los recursos que nos ofrecen en un momento dado \footnote{Dichos comandos son ejecutados el 18 de Septiembre de 2023}
 
                 \begin{itemize}
                     \item El comando \lstinline{df -h} nos muestra la siguiente información sobre el sistema de ficheros:
-                    \item El comando \lstinline{cat /proc/cpuinfo} nos muestra la siguiente información
-                        \begin{lstlisting}
-
-processor	: 0
-vendor_id	: GenuineIntel
-cpu family	: 6
-model		: 79
-model name	: Intel(R) Xeon(R) CPU @ 2.20GHz
-stepping	: 0
-microcode	: 0xffffffff
-cpu MHz		: 2199.998
-cache size	: 56320 KB
-physical id	: 0
-siblings	: 2
-core id		: 0
-cpu cores	: 1
-apicid		: 0
-initial apicid	: 0
-fpu		: yes
-fpu_exception	: yes
-cpuid level	: 13
-wp		: yes
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt arat md_clear arch_capabilities
-bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa mmio_stale_data retbleed
-bogomips	: 4399.99
-clflush size	: 64
-cache_alignment	: 64
-address sizes	: 46 bits physical, 48 bits virtual
-power management:
-
-processor	: 1
-vendor_id	: GenuineIntel
-cpu family	: 6
-model		: 79
-model name	: Intel(R) Xeon(R) CPU @ 2.20GHz
-stepping	: 0
-microcode	: 0xffffffff
-cpu MHz		: 2199.998
-cache size	: 56320 KB
-physical id	: 0
-siblings	: 2
-core id		: 0
-cpu cores	: 1
-apicid		: 1
-initial apicid	: 1
-fpu		: yes
-fpu_exception	: yes
-cpuid level	: 13
-wp		: yes
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt arat md_clear arch_capabilities
-bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa mmio_stale_data retbleed
-bogomips	: 4399.99
-clflush size	: 64
-cache_alignment	: 64
-address sizes	: 46 bits physical, 48 bits virtual
-power management:
-                        \end{lstlisting}
+                    \item El comando \lstinline{cat /proc/cpuinfo} nos muestra que estamos usando una \textit{CPU} \entrecomillado{Intel ( R ) Xeon ( R ) @ 2.20 GHz}
                     \item El comando \lstinline{cat /proc/meminfo} nos muestra la siguiente información:
 
-
-                    \begin{lstlisting}
 MemTotal:       13294252 kB
 MemFree:         4619912 kB
 MemAvailable:   12329164 kB
