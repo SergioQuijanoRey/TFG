@@ -211,13 +211,19 @@ Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber
 
 Desarrollada esta visión de forma general, veamos cómo se implementa cada una de las partes, siguiendo las técnicas introducidas en \cite{informatica:principal}.
 
-\subsection{Muestreo de los datos con \textit{P-K sampling}}
+\subsection{Muestreo de los datos con \textit{P-K sampling}} \label{isubs:muestreo_datos_pk_sampling_teoria}
 
 La \textbf{idea principal del muestreo} es lo que definiremos como \textbf{\textit{P-K sampling}}. Como ya hemos comentado en \customref{isubs:triples_online}, nuestra tarea ahora es generar un \textit{batch} de elementos de la forma \lstinline{(imagen, identidad, edad)}. En una segunda etapa (véase \customref{isubs:seleccion_de_triples}), otro algoritmo decide como generar triples a partir de estos datos.
 
 El algoritmo de muestreo \textit{P-K sampling} es muy sencillo. En cada muestreo, seleccionamos aleatoriamente $P$ identidades de individuos (o clases, en un ambiente más general en el que no necesariamente estemos trabajando con imágenes de personas). Por cada una de las identidades, seleccionamos aleatoriamente $K$ imágenes. Por tanto, obtenemos una lista de $P \cdot K$ imágenes, o lo que podemos llamar, un \textbf{\textit{P-K batch}}. Para poder obtener triples interesantes en la siguiente etapa, parece que lo deseable es que ambas selecciones aleatorias (muestreos) sean sin repetición.
 
 El hecho de tener $K$ imágenes por cada uno de los individuos seleccionados es lo que va a permitir al algoritmo de generación de triples obtener rápidamente triples interesantes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/ejemplo_grafico_pk_sampling}
+    \caption{Ejemplo gráfico del proceso de \textit{P-K sampling}. Imagen extraída de \cite{informatica:paper_image_pk_sampling}}
+\end{figure}
 
 Queda aquí claro los problemas que introduce este muestreo: si queremos muestrear $K$ imágenes de cada individuo sin repetición, cada individuo debe tener asociadas al menos $K$ imágenes. Así que a la hora de trabajar con un \textit{dataset}, siempre deberíamos comprobar la distribución del número de imágenes por individuo, como hemos hecho en \customref{isec:base_datos_usada}.
 

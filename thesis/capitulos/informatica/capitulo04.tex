@@ -144,11 +144,56 @@ Como deja claro el diagrama, hemos estructura el código de la librería en mód
 
 Por la gran extensión de la base de código, mostrar el diagrama de clases completo no aporta apenas información. Pero mostraremos los diagramas de clase de ciertos módulos en \customref{isec:modulos_relevantes}, cuando esto aporte información relevante.
 
-\section{Módulos relevantes} \label{isec:modulos_relevantes}
+\section{Módulos relevantes} \label{isec:modulos_relevantes}aumentado de dato
 
 Por la extensión del proyecto no comentaremos cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos algunos de los módulos más relevantes introducidos en \customref{isec:estructura_paquetes_modulos}.
 
 \subsection{\textit{P-K sampling}}
+
+En \customref{isubs:muestreo_datos_pk_sampling_teoria} hemos introducido nuevas técnicas para computar el \textit{Triplet Loss}. Una parte fundamental de estas técnicas consiste en realizar el \textit{P-K sampling}, que implementamos en el módulo \lstinline{src.lib.sampler}, en la clase \lstinline{CustomSampler}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/pksampler_diagrama_clases}
+    \caption{Diagrama de clases de \lstinline{CustomSampler} y sus clases colaboradoras. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
+    \label{img:diagrama_clases_CustomSampler}
+\end{figure}
+
+En el diagrama de clases \customref{img:diagrama_clases_CustomSampler} podemos ver que:
+
+\begin{itemize}
+    \item \lstinline{CustomSampler} hereda de la clase \lstinline{Sampler} de \lstinline{torch} para introducir el comportamiento deseado a través de un \lstinline{Dataloader} \cite{informatica:pytorch_sampler}.
+        \begin{itemize}
+            \item Un \lstinline{DataLoader} especifica la forma en la que se realiza el \textit{batching} y otros detalles de implementación (por ejemplo, las políticas a seguir para cargar datos cuando trabajamos en paralelo). Uno de sus atributos es el \lstinline{sampler} usado. Escribiendo un \textit{sampler} propio será suficiente para obtener el comportamiento deseado
+            \item Un \lstinline{Sampler} indica el orden en el que iteramos un \textit{dataset}. Debe implementar el método \lstinline{__len__()}, que muestra el número de datos que ofrecemos, y el método \lstinline{__iter__()}, que indica cómo se itera sobre los índices de los datos almacenados.
+        \end{itemize}
+\end{itemize}
+
+En resumen, para realizar \textit{P-K sampling}, especificamos el orden el el que se itera el \textit{dataset} usando la clase \lstinline{CustomSampler}.
+
+Fijados los valores de $P$ y $K$, debemos indicar que el \textit{batch size} sea $P \cdot K$. Esto es claro, pues de otra forma sería imposible generar \textit{batches} en los que haya $P$ individuos representados cada uno con $K$ imágenes.
+
+El funcionamiento de \lstinline{CustomSampler} es el siguiente. Generamos una \textbf{lista de índices} vacía y una lista de imágenes candidatas, que al principio corresponderá al total del \textit{dataset}. Mientras al menos hayan $P$ individuos con al menos $K$ imágenes, realizamos el siguiente proceso:
+
+\begin{enumerate}
+    \item Elegimos aleatoriamente $P$ individuos asociados a la lista de imágenes candidatas
+    \item Por cada individuo elegido, seleccionamos $K$ imágenes candidatas suyas aleatoriamente
+    \item Añadimos los índices asociados a las $P \cdot K$ imágenes escogidas al final de la lista de índices y eliminamos dichas imágenes de la lista de candidatas
+\end{enumerate}
+
+Este proceso es realmente sencillo. Sin embargo, realizar optimizaciones para que consuma el menor tiempo posible complica su implementación. Principalmente hemos pre-computado algunos datos, que almacenamos como atributos, para acelerar este proceso:
+
+\begin{itemize}
+    \item \lstinline{self.dict_of_classes} es un diccionario en el que cada llave o \textit{key} es el identificador de un individuo (o su clase, en un entorno más amplio que el \textit{AIFR}) y el valor asociado a la llave es una lista de índices de imágenes de ese individuo. Con ello, una vez elegido un individuo al azar, es realmente rápido muestrear $K$ índices de imágenes asociadas
+    \item \lstinline{self.classes} es una lista con los identificadores de individuos que tienen al menos $K$ imágenes, y por tanto, que son candidatos a ser elegidos en un ciclo del proceso anteriormente descrito
+    \item Esto supone que, durante el proceso de generación de índices, debemos mantener en un estado válido estas estructuras, lo que añade algo de complejidad a la implementación, aunque supone una mejora en tiempos de ejecución considerable
+\end{itemize}
+
+\begin{observacion}
+
+    Aunque los índices en cada \textit{P-K batch} estén ordenados por individuo, esto no supone un problema al considerar la definición de las funciones de pérdida que estamos usando (véase \customref{isubs:seleccion_de_triples})
+
+\end{observacion}
 
 \subsection{Aumentado de datos} \label{isec:aumentado_datos}
 
@@ -168,7 +213,7 @@ Esto se usa en \cite{informatica:facenet}
     \centering
     % \includegraphics[width=0.8\textwidth]{informatica/diagrama_loggers}
     \includegraphics[width=1.25\textwidth,height=\textheight,keepaspectratio]{informatica/diagrama_loggers}
-    \caption{Diagrama de clases del módulo \lstinline{src.lib.train_loggers}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}.}
+    \caption{Diagrama de clases del módulo \lstinline{src.lib.train_loggers}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
     \label{img:diagrama_clases_loggers}
 \end{figure}
 
