@@ -399,7 +399,7 @@ Todo esto ocurre mientras el valor de la función de pérdida parece no cambiar.
 
 Por lo tanto, lo que buscamos ver es que las distancias intracluster se minimizan, mientras que las intercluster se maximizan.
 
-\subsection{Normas de los \textit{embeddings}}
+\subsection{Normas de los \textit{embeddings}} \label{isubs:normas_embeddings}
 
 Como ya hemos comentado en \customref{isec:triplet_loss}, un problema que puede ocurrir es que nuestro modelo decida colapsar cualquier entrada al vector $\vec{0}$. Esto justifica el uso de un margen, pero en \customref{isec:margenes_suaves} hemos introducido una función para computar los márgenes de forma suave, sin especificar un valor del margen $\alpha$, que en principio podría dar lugar a este colapso del modelo. Por tanto, vamos a observar durante el entrenamiento la norma euclídea de todas las salidas de nuestro modelo durante el entrenamiento.
 

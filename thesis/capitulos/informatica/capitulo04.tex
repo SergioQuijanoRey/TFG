@@ -261,11 +261,31 @@ El método \lstinline{check_integrity()} comprueba el tamaño del \textit{datase
 
 \subsection{Normalización}
 
-Esto se usa en \cite{informatica:facenet}
+En \customref{isubs:normas_embeddings} y \customref{isec:margenes_suaves} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Además de introducir un margen en las funciones de pérdida, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. Esta normalización consiste en realizar la siguiente sustitución:
+
+\begin{equation}
+    \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}
+\end{equation}
+
+Además del interés que pueda tener estudiar el comportamiento de los modelos al introducir la normalización, esta técnica introduce el siguiente punto a tener en cuenta. Durante los entrenamientos hemos tenido muchos problemas para producir entrenamientos estables. Esto es, en la mayoría de ocasiones, el entrenamiento se saturaba tras pocas iteraciones. Según nuestra experiencia, introducir normalización ayuda enormemente a reducir este problema.
+
+Nuestro objetivo es introducir esta normalización en nuestros modelos de aprendizaje automático, de forma modular y sencilla. En el módulo \lstinline{src.lib.models}, donde describimos las arquitecturas empleadas a lo largo de toda la experimentación, definimos la clase \lstinline{NormalizedNet}. Dicha clase implementa el patrón de diseño \textit{Composite}, del que ya hemos hablado en \customref{isec:loggin_metricas}.
+
+Esta clase toma una red neuronal como parámetro. El método \lstinline{forward}, que las redes neuronales de \lstinline{pytorch} debe implementar, usa dicho método en la clase base almacenando la salida. Sobre dicha salida, se realiza y devuelve la normalización.
+
+El uso de este patrón permite que podamos decidir si queremos trabajar o no con normalización, sin que el resto del código tenga que saber esto. Por ejemplo:
+
+\begin{lstlisting}[caption={Ejemplo de uso del patrón \textit{composite} para decidir si usamos o no normalización. El resto del código no tiene por qué saber este detalle de implementación, porque no cambiamos la interfaz de la clase}, captionpos=b]
+net = LFWResNet18(embedding_dimension = 5)
+net = NormalizedNet(net)
+\end{lstlisting}
 
 \subsection{\textit{Hyperparameter Tuning}} \label{isec:hp_tuning}
 
+\subsection{Adaptadores para realizar \textit{retrieval}}
+
 \subsection{Separación de datos teniendo en cuenta obtener clases disjuntas}
+\todo{Merece la pena comentar esto?}
 
 \subsection{Logging de métricas} \label{isec:loggin_metricas}
 
