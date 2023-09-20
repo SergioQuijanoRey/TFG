@@ -144,7 +144,7 @@ Como deja claro el diagrama, hemos estructura el código de la librería en mód
 
 Por la gran extensión de la base de código, mostrar el diagrama de clases completo no aporta apenas información. Pero mostraremos los diagramas de clase de ciertos módulos en \customref{isec:modulos_relevantes}, cuando esto aporte información relevante.
 
-\section{Módulos relevantes} \label{isec:modulos_relevantes}aumentado de dato
+\section{Módulos relevantes} \label{isec:modulos_relevantes}
 
 Por la extensión del proyecto no comentaremos cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos algunos de los módulos más relevantes introducidos en \customref{isec:estructura_paquetes_modulos}.
 
@@ -283,3 +283,36 @@ A continuación mostramos un ejemplo de uso de esta plataforma:
 
 \section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
 
+Disponemos de dos conjuntos o \textit{suites} de \textit{tests}: unitarios y de integración.
+
+Los \textbf{\textit{tests} unitarios} buscan principalmente validar la corrección de los módulos de código desarrollados en la librería. Para ello, usamos algunas técnicas comunes de \textit{testeo}:
+
+\begin{itemize}
+    \item Validación de casos concretos: controlamos los datos de entrada de una funcionalidad, y comprobamos la salida con el resultado esperado. Esto es factible cuando las funciones a validar son deterministas y fáciles de calcular manualmente. Como puede ser el caso de las funciones de pérdida, validadas en \lstinline{src/test/loss_functions.py} usando principalmente este enfoque
+    \item Validación de propiedades \cite{informatica:property_based_testing}: dados unos datos de entrada, comprobamos que ciertas propiedades de la funcionalidad a validar se cumplen. Esta técnica es realmente útil cuando usamos funciones no deterministas, o cuando no es viable computar manualmente la salida esperada. Como puede ser el caso del aumentado de datos (véase \customref{isec:aumentado_datos}), de naturaleza claramente aleatoria. Comprobamos propiedades como:
+
+    \begin{itemize}
+        \item Que el tamaño del \textit{dataset} no aumenta si todos los individuos tienen al menos $K$ imágenes asociadas
+        \item Que tras el aumento de datos todos los individuos tienen al menos $K$ imágenes asociadas
+        \item Que el tamaño del \textit{dataset} aumenta o se mantiene, nunca disminuye
+    \end{itemize}
+
+\end{itemize}
+
+También usamos \textit{tests} unitarios cada vez que encontramos un error en nuestra base de código, siguiendo el siguiente proceso:
+
+\begin{itemize}
+    \item Aislamos el error en una serie de \textit{tests} que comprueban la propiedad que no se está cumpliendo
+    \item Tratamos de localizar y arreglar la fuente del error
+    \item Comprobamos que, tras arreglar el problema, los \textit{tests} introducidos ahora sí que se ejecutan correctamente
+\end{itemize}
+
+Esto permite encontrar y solucionar los problemas más rápidamente, y además documentar errores previamente encontrados y propiedades que son importantes verificar en otros escenarios.
+
+Los \textbf{\textit{tests} de integración} buscan evitar el siguiente problema. Como hemos comentado en \customref{isec:planificacion}, hemos realizado un trabajo iterativo, partiendo de bases de datos más sencillas hacia bases de datos más grandes y complejas. En dicho trabajo iterativo puede ocurrir que, cambiando o añadiendo código a la librería, rompamos \textit{pipelines} en bases de datos previas. Los \textit{tests} de integración buscan verificar que \textit{pipelines} en bases de datos previas sigan funcionando.
+
+Para esto, cada \textit{test} de integración ejecuta el \textit{pipeline} de una base de datos cuando abandonamos esta para pasar a la siguiente. Usamos valores de los parámetros para adecuar la tarea: usamos un subconjunto muy reducido de la base de datos, hacemos \textit{logging} de forma mucho menos frecuente, los valores de $\{P, K\}$ son mucho más bajos, la red neuronal es muy ligera, ...
+
+Por el esfuerzo computacional que suponen, los \textit{tests} de integración únicamente se ejecutan a la hora de validar una \textit{pull request}.
+
+Y como ya hemos comentado en \customref{isec:github_buenas_practicas}, estamos usando \textit{Github Actions} para lanzar las dos \textit{suites} de \textit{tests}, aunque usando la herramienta \lstinline{just} (véase \customref{isec:estructura_carpetas}) se pueden lanzar en local.
