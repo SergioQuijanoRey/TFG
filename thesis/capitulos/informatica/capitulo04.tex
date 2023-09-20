@@ -164,12 +164,73 @@ Esto se usa en \cite{informatica:facenet}
 
 \subsection{Logging de métricas} \label{isec:loggin_metricas}
 
-wandb
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{informatica/diagrama_loggers}
+    \includegraphics[width=1.25\textwidth,height=\textheight,keepaspectratio]{informatica/diagrama_loggers}
+    \caption{Diagrama de clases del módulo \lstinline{src.lib.train_loggers}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}.}
+    \label{img:diagrama_clases_loggers}
+\end{figure}
 
-\subsection{Gestion de parámetros globales en un diccionario}
+El módulo \lstinline{src.lib.train_loggers} se encarga de introducir el cálculo y visualización de métricas en el proceso de entrenamiento de forma cómoda, modular y extensible. Nuestro objetivo es definir el proceso de \textit{logging} de forma externa al bucle de entrenamiento. De esta forma, podremos cambiar las métricas observadas sin tener que modificar el código que implementa el bucle de entrenamiento.
 
-Quizás hablar de ello en logging de métricas
+En \customref{img:diagrama_clases_loggers} podemos ver la siguiente estructura:
 
+\begin{itemize}
+    \item La clase abstracta \lstinline{Trainlogger} define la interfaz que queremos que todos los \textit{loggers} implementen. Dicha interfaz se compone de dos métodos:
+        \begin{itemize}
+            \item \lstinline{log_process} que muestra los valores de ciertas métricas tomando como entradas los datos de entrenamiento, los datos de validación, la época en la que nos encontramos en el proceso de entrenamiento y la iteración dentro de dicha épica
+            \item \lstinline{should_log} que decide si debemos mostrar o no las métricas para una iteración global del proceso de entrenamiento
+        \end{itemize}
+    \item Gracias a esta interfaz, el bucle de entrenamiento puede mostrar métricas solo cuando \lstinline{should_log} lo indique, pasando todos los datos necesarios a \lstinline{log_process}
+    \item La clase \lstinline{SilentLogger} ofrece una implementación trivial de la interfaz. \lstinline{should_log} siempre devuelve falso y \lstinline{log_process} no realiza ninguna acción
+    \item El resto de clases tienen la misma lógica para decidir cuándo mostrar las métricas. Por tanto, la clase abstracta \lstinline{IterationLogger} implementa dicha lógica compartida, dejando todavía como método abstracto a \lstinline{log_process}
+    \item Los \textit{loggers} que vemos en la parte baja del diagrama son \textit{loggers} concretos que implementan cada uno \lstinline{log_process} con el cálculo y visualización de métricas concretas
+    \item La clase \lstinline{CompoundLogger} implementa el \textbf{patrón de diseño \textit{composite}}
+\end{itemize}
+
+Como acabamos de comentar, la clase \lstinline{CompoundLogger} implementa el patrón de diseño \textit{composite} \cite{informatica:design_patterns}. En dicho patrón buscamos definir la lógica de ciertos componentes en función del agregado de otros componentes. En nuestro caso, buscamos definir un objeto que implemente la interfaz \lstinline{TrainLogger} combinando varios \textit{loggers} en uno solo. Para ello, guardamos una lista de objetos de tipo \lstinline{TrainLogger}. La función \lstinline{should_log} consulta a todos los objetos guardados si quieren mostrar métricas, haciendo uso de la misma función \lstinline{should_log}. En cuyo caso, se llama a los correspondientes métodos \lstinline{log_process}. Gracias a esto, en un \textit{script} de \lstinline{Python} podemos configurar nuestro \textit{logging} con el siguiente código:
+
+\begin{lstlisting}[language=python, caption=Ejemplo de configuración del \textit{logging} de un entrenamiento con nuestro sistema propio. Se ve claramente la ventaja de usar un patrón \textit{composite} a la hora de configurar qué \textit{loggers} queremos usar, captionpos=b]
+
+# Define the loggers we want to use
+triplet_loss_logger = TripletLoggerOnline(... params ... )
+cluster_sizes_logger = IntraClusterLogger(... params ... )
+intercluster_metrics_logger = InterClusterLogger( ... params ... )
+rank_at_one_logger = RankAtKLogger( ... params ... )
+rank_at_k_logger = RankAtKLogger( ... params ... )
+local_rank_at_one_logger = LocalRankAtKLogger( ... params ... )
+local_rank_at_k_logger = LocalRankAtKLogger( ... params ... )
+
+# Combine them in a single logger
+logger = CompoundLogger([
+    triplet_loss_logger,
+    cluster_sizes_logger,
+    intercluster_metrics_logger,
+    rank_at_one_logger,
+    rank_at_k_logger,
+    local_rank_at_one_logger,
+    local_rank_at_k_logger,
+])
+\end{lstlisting}
+
+Hemos usado \textbf{dos técnicas para mostrar las métricas calculadas}. La primera y más sencilla ha sido \textbf{imprimir por pantalla} los valores obtenidos. Esta técnica no es suficiente porque no podemos guardar de forma estructurada los históricos de entrenamientos, ni facilita estudiar de forma visual el comportamiento del entrenamiento. Por tanto, hemos usado como segunda técnica el servicio \textbf{\textit{Weights and Biases} o \textit{WANDB}} \cite{informatica:wandb_web}. Este servicio permite registrar métricas de forma muy sencilla, relegando en dicho servicio:
+
+\begin{itemize}
+    \item El control de históricos de entrenamiento
+    \item La visualización de los procesos de entrenamiento
+    \item El registro de parámetros globales usados en cada entrenamiento
+\end{itemize}
+
+Para registrar todos los parámetros globales, creamos un diccionario de \lstinline{Python} en el que definimos dichos parámetros. Este diccionario, al que llamamos \lstinline{GLOBALS}, se registra directamente en la plataforma \textit{WANDB}. Los parámetros globales definen hiperparámetros del proceso de entrenamiento (por ejemplo, los valores de $\{P, K\}$), directorios en los que guardamos archivos, qué entorno de ejecución estamos usando, si queremos saltar ciertas secciones del \textit{pipeline}, \ldots
+
+A continuación mostramos un ejemplo de uso de esta plataforma:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/wandb_example}
+    \caption{Ejemplo de uso de \textit{WANDB}. A la izquierda, podemos ver una lista filtrada para mostrar solo los históricos que producen resultados satisfactorios. A la derecha, podemos ver algunas métricas recogidas por nuestro sistema de \textit{logging}}
+\end{figure}
 
 \section{Optimización del código} \label{isec:optimizacion_codigo}
 
