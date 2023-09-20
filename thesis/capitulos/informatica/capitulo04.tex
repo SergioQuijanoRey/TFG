@@ -199,6 +199,31 @@ Este proceso es realmente sencillo. Sin embargo, realizar optimizaciones para qu
 
 \subsection{Implementaciones propias de \textit{Datasets}} \label{isec:datasets_customs}
 
+Como ya hemos comentado en \customref{isec:base_datos_usada}, las bases de datos \textit{FG-Net} y \textit{CACD} no se ofrecen como parte de ninguna librería asociada a \lstinline{Pytorch}. Por tanto, tendremos que implementar la descarga, extracción y carga en objetos compatibles con \lstinline{Pytorch}. Estas tareas se realizan en el módulo \lstinline{src/lib/datasets}.
+
+Este módulo contiene, además de las dos clases que más adelante estudiamos, las funciones \lstinline{download_fg_dataset} y \lstinline{download_cacd_dataset}, que descargan y extraen los dos \textit{datsets}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/diagrama_clases_carga_datos}
+    \caption{Diagrama de clases de las implementaciones para los \textit{datasets} \textit{FG-Net} y \textit{CACD}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
+    \label{img:diagrama_clases_datasets}
+\end{figure}
+
+En \customref{img:diagrama_clases_datasets} podemos ver el diagrama de clases de las dos implementaciones realizadas. Para inicializar estas clases, solo tenemos que especificar la localización del directorio donde se almacenan los datos.
+
+Para poder trabajar correctamente con \lstinline{Pytorch}, debemos especificar el tamaño del \textit{dataset} con el método \lstinline{__len__()} e implementar el acceso a cada elemento del \textit{dataset} con el método \lstinline{__getitem__()}.
+
+A la hora de cargar los datos al \textit{dataset}, realizamos el siguiente proceso:
+
+\begin{itemize}
+    \item Tomamos los nombres de todas las imágenes almacenadas en el \textit{dataset}, que guardamos en el atributo \lstinline{self.file_names}
+    \item A partir de los nombres de las imágenes, extraemos el identificador y edad asociados a cada imagen. Para ello usamos el método \lstinline{__id_and_age_from_filename(filename: str)}
+    \item Almacenamos adecuadamente toda esta información para poder devolver dicha información en \lstinline{__getitem__}
+\end{itemize}
+
+El método \lstinline{check_integrity()} comprueba el tamaño del \textit{dataset} para asegurarnos de que no ha habido corrupción de datos en la descarga. El método \lstinline{set_exploration_mode()} permite activar el modo exploración. En dicho modo, \lstinline{__getitem__()} devuelve la imagen con una serie de metadatos asociados almacenados en un diccionario (edad e identidad). En el modo de funcionamiento normal, \lstinline{__getitem__()} devuelve un par con la imagen y la etiqueta de dicha imagen.
+
 \subsection{Normalización}
 
 Esto se usa en \cite{informatica:facenet}
