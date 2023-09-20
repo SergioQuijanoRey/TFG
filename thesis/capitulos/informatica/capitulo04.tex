@@ -76,7 +76,7 @@ Como sistema operativo, hemos usado:
 \end{itemize}
 
 
-\section{Estructura de carpetas del proyecto}
+\section{Estructura de carpetas del proyecto} \label{isec:estructura_carpetas}
 
 Por la extensión de la base de código, es necesario que comentemos la estructura de carpetas del proyecto. En el directorio raíz tenemos los siguientes ficheros relevantes:
 
@@ -113,7 +113,11 @@ En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
             \item \textit{Scripts} de \lstinline{Python}, usados principalmente para entrenar y validar modelos
         \end{itemize}\end{itemize}
 
-\section{Diagramas de paquetes, de clases, \ldots}
+\section{Estructura lógica de la base de código} \label{isec:estructura_paquetes_modulos}
+
+En \customref{isec:estructura_carpetas} ya hemos hablado de la estructura de carpetas de la base de código. Ahora pasamos a comentar la estructura lógica de la base de código. Nos centraremos en la parte de la librería, pues en los \textit{Notebooks} y \textit{scripts} de \lstinline{Python} consumimos la librería para realizar análisis exploratorio de datos, entrenamiento de modelos y validación (véase \customref{isec:pipeline}).
+
+Empezamos mostrando el diagrama de paquetes de nuestra librería:
 
 \begin{figure}[H]
     \centering
@@ -121,12 +125,28 @@ En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
     \caption{Diagrama de paquetes de nuestra librería. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}.}
 \end{figure}
 
-\section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
+Como deja claro el diagrama, hemos estructura el código de la librería en módulos muy interconectados entre ellos. Comentamos ahora el \textbf{propósito de los módulos más relevantes}:
 
+\begin{itemize}
+    \item \lstinline{src.lib.utils} contiene funciones auxiliares que se usan en distintas partes del código. Por ejemplo, comprobar si un tensor de \lstinline{pytorch} representa un vector o una matriz, realizar ciertos pre-cómputos para acelerar la ejecución de módulos, autentificarse en el servicio de logging \lstinline{wandb}, \ldots
+    \item \lstinline{src.lib.loss_functions} contiene todo el código para computar las distintas funciones de pérdida que hemos introducido en \customref{ich:fundamentos_teoricos}.
+    \item \lstinline{src.lib.sampler} contiene el código que implementa el \textit{P-K sampling}
+    \item \lstinline{src.lib.metrics} implementa todas las métricas que hemos introducido en \customref{isec:metricas_teoria}
+    \item \lstinline{src.lib.train_loggers} contiene la lógica para mostrar las métricas deseadas durante el ciclo de entrenamiento de forma cómoda, modular y extensible, como comentaremos en \customref{isec:loggin_metricas}
+    \item \lstinline{src.lib.datasets} contiene la lógica para descargar, extraer, y cargar en una clase accesible para \lstinline{pytorch} los \textit{datasets} \textit{FG-Net} y \textit{CACD}
 
-\section{Módulos relevantes}
+    \item \lstinline{src.lib.hyperparameter_tuning} contiene el código necesario para realizar \textit{hyperparameter tuning} usando \textit{K-Fold Cross Validation}
+    \todo{Hacer aquí una referencia a esta técnica. Igual debería ir en la parte de teoría}
 
-Por la extensión del proyecto, no entraremos a comentar cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos aquellos módulos más relevantes
+    \item \lstinline{src.lib.split_dataset} contiene el código para dividir un \textit{dataset} en dos porciones, usando dos técnicas distintas. La primera técnica consiste en separar el \textit{dataset} usando muestreo aleatorio. La segunda técnica consiste en realizar la separación usando muestreo aleatorio, pero asegurando que no existan individuos de una clase en ambos \textit{datasets} simultáneamente
+    \item \lstinline{src.lib.data_augmentation} implementa el aumento de datos. Este aumento de datos es necesario porque, como hemos comentado en \customref{isubsubs:observaciones_conclusiones_pksampling}, para realizar \textit{P-K sampling} es obligatorio que todos los individuos tengan al menos $K$ imágenes asociadas. Realizamos el aumento de datos de forma clásica, añadiendo nuevos elementos a nuestro \textit{dataset}, y de forma \textit{lazy} o perezosa. En el aumento de datos \textit{lazy} no generamos nuevos elementos hasta que estos se solicitan en alguna parte del código. En \customref{isec:aumentado_datos} explicamos esto en detalle
+\end{itemize}
+
+Por la gran extensión de la base de código, mostrar el diagrama de clases completo no aporta apenas información. Pero mostraremos los diagramas de clase de ciertos módulos en \customref{isec:modulos_relevantes}, cuando esto aporte información relevante.
+
+\section{Módulos relevantes} \label{isec:modulos_relevantes}
+
+Por la extensión del proyecto no comentaremos cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos algunos de los módulos más relevantes introducidos en \customref{isec:estructura_paquetes_modulos}.
 
 \subsection{\textit{P-K sampling}}
 
@@ -144,6 +164,16 @@ Esto se usa en \cite{informatica:facenet}
 
 \subsection{Logging de métricas} \label{isec:loggin_metricas}
 
+wandb
+
+\subsection{Gestion de parámetros globales en un diccionario}
+
+Quizás hablar de ello en logging de métricas
 
 
 \section{Optimización del código} \label{isec:optimizacion_codigo}
+
+\section{Pipeline} \label{isec:pipeline}
+
+\section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
+
