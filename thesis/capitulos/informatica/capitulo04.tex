@@ -348,8 +348,18 @@ La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para ace
 \lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{composite}, del que ya hemos hablado en \customref{isec:loggin_metricas}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y empleamos la implementación de clases previas.
 \todo{Estamos usando el patrón Decorator y no composite. No es el patrón adapter porque no estamos cambiando el comportamiento para acoplarnos a otra interfaz}
 
-\subsection{Separación de datos teniendo en cuenta obtener clases disjuntas}
-\todo{Merece la pena comentar esto?}
+\subsection{Separación de datos imponiendo clases disjuntas}
+
+A la hora de separar el \textit{dataset} completo en subconjuntos (entrenamiento, validación y \textit{test}), la opción más utilizada es la de usar muestreo aleatorio para seleccionar qué elementos van a un conjunto u otro. En el problema que estamos resolviendo esto puede no ser adecuado por las siguientes peculiaridades:
+
+\begin{itemize}
+    \item Un individuo con al menos $K$ imágenes asociadas puede acabar teniendo menos de $K$ imágenes asociadas en el subconjunto de entrenamiento. Esto provoca que no pueda aparecer en ningún \textit{P-K batch} en el proceso de aprendizaje
+    \item Además, podemos acabar con conjuntos de validación y \textit{test} en los que muchos individuos han sido vistos durante el proceso de entrenamiento. En la aplicación real del modelo vamos a encontrarnos con muchas identidades nunca vistas (potencialmente siempre será así)
+\end{itemize}
+
+Por tanto, es conveniente que usemos una separación de datos en la que las identidades (clases, en un ambiente más amplio que el \textit{AIFR}) sean disjuntas. Esto es, que no existan individuos con imágenes asociadas en más de un conjunto de datos.
+
+Las dos técnicas de separación (clásica e identidades disjuntas) se implementan en el módulo \lstinline{src.lib.split_dataset}, en las funciones \lstinline{split_dataset} y \lstinline{split_dataset_disjoint_classes}
 
 \subsection{Logging de métricas} \label{isec:loggin_metricas}
 
