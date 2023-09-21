@@ -288,7 +288,36 @@ net = NormalizedNet(net)
 
 \subsection{\textit{Hyperparameter Tuning}} \label{isec:hp_tuning}
 
-\subsection{Adaptadores para realizar \textit{retrieval}}
+\subsection{Adaptador para realizar \textit{retrieval}}
+
+Como hemos comentado en \customref{isec:triplet_loss}, una de las ventajas de aprender un \textit{embedding} semántico en un modelo es que podemos adaptar dicho modelo para realizar varias tareas. La tarea que nos interesa en este trabajo es la de \textit{retrieval}.
+
+Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lstinline{FastRetrievalAdapter}, que se encuentran en el módulo \lstinline{src.lib.models}. Mostramos los diagramas de clase asociados:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/diagrama_clases_retrieval}
+    \caption{Diagrama de clases de los dos adaptadores. Por el tamaño de \lstinline{torch.nn.Module} solo mostramos los nombres de las clases. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{.6\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/diagrama_clases_retrievaladapter}
+        \caption{Diagrama de clase de \lstinline{RetrievalAdapter}}
+    \end{subfigure}%
+    \begin{subfigure}{.4\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/diagrama_clases_fastretrieval}
+        \caption{Diagrama de clase de \lstinline{FastRetrievalAdapter}}
+    \end{subfigure}
+\caption{Diagrama de clase de los dos adaptadores, con toda la información asociada. Estos diagramas han sido creados usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
+\end{figure}
+
+% TODO -- seguir por aqui
+
+
 
 \subsection{Separación de datos teniendo en cuenta obtener clases disjuntas}
 \todo{Merece la pena comentar esto?}
