@@ -276,6 +276,7 @@ Además del interés que pueda tener estudiar el comportamiento de los modelos a
 \end{figure}
 
 Nuestro objetivo es introducir esta normalización en nuestros modelos de aprendizaje automático, de forma modular y sencilla. En el módulo \lstinline{src.lib.models}, donde describimos las arquitecturas empleadas a lo largo de toda la experimentación, definimos la clase \lstinline{NormalizedNet}. Dicha clase implementa el patrón de diseño \textit{Composite}, del que ya hemos hablado en \customref{isec:loggin_metricas}.
+\todo{Esto está en una sección posterior, así que de momento no hemos hablado de él}
 
 Esta clase toma una red neuronal como parámetro. Las redes neuronales de \lstinline{pytorch} deben implementar el método \lstinline{forward}, que indica cómo la red computa las salidas a partir de las entradas dadas. Nuestra clase \lstinline{NormalizedNet} implementa este método basándose en el mismo método de la clase base. Usamos el método \lstinline{forward} de la clase base y almacenamos la salida, que normalizamos y devolvemos.
 
@@ -296,8 +297,9 @@ Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lst
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{informatica/diagrama_clases_retrieval}
+    \includegraphics[width=0.9\textwidth]{informatica/diagrama_clases_retrieval}
     \caption{Diagrama de clases de los dos adaptadores. Por el tamaño de \lstinline{torch.nn.Module} solo mostramos los nombres de las clases. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
+    \label{img:diagrama_clases_global_adaptadores}
 \end{figure}
 
 \begin{figure}[H]
@@ -313,11 +315,38 @@ Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lst
         \caption{Diagrama de clase de \lstinline{FastRetrievalAdapter}}
     \end{subfigure}
 \caption{Diagrama de clase de los dos adaptadores, con toda la información asociada. Estos diagramas han sido creados usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
+\label{img:diagramas_clase_concretos_adaptadores}
 \end{figure}
 
-% TODO -- seguir por aqui
+En \customref{img:diagrama_clases_global_adaptadores} podemos ver que ambas clases implementan la interfaz \lstinline{torch.nn.Module}, que es la interfaz que las redes neuronales y sus componentes deben implementar en \lstinline{pytorch}. Además, \lstinline{RetrievalAdapter} forma parte de \lstinline{FastRetrievalAdapter}. Queda claro que vamos a usar de nuevo el patrón \textit{composite} para realizar la adaptación.
 
+En \customref{img:diagramas_clase_concretos_adaptadores} podemos ver que no estamos buscando trabajar con la interfaz de \lstinline{torch.nn.Module}, sino que buscamos trabajar con una nueva interfaz, asociada a la tarea de \lstinline{retrieval} (véase \customref{ich:descrp_problema}). Para ello, la clase \lstinline{RetrievalAdapter} define dos métodos relevantes:
 
+\begin{itemize}
+    \item \lstinline{query} toma una imagen \textit{key}, una lista de imágenes que forman la base de datos y el número de imágenes $k$ que queremos que devuelva la consulta. Devuelve los índices asociados a las mejores $k$ imágenes de la base de datos
+        \begin{itemize}
+            \item Tenemos imágenes como entradas, así que debemos almacenar la red neuronal que computa los \textit{embeddings} para transformar estas imágenes
+            \item Esto lo hacemos con el atributo \lstinline{self.base_net}
+        \end{itemize}
+    \item \lstinline{query_embedding} realiza la misma tarea, pero en vez de pasar la imagen \textit{key} y las imágenes que forman la base de datos, pasamos directamente los \textit{embeddings} de estas imágenes. En este caso:
+        \begin{itemize}
+            \item Tenemos que tener cuidado de usar la misma red neuronal que la que tenemos almacenada en \lstinline{self.base_net}, para evitar errores lógicos
+            \item \lstinline{src.base_net} no participa en el cómputo de este método
+        \end{itemize}
+    \item \lstinline{set_permute} trata sobre detalles sobre como trabajamos la representación de los tensores de \textit{batches}
+\end{itemize}
+
+La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para acelerar los tiempos de cómputo:
+
+\begin{itemize}
+    \item Podemos ver en \customref{img:diagramas_clase_concretos_adaptadores} que esta clase se compone de un modelo que computa el \textit{embedding} semántico, \lstinline{self.base_net}, y un modelo que ya está adaptado a la tarea de \textit{retrieval}, \lstinline{self.wrapped_net}. \lstinline{self.wrapped_net} es el resultado de construir un objeto de la clase \lstinline{RetrievalAdapter} usando \lstinline{self.base_net}
+    \item En \customref{isubs:rank_at_k} se especifica de qué forma se va a usar la adaptación. Siempre tomaremos una base de datos de imágenes, extraeremos una imagen que usaremos como \textit{key}, y realizaremos la \textit{query} contra el resto de imágenes de la base de datos
+    \item Por tanto, en el método \lstinline{precompute_embeddings} pasamos toda la base de datos de imágenes, calculamos su proyección en el \textit{embedding} usando \lstinline{self.base_net}, y almacenaremos estos datos
+    \item Con esto, el método \lstinline{query} simplemente especifica el índice de la \textit{key} y el número $k$ de individuos más parecidos que queremos seleccionar. Y usando \lstinline{self.wrapped_net} con su método \lstinline{query_embedding}, realizamos el cómputo sobre los \textit{embeddings}
+\end{itemize}
+
+\lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{composite}, del que ya hemos hablado en \customref{isec:loggin_metricas}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y empleamos la implementación de clases previas.
+\todo{Estamos usando el patrón Decorator y no composite. No es el patrón adapter porque no estamos cambiando el comportamiento para acoplarnos a otra interfaz}
 
 \subsection{Separación de datos teniendo en cuenta obtener clases disjuntas}
 \todo{Merece la pena comentar esto?}
