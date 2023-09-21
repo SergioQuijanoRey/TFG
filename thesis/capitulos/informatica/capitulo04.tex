@@ -460,6 +460,53 @@ A continuación mostramos un ejemplo de uso de esta plataforma:
 
 \section{Pipeline} \label{isec:pipeline}
 
+En Aprendizaje Automático, nos referimos por \textit{pipeline} a la descripción e implementación de las distintas fases o etapas que participan en la creación de un modelo \cite{informatica:pipeline_web}.
+
+Existen múltiples soluciones para codificar estos \textit{pipelines}. Estas soluciones se encargan de facilitar la definición de los \textit{pipelines} y la automatización de ciertas tareas. Con estas soluciones podemos, por ejemplo, lanzar todo el proceso cada vez que se actualiza la base de datos, rechazar el nuevo modelo producido si este no cumple con ciertos criterios de calidad, desplegar en producción nuevos modelos, ...
+
+Sin embargo, por la simplicidad de nuestro \textit{pipeline}, codificamos manualmente este proceso. Simplemente, usaremos variables globales, almacenadas en la variable \lstinline{GLOBALS} (véase \customref{isec:loggin_metricas}), para decidir si ejecutar o no ciertas secciones opcionales.
+
+El siguiente diagrama describe el \textit{pipeline} seguido en todos nuestros experimentos:
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    mandatorynode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
+    optionalnode/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm, align=center},
+]
+    \node [mandatorynode] (wandb) {\textit{Log} en \textit{WANDB}};
+    \node [mandatorynode] (dataset_download) [right=of wandb] {Descarga de los datos};
+    \node [mandatorynode] (dataset_load) [right=of dataset_download] {Carga de los datos en \\ un \lstinline{Dataset} de \lstinline{pytorch}};
+    \node [mandatorynode] (dataset_split) [below=of dataset_load] {Dividir en \textit{train, test, validation}};
+    \node [mandatorynode] (dataloaders) [left=of dataset_split] {Cargar los tres conjuntos de \\ datos en \lstinline{Dataloaders} de \lstinline{pytorch}};
+    \node [optionalnode] (data_augmentation) [left=of dataloaders]{\textit{Data Augmentation}};
+    \node [optionalnode] (hp_tuning) [below=of data_augmentation] {\textit{Hyperparameter Tuning}};
+    \node [optionalnode] (train) [right=of hp_tuning] {Entrenamiento del modelo};
+    \node [mandatorynode] (eval) [right=of train] {Evaluación del modelo};
+
+    \draw[-stealth] (wandb.east) -- (dataset_download.west);
+    \draw[-stealth] (dataset_download.east) -- (dataset_load.west);
+    \draw[-stealth] (dataset_load.south) -- (dataset_split.north);
+    \draw[-stealth] (dataset_split.west) -- (dataloaders.east);
+    \draw[-stealth] (dataloaders.west) -- (data_augmentation.east);
+    \draw[-stealth] (data_augmentation.south) -- (hp_tuning.north);
+    \draw[-stealth] (hp_tuning.east) -- (train.west);
+    \draw[-stealth] (train.east) -- (eval.west);
+
+\end{tikzpicture}
+\caption{Representación gráfica de nuestro \textit{pipeline}. Los nodos azules son nodos obligatorios. Los nodos verdes son nodos opcionales: usando \lstinline{GLOBALS} podemos decidir si ejecutarlos o no}
+\end{figure}
+
+Es claro que podemos saltarnos el proceso de aumento de datos y el \textit{hyperparamenter tuning}. De hecho, este último lo ejecutaremos muy pocas ocasiones. Sin embargo puede extrañar que hayamos marcado el entrenamiento del modelo como un paso opcional.
+
+Cuando terminamos el entrenamiento de un modelo, guardamos los datos de dicho modelo en disco. Podemos recuperar ese modelo sin tener que pasar por todo el proceso de entrenamiento, y evaluarlo. Esto es útil por varias razones:
+
+\begin{itemize}
+    \item Si estamos desarrollando nuevas métricas, y queremos ver cómo funcionan en modelos entrenados, no tenemos que re-entrenar un modelo cada vez que introducimos un cambio
+    \item Podemos verificar que un modelo concreto obtiene ciertas métricas
+    \item Al introducir una nueva métrica, podemos computarla para modelos entrenados previamente a la implementación de dicha métrica
+\end{itemize}
+
 \section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
 
 Disponemos de dos conjuntos o \textit{suites} de \textit{tests}: unitarios y de integración.
