@@ -481,6 +481,7 @@ Identificamos problemas en los tiempos de cómputo trabajando con el \textit{dat
 El commit 6aade342e0736d911040d969f9e69bebc49d41ef indica el estado original previo a realizar las optimizaciones. Usando el paquete \lstinline{cProfile}, de la librería estándar de \lstinline{Python}, añadimos la opción de realizar un \textit{profile} del proceso de entrenamiento. Realizamos un primer \textit{profile}. Guardamos los resultados en el archivo \lstinline{./src/profiling/first_profile.txt} los resultados. Filtramos estos resultados en el archivo \lstinline{./src/profiling/first_profile_filtered.txt}, para que contenga únicamente entradas asociadas a nuestra librería, que es el código que podemos modificar. De esta forma, podemos leer este archivo para buscar algunas conclusiones. Pero es mucho más útil si utilizamos gráficos interactivos tipo \textit{flamegraph}
 
 Podemos explorar, a través de una terminal interactiva, los archivos guardados con el comando \lstinline{python -m pstats <file_path>}. Pero es mucho más cómodo usar \textit{flamegraphs} interactivos. Para ello, usamos el comando \lstinline{snakeviz <file_path>}.
+\todo{No está bien. Tenemos archivos \lstinline{first_profile.stat}}
 
 \subsection{Primer \textit{profile}}
 
@@ -602,7 +603,127 @@ Podemos ver que los cambios introducidos mejoran los tiempos de cómputo de form
 
 \subsection{Tercer \textit{profile}}
 
+La primera ronda de optimizaciones potencialmente ha cambiado las partes críticas del código. Así que es necesario llevar a cabo un tercer \textit{profile} para estudiar el estado de la base de código e identificar, si hiciera falta, nuevas partes críticas a optimizar.
 
+En este \textit{profile} usamos los siguientes parámetros:
+
+\begin{itemize}
+    \item $P = 100$, $K = 2$
+    \item Una época de entrenamiento
+    \item \textit{Embedding Dimension} = 1
+    \item Enfoque \textit{Lazy} para el aumentado de datos
+\end{itemize}
+
+Con ello, visualizamos los tiempos globales en la siguiente imagen:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/profiles/third_profile/total}
+    \caption{Visualización global de todo el proceso de entrenamiento.}
+\end{figure}
+
+Podemos ver que la mayor parte del tiempo se corresponde al \textit{logging} de métricas, seguido del acceso a los datos. Sobre el acceso de datos ya hemos trabajado, así que pasamos a estudiar en qué se gasta el tiempo en el \textit{logging}.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/profiles/third_profile/logging}
+    \caption{Visualización de los tiempos de cómputo asociados al \textit{logging} de métricas}
+\end{figure}
+
+Tenemos tres bloques, que podemos expandir, como mostramos en las siguientes imágenes:
+
+\begin{figure}[H]
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/profiles/third_profile/logging_primero}
+        \caption{\lstinline{calculate_mean_loss_function_online}}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{informatica/profiles/third_profile/logging_segundo}
+        \caption{\lstinline{compute_cluster_sizes_metrics}}
+    \end{subfigure}
+
+    \begin{subfigure}{.7\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/profiles/third_profile/logging_tercero}
+        \caption{\lstinline{compute_intercluster_metrics}}
+    \end{subfigure}
+\caption{Visualización de los tiempos de cómputo asociados a cada una de las tres métricas que mostramos}
+\end{figure}
+
+Podemos ver que:
+
+\begin{itemize}
+    \item Las tres métricas que en ese momento estábamos mostrando suponen aproximadamente la misma cantidad de tiempo
+    \item En \lstinline{calculate_mean_loss_function_online}, la mayor parte del tiempo se debe al acceso a los datos,
+    \item En \lstinline{compute_cluster_sizes_metrics}, la mayor parte del tiempo se pasa en \lstinline{__get_portion_of_dataset_and_embed}
+    \item En \lstinline{compute_inter_cluster_metrics} la mayor parte del tiempo se pasa en \lstinline{__get_portion_of_dataset_and_embed}, pero no tanto como en el caso anterior. Le sigue la función \lstinline{__compute_pairwise_distances}
+\end{itemize}
+
+Además, estudiando el archivo con los tiempos de cómputo filtrados \lstinline{./src/profiling/third_profile_filtered.txt}, podemos ver que:
+
+\begin{itemize}
+    \item Como ya hemos visto, la mayor parte del tiempo se pasa en \lstinline{log_process}, seguido de \lstinline{calculate_mean_loss_function_online}, \lstinline{__get_portion_of_dataset_and_embed} y \lstinline{compute_cluster_sizes_metrics}
+    \item Una comprensión de diccionarios en \lstinline{precompute_pairwise_distances} supone 1.524 segundos de 1.526 segundos totales
+\end{itemize}
+
+Todo esto justifica que identifiquemos las siguientes partes críticas del código, a tratar en una segunda ronda de optimizaciones:
+
+\begin{itemize}
+    \item \lstinline{calculate_mean_loss_function_online}
+    \item \lstinline{__get_portion_of_dataset_and_embed}
+        \begin{itemize}
+            \item De esta forma, como ya hemos visto previamente, estaríamos optimizando tanto \lstinline{compute_cluster_sizes_metrics} y \lstinline{compute_intercluster_metrics}
+        \end{itemize}
+    \item Mejorar la comprensión de diccionarios en \lstinline{__compute_pairwise_distances}
+\end{itemize}
+
+\subsection{Segunda ronda de optimizaciones} \label{isubs:segunda_ronda_optimizaciones}
+
+Seguimos el mismo enfoque que en la primera ronda de optimizaciones. Ya tenemos un \textit{benchmark} para \lstinline{compute_intercluster_metrics}. Como \lstinline{compute_intercluster_distances} se usa en \lstinline{compute_intercluster_metrics}, no añadimos un nuevo \textit{benchmark}, y veremos el impacto de los cambios a través del primer \textit{benchmark}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lccccc}
+        \toprule
+        \textbf{} & \multicolumn{2}{c}{\textbf{\lstinline|compute_intercluster_metrics|}} & \multicolumn{2}{c}{\textbf{\lstinline|precompute_pairwise_distances|}} & \textbf{Tiempo entrenamiento} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+        \textbf{Id. Cambio} & Media & Desv. Típica & Media & Desv. Típica & \\
+        \midrule
+            1 & 2.55  & 1.61 & 12.75 & 1.48 & 625.89  \\
+            2 & 3.03  & 1.90 & 13.62 & 0.50 & -       \\
+            3 & 3.45  & 2.68 & 13.28 & 0.37 & -       \\
+        \bottomrule
+    \end{tabular}
+    \caption{Tabla que recoge el segundo proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
+\end{table}
+\label{table:optimization_process_second}
+\todo{La tabla se sale por la derecha}
+
+Describimos ahora todos los cambios realizados:
+
+\begin{enumerate}
+    \item Estado inicial de la base de datos. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
+    \item Refactorizamos \lstinline{__get_portion_of_dataset_and_embed} para usar una única llamada de \lstinline{pytorch} para computar todos los \textit{embeddings}, en vez de usar un bucle \lstinline{for}.
+    \item Mejoramos el diseño de la anterior función. No deberían producirse cambios en el rendimiento
+\end{enumerate}
+
+En \customref{table:optimization_process_second} podemos ver que no estamos mostrando tiempos de cómputo. Esto es porque el uso de la función de \lstinline{pytorch} para computar todos los \textit{embeddings} de golpe provoca que el consumo de memoria se eleve hasta abortar el proceso. Además, los \textit{benchmarks} han empeorado algo.
+
+Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar en cada momento. Puede ser que al acceder a los servidores \textit{nGPU}, mucho más potentes, la nueva implementación no provoque consumos elevados de memoria y acelere el proceso.
+
+\subsection{Comentarios y mejoras a tener en cuenta}
+
+En el momento de realizar este proceso de optimización, no teníamos acceso a los servidores \textit{nGPU}. Sin embargo, era necesario optimizar el código para seguir avanzando el proyecto sin detenernos.
+
+El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un error a tener en cuenta. Por ejemplo, en \customref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente.
+
+Por tanto, una mejora a tener en cuenta es realizar otro proceso de optimización sobre \textit{nGPU}. Es decir, repetir el proceso de crear un \textit{profile}, buscar en este partes críticas del código, y optimizar estas partes de ser necesario.
+
+Sin embargo, al acceder a los servidores \textit{nGPU} y \textit{datasets} más grandes, no hemos tenido problemas de rendimiento. Con ello, un esfuerzo en optimizar el código no estaría del todo justificado. Por tanto, aún con los fallos que hemos comentado, \textbf{el proceso de optimización cumplió con su cometido} en el momento en el que era necesario.
 
 \section{Pipeline} \label{isec:pipeline}
 
