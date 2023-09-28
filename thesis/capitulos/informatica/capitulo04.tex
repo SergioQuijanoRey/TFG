@@ -794,8 +794,9 @@ Sin embargo, por la simplicidad de nuestro \textit{pipeline}, codificamos manual
 
 El siguiente diagrama describe el \textit{pipeline} seguido en todos nuestros experimentos:
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
+\scalebox{0.9}{
 \begin{tikzpicture}[
     mandatorynode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
     optionalnode/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm, align=center},
@@ -820,6 +821,7 @@ El siguiente diagrama describe el \textit{pipeline} seguido en todos nuestros ex
     \draw[-stealth] (train.east) -- (eval.west);
 
 \end{tikzpicture}
+}
 \caption{Representación gráfica de nuestro \textit{pipeline}. Los nodos azules son nodos obligatorios. Los nodos verdes son nodos opcionales: usando \lstinline{GLOBALS} podemos decidir si ejecutarlos o no}
 \end{figure}
 
