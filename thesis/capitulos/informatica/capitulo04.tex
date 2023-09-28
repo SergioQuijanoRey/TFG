@@ -507,7 +507,7 @@ Usando el paquete \lstinline{snakeviz} podemos consultar de forma gráfica e int
 En este \textit{profile} usamos los siguientes parámetros durante el ciclo de entrenamiento:
 
 \begin{itemize}
-    \item \textit{lazy data augmentation} (véase \customref{isec:aumentado_datos})
+    \item Enfoque \textit{lazy} para el aumentado de datos (véase \customref{isec:aumentado_datos})
     \item $P = 200$, $K = 2$
     \item Dimensión del \textit{embedding} a aprender igual a 5
 \end{itemize}
@@ -516,32 +516,32 @@ Obtenemos los siguientes resultados, que visualizamos con \lstinline{snakeviz}:
 
 \begin{figure}[H]
 \centering
-    \begin{subfigure}{.4\textwidth}
+\ajustarsubcaptions
+
+    \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.8\linewidth]{informatica/profiles/first_profile/global}
+        \includegraphics[width=0.9\linewidth]{informatica/profiles/first_profile/global}
         \caption{Visualización global de todo el proceso de entrenamiento}
         \label{img:first_profile_global}
     \end{subfigure}%
-    \begin{subfigure}{.6\textwidth}
+    \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.8\linewidth]{informatica/profiles/first_profile/dataloader}
+        \includegraphics[width=0.9\linewidth]{informatica/profiles/first_profile/dataloader}
         \caption{Visualización de los tiempos involucrados en computar \lstinline{dataloader.__next__}}
         \label{img:first_profile_dataloader_next}
     \end{subfigure}
 \caption{Visualizaciones obtenidas usando \lstinline{snakeviz} para los resultados del \textit{profile} inicial}
 \end{figure}
 
-% TODO -- seguir por aqui
-
 El tiempo total de cómputo es de 328.638 segundos. Podemos ver en \customref{img:first_profile_global} que la mayor parte del tiempo de entrenamiento se pasa en el método \lstinline{dataloader.__next__()}. En \customref{img:first_profile_dataloader_next} podemos ver que, en dicho método, prácticamente todo el tiempo estamos esperando a que se complete una operación asíncrona, como indica \lstinline{threading.wait()}.
 
-Creemos que esto es por estar empleando el enfoque \textit{lazy} para el aumentado de datos. Cada vez que queremos acceder a una nueva imagen, tenemos que generarla en dicho momento. Por tanto, en la siguiente iteración no usaremos el enfoque \textit{lazy}. Veremos si los tiempos aumentan o disminuyen, y si aparecen nuevas partes de código a optimizar.
+Creemos que esto es por estar empleando el enfoque \textit{lazy} para el aumentado de datos. Cada vez que queremos acceder a una nueva imagen, tenemos que generarla en ese preciso instante. Por tanto, en la siguiente iteración no usaremos el enfoque \textit{lazy}. Veremos si los tiempos aumentan o disminuyen, y si aparecen nuevas partes de código a optimizar.
 
 \subsection{Segundo \textit{profile}}
 
-Como ya hemos comentado, esta vez nos centraremos en usar un enfoque no \textit{lazy} para el aumentado de datos. Si intentamos usar los mismos valores de $\{P, K\}$, saturamos la memoria del proceso haciendo que este aborte. Así que tenemos que usar $P = 100, K = 2$, lo que supone un problema para comparar las dos ejecuciones.
+Como ya hemos comentado, esta vez nos centraremos en usar un enfoque no \textit{lazy} para el aumentado de datos. Si intentamos usar los mismos valores $P = 200$, $K = 2$, saturamos la memoria del proceso haciendo que este aborte. Así que tenemos que usar $P = 100, K = 2$, lo que supone un problema para comparar las dos ejecuciones.
 
-Para evitar que estas diferencias interfieran en nuestro estudio, lanzamos el anterior \textit{profile} pero con los valores $P = 100, K = 2$. Obtenemos los siguientes resultados:
+Para evitar que estas diferencias en los parámetros $\{P, K\}$ interfieran en nuestra optimización, lanzamos las dos versiones (\textit{lazy} y clásico) usando los valores $P = 100$, $K = 2$, y con ello podremos comparar de forma justa los tiempos de ejecución. Los resultados se resumen en la siguiente tabla:
 
 \begin{table}[H]
 \centering
@@ -559,9 +559,17 @@ Para evitar que estas diferencias interfieran en nuestro estudio, lanzamos el an
 \caption{Tiempos de ejecución de los dos enfoques de aumento de datos, usando los valores $P = 100, K = 2$}
 \end{table}
 
-Como era de esperar por lo comentado en \customref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva tiempos de ejecución mayores. Solo estamos midiendo el tiempo de ejecución en el entrenamiento. Y en este, el enfoque clásico ya tiene todas las imágenes pre-computadas, mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que permite usar unos valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos.
+Como era de esperar por lo comentado en \customref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva tiempos de ejecución mayores. Solo estamos midiendo el tiempo de ejecución en el entrenamiento, no tenemos en cuenta los tiempos asociados a generar el \textit{dataset} aumentado. Y de esta forma, el enfoque clásico ya tiene todas las imágenes pre-computadas (lo que conlleva un tiempo considerable que no estamos considerando), mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que permite usar unos valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos (sin considerar lo que tarda en generarse el \textit{dataset} aumentado de forma clásica).
 
-Una vez resuelto esto, procedemos a explorar los resultados del segundo \textit{profile}:
+Una vez resuelto esto, realizamos un segundo \textit{profile} usando los siguientes parámetros:
+
+\begin{itemize}
+    \item $P = 100$, $K = 2$
+    \item Aumentado de datos clásico
+    \item Dimensión del \textit{embedding} aprendido igual a 5
+\end{itemize}
+
+Los resultados del segundo \textit{profile} se muestran en la siguiente imagen:
 
 \begin{figure}[H]
     \centering
@@ -578,9 +586,9 @@ En este caso, podemos ver que los resultados ya son más ricos y variados. Los t
     \label{img:second_profile_tiempos_metricas}
 \end{figure}
 
-Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (distancia intercluster que introducimos en \customref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre pares.
+Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (distancia intercluster que introducimos en \customref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre todos los pares de \textit{embeddings}.
 
-Ahora estudiamos el bloque asociado al cálculo de la función de pérdida (que acabamos de ver que ya ha participado):
+Ahora estudiamos el bloque asociado al cálculo de la función de pérdida:
 
 \begin{figure}[H]
     \centering
@@ -599,13 +607,20 @@ Algunos detalles sobre los \textit{benchmarks}:
 \begin{itemize}
     \item Estudiaremos los tiempos de ejecución de las funciones \lstinline{compute_intercluster_metrics} y \lstinline{precompute_pairwise_distances} con los dos \textit{scripts} que se encuentran en \lstinline{./src/benchmarks}
     \item Correremos estos \textit{scripts} en la plataforma \textit{Google Colab} (véase \customref{isec:entorno_ejecucion}), usando un \textit{Notebook} que invoca el código de los \textit{benchmarks}: \lstinline{./src/benchmarks/Benchmarking notebook.ipynb}
-    \item Usamos los valores $P = 100, K = 2$, la dimensión del \textit{embedding} a aprender es 5, 1 época de entrenamiento y enfoque \textit{lazy} para el aumentado de datos
+    \item Usaremos los parámetros:
+        \begin{itemize}
+            \item $P = 100, K = 2$
+            \item Enfoque \textit{lazy} para el aumentado de datos
+            \item Dimensión del \textit{embedding} a parender igual a 5
+            \item Una época de entrenamiento
+        \end{itemize}
 \end{itemize}
 
-La siguiente tabla muestra algunos cambios introducidos y los tiempos de los \textit{benchmarks}. Además, mostramos el tiempo de ejecución del \textit{Notebook} \lstinline{LFW Notebook.ipynb}, que en el momento de realizar las optimizaciones, usábamos para entrenar y validar modelos sobre el \textit{dataset} \textit{LFW}.
+La siguiente tabla muestra los cambios introducidos y los tiempos de los \textit{benchmarks}. Además, mostramos el tiempo de ejecución del \textit{Notebook} \lstinline{LFW Notebook.ipynb}, que en el momento de realizar las optimizaciones, usábamos para entrenar y validar modelos sobre el \textit{dataset} \textit{LFW}.
 
 \begin{table}[H]
     \centering
+    \scalebox{0.8}{
     \begin{tabular}{lccccc}
         \toprule
         \textbf{} & \multicolumn{2}{c}{\textbf{\lstinline|compute_intercluster_metrics|}} & \multicolumn{2}{c}{\textbf{\lstinline|precompute_pairwise_distances|}} & \textbf{Tiempo entrenamiento} \\
@@ -617,13 +632,14 @@ La siguiente tabla muestra algunos cambios introducidos y los tiempos de los \te
         3 &  2.55 & 1.61  & 12.75 & 1.48 & 625.89  \\
         \bottomrule
     \end{tabular}
+    }
     \caption{Tabla que recoge el proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
 \end{table}
 
 Los cambios realizados asociados son:
 
 \begin{enumerate}
-    \item Estado inicial de la base de datos. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
+    \item Estado inicial de la base de código. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
     \item En \lstinline|precompute_pairwise_distances|, usamos el método \lstinline|cdist| de \lstinline|pytorch| para calcular una matriz de distancias. Convertimos dicha matriz a un diccionario para respetar la interfaz que ciertas clases esperan de esta función
     \item Usamos \lstinline|precompute_pairwise_distances| en el cálculo de las funciones de pérdida. Introducimos algunos pre-cómputos en \lstinline|compute_intracluster_distances| para acelerar la ejecución
 \end{enumerate}
@@ -643,7 +659,7 @@ En este \textit{profile} usamos los siguientes parámetros:
     \item Enfoque \textit{Lazy} para el aumentado de datos
 \end{itemize}
 
-Con ello, visualizamos los tiempos globales en la siguiente imagen:
+Visualizamos los resultados del \textit{profile} en la siguiente imagen:
 
 \begin{figure}[H]
     \centering
@@ -683,20 +699,22 @@ Tenemos tres bloques, que podemos expandir, como mostramos en las siguientes im�
 \caption{Visualización de los tiempos de cómputo asociados a cada una de las tres métricas que mostramos}
 \end{figure}
 
-Podemos ver que:
+En base a estas visualizaciones podemos ver que:
 
+\begin{sloppypar}
 \begin{itemize}
     \item Las tres métricas que en ese momento estábamos mostrando suponen aproximadamente la misma cantidad de tiempo
-    \item En \lstinline{calculate_mean_loss_function_online}, la mayor parte del tiempo se debe al acceso a los datos,
+    \item En \lstinline{calculate_mean_loss_function_online}, la mayor parte del tiempo se debe al acceso a los datos
     \item En \lstinline{compute_cluster_sizes_metrics}, la mayor parte del tiempo se pasa en \lstinline{__get_portion_of_dataset_and_embed}
-    \item En \lstinline{compute_inter_cluster_metrics} la mayor parte del tiempo se pasa en \lstinline{__get_portion_of_dataset_and_embed}, pero no tanto como en el caso anterior. Le sigue la función \lstinline{__compute_pairwise_distances}
+    \item En \lstinline[breaklines=true]{compute_inter_cluster_metrics} la mayor parte del tiempo se pasa en \lstinline[breaklines=true]{__get_portion_of_dataset_and_embed}, pero no tanto como en el caso anterior. Le sigue la función \lstinline{__compute_pairwise_distances}
 \end{itemize}
+\end{sloppypar}
 
 Además, estudiando el archivo con los tiempos de cómputo filtrados \lstinline{./src/profiling/third_profile_filtered.txt}, podemos ver que:
 
 \begin{itemize}
     \item Como ya hemos visto, la mayor parte del tiempo se pasa en \lstinline{log_process}, seguido de \lstinline{calculate_mean_loss_function_online}, \lstinline{__get_portion_of_dataset_and_embed} y \lstinline{compute_cluster_sizes_metrics}
-    \item Una comprensión de diccionarios en \lstinline{precompute_pairwise_distances} supone 1.524 segundos de 1.526 segundos totales
+    \item Una comprensión de diccionarios en \lstinline{precompute_pairwise_distances} supone 1.524 segundos de 1.526 segundos que tarda la función en total
 \end{itemize}
 
 Todo esto justifica que identifiquemos las siguientes partes críticas del código, a tratar en una segunda ronda de optimizaciones:
@@ -716,6 +734,7 @@ Seguimos el mismo enfoque que en la primera ronda de optimizaciones. Ya tenemos 
 
 \begin{table}[H]
     \centering
+    \scalebox{0.8}{
     \begin{tabular}{lccccc}
         \toprule
         \textbf{} & \multicolumn{2}{c}{\textbf{\lstinline|compute_intercluster_metrics|}} & \multicolumn{2}{c}{\textbf{\lstinline|precompute_pairwise_distances|}} & \textbf{Tiempo entrenamiento} \\
@@ -727,12 +746,12 @@ Seguimos el mismo enfoque que en la primera ronda de optimizaciones. Ya tenemos 
             3 & 3.45  & 2.68 & 13.28 & 0.37 & -       \\
         \bottomrule
     \end{tabular}
+    }
     \caption{Tabla que recoge el segundo proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
     \label{table:optimization_process_second}
 \end{table}
-\todo{La tabla se sale por la derecha}
 
-Describimos ahora todos los cambios realizados:
+Describimos los cambios realizados:
 
 \begin{enumerate}
     \item Estado inicial de la base de datos. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
@@ -740,17 +759,15 @@ Describimos ahora todos los cambios realizados:
     \item Mejoramos el diseño de la anterior función. No deberían producirse cambios en el rendimiento
 \end{enumerate}
 
-En \customref{table:optimization_process_second} podemos ver que no estamos mostrando tiempos de cómputo. Esto es porque el uso de la función de \lstinline{pytorch} para computar todos los \textit{embeddings} de golpe provoca que el consumo de memoria se eleve hasta abortar el proceso. Además, los \textit{benchmarks} han empeorado algo.
+En \customref{table:optimization_process_second} podemos ver que no estamos mostrando tiempos de cómputo de entrenamiento en las dos últimas entradas. Esto es porque el uso de la función de \lstinline{pytorch} para computar todos los \textit{embeddings} de golpe provoca que el consumo de memoria se eleve hasta abortar el proceso. Además, los \textit{benchmarks} han empeorado algo.
 
-Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar en cada momento. Puede ser que al acceder a los servidores \textit{nGPU}, mucho más potentes, la nueva implementación no provoque consumos elevados de memoria y acelere el proceso.
+Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar en cada momento. Puede ser que al acceder a los servidores \textit{nGPU} (véase \customref{isec:entorno_ejecucion}), mucho más potentes, la nueva implementación no provoque consumos elevados de memoria y acelere el proceso.
 
 \subsection{Comentarios y mejoras a tener en cuenta}
 
 En el momento de realizar este proceso de optimización, no teníamos acceso a los servidores \textit{nGPU}. Sin embargo, era necesario optimizar el código para seguir avanzando el proyecto sin detenernos.
 
-El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un error a tener en cuenta. Por ejemplo, en \customref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente.
-
-Por tanto, una mejora a tener en cuenta es realizar otro proceso de optimización sobre \textit{nGPU}. Es decir, repetir el proceso de crear un \textit{profile}, buscar en este partes críticas del código, y optimizar estas partes de ser necesario.
+El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un \textbf{error a tener en cuenta}. Por ejemplo, en \customref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente. Por tanto, \textbf{una posible mejora} es repetir el proceso de optimización sobre \textit{nGPU}.
 
 Sin embargo, al acceder a los servidores \textit{nGPU} y \textit{datasets} más grandes, no hemos tenido problemas de rendimiento. Con ello, un esfuerzo en optimizar el código no estaría del todo justificado. Por tanto, aún con los fallos que hemos comentado, \textbf{el proceso de optimización cumplió con su cometido} en el momento en el que era necesario.
 
