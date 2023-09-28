@@ -259,7 +259,7 @@ A la hora de cargar los datos al \textit{dataset}, realizamos el siguiente proce
 
 El método \lstinline{check_integrity()} comprueba el tamaño del \textit{dataset} para asegurarnos de que no ha habido corrupción de datos en la descarga. El método \lstinline{set_exploration_mode()} permite activar el modo exploración. En dicho modo, \lstinline{__getitem__()} devuelve la imagen con una serie de metadatos asociados almacenados en un diccionario (edad e identidad). En el modo de funcionamiento normal, \lstinline{__getitem__()} devuelve un par con la imagen y la etiqueta de dicha imagen.
 
-\subsection{Normalización}
+\subsection{Normalización} \label{isubs:normalization_impl}
 
 En \customref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \customref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
 
@@ -355,9 +355,9 @@ Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lst
 \label{img:diagramas_clase_concretos_adaptadores}
 \end{figure}
 
-En \customref{img:diagrama_clases_global_adaptadores} podemos ver que ambas clases implementan la interfaz \lstinline{torch.nn.Module}, que es la interfaz que las redes neuronales y sus componentes deben implementar en \lstinline{pytorch}. Además, \lstinline{RetrievalAdapter} forma parte de \lstinline{FastRetrievalAdapter}. Queda claro que vamos a usar de nuevo el patrón \textit{composite} para realizar la adaptación.
+En \customref{img:diagrama_clases_global_adaptadores} podemos ver que ambas clases implementan la interfaz \lstinline{torch.nn.Module}, que es la interfaz que las redes neuronales y sus componentes deben implementar en \lstinline{pytorch}. Además, \lstinline{RetrievalAdapter} forma parte de \lstinline{FastRetrievalAdapter}. Sin embargo, vamos a introducir una nueva interfaz, por lo que queda claro que ahora sí que vamos a usar el patrón \textit{Adapter} (véase \customref{isubs:normalization_impl}).
 
-En \customref{img:diagramas_clase_concretos_adaptadores} podemos ver que no estamos buscando trabajar con la interfaz de \lstinline{torch.nn.Module}, sino que buscamos trabajar con una nueva interfaz, asociada a la tarea de \lstinline{retrieval} (véase \customref{ich:descrp_problema}). Para ello, la clase \lstinline{RetrievalAdapter} define dos métodos relevantes:
+En \customref{img:diagramas_clase_concretos_adaptadores} podemos ver que no estamos buscando trabajar con la interfaz de \lstinline{torch.nn.Module}, sino que buscamos trabajar con una nueva interfaz, asociada a la tarea de \lstinline{retrieval} (véase \customref{ich:descrp_problema}). Para ello, la clase \lstinline{RetrievalAdapter} define dos métodos relevantes, que son los que introducen una nueva interfaz:
 
 \begin{itemize}
     \item \lstinline{query} toma una imagen \textit{key}, una lista de imágenes que forman la base de datos y el número de imágenes $k$ que queremos que devuelva la consulta. Devuelve los índices asociados a las mejores $k$ imágenes de la base de datos
@@ -382,8 +382,9 @@ La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para ace
     \item Con esto, el método \lstinline{query} simplemente especifica el índice de la \textit{key} y el número $k$ de individuos más parecidos que queremos seleccionar. Y usando \lstinline{self.wrapped_net} con su método \lstinline{query_embedding}, realizamos el cómputo sobre los \textit{embeddings}
 \end{itemize}
 
-\lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{composite}, del que ya hemos hablado en \customref{isec:loggin_metricas}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y empleamos la implementación de clases previas.
-\todo{Estamos usando el patrón Decorator y no composite. No es el patrón adapter porque no estamos cambiando el comportamiento para acoplarnos a otra interfaz}
+\begin{sloppypar}
+\lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{Decorator} sobre la clase \lstinline{RetrievalAdapter}, del que ya hemos hablado en \customref{isubs:normalization_impl}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y empleamos la implementación de clases previas.
+\end{sloppypar}
 
 \subsection{Separación de datos imponiendo clases disjuntas}
 
