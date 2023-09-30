@@ -746,16 +746,65 @@ Por todo esto, los objetivos del presente trabajo son los siguientes:
 
 \section{Planificación} \label{isec:planificacion}
 
-Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para las técnicas sobre las que queremos estudiar. Esto supone que deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código. Por tanto, decidimos realizar un desarrollo en varias etapas, iterando sobre distintas bases de datos, de menor complejidad (estructura de los datos, facilidad de trabajo con ellos, tamaño) e interés, hasta los datos más complejos y relevantes para nuestro estudio.
+Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para las técnicas que queremos explorar. Esto supone que \textbf{deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código}. Por tanto, decidimos realizar un desarrollo en varias etapas, iterando sobre distintas bases de datos, de menor complejidad (estructura de los datos, facilidad de trabajo con ellos, tamaño) e interés, hasta los datos más complejos y relevantes para nuestro estudio. Como veremos en \customref{isec:optimizacion_codigo}, esto permite en un inicio desarrollar rápidamente una amplia base de código sin preocuparnos de realizar optimizaciones prematuras y poco relevantes. Solo se realiza un proceso de optimización cuando encontramos problemas reales con los tiempos de cómputo.
 
-Esto ha permitido poder centrarnos en el desarrollo de los módulos, sin preocuparnos de los problemas que podrían introducir distintas bases de datos. Una vez realizada una implementación inicial junto con su validación a partir de una base sólida de \textit{tests}, se itera sobre bases de datos más complejas, en busca de analizar posibles problemas de rendimiento. Y así es como acaba ocurriendo, como plasmamos en \customref{isec:optimizacion_codigo}.
+Una vez analizados y resuelto los puntos débiles en temas de rendimiento pasamos a tratar con las bases de datos que realmente nos interesan. Así, en este punto, tenemos prácticamente toda la base de código desarrollada, pudiendo centrarnos únicamente en la experimentación.
 
-Una vez analizados y resuelto los puntos débiles en temas de rendimiento (evitando así realizar optimizaciones prematuras e irrelevantes que ralentizasen el desarrollo de código), pasamos a tratar con las bases de datos que realmente nos interesan. Así, en este punto, tenemos prácticamente toda la base de código desarrollada, pudiendo centrarnos únicamente en la experimentación.
+Las bases de datos sobre las que iteramos se describen con detalle en \customref{isec:base_datos_usada}.
+
+Además, como veremos en \customref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestro enfoque para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos.
+
+Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura sobre el tema, desconocemos los posibles problemas que pueden resultar de aplicar esta técnica. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones. En cada una de las iteraciones podemos aplicar el modelo en cascada. Este modelo encaja perfectamente con nuestro enfoque, en el que buscamos iterar sobre distintas bases de datos. El funcionamiento de este modelo se explica mejor en la siguiente imagen:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{informatica/kanban_board}
-    \caption{Ejemplo del estado de nuestra tabla \textit{kanban} en un momento durante la fase de desarrollo. Podemos ver que tenemos cuatro columnas. La primera de ellas, dedicada a tareas que puede que no lleguen a ser realizadas. La segunda, tareas que debemos realizar. La tercera columna, tareas que estamos realizando en ese momento. Y la última columna, tareas que ya han sido completadas}
+    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_modelo_incremental}
+    \caption{Ejemplo del modelo de desarrollo incremental. Podemos ver que en cada iteración aplicamos un modelo de desarrollo en cascada. En nuestro caso, cada iteración corresponderá con cada una de las bases de datos sobre las que iteramos. Imagen extraída de \cite{informatica:libro_metodologias_desarrollo}}
 \end{figure}
+
+Para cada base de datos sobre la que trabajamos, consideramos las siguientes fases del modelo en cascada para esa iteración:
+
+\begin{itemize}
+    \item Análisis: realizamos un análisis exploratorio de la base de datos con la que trabajamos en esta iteración (véase \customref{isec:base_datos_usada}). Estudiamos las técnicas que queremos aplicar y nos marcamos una serie de objetivos para esta iteración
+    \item Diseño: en base al estudio realizado sobre el \textit{dataset} y las técnicas que queremos aplicar, definimos qué módulos de código debemos de introducir, qué interfaces deben cumplir para interactuar con otros módulos de código, las propiedades que queremos verificar en los \textit{tests}, distintos \textit{pipelines} que seguir en la experimentación...
+    \item Implementación: desarrollamos el código necesario para cumplir con el diseño realizado previamente. En esta fase también incluimos el desarrollo de \textit{tests} para realizar las validaciones
+    \item Optimización: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados, y llevamos a cabo dichos cambios. Esto se explica en detalle en \customref{isec:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes
+    \item Experimentación: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase \customref{isec:pipeline}), analizamos los resultados obtenidos, buscamos anomalías en el proceso o en los resultados, ... Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos
+\end{itemize}
+
+Para organizar todas las tareas de cada iteración, que nacen en las fases de análisis, diseño e implementación, usamos la \textbf{metodología \textit{Kanban}}. En dicha metodología se usa un tablero, en el que tarjetas que representan tareas a realizar se colocan sobre columnas que representan distintos estados. Usamos cuatro estados:
+
+\begin{itemize}
+    \item \textit{Backlog} o tareas que no sabemos si vamos a llevar a cabo
+    \item \textit{To-do} o tareas que debemos llevar a cabo.
+    \item \textit{In-progress} o tareas que actualmente estamos trabajando
+    \item \textit{Done} o tareas que ya se han completado
+\end{itemize}
+
+Esto permite tener una visualización rápida del estado de la iteración. Como comentaremos detalladamente en \customref{isec:github_buenas_practicas}, usaremos la utilidad de proyectos que ofrece \textit{Github} para tener acceso a un tablero \textit{kanban}. En la siguiente imagen se muestra un ejemplo del estado de este tablero:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{informatica/kanban_board}
+    \caption{Ejemplo del estado de nuestro tablero \textit{kanban} en un momento concreto durante la fase de desarrollo. Podemos ver las cuatro columnas que ya hemos descrito. \textit{Github} le da el nombre \textit{No Status} a la columna que nosotros usamos como \textit{backlog}}
+\end{figure}
+
+Comenzamos a desarrollar el proyecto en Febrero de 2022. En los meses ??? tenemos planeado dedicar X cantidad de horas. En los meses de Julio, Agosto y Septiembre, planeamos dedicar Y horas semanales.
+
+
+% TODO -- descomentar esta imagen cuando la generemos
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{informatica/diagrama_gannt}
+%     \caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto}
+% \end{figure}
+En cuanto a la planificación económica
+
+% TODO -- Diagrama de Gannt
+% TODO -- gasto económico supuesto
+%      -- Salario de un investigador: 35€ / h
+%      -- Lo que me cuesta el portátil
+%      -- Servidores nGPU
+%      -- Usar los commits de github para poner los diagramas
 
 \todo{Todavía le faltan partes}
