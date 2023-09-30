@@ -772,7 +772,7 @@ Para cada base de datos sobre la que trabajamos, consideramos las siguientes fas
     \item Experimentación: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase \customref{isec:pipeline}), analizamos los resultados obtenidos, buscamos anomalías en el proceso o en los resultados, ... Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos
 \end{itemize}
 
-Para organizar todas las tareas de cada iteración, que nacen en las fases de análisis, diseño e implementación, usamos la \textbf{metodología \textit{Kanban}}. En dicha metodología se usa un tablero, en el que tarjetas que representan tareas a realizar se colocan sobre columnas que representan distintos estados. Usamos cuatro estados:
+Para organizar todas las tareas de cada iteración, que nacen en las fases de análisis, diseño e implementación, usamos la \textbf{metodología \textit{Kanban}} \cite{informatica:kanban_paper}. En dicha metodología se usa un tablero, en el que tarjetas que representan tareas a realizar se colocan sobre columnas que representan distintos estados. Usamos cuatro estados:
 
 \begin{itemize}
     \item \textit{Backlog} o tareas que no sabemos si vamos a llevar a cabo
@@ -789,18 +789,29 @@ Esto permite tener una visualización rápida del estado de la iteración. Como 
     \caption{Ejemplo del estado de nuestro tablero \textit{kanban} en un momento concreto durante la fase de desarrollo. Podemos ver las cuatro columnas que ya hemos descrito. \textit{Github} le da el nombre \textit{No Status} a la columna que nosotros usamos como \textit{backlog}}
 \end{figure}
 
-Comenzamos a desarrollar el proyecto en Febrero de 2022. En los meses ??? tenemos planeado dedicar X cantidad de horas. En los meses de Julio, Agosto y Septiembre, planeamos dedicar Y horas semanales.
+Comenzamos a desarrollar el proyecto en Febrero de 2022. Sabemos que, debido a los exámenes universitarios, apenas trabajaremos en los meses de Enero, Mayo y Junio. Por tanto, consideraremos que en estos meses no trabajemos ninguna hora (aunque en la práctica sí que consigamos sacar algo de tiempo). Los meses en los que más trabajaremos serán Febrero, Julio, Agosto y Septiembre. En estos meses tenemos previsto trabajar al menos 20 horas semanales. En el resto de meses consideramos que trabaremos al menos 2 horas semanales. Por tanto, en los dos años que dedicamos al proyecto de informática, dedicaremos al menos 720 horas.
 
+Teniendo todo esto en cuenta, inicialmente planificamos el proyecto tal y como describe el siguiente diagrama de Gannt:
 
-% TODO -- descomentar esta imagen cuando la generemos
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{informatica/diagrama_gannt}
-%     \caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_ideal}
+    \caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto. El color azul corresponde al \textit{dataset} \textit{MNIST}. El color morado corresponde al \textit{dataset} \textit{LFW}. El color naranja corresponde a los \textit{datasets} \textit{FG-Net} junto con \textit{CACD}}
+\end{figure}
+
+Sin embargo, por los problemas enfrentados durante el desarrollo, y por inexactitudes en la planificación, acabamos distribuyendo el tiempo dedicado al trabajo tal y como se muestra en el siguiente diagrama de Gannt:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_real}
+    \caption{Diagrama de \textit{Gantt} que describe la distribución real del tiempo dedicado al proyecto. Seguimos el mismo código de colores que en el diagrama anterior}
+    \label{img:gannt_real}
+\end{figure}
+
+En el repositorio abierto de \textit{Github} \cite{informatica:repogithub} donde hemos desarrollado el proyecto, podemos verificar los tiempos que aparecen en \customref{img:gannt_real}.
+
 En cuanto a la planificación económica
 
-% TODO -- Diagrama de Gannt
 % TODO -- gasto económico supuesto
 %      -- Salario de un investigador: 35€ / h
 %      -- Lo que me cuesta el portátil
