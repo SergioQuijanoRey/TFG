@@ -268,6 +268,103 @@ class FGLigthModel(torch.nn.Module):
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
 
+class CACDResnet18(torch.nn.Module):
+    """
+    Pretrained ResNet18 on ImageNet, for CACD dataset. Some slight changes have been made:
+
+    - Last linear layer have out_features given by __init__ parameter
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(CACDResnet18, self).__init__()
+
+        # Dimension del embedding que la red va a calcular
+        self.embedding_dimension = embedding_dimension
+
+        # Tomamos el modelo pre-entrenado ResNet18
+        self.pretrained = models.resnet18(weights = models.ResNet18_Weights.DEFAULT)
+
+        # Cambiamos la primera convolucion para que en vez
+        # de tres canales acepte un canal para las imagenes
+        # de entrada
+        #  self.pretrained.conv1 = nn.Conv2d(in_channels = 1, out_channels = 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+        # Cambiamos la ultima capa fc Linear(in_features=512, out_features=1000, bias=True)
+        # para calcular un embedding de dimension mucho menor, especificada por parameatro
+        # TODO -- comentar en la memoria el cambio de ERROR que hacer esto nos ha supuesto
+        previous_in_features = self.pretrained.fc.in_features
+        self.pretrained.fc = nn.Linear(in_features=previous_in_features, out_features=self.embedding_dimension, bias=True)
+
+        # Por defecto siempre realizamos la permutacion del tensor de entrada
+        self.should_permute = True
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
+        # queremos tensores (DATALOADER_BACH_SIZE, 1, 28, 28) para poder trabajar
+        # con la red pre-entrenada
+        # Usamos permute en vez de reshape porque queremos que tambien funcione al
+        # realizar inferencia con distintos tamaños de minibatch (ie. 1)
+        if self.should_permute is True:
+            x = torch.permute(x, (1, 0, 2, 3))
+
+        # Usamos directamente la red pre-entrenada para hacer el forward
+        x = self.pretrained.forward(x)
+
+        return x
+
+    def set_permute(self, should_permute: bool):
+        self.should_permute = should_permute
+
+
+class CACDResnet50(torch.nn.Module):
+    """
+    Pretrained ResNet50 on ImageNet, for CACD dataset. Some slight changes have been made:
+
+    - Last linear layer have out_features given by __init__ parameter
+    """
+
+    def __init__(self, embedding_dimension: int):
+
+        super(CACDResnet50, self).__init__()
+
+        # Dimension del embedding que la red va a calcular
+        self.embedding_dimension = embedding_dimension
+
+        # Tomamos el modelo pre-entrenado ResNet50
+        self.pretrained = models.resnet50(weights = models.ResNet50_Weights.DEFAULT)
+
+        # Cambiamos la primera convolucion para que en vez
+        # de tres canales acepte un canal para las imagenes
+        # de entrada
+        #  self.pretrained.conv1 = nn.Conv2d(in_channels = 1, out_channels = 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+        # Cambiamos la ultima capa fc Linear(in_features=512, out_features=1000, bias=True)
+        # para calcular un embedding de dimension mucho menor, especificada por parameatro
+        # TODO -- comentar en la memoria el cambio de ERROR que hacer esto nos ha supuesto
+        previous_in_features = self.pretrained.fc.in_features
+        self.pretrained.fc = nn.Linear(in_features=previous_in_features, out_features=self.embedding_dimension, bias=True)
+
+        # Por defecto siempre realizamos la permutacion del tensor de entrada
+        self.should_permute = True
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
+        # queremos tensores (DATALOADER_BACH_SIZE, 1, 28, 28) para poder trabajar
+        # con la red pre-entrenada
+        # Usamos permute en vez de reshape porque queremos que tambien funcione al
+        # realizar inferencia con distintos tamaños de minibatch (ie. 1)
+        if self.should_permute is True:
+            x = torch.permute(x, (1, 0, 2, 3))
+
+        # Usamos directamente la red pre-entrenada para hacer el forward
+        x = self.pretrained.forward(x)
+
+        return x
+
+    def set_permute(self, should_permute: bool):
+        self.should_permute = should_permute
+
 
 class RandomNet(torch.nn.Module):
     """
