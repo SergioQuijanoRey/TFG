@@ -78,7 +78,7 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 # Parameters of P-K sampling
 GLOBALS['P'] = 10    # Number of classes used in each minibatch
-GLOBALS['K'] = 10    # Number of images sampled for each selected class
+GLOBALS['K'] = 5     # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -102,15 +102,17 @@ GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
 #
 # `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
 # minibatches
-GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 100
+#  GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 500
+GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 3_000
 
 # Which percentage of the training and validation set we want to use for the logging
-GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 0.2
-GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 1
+GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 0.005
+GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 0.005
 
 # Choose which model we're going to use
-# Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel"
-GLOBALS['NET_MODEL'] = "LFWResNet18"
+# Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel",
+#        "CACDResNet18", "CACDResNet50"
+GLOBALS['NET_MODEL'] = "CACDResNet50"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
@@ -156,7 +158,7 @@ GLOBALS['PENALTY_FACTOR'] = 0.6
 
 # If we want to wrap our model into a normalizer
 # That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
-GLOBALS['NORMALIZED_MODEL_OUTPUT'] = True
+GLOBALS['NORMALIZED_MODEL_OUTPUT'] = False
 
 # If its None, we do not perform gradient clipping
 # If its a Float value, we perform gradient clipping, using that value as a
@@ -172,6 +174,9 @@ GLOBALS['ACCURACY_AT_K_VALUE'] = 5
 # so we can normalize the images to have the same shape
 GLOBALS['IMAGE_SHAPE'] = (300, 300)
 
+# Degrees that we are going to use in data augmentation rotations
+GLOBALS['ROTATE_AUGM_DEGREES'] = (0, 20)
+
 ## Section parameters
 # ==============================================================================
 
@@ -180,7 +185,7 @@ GLOBALS['IMAGE_SHAPE'] = (300, 300)
 
 
 # Skip hyper parameter tuning for online training
-GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = True
+GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = False
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
@@ -305,11 +310,11 @@ import lib.split_dataset as split_dataset
 import lib.hyperparameter_tuning as hptuning
 import lib.datasets as datasets
 
-from lib.trainers import train_model_offline, train_model_online
+from lib.trainers import train_model_online
 from lib.train_loggers import SilentLogger, TripletLoggerOffline, TripletLoggerOnline, TrainLogger, CompoundLogger, IntraClusterLogger, InterClusterLogger, RankAtKLogger, LocalRankAtKLogger
 from lib.models import *
 from lib.visualizations import *
-from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter, FGLigthModel
+from lib.models import ResNet18, LFWResNet18, LFWLightModel, NormalizedNet, RetrievalAdapter, FGLigthModel, CACDResnet18, CACDResnet50
 from lib.loss_functions import MeanTripletBatchTripletLoss, BatchHardTripletLoss, BatchAllTripletLoss, AddSmallEmbeddingPenalization
 from lib.embedding_to_classifier import EmbeddingToClassifier
 from lib.sampler import CustomSampler
@@ -479,6 +484,11 @@ print(f"\tTrain dataset: {len(train_dataset) / len(cacd_dataset) * 100}%")
 print(f"\tValidation dataset: {len(validation_dataset) / len(cacd_dataset) * 100}%")
 print("")
 
+print("--> Logging sizes:")
+print(f"\tTrain dataset: {len(train_dataset) * GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE']}")
+print(f"\tValidation dataset: {len(validation_dataset) * GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE']}")
+print("")
+
 ## Use our custom sampler
 # ==============================================================================
 #
@@ -576,7 +586,7 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
             # NOTE: We have normalized our images to be (3, 300, 300), so new
             # randomly generated images have to have the same shape
             transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
-            transforms.RandomRotation(degrees=(0, 20)),
+            transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
             transforms.RandomAutocontrast(),
         ])
     )
@@ -592,7 +602,7 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
             # NOTE: We have normalized our images to be (3, 300, 300), so new
             # randomly generated images have to have the same shape
             transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
-            transforms.RandomRotation(degrees=(0, 20)),
+            transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
             transforms.RandomAutocontrast(),
         ])
     )
@@ -698,21 +708,25 @@ def objective(trial):
 
     # Parameters that we are exploring
     p = trial.suggest_int("P", 2, 500)
-    k = trial.suggest_int("K", 2, 10)
+    k = trial.suggest_int("K", 2, 20)
     net_election = trial.suggest_categorical(
         "Network",
-        ["LFWResNet18", "LFWLightModel", "FGLigthModel"]
+        ["CACDResNet18", "CACDResNet50", "FGLightModel"]
     )
     normalization_election = trial.suggest_categorical(
         "UseNormalization", [True, False]
     )
     embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 20)
-    learning_rate = trial.suggest_float("Learning rate", 0.0000001, 0.1)
-    margin = trial.suggest_float("Margin", 0.001, 1.0)
+    learning_rate = trial.suggest_float("Learning rate", 0.000000000000001, 1)
     softplus = trial.suggest_categorical("Use Softplus", [True, False])
     use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
+
     if use_norm_penalty is True:
         norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
+
+    margin = None
+    if softplus is False:
+        margin = trial.suggest_float("Margin", 0.001, 1.0)
 
     # Log that we are going to do k-fold cross validation and the values of the
     # parameters. k-fold cross validation can be really slow, so this logs are
@@ -735,7 +749,7 @@ def objective(trial):
         # Again, we want to end with the normalized shape
         transform = transforms.Compose([
             transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
-            transforms.RandomRotation(degrees=(0, 45)),
+            transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
             transforms.RandomAutocontrast(),
         ])
 
@@ -769,7 +783,7 @@ def objective(trial):
                 # Otherwise, we could end with a lot of repeated images
                 transform = transforms.Compose([
                     transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
-                    transforms.RandomRotation(degrees=(0, 45)),
+                    transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
                     transforms.RandomAutocontrast(),
                 ])
 
@@ -809,14 +823,16 @@ def objective(trial):
     def network_creator():
 
         # Model that we have chosen
-        if net_election == "LFWResNet18":
-            net = LFWResNet18(embedding_dimension = embedding_dimension)
-        elif net_election == "LFWLightModel":
-            net = LFWLightModel(embedding_dimension = embedding_dimension)
-        elif net_election == "FGLightModel":
+        if net_election == "FGLightModel":
             net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+        elif net_election == "CACDResNet18":
+            net = CACDResnet18(GLOBALS['EMBEDDING_DIMENSION'])
+        elif net_election == "CACDResNet50":
+            net = CACDResnet50(GLOBALS['EMBEDDING_DIMENSION'])
         else:
-            raise ValueError("String for net election is not valid")
+            err_msg = "Parameter `net_election` has not a valid value \n"
+            err_msg += f"{net_election=}"
+            raise Exception(err_msg)
 
         # Wether or not use normalization
         if normalization_election is True:
@@ -896,7 +912,7 @@ if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
 
     study = optuna.create_study(
         direction = "maximize",
-        study_name = "Silhouette optimization",
+        study_name = "Rank@1 optimization",
         storage = GLOBALS['OPTUNA_DATABASE'],
         load_if_exists = True
     )
@@ -927,6 +943,10 @@ elif GLOBALS['NET_MODEL'] == "LFWLightModel":
     net = LFWLightModel(GLOBALS['EMBEDDING_DIMENSION'])
 elif GLOBALS['NET_MODEL'] == "FGLightModel":
     net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "CACDResNet18":
+    net = CACDResNet50(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "CACDResNet18":
+    net = CACDResNet50(GLOBALS['EMBEDDING_DIMENSION'])
 else:
     raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
@@ -1087,6 +1107,10 @@ else:
         net_func = lambda: LFWLightModel(GLOBALS['EMBEDDING_DIMENSION'])
     elif GLOBALS['NET_MODEL'] == "FGLightModel":
         net_func = lambda: FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "CADResNet18":
+        net_func = lambda: CADResNet18(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "CADResNet50":
+        net_func = lambda: CADResNet50(GLOBALS['EMBEDDING_DIMENSION'])
     else:
         raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
