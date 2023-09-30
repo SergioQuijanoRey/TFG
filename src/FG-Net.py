@@ -707,8 +707,8 @@ def objective(trial):
     # TODO -- we don't have fixed parameters
 
     # Parameters that we are exploring
-    p = trial.suggest_int("P", 2, 500)
-    k = trial.suggest_int("K", 2, 20)
+    p = trial.suggest_int("P", 2, 50)
+    k = trial.suggest_int("K", 2, 10)
     net_election = trial.suggest_categorical(
         "Network",
         ["CACDResNet18", "CACDResNet50", "FGLightModel"]
@@ -717,7 +717,7 @@ def objective(trial):
         "UseNormalization", [True, False]
     )
     embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 20)
-    learning_rate = trial.suggest_float("Learning rate", 0.000000000000001, 1)
+    learning_rate = trial.suggest_float("Learning rate", 0, 0.1)
     softplus = trial.suggest_categorical("Use Softplus", [True, False])
     use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
 
