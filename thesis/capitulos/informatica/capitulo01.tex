@@ -24,7 +24,7 @@
 % 1. Dar prioridad al resumen, introduccion (descripcion del problema, motivacion, objetivos) y las conclusiones (**"deben estar perfectas"**)
 % 2. Introducir una figura de SCOPUS
 
-Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. Dentro de este problema, nos centraremos en resolver una tarea de \textbf{retrieval}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \footnote{Esta nueva técnica se introduce en \cite{matematicas:principal}}. Introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Evitando así tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples.
+Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. Dentro de este problema, nos centraremos en resolver una tarea de \textbf{retrieval}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \cite{informatica:principal}. Introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Evitando así tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples.
 
 Esta situación plantea una serie de \textbf{problemas}:
 
@@ -102,25 +102,25 @@ Este problema tiene, además de los problemas comunes de la visión por computad
     \begin{subfigure}{0.5\textwidth}
         \centering
         \includegraphics[width=0.5\linewidth]{informatica/messi_niño}
-        \caption{Edad temprana}
-        \label{img:messi_pequeño}
+        \caption{Edad temprana. Imagen extraída de \cite{informatica:webimg_messi_pequeno}}
+        \label{img:messi_pequeno}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=0.8\linewidth]{informatica/messi_joven}
-        \caption{Edad joven}
+        \caption{Edad joven. Imagen extraída de \cite{informatica:webimg_messi_joven}}
     \end{subfigure}%
 
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=0.6\linewidth]{informatica/messi_adulto}
-        \caption{Edad adulta}
+        \caption{Edad adulta. Imagen extraída de \cite{informatica:webimg_messi_adulto}}
         \label{img:messi_adulto}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=0.8\linewidth]{informatica/messi_rubio}
-        \caption{Otra imágene ne la edad adulta, pocos años después}
+        \caption{Otra imagen en la edad adulta, pocos años después. Imagen extraída de \cite{informatica:webimg_messi_rubio}}
     \end{subfigure}
 
     \caption{Lionel Messi en cuatro momentos distintos de su vida}
@@ -128,8 +128,7 @@ Este problema tiene, además de los problemas comunes de la visión por computad
 
 \end{figure}
 
-Por poner un ejemplo, fijémonos en \customref{img:messi_cuatro_edades} \footnotemark. Estas cuatro imágenes reflejan perfectamente los problemas que hemos planteado previamente. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeño}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador, como por ejemplo, cambios en la pose, iluminación, \ldots
-\footnotetext{Imágenes extraídas de \url{https://tinyurl.com/2x4fkxjx}, \url{https://tinyurl.com/y4ubnz3v}, \url{https://tinyurl.com/ywek233h} y \url{https://tinyurl.com/yqrf78w8}}
+Por poner un ejemplo, fijémonos en \customref{img:messi_cuatro_edades}. Estas cuatro imágenes reflejan perfectamente los problemas que hemos planteado previamente. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeño}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador, como por ejemplo, cambios en la pose, iluminación, \ldots
 
 Veámos otro ejemplo:
 
@@ -171,6 +170,11 @@ Y para finalizar, comentaremos los \textbf{dos enfoques principales usados para 
     \item El segundo enfoque es directamente trabajar sobre una base de datos que presente la suficiente variabilidad en la edad de los individuos, y desarrollar un modelo que realice nuestra tarea. Este enfoque casi siempre pasa por computar un \textit{embedding}. Este será el enfoque que sigamos.
 \end{enumerate}
 \todo{\cite{informatica:paper_cacd} habla en la página 3 de \url{http://www.sirius.umiacs.io/papers/chen14tmm.pdf} de las aproximaciones al problema!}
+
+\section{Motivación}
+
+\todo{Desarrollar}
+
 
 \section{Descripción de las bases de datos usadas} \label{isec:base_datos_usada}
 
