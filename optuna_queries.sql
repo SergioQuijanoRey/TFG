@@ -5,6 +5,10 @@
 -- so we can detect some problems
 SELECT * FROM trial_values;
 
+-- And sometimes optuna can't produce any succesful train. So this query will
+-- return all trials (useful for debuggin)
+SELECT * FROM trials;
+
 -- Get the info of the best trial value (trial value is the float that we are
 -- optimizing)
 SELECT *  FROM trial_values WHERE value == (SELECT MAX(value) FROM trial_values);
