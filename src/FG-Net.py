@@ -117,7 +117,7 @@ GLOBALS['NET_MODEL'] = "CACDResNet50"
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
 # TODO -- delete this, we are going to perform a search in the number of epochs
-GLOBALS['HYPERPARAMETER_TUNING_EPOCHS'] = 20
+GLOBALS['HYPERPARAMETER_TUNING_EPOCHS'] = 1
 
 # Number of tries in the optimization process
 # We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
@@ -125,7 +125,7 @@ GLOBALS['HYPERPARAMETER_TUNING_EPOCHS'] = 20
 GLOBALS['HYPERPARAMETER_TUNING_TRIES'] = 300
 
 # Number of folds used in k-fold Cross Validation
-GLOBALS['NUMBER_OF_FOLDS'] = 8
+GLOBALS['NUMBER_OF_FOLDS'] = 3
 
 # Margin used in the loss function
 GLOBALS['MARGIN'] = 0.5
@@ -721,12 +721,21 @@ def objective(trial):
     softplus = trial.suggest_categorical("Use Softplus", [True, False])
     use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
 
+    use_gradient_clipping = trial.suggest_categorical(
+        "UseGradientClipping", [True, False]
+    )
+
+
     if use_norm_penalty is True:
         norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
 
     margin = None
     if softplus is False:
         margin = trial.suggest_float("Margin", 0.001, 1.0)
+
+    gradient_clipping = None
+    if use_gradient_clipping is True:
+        gradient_clipping = trial.suggest_float("Gradient Clipping Value", 0.00001, 10.0)
 
     # Log that we are going to do k-fold cross validation and the values of the
     # parameters. k-fold cross validation can be really slow, so this logs are
@@ -866,7 +875,7 @@ def objective(trial):
             name = "Hyperparameter Tuning Network",
             logger = SilentLogger(),
             snapshot_iterations = None,
-            gradient_clipping = GLOBALS['GRADIENT_CLIPPING'],
+            gradient_clipping = gradient_clipping,
             fail_fast = True,
         )
 
