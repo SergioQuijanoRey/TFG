@@ -326,7 +326,7 @@ En la sección de ajuste de hiperparámetros, deberemos configurar \lstinline{op
     \item Configuramos el proceso que produce el valor numérico a optimizar. En nuestro caso, en función de los hiperparámetros elegidos por \lstinline{optuna}, construimos un modelo u otro, adaptamos la red adecuadamente (por ejemplo, añadiendo o no normalización) y lanzamos la función \lstinline{custom_cross_validation} que en definitiva produce la métrica a optimizar
 \end{itemize}
 
-\subsection{Adaptador para realizar \textit{retrieval}}
+\subsection{Adaptador para realizar \textit{retrieval}} \label{isubs:impl_retr_adapter}
 
 Como hemos comentado en \customref{isec:triplet_loss}, una de las ventajas de aprender un \textit{embedding} semántico en un modelo es que podemos adaptar dicho modelo para realizar varias tareas. La tarea que nos interesa en este trabajo es la de \textit{retrieval}.
 
