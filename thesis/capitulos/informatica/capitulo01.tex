@@ -1,28 +1,16 @@
 % !TeX root = ../../libro.tex
 % !TeX encoding = utf8
 
+% TODO -- Lista de TODO's:
+%
+% - [ ] Añadir la fecha de busqueda realizada en SCOPUS
+% - [ ] Mover las bases de datos a materiales y métodos
+% - [ ] Escribir la sección de motivación
+% - [ ] Mover las métricas al comienzo de la parte experimental
+% - [ ] ? Quitar secciones en la parte del estado del arte, hacerlo todo en conjunto. Quitar seccion de conclusiones en el estado del arte
+% - [ ] ? Formateo de las citas
+
 \chapter{Introducción} \label{ich:introduccion}
-
-% TODO -- estructura que le quiero dar al trabajo
-% 1. Introduccion
-% 1. Hablar del problema de retrieval de imagenes, y por qué este problema es relevante
-% 1. Hablar del dataset que hemos empleado y de otros datasets que hemos considerado
-% 1. Explicar el triplet loss, ventajas que se plantean en el paper de referencia
-% 1. Desarrollo de Software
-%     1. Explicar las herramientas usadas (entornos de python, librerias principales)
-%     2. Explicar github CI CD
-%     3. Explicar como accedemos al servidor
-%     4. Explicar toda la estructura del codigo, patrones de diseños, sacarme partido aqui que es donde mas fuerte estoy
-% 1. Hablar de la aproximacion al problema, iterativa, usando MNIST, LFW, luego CACD + FG-Net
-%     - Esto se puede meter en algo asi como planificacion. Lo justifico diciendo que habia mucho codigo nuevo que implementar, y que para iterar de forma rapida iba resolviendo problemas cada vez mas complejos y mas pesados en lo que tamaño de datset se refiere
-% 1. Analisis de los malos resultados
-% 1. Proponer mejoras a estos problemas
-
-% TODO -- tomar de referencia la guia de Pablo Mesejo: https://drive.google.com/drive/folders/1BGI7zUp0kiZ6ufCH1UlhzvcFPdZ5NFWN
-% A partir de esta, importante:
-
-% 1. Dar prioridad al resumen, introduccion (descripcion del problema, motivacion, objetivos) y las conclusiones (**"deben estar perfectas"**)
-% 2. Introducir una figura de SCOPUS
 
 Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. Dentro de este problema, nos centraremos en resolver una tarea de \textbf{retrieval}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \cite{informatica:principal}. Introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Evitando así tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples.
 
@@ -60,7 +48,7 @@ Este problema se puede aún especificar más, en las siguientes tareas:
             \item A la acción de aportar una imagen, una base de datos, y tomar las $N$ imágenes que son más probables de coincidir en la identidad de la persona de la primera imagen, la llamaremos \textbf{consulta} o \textbf{\textit{query}}. A la imagen pasada como parámetro se le llama \textbf{\textit{key}} o llave.
         \end{itemize}
 
-    \item Verificación: dada dos imágenes, el modelo debe decidir si se tratan de la misma persona o no.
+    \item Verificación: dadas dos imágenes, el modelo debe decidir si se trata de la misma persona o no.
         \begin{itemize}
             \item Un escenario es, por ejemplo, comprobar la imagen del pasaporte y la imagen obtenida de las cámaras de los puestos de control de acceso automático
         \end{itemize}
@@ -204,7 +192,7 @@ La \textbf{segunda base de datos} con la que trabajamos es \textit{Labeled Faces
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{informatica/ejemplo_lfw}
-    \caption{Muestra de ejemplo del \textit{dataset} \textit{LFW}. Imagen tomada de \url{https://paperswithcode.com/dataset/lfw}}
+    \caption{Muestra de ejemplo del \textit{dataset} \textit{LFW}. Imagen extraída de \cite{informatica:papers_with_code_lfw}}
 \end{figure}
 
 En este caso damos un salto de calidad en cuanto a lo adecuada que es la base de datos a nuestro problema. Principalmente:

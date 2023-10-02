@@ -1,872 +1,154 @@
-\chapter{Implementación} \label{ich:implementacion}
+\chapter{Estado del arte} \label{ich:estado_arte}
 
-Las nuevas técnicas que introducimos implican un esfuerzo considerable en la implementación de módulos de código. Como comentamos en \customref{isubsubs:observaciones_conclusiones_pksampling}, el uso de \textit{P-K sampling} provoca que no podamos usar librerías de aprendizaje automático para realizar tareas comunes, como muestreo de datos, funciones de pérdida, métricas, \ldots
+Procedemos a realizar un estudio del estado del arte para el problema que buscamos resolver. Consultaremos los mejores resultados para la tarea de \textit{retrieval } en reconocimiento facial invariante a la edad sobre el conjunto de datos \textit{FG-Net}. Esto porque, como ya hemos comentado en \customref{isubsubs:fgnet_inconvenientes}, y motivados por el trabajo de \cite{informatica:best_fgnet_model}, nuestro enfoque va a ser el siguiente: realizar un entrenamiento sobre el conjunto de datos \textit{CACD}, y usar \textit{FG-Net} para validar nuestro modelo.
 
-Por tanto, en esta sección explicaremos todo el trabajo de implementación realizado.
+No es de interés estudiar los resultados de modelos sobre \textit{CACD}, porque estamos usando dicho conjunto para entrenar. Además, la mayoría de trabajos que estudiaremos más adelante, usan un \textit{dataset} de tamaño considerable para entrenar, y evalúan sobre \textit{FG-Net}. Su \textit{dataset} de entrenamiento no tiene por qué ser \textit{CACD}. Con esto queda claro que lo que realmente nos interesa son los resultados sobre \textit{FG-Net}.
 
-\section{Control de versiones y buenas prácticas} \label{isec:github_buenas_practicas}
+\section{Interés del área de estudio} \label{isec:interesareaestudio}
 
-Para el control de versiones, usamos \textit{Git} con \textit{Github}. Todo el desarrollo del trabajo, tanto la implementación de código como la escritura de la presente memoria, se ha realizado en un repositorio abierto alojado en \cite{informatica:repogithub}.
+Empecemos viendo el interés de este área de estudio. Para ello podemos realizar una búsqueda en \textit{SCOPUS}, buscando trabajos sobre \textit{AIFR}, filtrando el área de estudio al de las ciencias de la computación. Esto produce los siguientes \textit{keywords}:
 
-Gracias al uso de \textit{Github} hemos podido implementar fácilmente una serie de buenas prácticas de desarrollo, entre las cuales se encuentran:
-
-\begin{itemize}
-    \item El uso de \textbf{\textit{issues}} para especificar las necesidades del proyecto en cada momento, los errores encontrados durante el proceso de implementación, \ldots. Véase por ejemplo \url{https://github.com/SergioQuijanoRey/TFG/issues/14}, donde especificamos una necesidad y proponemos una solución. Además, se pueden ver todos los \textit{commits} que tratan con dicha \textit{issue}
-    \item Gracias a estar usando \textit{issues}, trabajamos con la metodología de \textbf{\textit{feature branches}}. En esta metodología, por cada nueva característica a implementar, se crea una \textit{branch} de \textit{Git} para introducir los cambios. Una vez se implementa y valida dicha característica, el código de la nueva \textit{branch} se fusiona en la rama principal \cite{informatica:feature_branches}. Como se puede ver en \cite{informatica:repogithub}, el nombre de cada \textit{feature branch} referencia al identificador de la \textit{issue} con la que estamos trabajando
-    \item El fusionado de \textit{feature branches} a la rama principal se realiza por medio de \textbf{\textit{pull requests}}. En cada \textit{pull request} podemos revisar el código una última vez antes de fusionarlo en la rama principal. Además, sirven como forma de localizar los cambios de alto nivel introducidos en nuestra base de código. En nuestro caso, los \textit{commits} individuales pueden llegar a ser demasiado granulares, y revisando la lista de todos los \textit{commits} realizados podemos perder el foco sobre la tarea de alto nivel que tratan de resolver. Por ejemplo, en una \textit{pull request} como \url{https://github.com/SergioQuijanoRey/TFG/pull/57} podemos ver que, para introducir las dos variantes de \textit{Rank@K accuracy} (véase \customref{isubs:rank_at_k}) empleamos 53 \textit{commits}.
-    \item El uso de \textbf{\textit{Github Actions}} para ejecutar ciertas tareas tras realizar una subida de \textit{commits} al repositorio (\entrecomillado{push}) o antes de aceptar una \textit{pull request}. Principalmente, hemos usado estas \entrecomillado{actions} para lanzar todos los \textit{tests} unitarios tras cada \textit{push} al repositorio y lanzar todos los \textit{tests} de integración antes de cada \textit{pull request}. El objetivo de esta base de \textit{tests} se especifica en \customref{isec:test_suite}
-    \item El uso de \textbf{\textit{Github Projects}}, que nos ofrecen una tabla tipo \entrecomillado{Kanban} para organizar las tareas pendientes. Dicha forma de organizarnos ha sido ya comentada en \customref{isec:planificacion}.
-\end{itemize}
-
-\section{Entorno de ejecución} \label{isec:entorno_ejecucion}
-
-Durante la implementación del código y el proceso de experimentación, hemos trabajado en tres entornos de desarrollo y ejecución distintos:
-
-\begin{enumerate}
-    \item El entorno de \textbf{desarrollo local}, nuestro ordenador portátil. Lo hemos usado principalmente para implementar el código y ejecutar algunos \textit{tests}. Por su baja potencia, no lo hemos usado ni para lanzar los \textit{Notebooks} de \textit{Jupyter} sobre los que realizamos la exploración de datos, ni para lanzar los \textit{scripts} de aprendizaje. Por tanto, no resulta interesante mostrar sus especificaciones
-
-    \item En fases tempranas del proyecto hemos escrito y ejecutado código en \textbf{\textit{Google Colab}}. Esta plataforma nos permite ejecutar, a través de una interfaz \textit{web}, \textit{Notebooks} de \lstinline{Python}.
-
-        \begin{itemize}
-            \item Además, otorga de forma limitada algunos recursos como acceso a cómputo \textit{TPU}. Las \textit{Tensor Processing Units} o \textit{TPUs} son tecnología \textit{hardware} propietaria de \textit{Google}, que busca optimizar el entrenamiento e inferencia de modelos de IA \cite{informatica:google_tpu}.
-
-            \item Los \textit{Notebooks} vienen con la mayoría de bibliotecas de aprendizaje automático pre-instaladas. Esto es una gran ventaja al inicio del desarrollo, puesto que evitamos enfrentarnos a la complejidad de configurar un entorno de ejecución \lstinline{Python} con las librerías necesarias
-
-            \item Sin embargo, rápidamente tenemos que abandonar este entorno por dos motivos: el acceso a recursos es demasiado limitado, y solo poder usar código escrito en \textit{Notebooks} es una restricción importante.
-
-            \item El \textit{hardware} que se pone a disposición del usuario se asigna dinámicamente, en base al consumo previo de recursos del usuario y a la demanda actual. Por tanto, no podemos obtener una especificación estática de los recursos de los que disponemos \cite{informatica:google_colab_faq}. Tampoco existe documentación oficial donde se especifique qué \textit{hardware} se ofrece, cuotas de consumo, \ldots\; Sin embargo, accediendo a un \textit{Notebook}, podemos ejecutar algunos comandos para ver los recursos que nos ofrecen en un momento dado \footnote{Dichos comandos son ejecutados el 18 de Septiembre de 2023}
-
-                \begin{itemize}
-                    \item El comando \lstinline{df -h} nos muestra que tenemos disponibles 50GB de memoria permanente. Sin embargo, esto no es una limitación porque podemos conectar nuestra cuenta de usuario de \textit{Google} para acceder a todos los datos almacenados en \textit{Google Drive}
-                    \item El comando \lstinline{cat /proc/cpuinfo} nos muestra que estamos usando una \textit{CPU} \entrecomillado{Intel ( R ) Xeon ( R ) @ 2.20 GHz}
-                    \item El comando \lstinline{cat /proc/meminfo} nos muestra que disponemos de aproximadamente 12GB de memoria \textit{RAM}
-                    \item Sabemos que podemos acceder a \textit{TPUs} de \textit{Google}, pero no disponemos de ningún comando para acceder a las especificaciones de esta
-                \end{itemize}
-        \end{itemize}
-
-    \item Los \textbf{clúster de servidores GPU de la Universidad de Granada, \textit{nGPU}}.
-        \begin{itemize}
-            \item Estos servidores se encuentran en el Centro de Procesado de Datos (\textit{CPD}) Santa Lucía. Para trabajar con estos servidores, accedemos por \lstinline{ssh} a un nodo cabecera, y usando el programa \lstinline{slurm}, enviamos trabajos a los distintos nodos que componen el \textit{CPD}.
-            \item Hemos usado estos servidores tanto para lanzar \textit{Notebooks} en los que realizamos principalmente análisis exploratorio de datos, como para lanzar \textit{scripts} de \lstinline{Python} usados principalmente para llevar a cabo el entrenamiento y validación de modelos
-            \item Los nodos \textit{Titan} y \textit{Atenea}, los dos nodos que hemos usado mayoritariamente, disponen del siguiente \textit{hardware}:
-                \begin{itemize}
-                    \item Dos \textit{Intel® Xeon® E5-2630}, cada uno
-                    \item Memoria \textit{RAM} de 128 Gb \textit{DDR4}
-                    \item Memoria permantente de 2,7TB
-                    \item El nodo \textit{Titan} dispone de tres \textit{GPUs} \textit{GTX Titan X Pascal} y una \textit{GPU} \textit{GTX Titan Xp}, mientras que el nodo \textit{Atenea} dispone de cuatro \textit{GPUs} \textit{GTX Titan Xp}
-                \end{itemize}
-        \end{itemize}
-
-\end{enumerate}
-\todo{Esto debería ir a materiales}
-
-Como lenguaje de programación usaremos \lstinline{Python}, en su versión 3.10.2. Para la gestión de entornos de \lstinline{Python} usaremos dos tecnologías:
-
-\begin{enumerate}
-    \item El gestor de paquetes y entornos \textbf{\lstinline{Conda}} \cite{informatica:conda_web}. Este gestor nos permite instalar fácilmente paquetes de \lstinline{Python} en entornos virtuales, evitando así instalarlos a nivel de sistema (lo que puede provocar conflictos con versiones de paquetes usados en otros proyectos). Además, permite generar un archivo \lstinline{enviroment.yml} que especifica exactamente qué paquetes están instalados y con qué versión. A partir de dicho fichero podremos reproducir el entorno de desarrollo en diferentes máquinas (por ejemplo, tenemos en mismo entorno de desarrollo en nuestro ordenador portátil y en los servidores donde se ejecutan los entrenamientos). Junto con el uso de contenedores \lstinline{docker} (enfoque que consideramos muy complejo), es la única alternativa que tenemos para configurar nuestro entorno de desarrollo en los servidores \textit{nGPU}
-    \item \textbf{\lstinline{nix}} \cite{informatica:nixos_web}. Dicha tecnología se compone de un lenguaje funcional puro, que se usa en su gestor de paquetes reproducible y declarativo. Usamos esta tecnología en nuestro ordenador por su robustez: durante los meses de desarrollo, algunas librerías se rompen en sus últimas versiones. Con \lstinline{nix} podemos volver cómodamente a versiones previas de todo el entorno de desarollo (\entrecomillado{rollback}). Esto se puede conseguir también con \lstinline{Conda} pero es mucho más complicado. Además, permite especificar paquetes de \lstinline{Python}, paquetes de \LaTeX usados para producir esta memoria y paquetes de \textit{Linux}
-\end{enumerate}
-
-Como sistema operativo, hemos usado:
-
-\begin{itemize}
-    \item En nuestro entorno de desarrollo, la distribución de \textit{Linux} \textit{NixOS} en su versión 23.11
-    \item En \textit{Google Colab}, la distribución de \textit{Linux} \textit{Ubuntu} en su versión 22.04.2 \textit{LTS} \footnote{Comprobamos esta versión ejecutando el comando \lstinline{lsb_release -d} el 19 de Septiembre de 2023}
-    \item En los servidores \textit{nGPU}, la distribución de \textit{Linux} \textit{Ubuntu} en su versión 20.04.5 \textit{LTS}
-\end{itemize}
-
-
-\section{Estructura de carpetas del proyecto} \label{isec:estructura_carpetas}
-
-Por la extensión de la base de código, es necesario que comentemos la estructura de carpetas del proyecto. En el directorio raíz tenemos los siguientes ficheros relevantes:
-
-\begin{itemize}
-    \item \lstinline{flake.nix} y \lstinline{flake.lock} especifican el entorno de desarrollo usando el gestor \textit{nix}. El fichero \lstinline{enviroment.yml} especifica el entorno de desarrollo usando el gestor \textit{Conda}
-    \item Los ficheros \lstinline{interactive_slurm.sh} y \lstinline{launch_server_process.sh} son dos \textit{scripts Bash} que usamos para lanzar procesos en los servidores \textit{nGPU}. El primero lo utilizamos para entrar en una terminal de forma interactiva. El segundo, para lanzar un \textit{script} de \lstinline{Python} para que ejecute el aprendizaje y validación de un modelo
-    \item \lstinline{justfile} especifica tareas para ejecutarse con la herramienta \lstinline{just} \cite{informatica:just}. Dicha herramienta es parecida a \lstinline{make}. La usamos para definir tareas como:
-        \begin{itemize}
-            \item Sincronizar las bases de código entre los tres entornos distintos con los que hemos trabajado
-            \item Ejecutar ciertos \textit{scripts}
-            \item Ejecutar la \textit{suite} de pruebas y los \textit{benchmarks}
-            \item Ejecutar ciertos análisis estáticos sobre la base de código (usando \lstinline{mypy} y \lstinline{ruff})
-            \item \ldots
-        \end{itemize}
-    \item \lstinline{optuna_queries.sql} define las consultas \lstinline{SQL} necesarias para vigilar el proceso de \textit{hyperparameter tuning}, que especificaremos en \customref{isec:hp_tuning}
-\end{itemize}
-
-En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
-
-\begin{itemize}
-    \item \lstinline{.github/workflows} en el que definimos las \textit{Github Actions} que ejecutamos (véase \customref{isec:github_buenas_practicas})
-    \item \lstinline{thesis} donde desarrollamos los documentos que componen la presente memoria
-    \item \lstinline{src} donde realizamos todo el desarrollo de código. Este a su vez se divide en los siguientes subdirectorios:
-        \begin{itemize}
-            \item \lstinline{lib}, donde implementamos toda la librería que usamos en los \textit{Notebooks} y en los \textit{scripts} de entrenamiento. Implementan tareas varias, como el cálculo de funciones de pérdida, el \textit{P-K sampling}, métricas, bucles de entrenamiento, el sistema de \textit{logging}, \ldots
-            \item \lstinline{test} e \lstinline{integration_tests} donde alojamos toda la \textit{suite} de pruebas unitarias y de integración, para validar las implementaciones realizadas en nuestra librería
-            \item \lstinline{benchmarks} donde alojamos los \textit{benchmarks} empleados en \customref{isec:optimizacion_codigo}
-            \item \lstinline{profiling} contiene los datos generados en los \textit{benchmarks} y el proceso explicado de optimización basado en datos
-        \end{itemize}
-    \item En \lstinline{src} tenemos algunos ficheros relevantes:
-
-        \begin{itemize}
-            \item \textit{Jupyter Notebooks} donde realizamos análisis exploratorios de distintas bases de datos
-            \item \textit{Scripts} de \lstinline{Python}, usados principalmente para entrenar y validar modelos
-        \end{itemize}\end{itemize}
-
-\section{Estructura lógica de la base de código} \label{isec:estructura_paquetes_modulos}
-
-En \customref{isec:estructura_carpetas} ya hemos hablado de la estructura de carpetas de la base de código. Ahora pasamos a comentar la estructura lógica de la base de código. Nos centraremos en la parte de la librería, pues en los \textit{Notebooks} y \textit{scripts} de \lstinline{Python} consumimos la librería para realizar análisis exploratorio de datos, entrenamiento de modelos y validación (véase \customref{isec:pipeline}).
-
-Empezamos mostrando el diagrama de paquetes de nuestra librería:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/diagrama_paquetes}
-    \caption{Diagrama de paquetes de nuestra librería. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}.}
-\end{figure}
-
-Como deja claro el diagrama, hemos estructura el código de la librería en módulos muy interconectados entre ellos. Comentamos ahora el \textbf{propósito de los módulos más relevantes}:
-
-\begin{itemize}
-    \item \lstinline{src.lib.utils} contiene funciones auxiliares que se usan en distintas partes del código. Por ejemplo, comprobar si un tensor de \lstinline{pytorch} representa un vector o una matriz, realizar ciertos pre-cómputos para acelerar la ejecución de módulos, autentificarse en el servicio de logging \lstinline{wandb}, \ldots
-    \item \lstinline{src.lib.loss_functions} contiene todo el código para computar las distintas funciones de pérdida que hemos introducido en \customref{ich:fundamentos_teoricos}.
-    \item \lstinline{src.lib.sampler} contiene el código que implementa el \textit{P-K sampling}
-    \item \lstinline{src.lib.metrics} implementa todas las métricas que hemos introducido en \customref{isec:metricas_teoria}
-    \item \lstinline{src.lib.train_loggers} contiene la lógica para mostrar las métricas deseadas durante el ciclo de entrenamiento de forma cómoda, modular y extensible, como comentaremos en \customref{isec:loggin_metricas}
-    \item \lstinline{src.lib.datasets} contiene la lógica para descargar, extraer, y cargar en una clase accesible para \lstinline{pytorch} los \textit{datasets} \textit{FG-Net} y \textit{CACD}
-
-    \item \lstinline{src.lib.hyperparameter_tuning} contiene el código necesario para realizar \textit{hyperparameter tuning} usando \textit{K-Fold Cross Validation}
-    \todo{Hacer aquí una referencia a esta técnica. Igual debería ir en la parte de teoría}
-
-    \item \lstinline{src.lib.split_dataset} contiene el código para dividir un \textit{dataset} en dos porciones, usando dos técnicas distintas. La primera técnica consiste en separar el \textit{dataset} usando muestreo aleatorio. La segunda técnica consiste en realizar la separación usando muestreo aleatorio, pero asegurando que no existan individuos de una clase en ambos \textit{datasets} simultáneamente
-    \item \lstinline{src.lib.data_augmentation} implementa el aumento de datos. Este aumento de datos es necesario porque, como hemos comentado en \customref{isubsubs:observaciones_conclusiones_pksampling}, para realizar \textit{P-K sampling} es obligatorio que todos los individuos tengan al menos $K$ imágenes asociadas. Realizamos el aumento de datos de forma clásica, añadiendo nuevos elementos a nuestro \textit{dataset}, y de forma \textit{lazy} o perezosa. En el aumento de datos \textit{lazy} no generamos nuevos elementos hasta que estos se solicitan en alguna parte del código. En \customref{isec:aumentado_datos} explicamos esto en detalle
-\end{itemize}
-
-Por la gran extensión de la base de código, mostrar el diagrama de clases completo no aporta apenas información. Pero mostraremos los diagramas de clase de ciertos módulos en \customref{isec:modulos_relevantes}, cuando esto aporte información relevante.
-
-\section{Módulos relevantes} \label{isec:modulos_relevantes}
-
-Por la extensión del proyecto no comentaremos cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos algunos de los módulos más relevantes introducidos en \customref{isec:estructura_paquetes_modulos}.
-
-\subsection{\textit{P-K sampling}}
-
-En \customref{isubs:muestreo_datos_pk_sampling_teoria} hemos introducido nuevas técnicas para computar el \textit{Triplet Loss}. Una parte fundamental de estas técnicas consiste en realizar el \textit{P-K sampling}, que implementamos en el módulo \lstinline{src.lib.sampler}, en la clase \lstinline{CustomSampler}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{informatica/pksampler_diagrama_clases}
-    \caption{Diagrama de clases de \lstinline{CustomSampler} y sus clases colaboradoras. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
-    \label{img:diagrama_clases_CustomSampler}
-\end{figure}
-
-En el diagrama de clases \customref{img:diagrama_clases_CustomSampler} podemos ver que:
-
-\begin{itemize}
-    \item \lstinline{CustomSampler} hereda de la clase \lstinline{Sampler} de \lstinline{torch} para introducir el comportamiento deseado a través de un \lstinline{Dataloader} \cite{informatica:pytorch_sampler}.
-        \begin{itemize}
-            \item Un \lstinline{DataLoader} especifica la forma en la que se realiza el \textit{batching} y otros detalles de implementación (por ejemplo, las políticas a seguir para cargar datos cuando trabajamos en paralelo). Uno de sus atributos es el \lstinline{sampler} usado. Escribiendo un \textit{sampler} propio será suficiente para obtener el comportamiento deseado
-            \item Un \lstinline{Sampler} indica el orden en el que iteramos un \textit{dataset}. Debe implementar el método \lstinline{__len__()}, que muestra el número de datos que ofrecemos, y el método \lstinline{__iter__()}, que indica cómo se itera sobre los índices de los datos almacenados.
-        \end{itemize}
-\end{itemize}
-
-En resumen, para realizar \textit{P-K sampling}, especificamos el orden el el que se itera el \textit{dataset} usando la clase \lstinline{CustomSampler}.
-
-Fijados los valores de $P$ y $K$, debemos indicar que el \textit{batch size} sea $P \cdot K$. Esto es claro, pues de otra forma sería imposible generar \textit{batches} en los que haya $P$ individuos representados cada uno con $K$ imágenes.
-
-El funcionamiento de \lstinline{CustomSampler} es el siguiente. Generamos una \textbf{lista de índices} vacía y una lista de imágenes candidatas, que al principio corresponderá al total del \textit{dataset}. Mientras al menos hayan $P$ individuos con al menos $K$ imágenes, realizamos el siguiente proceso:
-
-\begin{enumerate}
-    \item Elegimos aleatoriamente $P$ individuos asociados a la lista de imágenes candidatas
-    \item Por cada individuo elegido, seleccionamos $K$ imágenes candidatas suyas aleatoriamente
-    \item Añadimos los índices asociados a las $P \cdot K$ imágenes escogidas al final de la lista de índices y eliminamos dichas imágenes de la lista de candidatas
-\end{enumerate}
-
-Este proceso es realmente sencillo. Sin embargo, realizar optimizaciones para que consuma el menor tiempo posible complica su implementación. Principalmente hemos pre-computado algunos datos, que almacenamos como atributos, para acelerar este proceso:
-
-\begin{itemize}
-    \item \lstinline{self.dict_of_classes} es un diccionario en el que cada llave o \textit{key} es el identificador de un individuo (o su clase, en un entorno más amplio que el \textit{AIFR}) y el valor asociado a la llave es una lista de índices de imágenes de ese individuo. Con ello, una vez elegido un individuo al azar, es realmente rápido muestrear $K$ índices de imágenes asociadas
-    \item \lstinline{self.classes} es una lista con los identificadores de individuos que tienen al menos $K$ imágenes, y por tanto, que son candidatos a ser elegidos en un ciclo del proceso anteriormente descrito
-    \item Esto supone que, durante el proceso de generación de índices, debemos mantener en un estado válido estas estructuras, lo que añade algo de complejidad a la implementación, aunque supone una mejora en tiempos de ejecución considerable
-\end{itemize}
-
-\begin{observacion}
-
-    Aunque los índices en cada \textit{P-K batch} estén ordenados por individuo, esto no supone un problema al considerar la definición de las funciones de pérdida que estamos usando (véase \customref{isubs:seleccion_de_triples})
-
-\end{observacion}
-
-\subsection{Aumentado de datos} \label{isec:aumentado_datos}
-
-En \customref{isubsubs:observaciones_conclusiones_pksampling} hemos justificado la necesidad de llevar acabo aumentado de datos en ciertos \textit{datasets}, teniendo mucho cuidado de no saturar la memoria disponible. Por tanto, en el módulo \lstinline{src.lib.data_augmentation} proponemos dos soluciones, que mostramos en el siguiente diagrama de clases:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{informatica/diagramas_clases_aumentado_datos}
-    \caption{Diagrama de clases de las dos soluciones propuestas para el aumentado de datos. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
-    \label{img:diagrama_clases_aumentado_datos}
-\end{figure}
-
-En \customref{img:diagrama_clases_aumentado_datos} podemos ver que el aumentado de datos se realiza en dos clases que implementan la clase \lstinline{Dataset} de \lstinline{pytorch}. Gracias a esto, en nuestros \textit{pipelines} trabajamos igualmente con \textit{datasets} aumentados o sin aumentar, sin conocer este detalle. Además, podemos ver que ambas clases exponen la misma interfaz, por lo que podemos intercambiar estas soluciones. Podemos controlar cómo se generan nuevas imágenes gracias al atributo \lstinline{self.transform}.
-
-Para trabajar con el aumentado de datos, indicamos el \textit{dataset} que queremos aumentar, \lstinline{self.base_dataset}, y el número de imágenes mínimo por individuo, \lstinline{self.min_number_of_images}. Dicho valor siempre lo establecemos al valor de $K$ que usemos en cada proceso de entrenamiento. Con ello, aseguramos que cada individuo puede participar en al menos un \textit{P-K batch}.
-
-En \lstinline{AugmentedDataset}, localizamos los individuos con menos de \lstinline{self.min_number_of_images} imágenes asociadas. Generamos y almacenamos en memoria no permanente nuevas imágenes para estos individuos, en base a las imágenes que ya tenemos de los individuos. Almacenamos estas imágenes al final del \textit{dataset} (tienen los índices más altos). Pero esto no supone ningún problema gracias a estar usando \textit{P-K sampling}.
-
-En \lstinline{LazyAugmentedDataset} localizamos los individuos con menos de \lstinline{self.min_number_of_images} imágenes asociadas. Generamos nuevos índices para estos individuos, que almacenamos como atributo, sin computar todavía las nuevas imágenes. Cuando queremos acceder a una imagen concreta identificada por un índice, comprobamos si este índice corresponde a una imagen original o una de las imágenes generadas por el aumento de datos. En el primer caso, devolvemos la imagen que ya tenemos almacenada en el conjunto de datos \lstinline{self.base_dataset}. En el segundo caso, generamos la imagen en ese preciso instante y la devolvemos. En ningún momento almacenamos la nueva imagen para su uso posterior.
-
-El aumento de datos puede llegar a generar muchísimas imágenes nuevas si la distribución de número de imágenes por individuo es mala (como ocurre en \textit{LFW}). Por tanto, el proceso de almacenar las imágenes en memoria que hacemos en \lstinline{AugmentedDataset} puede provocar que saturemos la memoria disponible y que el proceso se detenga. Esto motiva el diseño de \lstinline{LazyAugmentedDataset}, que no almacena imágenes en memoria para su posterior uso.
-
-No almacenar las nuevas imágenes en memoria supone el siguiente compromiso:
-
-\begin{itemize}
-    \item Si accedemos dos veces al mismo índice no obtenemos la misma imagen
-    \item No se produce un aumento en el consumo de memoria, porque no estamos almacenando ninguna imagen nueva
-    \item El proceso de crear un \textit{dataset} aumentado es más rápido. Pero el acceso a nuevos datos es más lento. En la variante \textit{lazy} tenemos que esperar a que se genere la nueva imagen. Mientras que en la variante normal, ese proceso ya se ha realizado previamente y el acceso es inmediato
-\end{itemize}
-
-Para realizar el aumento de datos estamos utilizando:
-
-\begin{itemize}
-    \item Un cortado aleatorio de la imagen, usando \lstinline{torchvision.transforms.RandomResizedCrop}. Dicho método toma una porción aleatoria de la imagen, y cambia su tamaño al especificado en la función. El tamaño de las imágenes producidas es igual al tamaño de las imágenes originales
-    \item Una rotación aleatoria, usando \lstinline{torchvision.transforms.RandomRotation}. Rotamos entre 0º y 20º
-    \item Un cambio de contraste aleatorio, usando \lstinline{torchvision.transforms.RandomAutocontrast}
-\end{itemize}
-
-\subsection{Implementaciones propias de \textit{Datasets}} \label{isec:datasets_customs}
-
-Como ya hemos comentado en \customref{isec:base_datos_usada}, las bases de datos \textit{FG-Net} y \textit{CACD} no se ofrecen como parte de ninguna librería asociada a \lstinline{Pytorch}. Por tanto, tendremos que implementar la descarga, extracción y carga en objetos compatibles con \lstinline{Pytorch}. Estas tareas se realizan en el módulo \lstinline{src/lib/datasets}.
-
-Este módulo contiene, además de las dos clases que más adelante estudiamos, las funciones \lstinline{download_fg_dataset} y \lstinline{download_cacd_dataset}, que descargan y extraen los dos \textit{datsets}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{informatica/diagrama_clases_carga_datos}
-    \caption{Diagrama de clases de las implementaciones para los \textit{datasets} \textit{FG-Net} y \textit{CACD}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
-    \label{img:diagrama_clases_datasets}
-\end{figure}
-
-En \customref{img:diagrama_clases_datasets} podemos ver el diagrama de clases de las dos implementaciones realizadas. Para inicializar estas clases, solo tenemos que especificar la localización del directorio donde se almacenan los datos.
-
-Para poder trabajar correctamente con \lstinline{Pytorch}, debemos especificar el tamaño del \textit{dataset} con el método \lstinline{__len__()} e implementar el acceso a cada elemento del \textit{dataset} con el método \lstinline{__getitem__()}.
-
-A la hora de cargar los datos al \textit{dataset}, realizamos el siguiente proceso:
-
-\begin{itemize}
-    \item Tomamos los nombres de todas las imágenes almacenadas en el \textit{dataset}, que guardamos en el atributo \lstinline{self.file_names}
-    \item A partir de los nombres de las imágenes, extraemos el identificador y edad asociados a cada imagen. Para ello usamos el método \lstinline{__id_and_age_from_filename(filename: str)}
-    \item Almacenamos adecuadamente toda esta información para poder devolver dicha información en \lstinline{__getitem__}
-\end{itemize}
-
-El método \lstinline{check_integrity()} comprueba el tamaño del \textit{dataset} para asegurarnos de que no ha habido corrupción de datos en la descarga. El método \lstinline{set_exploration_mode()} permite activar el modo exploración. En dicho modo, \lstinline{__getitem__()} devuelve la imagen con una serie de metadatos asociados almacenados en un diccionario (edad e identidad). En el modo de funcionamiento normal, \lstinline{__getitem__()} devuelve un par con la imagen y la etiqueta de dicha imagen.
-
-\subsection{Normalización} \label{isubs:normalization_impl}
-
-En \customref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \customref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
-
-\begin{equation} \label{ieq:normalizacion}
-    \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}
-\end{equation}
-
-Además del interés que pueda tener estudiar el comportamiento de los modelos al introducir la normalización, esta técnica introduce el siguiente punto a tener en cuenta. Durante los entrenamientos hemos tenido muchos problemas de inestabilidad. Esto es, en la mayoría de ocasiones, el entrenamiento se saturaba tras pocas iteraciones. Es claro que si nuestra red aprende a colapsar todas las entradas a $\vec{0}$, la ecuación \eqref{ieq:normalizacion} falla, con lo que el entrenamiento se detiene. Sin embargo, a raíz de la experimentación, vemos que la normalización ayuda enormemente a que dicho comportamiento no se aprenda. Y con ello, es mucho más fácil conseguir entrenamientos estables. El siguiente diagrama muestra un ejemplo de entrenamiento inestable:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_colapso_entrenamiento}
-    \caption{Histórico de \textit{WANDB} que muestra un entrenamiento inestable que acaba por fallar. En las gráficas, los círculos indican entradas con el valor \lstinline{NaN}}
-\end{figure}
-
-Nuestro objetivo es introducir esta normalización en nuestras redes convolucionales profundas, de forma modular y sencilla. En el módulo \lstinline{src.lib.models}, donde describimos las arquitecturas empleadas a lo largo de toda la experimentación, definimos la clase \lstinline{NormalizedNet}. Dicha clase implementa el patrón de diseño \textit{Decorator} \cite{informatica:design_patterns} \cite{informatica:decorator_pattern}.
-
-En dicho patrón buscamos modificar el comportamiento de un módulo sin cambiar su interfaz. El nuevo comportamiento usa el comportamiento de la clase base, que se adapta de alguna forma. Gracias a no estar modificando la interfaz de la clase base, el resto del código puede trabajar con estos objetos, sin conocer si corresponden a la clase base o a la clase decorada. Esto es justo lo que queremos, porque las funciones que trabajan con nuestra red no deberían depender de la normalización (pensemos por ejemplo en una función que calcula el \textit{Rank@K Accuracy}).
-
-Además, este patrón se basa en la idea de preferir usar composición en vez de herencia (\entrecomillado{composition over inheritance}) \cite{informatica:comp_over_inh}. Mientras que la herencia es estática, la composición es dinámica. Esto, y que el patrón decorador respeta la interfaz de la clase base, permite que podamos combinar varios decoradores a la vez sin problema alguno.
-
-\begin{observacion}
-
-    Este patrón se parece mucho al patrón \textit{Adapter} \cite{informatica:design_patterns} \cite{informatica:adapter_pattern}.
-
-    El objetivo es adaptar un módulo de código para que implemente una interfaz dada. Por ejemplo, cuando queremos interactuar con interfaces de terceros usando módulos que no han sido diseñados para esta tarea. Por lo tanto, este patrón puede pensarse como el contrario del patrón \textit{Decorator}. Buscamos cambiar la interfaz manteniendo el comportamiento.
-
-\end{observacion}
-\todo{Todo esto es bastante teórico, quizás no debería ir aquí}
-
-La clase \lstinline{NormalizedNet} toma una red neuronal como parámetro. Las redes neuronales de \lstinline{pytorch} deben implementar el método \lstinline{forward}, que indica cómo la red computa las salidas a partir de las entradas dadas. Nuestra clase \lstinline{NormalizedNet} implementa este método basándose en el mismo método de la clase base. Usamos el método \lstinline{forward} de la clase base y almacenamos la salida, que normalizamos y devolvemos.
-
-Como ya hemos comentado, el uso de este patrón supone que no estamos cambiando la interfaz de un modelo si lo normalizamos, lo que permite que podamos decidir si queremos trabajar o no con normalización sin que el resto del código tenga que saber esto. Por ejemplo:
-
-\begin{lstlisting}[caption={Ejemplo de uso del patrón \textit{Decorator} para decidir si usamos o no normalización. El resto del código no tiene por qué saber este detalle de implementación, porque no cambiamos la interfaz de la clase}, captionpos=b]
-net = LFWResNet18(embedding_dimension = 5)
-net = NormalizedNet(net)
+\begin{lstlisting}[caption=\textit{Keywords usados para la búsqueda en \textit{SCOPUS}. Búsqueda realizada el 17 de Septiembre de 2023}, label=code:scopus_search, captionpos=b]
+    TITLE-ABS-KEY ( age  AND invariant  AND face  AND recognition )  AND  ( LIMIT-TO ( SUBJAREA ,  "COMP" ) )
 \end{lstlisting}
 
-\subsection{\textit{Hyperparameter Tuning}} \label{isec:hp_tuning}
-
-Como hemos comentado en \customref{isec:hptuning_kfold_cross_validation}, usaremos la técnica de \textit{K-Fold Cross Validation} para buscar buenos valores de hiperparámetros. Para facilitar este proceso, desarrollamos un módulo \lstinline{src.lib.hyperparameter_tuning}.
-
-En este módulo definimos la función \lstinline{custom_cross_validation}, que acepta los siguientes parámetros:
-
-\begin{itemize}
-    \item \lstinline{train_dataset}, \textit{dataset} de entrenamiento, sobre el que construiremos los \textit{folds}
-    \item \lstinline{k}, número de \textit{folds} a usar. No confundir con el valor de $K$ en \textit{P-K sampling}
-    \item \lstinline{random_seed}, valor de la semilla aleatoria, para que los resultados sean reproducibles
-    \item \lstinline{network_creator}, función que devuelve una red inicializada aleatoriamente con la arquitectura que queramos trabajar
-    \item \lstinline{network_trainer}, función que toma un \textit{dataloader} y una red neuronal, y ejecuta el entrenamiento devolviendo la red entrenada
-    \item \lstinline{loader_generator}, función que toma un \textit{dataset} que representa uno de los dos bloques (el \textit{fold} de validación o los $k-1$ \textit{folds} de entrenamiento), el tipo de bloque (entrenamiento o validación) y genera un \lstinline{torch.utils.dada.Dataloader} adecuado para poder lanzar el proceso de entrenamiento y el cálculo de la función a optimizar
-    \item \lstinline{loss_function}, función que queremos optimizar usando \textit{hyperparameter tuning}
-\end{itemize}
-
-Estamos aplicando el patrón estrategia \cite{informatica:design_patterns} \cite{informatica:strategy_pattern_web}. Pero en vez de estar usando el enfoque clásico en un ambiente de programación orientada a objetos, estamos usando un enfoque funcional. Gracias a esto, podemos usar esta función configurando muy fácilmente qué redes neuronales queremos usar, cómo queremos entrenar la red, cómo queremos trabajar con los datos, ... Y como comentamos a continuación, todo esto de forma dinámica en base a los hiperparámetros propuestos por el \textit{framework} usado.
-
-Usando esta función, cada \textit{script} que usemos para entrenar y validar definirá una sección de ajuste de hiperparámetros (como comentamos en \customref{isec:pipeline}). Usaremos el \textit{framework} \lstinline{optuna} para realizar una búsqueda en el espacio de hiperparámetros \cite{informatica:optuna_web}. Este \textit{framework} implementa toda la lógica necesaria para proponer valores de hiperparámetros, y en base a los resultados obtenidos gracias a \lstinline{custom_cross_validation}, proponer nuevos hiperparámetros. Además usa \lstinline{SQLite} para almacenar los resultados e introducir paralelismo, lo que permite que lancemos varios procesos en los servidores \textit{nGPU}, disminuyendo los tiempos de búsqueda. Como ya hemos comentado, el fichero \lstinline{optuna_queries.sql} contiene las consultas \textit{SQL} para poder acceder a la base de datos donde se almacenan los resultados de la búsqueda.
-
-En la sección de ajuste de hiperparámetros, deberemos configurar \lstinline{optuna} para realizar la búsqueda:
-
-\begin{itemize}
-    \item Indicamos qué hiperparámetros queremos explorar, el rango de valores que pueden tomar y sus distribuciones
-    \item Configuramos el proceso que produce el valor numérico a optimizar. En nuestro caso, en función de los hiperparámetros elegidos por \lstinline{optuna}, construimos un modelo u otro, adaptamos la red adecuadamente (por ejemplo, añadiendo o no normalización) y lanzamos la función \lstinline{custom_cross_validation} que en definitiva produce la métrica a optimizar
-\end{itemize}
-
-\subsection{Adaptador para realizar \textit{retrieval}}
-
-Como hemos comentado en \customref{isec:triplet_loss}, una de las ventajas de aprender un \textit{embedding} semántico en un modelo es que podemos adaptar dicho modelo para realizar varias tareas. La tarea que nos interesa en este trabajo es la de \textit{retrieval}.
-
-Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lstinline{FastRetrievalAdapter}, que se encuentran en el módulo \lstinline{src.lib.models}. Mostramos los diagramas de clase asociados:
+Con dichos \textit{keywords} obtenemos la siguiente gráfica:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{informatica/diagrama_clases_retrieval}
-    \caption{Diagrama de clases de los dos adaptadores. Por el tamaño de \lstinline{torch.nn.Module} solo mostramos los nombres de las clases. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
-    \label{img:diagrama_clases_global_adaptadores}
+    \includegraphics[width=0.6\textwidth]{informatica/scopus_search_histogram}
+    \caption{Resultados de la búsqueda en \textit{SCOPUS} usando los \textit{keywords} \customref{code:scopus_search}}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-    \begin{subfigure}{.6\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{informatica/diagrama_clases_retrievaladapter}
-        \caption{Diagrama de clase de \lstinline{RetrievalAdapter}}
-    \end{subfigure}%
-    \begin{subfigure}{.4\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{informatica/diagrama_clases_fastretrieval}
-        \caption{Diagrama de clase de \lstinline{FastRetrievalAdapter}}
-    \end{subfigure}
-\caption{Diagrama de clase de los dos adaptadores, con toda la información asociada. Estos diagramas han sido creados usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
-\label{img:diagramas_clase_concretos_adaptadores}
-\end{figure}
+Vemos que, a partir de 2012 (momento que coincide con la aparición de \textit{AlexNet} y que da paso a la popularidad de redes convolucionales profundas en el campo de la imagen) este área de estudio gana bastante popularidad. Sin tener en cuenta el último año (pues, en el momento de la consulta, sigue en curso y está lejos de acabar), no vemos que la tendencia siga al alza, pudiendo llegar a pensar que la popularidad de este campo se está estancando. Aunque habría que tener en cuenta condiciones externas, como la pandemia de \textit{COVID}, que podrían explicar la bajada notable en los años 2020 y 2021.
 
-En \customref{img:diagrama_clases_global_adaptadores} podemos ver que ambas clases implementan la interfaz \lstinline{torch.nn.Module}, que es la interfaz que las redes neuronales y sus componentes deben implementar en \lstinline{pytorch}. Además, \lstinline{RetrievalAdapter} forma parte de \lstinline{FastRetrievalAdapter}. Sin embargo, vamos a introducir una nueva interfaz, por lo que queda claro que ahora sí que vamos a usar el patrón \textit{Adapter} (véase \customref{isubs:normalization_impl}).
+Veamos también la popularidad de la técnica \textit{triplet loss}, pues estamos proponiendo una mejora sobre esta. Los \textit{keywords} usados fueron:
 
-En \customref{img:diagramas_clase_concretos_adaptadores} podemos ver que no estamos buscando trabajar con la interfaz de \lstinline{torch.nn.Module}, sino que buscamos trabajar con una nueva interfaz, asociada a la tarea de \lstinline{retrieval} (véase \customref{ich:descrp_problema}). Para ello, la clase \lstinline{RetrievalAdapter} define dos métodos relevantes, que son los que introducen una nueva interfaz:
-
-\begin{itemize}
-    \item \lstinline{query} toma una imagen \textit{key}, una lista de imágenes que forman la base de datos y el número de imágenes $k$ que queremos que devuelva la consulta. Devuelve los índices asociados a las mejores $k$ imágenes de la base de datos
-        \begin{itemize}
-            \item Tenemos imágenes como entradas, así que debemos almacenar la red neuronal que computa los \textit{embeddings} para transformar estas imágenes
-            \item Esto lo hacemos con el atributo \lstinline{self.base_net}
-        \end{itemize}
-    \item \lstinline{query_embedding} realiza la misma tarea, pero en vez de pasar la imagen \textit{key} y las imágenes que forman la base de datos, pasamos directamente los \textit{embeddings} de estas imágenes. En este caso:
-        \begin{itemize}
-            \item Tenemos que tener cuidado de usar la misma red neuronal que la que tenemos almacenada en \lstinline{self.base_net}, para evitar errores lógicos
-            \item \lstinline{src.base_net} no participa en el cómputo de este método
-        \end{itemize}
-    \item \lstinline{set_permute} trata sobre detalles sobre como trabajamos la representación de los tensores de \textit{batches}
-\end{itemize}
-
-La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para acelerar los tiempos de cómputo:
-
-\begin{itemize}
-    \item Podemos ver en \customref{img:diagramas_clase_concretos_adaptadores} que esta clase se compone de un modelo que computa el \textit{embedding} semántico, \lstinline{self.base_net}, y un modelo que ya está adaptado a la tarea de \textit{retrieval}, \lstinline{self.wrapped_net}. \lstinline{self.wrapped_net} es el resultado de construir un objeto de la clase \lstinline{RetrievalAdapter} usando \lstinline{self.base_net}
-    \item En \customref{isubs:rank_at_k} se especifica de qué forma se va a usar la adaptación. Siempre tomaremos una base de datos de imágenes, extraeremos una imagen que usaremos como \textit{key}, y realizaremos la \textit{query} contra el resto de imágenes de la base de datos
-    \item Por tanto, en el método \lstinline{precompute_embeddings} pasamos toda la base de datos de imágenes, calculamos su proyección en el \textit{embedding} usando \lstinline{self.base_net}, y almacenaremos estos datos
-    \item Con esto, el método \lstinline{query} simplemente especifica el índice de la \textit{key} y el número $k$ de individuos más parecidos que queremos seleccionar. Y usando \lstinline{self.wrapped_net} con su método \lstinline{query_embedding}, realizamos el cómputo sobre los \textit{embeddings}
-\end{itemize}
-
-\begin{sloppypar}
-\lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{Decorator} sobre la clase \lstinline{RetrievalAdapter}, del que ya hemos hablado en \customref{isubs:normalization_impl}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y empleamos la implementación de clases previas.
-\end{sloppypar}
-
-\subsection{Separación de datos imponiendo clases disjuntas}
-
-A la hora de separar el \textit{dataset} completo en subconjuntos (entrenamiento, validación y \textit{test}), la opción más utilizada es la de usar muestreo aleatorio para seleccionar qué elementos van a un conjunto u otro. En el problema que estamos resolviendo esto puede no ser adecuado por las siguientes peculiaridades:
-
-\begin{itemize}
-    \item Un individuo con al menos $K$ imágenes asociadas puede acabar teniendo menos de $K$ imágenes asociadas en el subconjunto de entrenamiento. Esto provoca que no pueda aparecer en ningún \textit{P-K batch} en el proceso de aprendizaje
-    \item Además, podemos acabar con conjuntos de validación y \textit{test} en los que muchos individuos han sido vistos durante el proceso de entrenamiento. En la aplicación real del modelo vamos a encontrarnos con muchas identidades nunca vistas (potencialmente siempre será así)
-\end{itemize}
-
-Por tanto, es conveniente que usemos una separación de datos en la que las identidades (clases, en un ambiente más amplio que el \textit{AIFR}) sean disjuntas. Esto es, que no existan individuos con imágenes asociadas en más de un conjunto de datos.
-
-Las dos técnicas de separación (clásica e identidades disjuntas) se implementan en el módulo \lstinline{src.lib.split_dataset}, en las funciones \lstinline{split_dataset} y \lstinline{split_dataset_disjoint_classes}
-
-\subsection{Logging de métricas} \label{isec:loggin_metricas}
-
-\begin{figure}[H]
-    \centering
-    % \includegraphics[width=0.8\textwidth]{informatica/diagrama_loggers}
-    \includegraphics[width=1.25\textwidth,height=\textheight,keepaspectratio]{informatica/diagrama_loggers}
-    \caption{Diagrama de clases del módulo \lstinline{src.lib.train_loggers}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
-    \label{img:diagrama_clases_loggers}
-\end{figure}
-
-El módulo \lstinline{src.lib.train_loggers} se encarga de introducir el cálculo y visualización de métricas en el proceso de entrenamiento de forma cómoda, modular y extensible. Nuestro objetivo es definir el proceso de \textit{logging} de forma externa al bucle de entrenamiento. De esta forma, podremos cambiar las métricas observadas sin tener que modificar el código que implementa el bucle de entrenamiento.
-
-En \customref{img:diagrama_clases_loggers} podemos ver la siguiente estructura:
-
-\begin{itemize}
-    \item La clase abstracta \lstinline{Trainlogger} define la interfaz que queremos que todos los \textit{loggers} implementen. Dicha interfaz se compone de dos métodos:
-        \begin{itemize}
-            \item \lstinline{log_process} que muestra los valores de ciertas métricas tomando como entradas los datos de entrenamiento, los datos de validación, la época en la que nos encontramos en el proceso de entrenamiento y la iteración dentro de dicha épica
-            \item \lstinline{should_log} que decide si debemos mostrar o no las métricas para una iteración global del proceso de entrenamiento
-        \end{itemize}
-    \item Gracias a esta interfaz, el bucle de entrenamiento puede mostrar métricas solo cuando \lstinline{should_log} lo indique, pasando todos los datos necesarios a \lstinline{log_process}
-    \item La clase \lstinline{SilentLogger} ofrece una implementación trivial de la interfaz. \lstinline{should_log} siempre devuelve falso y \lstinline{log_process} no realiza ninguna acción
-    \item El resto de clases tienen la misma lógica para decidir cuándo mostrar las métricas. Por tanto, la clase abstracta \lstinline{IterationLogger} implementa dicha lógica compartida, dejando todavía como método abstracto a \lstinline{log_process}
-    \item Los \textit{loggers} que vemos en la parte baja del diagrama son \textit{loggers} concretos que implementan cada uno \lstinline{log_process} con el cálculo y visualización de métricas concretas
-    \item La clase \lstinline{CompoundLogger} implementa el \textbf{patrón de diseño \textit{composite}}
-\end{itemize}
-
-Como acabamos de comentar, la clase \lstinline{CompoundLogger} implementa el patrón de diseño \textit{composite} \cite{informatica:design_patterns}. En dicho patrón buscamos definir la lógica de ciertos componentes en función del agregado de otros componentes. En nuestro caso, buscamos definir un objeto que implemente la interfaz \lstinline{TrainLogger} combinando varios \textit{loggers} en uno solo. Para ello, guardamos una lista de objetos de tipo \lstinline{TrainLogger}. La función \lstinline{should_log} consulta a todos los objetos guardados si quieren mostrar métricas, haciendo uso de la misma función \lstinline{should_log}. En cuyo caso, se llama a los correspondientes métodos \lstinline{log_process}. Gracias a esto, en un \textit{script} de \lstinline{Python} podemos configurar nuestro \textit{logging} con el siguiente código:
-
-\begin{lstlisting}[language=python, caption=Ejemplo de configuración del \textit{logging} de un entrenamiento con nuestro sistema propio. Se ve claramente la ventaja de usar un patrón \textit{composite} a la hora de configurar qué \textit{loggers} queremos usar, captionpos=b]
-
-# Define the loggers we want to use
-triplet_loss_logger = TripletLoggerOnline(... params ... )
-cluster_sizes_logger = IntraClusterLogger(... params ... )
-intercluster_metrics_logger = InterClusterLogger( ... params ... )
-rank_at_one_logger = RankAtKLogger( ... params ... )
-rank_at_k_logger = RankAtKLogger( ... params ... )
-local_rank_at_one_logger = LocalRankAtKLogger( ... params ... )
-local_rank_at_k_logger = LocalRankAtKLogger( ... params ... )
-
-# Combine them in a single logger
-logger = CompoundLogger([
-    triplet_loss_logger,
-    cluster_sizes_logger,
-    intercluster_metrics_logger,
-    rank_at_one_logger,
-    rank_at_k_logger,
-    local_rank_at_one_logger,
-    local_rank_at_k_logger,
-])
+\begin{lstlisting}[caption=\textit{Keywords usados para la búsqueda en \textit{SCOPUS} para consultar la popularidad del \textit{triplet loss}. Búsqueda realizada el 17 de Septiembre de 2023}, label=code:scopus_search_tripletloss, captionpos=b]
+    TITLE-ABS-KEY ( triplet  AND loss )
+    AND  ( LIMIT-TO ( SUBJAREA ,  "COMP" ) )
 \end{lstlisting}
 
-Hemos usado \textbf{dos técnicas para mostrar las métricas calculadas}. La primera y más sencilla ha sido \textbf{imprimir por pantalla} los valores obtenidos. Esta técnica no es suficiente porque no podemos guardar de forma estructurada los históricos de entrenamientos, ni facilita estudiar de forma visual el comportamiento del entrenamiento. Por tanto, hemos usado como segunda técnica el servicio \textbf{\textit{Weights and Biases} o \textit{WANDB}} \cite{informatica:wandb_web}. Este servicio permite registrar métricas de forma muy sencilla, relegando en dicho servicio:
-
-\begin{itemize}
-    \item El control de históricos de entrenamiento
-    \item La visualización de los procesos de entrenamiento
-    \item El registro de parámetros globales usados en cada entrenamiento
-\end{itemize}
-
-Para registrar todos los parámetros globales, creamos un diccionario de \lstinline{Python} en el que definimos dichos parámetros. Este diccionario, al que llamamos \lstinline{GLOBALS}, se registra directamente en la plataforma \textit{WANDB}. Los parámetros globales definen hiperparámetros del proceso de entrenamiento (por ejemplo, los valores de $\{P, K\}$), directorios en los que guardamos archivos, qué entorno de ejecución estamos usando, si queremos saltar ciertas secciones del \textit{pipeline}, \ldots
-
-A continuación mostramos un ejemplo de uso de esta plataforma:
+La búsqueda con estos \textit{keywords} produce la siguiente gráfica:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{informatica/wandb_example}
-    \caption{Ejemplo de uso de \textit{WANDB}. A la izquierda, podemos ver una lista filtrada para mostrar solo los históricos que producen resultados satisfactorios. A la derecha, podemos ver algunas métricas recogidas por nuestro sistema de \textit{logging}}
+    \includegraphics[width=0.6\textwidth]{informatica/scopus_search_tripletloss}
+    \caption{Resultados de la búsqueda en \textit{SCOPUS} usando los \textit{keywords} \customref{code:scopus_search_tripletloss}}
 \end{figure}
 
-\section{Optimización del código} \label{isec:optimizacion_codigo}
+Vemos que entre 2017 y 2018 esta técnica da un grandísimo salto en popularidad. Sin embargo, en los dos últimos años la popularidad ha caído en picado, y aunque todavía no haya pasado el tiempo suficiente para observar el progreso de dicha tendencia, la caída en el último año es demasiado grande, y pensamos que la tendencia va a seguir a la baja.
 
-Como ya se ha comentado en \customref{isec:planificacion}, una parte esperada del proceso de desarrollo es encontrar problemas de rendimiento, localizar qué partes del código están produciendo los problemas, y re-escribir implementaciones mucho más eficientes.
+Por otro lado, estamos usando nuevas técnicas para computar \textit{triplet loss}. Dichas técnicas fueron introducidas en \cite{informatica:principal}. En dicho trabajo se intenta resolver una tarea de re-identificación, que difiere de nuestra tarea de \textit{retrieval} para reconocimiento facial invariante a la edad. Por lo tanto, buscamos trabajos que hayan aplicado \textit{triplet loss} en el campo del \textit{AIFR}. Aplicamos la siguiente búsqueda:
 
-En esta sección explicamos cómo hemos desarrollado este proceso.
+\begin{lstlisting}[caption=Keywords usandos para la búsqueda de trabajos que combinen \textit{AIFR} y \textit{triplet loss} en \textit{SCOPUS}, label=code:scopus_search_especifico]
+    TITLE-ABS-KEY ( age AND invariant AND face AND recognition, AND triplet AND loss )  AND  ( LIMIT-TO ( SUBJAREA ,  "COMP" ) )
+\end{lstlisting}
 
-\subsection{Justificación de nuestro enfoque}
-\todo{Debería ir en otra sección}
+La búsqueda determinada por \customref{code:scopus_search_especifico} no produce ningún resultado. \textbf{No hay publicado ningún trabajo que aplique \textit{triplet loss} al campo del \textit{AIFR}}. Y esto, sin considerar que nuestro trabajo introduce nuevas técnicas que mejoran el uso del \textit{triplet loss} clásico, desarrollado en \customref{isec:triplet_loss}.
 
-Hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas, sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con tiempos de ejecución demasiado lentos, identificamos qué partes del código son las responsables. Con ello, sabemos en qué partes concretas debemos concentrar nuestros esfuerzos. De esta forma desarrollamos una amplia base de código inicial de forma rápida, sin aplicar optimizaciones prematuras. Y las optimizaciones que realizamos son óptimas, pues estamos localizando el código responsable de los tiempos de cómputo.
+Así que, cuando veamos en \customref{ich:conclusiones} que no obtenemos buenos resultados, tendremos que \textbf{justificar el por qué basándonos únicamente en el trabajo presente}, puesto que \textbf{ningún trabajo ha intentado resolver una tarea de \textit{AIFR} usando \textit{triplet loss}}.
 
-El enfoque que acabamos de describir se fundamenta en la ley de Amdahl \cite{informatica:amdahl_original} \cite{informatica:amdahl_moderno}. Aunque esta ley se centra en medir mejoras de tiempo al introducir paralelismo, es fácilmente aplicable a nuestro ámbito: cambios en las implementaciones para acelerar los tiempos de cómputo. Si optimizamos una fracción de cómputo $f$ obteniendo una mejora en tiempos de cómputo de $S$ para esa fracción, la mejora global (mejora que obtenemos sobre toda la base de código) viene dada por:
+\section{Mejores modelos de \textit{retrieval} para el \textit{dataset} \textit{FG-Net}}
 
-\begin{equation} \label{eq:amdahl}
-    S_{global} := \frac{1}{(1 - f) + \frac{f}{S}}
-\end{equation}
+En esta sección vamos a introducir los mejores modelos que resuelven una tarea de \textit{retrieval} sobre el \textit{dataset} \textit{FG-Net}. Como ya hemos visto en \customref{isec:interesareaestudio}, ninguno de estos modelos usará \textit{triplet loss}. Por lo tanto, será complicado justificar las diferencias en los resultados obtenidos.
 
-Además, suponiendo que optimicemos infinitamente la fracción de cómputo, hasta tal punto que sea instantánea de computar, la mejora global sería:
+\subsection{When Age-Invariant Face Recognition Meets Face Age Synthesis: A Multi-Task Learning Framework} \label{isubs:mtl_face}
 
-\begin{equation}
-    S_{max} := \lim_{S \to \infty}\frac{1}{(1 - f) + \frac{f}{S}} = \frac{1}{1 - f}
-\end{equation}
+El trabajo realizado en \cite{informatica:best_fgnet_model} propone el modelo \textit{MTLFace}. Dicho modelo se construye optimizando una función multiobjetivo.
 
-Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el uso que hacemos de diagramas generados por \lstinline{snakeviz} para localizar las funciones a optimizar, como veremos más adelante.
+Para ello, se da un primer paso que consiste en la obtención de dos \textit{features} incorreladas: edad e identidad. Para ello, usan una arquitectura basada en mecanismos de atención. A partir de esto, se realiza el aprendizaje de la función multiobjetivo. Por un lado, se debe resolver la tarea de, dada una imagen de una persona, estimar su edad. Y por otro lado, el del reconocimiento facial: dadas dos imágenes de la misma persona (resp. dos personas distintas) identificar que son la misma persona (resp. identificar que no son la misma persona).
 
-\subsection{Identificación del problema}
+Para obtener buenos resultados sobre \textit{FG-Net}, proponen la creación de un nuevo \textit{dataset}, que combina varios \textit{datasets} en uno.
 
-Identificamos problemas con los tiempos de cómputo por primera vez trabajando con el \textit{dataset} \textit{LFW}. El proceso de identificación y resolución se agrupan en las issues \cite{informatica:issue35_profiling} \cite{informatica:issue36_slowmetrics} y resuelve en la pull request \cite{informatica:pr42_profiling}. El \textit{commit} \lstinline{6aade342e07} \cite{informatica:commit_base_optimizacion} indica el estado original previo a realizar todo el proceso de optimización (\textit{profiling}, identificación de partes críticas del código, \textit{benchmarking} y cambios en las implementaciones).
-
-\subsection{Organización del proceso}
-
-El proceso de optimización se compone de los siguientes pasos:
-
-\begin{itemize}
-    \item \textit{Profiling} del código. Usamos la librería \lstinline{cProfile}. Esta forma parte de la librería estándar de \lstinline{Python}
-    \item Identificación de las partes críticas del código. Para ello usaremos \lstinline{pstats} (que también forma parte de la librería estándar de \lstinline{python}) para explorar los resultados desde la terminal, y \lstinline{snakeviz} para explorar los datos de forma gráfica e interactiva
-    \item Añadimos \textit{benchmarks} para medir los tiempos de ejecución de las partes críticas que vamos a modificar. Con ello tendremos mayor control sobre el impacto que suponen los cambios introducidos
-    \item Realizamos cambios sobre las partes críticas identificadas y medimos el impacto que suponen
-\end{itemize}
-
-En la sección de código donde realizamos el entrenamiento, añadimos la opción de usar la librería \lstinline{cProfile} para generar un \textit{profile}. Guardamos los resultados en la carpeta \lstinline{./src/profiling}, en los archivos \lstinline|{first, second, third}_profile.stat|.
-
-Usando el paquete \lstinline{pstats} podemos realizar consultas sobre los archivos \lstinline{.stat}. Para ello usamos el comando \lstinline{python -m pstats <file_path>}. Tomamos el tiempo acumulado de cada función y guardamos los resultados en los archivos \lstinline|{first, second, third}_profile.txt|. Usando un editor de texto, filtramos esos archivos para que solo contengan entradas asociadas a funciones de nuestra librería (no nos interesan los tiempos de funciones de la librería estándar, por ejemplo) y guardamos el filtrado en los archivos \lstinline|{first, second, third}_profile_filtered.txt|. Con ello, podemos consultar estos resultados filtrados con un editor de texto, de forma más cómoda que trabajando con todos los resultados usando \lstinline{pstats}.
-
-Usando el paquete \lstinline{snakeviz} podemos consultar de forma gráfica e interactiva los resultados almacenados en los archivos \lstinline{.stat}. Esto permite explorar los resultados de forma mucho más intuitiva, como veremos a continuación.
-
-\subsection{Primer \textit{profile}}
-
-En este \textit{profile} usamos los siguientes parámetros durante el ciclo de entrenamiento:
-
-\begin{itemize}
-    \item Enfoque \textit{lazy} para el aumentado de datos (véase \customref{isec:aumentado_datos})
-    \item $P = 200$, $K = 2$
-    \item Dimensión del \textit{embedding} a aprender igual a 5
-\end{itemize}
-
-Obtenemos los siguientes resultados, que visualizamos con \lstinline{snakeviz}:
+Además, usan modelos generativos adversarios \textit{GANs} para, dada la imagen de una persona, y una edad objetivo, generar una posible imagen de esa persona a la edad dada. Esto es utilizado en el proceso de aprendizaje. La siguiente figura muestra dicho proceso sintético:
 
 \begin{figure}[H]
-\centering
-\ajustarsubcaptions
-
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{informatica/profiles/first_profile/global}
-        \caption{Visualización global de todo el proceso de entrenamiento}
-        \label{img:first_profile_global}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{informatica/profiles/first_profile/dataloader}
-        \caption{Visualización de los tiempos involucrados en computar \lstinline{dataloader.__next__}}
-        \label{img:first_profile_dataloader_next}
-    \end{subfigure}
-\caption{Visualizaciones obtenidas usando \lstinline{snakeviz} para los resultados del \textit{profile} inicial}
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/mtlface_generativo}
+    \caption{Ejemplo de los resultados del modelo generativo usado en el entrenamiento. La primera fila muestra imágenes reales de una persona en distintas etapas de su vida. Las siguientes filas son imágenes generadas cuando se da como entrada la imagen marcada en rojo. Imagen extraída de \cite{informatica:best_fgnet_model}}
 \end{figure}
 
-El tiempo total de cómputo es de 328.638 segundos. Podemos ver en \customref{img:first_profile_global} que la mayor parte del tiempo de entrenamiento se pasa en el método \lstinline{dataloader.__next__()}. En \customref{img:first_profile_dataloader_next} podemos ver que, en dicho método, prácticamente todo el tiempo estamos esperando a que se complete una operación asíncrona, como indica \lstinline{threading.wait()}.
+Este trabajo obtiene para la métrica \textit{Rank@1} un valor de 94.78\% \footnote{En dicho trabajo, se refieren a dicha métrica como \textit{leave one out}. Dicho nombre está justificado por el proceso que supone el cálculo de la métrica, como hemos explicado previamente. El otro protocolo, \textit{MF1}, que supone evaluar añadiendo un conjunto de imágenes distractoras, no lo consideramos pues no lo hemos implementado }
 
-Creemos que esto es por estar empleando el enfoque \textit{lazy} para el aumentado de datos. Cada vez que queremos acceder a una nueva imagen, tenemos que generarla en ese preciso instante. Por tanto, en la siguiente iteración no usaremos el enfoque \textit{lazy}. Veremos si los tiempos aumentan o disminuyen, y si aparecen nuevas partes de código a optimizar.
+\subsection{Decorrelated Adversarial Learning for Age-Invariant Face Recognition}
 
-\subsection{Segundo \textit{profile}}
+El trabajo realizado en \cite{informatica:dal} propone eliminar los factores asociados a la edad en la representación que su modelo aprende. En la misma línea que \customref{isubs:mtl_face}, se buscan aprender dos \textit{features} incorreladas, una asociada a la edad, y otra asociada a la identidad. Se propone el algoritmo de aprendizaje \textit{Decorrelated Adversarial Learning} o \textit{DAL}. Se emplea un módulo \textit{Canonical Mapping Module} con el objetivo de buscar la máxima correlación entre los pares de \textit{features} generados por la red neuronal. Por lo tanto, actuará como discriminador en un escenario adversario. La red se entrena para que la correlación de dichos pares sea lo menor posible.
 
-Como ya hemos comentado, esta vez nos centraremos en usar un enfoque no \textit{lazy} para el aumentado de datos. Si intentamos usar los mismos valores $P = 200$, $K = 2$, saturamos la memoria del proceso haciendo que este aborte. Así que tenemos que usar $P = 100, K = 2$, lo que supone un problema para comparar las dos ejecuciones.
+La siguiente imagen servirá para entender mejor la descomposición en dos \textit{features} incorreladas:
 
-Para evitar que estas diferencias en los parámetros $\{P, K\}$ interfieran en nuestra optimización, lanzamos las dos versiones (\textit{lazy} y clásico) usando los valores $P = 100$, $K = 2$, y con ello podremos comparar de forma justa los tiempos de ejecución. Los resultados se resumen en la siguiente tabla:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/dal_descomposicion}
+    \caption{Ejemplo de cómo estamos descomponiendo la información en dos componentes: una de edad y otra de identidad. Estas imágenes muestran como, fijada la componente de identidad, podemos variar la componente de edad. Imagen extraída de \cite{informatica:dal}}
+\end{figure}
+
+Se obtiene un valor de 94.5\% para \textit{Rank@1}.
+
+\subsection{Look Across Elapse: Disentangled Representation Learning and Photorealistic Cross-Age Face Synthesis for Age-Invariant Face Recognition}
+
+El trabajo desarrollado en \cite{informatica:aim} propone, de nuevo, extraer conjuntamente \textit{features} sobre la edad e identidad de las imágenes, introduciendo el modelo \textit{Age Invariant Model} o \textit{AIM}.
+
+Y de nuevo, realizan una tarea de síntesis y discriminación adversaria para el aprendizaje del modelo. En dicho proceso, se obtiene un generador fotorealista. Esto es, dada una imagen de entrada y una edad objetivo, el generador es capaz de crear una posible imagen de la persona con esa edad, de una calidad muy alta.
+
+Además, construyen un nuevo \textit{dataset} para ser usado como \textit{benchmark}, el \textit{dataset} \textit{Cross-Age Face Recognition} o \textit{CAFR}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/aim_manifold}
+    \caption{Espacio aprendido, continuo sobre las \textit{features} de edad (eje horizontal) e identidad (eje vertical). Imagen extraída de \cite{informatica:aim}}
+\end{figure}
+
+En dicha figura se puede observar lo que acabamos de comentar: el generador obtenido es de una grandísima calidad. Y podemos variar de forma continua la identidad o la edad de la imagen que queremos generar.
+
+Se obtiene un valor de 93.20\% para \textit{Rank@1}
+
+\subsection{Comparativa de todos los trabajos estudiados}
+
+Mostramos ahora, de forma resumida, una comparativa de los resultados obtenidos por los trabajos que acabamos de estudiar:
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|}
     \hline
-    \textbf{Enfoque} & \textbf{Tiempo total de ejecución (s)} & \textbf{Tiempo total de ejecución (min)} \\
+    Modelo & \textit{Rank@1} \\
     \hline
 
-    \textit{Lazy} & 952.00s & 15.86 min \\
-    Clásico       & 917.84s & 15.29 min \\
-
+    \textbf{\textit{MTLFace}} & \textbf{94.78} \\
+    \textit{DAL} & 94.5 \\
+    \textit{AIM} & 93.20 \\
     \hline
 
 \end{tabular}
-\caption{Tiempos de ejecución de los dos enfoques de aumento de datos, usando los valores $P = 100, K = 2$}
+\caption{Resultados de los principales modelos estudiados del estado del arte sobre el \textit{dataset} \textit{FG-Net}. La métrica \textit{Rank@1} también aparece referenciada en estos trabajos como \textit{leave one out}}
 \end{table}
 
-Como era de esperar por lo comentado en \customref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva tiempos de ejecución mayores. Solo estamos midiendo el tiempo de ejecución en el entrenamiento, no tenemos en cuenta los tiempos asociados a generar el \textit{dataset} aumentado. Y de esta forma, el enfoque clásico ya tiene todas las imágenes pre-computadas (lo que conlleva un tiempo considerable que no estamos considerando), mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que permite usar unos valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos (sin considerar lo que tarda en generarse el \textit{dataset} aumentado de forma clásica).
-
-Una vez resuelto esto, realizamos un segundo \textit{profile} usando los siguientes parámetros:
-
-\begin{itemize}
-    \item $P = 100$, $K = 2$
-    \item Aumentado de datos clásico
-    \item Dimensión del \textit{embedding} aprendido igual a 5
-\end{itemize}
-
-Los resultados del segundo \textit{profile} se muestran en la siguiente imagen:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/profiles/second_profile/global}
-    \caption{Visualización obtenida usando \lstinline{snakeviz} para los resultados del segundo \textit{profile}}
-\end{figure}
-
-En este caso, podemos ver que los resultados ya son más ricos y variados. Los tiempos de entrenamiento se dividen principalmente en dos bloques: el asociado a mostrar métricas con nuestra estructura de \textit{logging} (véase \customref{isec:loggin_metricas}) y el asociado al cálculo de la función de pérdida. Empecemos viendo el bloque de los \textit{loggers}:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/profiles/second_profile/loggers}
-    \caption{Visualización de los tiempos de cómputo asociados al \textit{logging} de métricas}
-    \label{img:second_profile_tiempos_metricas}
-\end{figure}
-
-Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (distancia intercluster que introducimos en \customref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre todos los pares de \textit{embeddings}.
-
-Ahora estudiamos el bloque asociado al cálculo de la función de pérdida:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/profiles/second_profile/loss_function}
-    \caption{Visualización de los tiempos de cómputo asociados al cálculo de la función de pérdida}
-\end{figure}
-
-Podemos ver que la mayor parte del tiempo se pasa en realizar una comprensión de lista (análogo a un bucle \lstinline{for}) para computar distancias entre todos los pares de puntos, como ya hemos visto en \customref{img:second_profile_tiempos_metricas}.
-
-\subsection{Primera ronda de optimizaciones}
-
-Con toda esta información, hemos localizado algunas partes críticas del código. Escribimos \textit{benchmarks} para estas partes del código previo a introducir cambios. Gracias a disponer de \textit{benchmarks}, estudiamos si estos cambios mejoran o empeoran los tiempos de cómputo.
-
-Algunos detalles sobre los \textit{benchmarks}:
-
-\begin{itemize}
-    \item Estudiaremos los tiempos de ejecución de las funciones \lstinline{compute_intercluster_metrics} y \lstinline{precompute_pairwise_distances} con los dos \textit{scripts} que se encuentran en \lstinline{./src/benchmarks}
-    \item Correremos estos \textit{scripts} en la plataforma \textit{Google Colab} (véase \customref{isec:entorno_ejecucion}), usando un \textit{Notebook} que invoca el código de los \textit{benchmarks}: \lstinline{./src/benchmarks/Benchmarking notebook.ipynb}
-    \item Usaremos los parámetros:
-        \begin{itemize}
-            \item $P = 100, K = 2$
-            \item Enfoque \textit{lazy} para el aumentado de datos
-            \item Dimensión del \textit{embedding} a parender igual a 5
-            \item Una época de entrenamiento
-        \end{itemize}
-\end{itemize}
-
-La siguiente tabla muestra los cambios introducidos y los tiempos de los \textit{benchmarks}. Además, mostramos el tiempo de ejecución del \textit{Notebook} \lstinline{LFW Notebook.ipynb}, que en el momento de realizar las optimizaciones, usábamos para entrenar y validar modelos sobre el \textit{dataset} \textit{LFW}.
+Y ahora, usando la comparativa que aparece en \cite{informatica:best_fgnet_model}, mostramos los resultados de otros modelos, cuyos trabajos no hemos estudiado:
 
 \begin{table}[H]
-    \centering
-    \scalebox{0.8}{
-    \begin{tabular}{lccccc}
-        \toprule
-        \textbf{} & \multicolumn{2}{c}{\textbf{\lstinline|compute_intercluster_metrics|}} & \multicolumn{2}{c}{\textbf{\lstinline|precompute_pairwise_distances|}} & \textbf{Tiempo entrenamiento} \\
-        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-        \textbf{Id. Cambio} & Media & Desv. Típica & Media & Desv. Típica & \\
-        \midrule
-        1 & 16.01 & 2.41 & 37.02 & 0.56 & 939.52 \\
-        2 &  3.25 & 0.93  & 12.05 & 0.67 & 734.75  \\
-        3 &  2.55 & 1.61  & 12.75 & 1.48 & 625.89  \\
-        \bottomrule
-    \end{tabular}
-    }
-    \caption{Tabla que recoge el proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    Modelo & \textit{Rank@1} \\
+    \hline
+    HFA & 69.00 \\
+    MEFA & 76.20 \\
+    CAN & 86.50 \\
+    LF-CNN & 88.10 \\
+    AIM & 93.20 \\
+    DAL & 94.50 \\
+    \textbf{MTLFace} & \textbf{94.78} \\
+    \hline
+\end{tabular}
+\caption{Resultados de algunos modelos sobre el \textit{dataset} \textit{FG-Net}. Datos extraídos de \cite{informatica:best_fgnet_model}}
 \end{table}
 
-Los cambios realizados asociados son:
+\section{Conclusiones}
 
-\begin{enumerate}
-    \item Estado inicial de la base de código. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
-    \item En \lstinline|precompute_pairwise_distances|, usamos el método \lstinline|cdist| de \lstinline|pytorch| para calcular una matriz de distancias. Convertimos dicha matriz a un diccionario para respetar la interfaz que ciertas clases esperan de esta función
-    \item Usamos \lstinline|precompute_pairwise_distances| en el cálculo de las funciones de pérdida. Introducimos algunos pre-cómputos en \lstinline|compute_intracluster_distances| para acelerar la ejecución
-\end{enumerate}
-
-Podemos ver que los cambios introducidos mejoran los tiempos de cómputo de forma sustancial. Por tanto, estos cambios son relevantes y los mantenemos, aunque esto implique que algunas funciones sean más complicadas y menos legibles.
-
-\subsection{Tercer \textit{profile}}
-
-La primera ronda de optimizaciones potencialmente ha cambiado las partes críticas del código. Así que es necesario llevar a cabo un tercer \textit{profile} para estudiar el estado de la base de código e identificar, si hiciera falta, nuevas partes críticas a optimizar.
-
-En este \textit{profile} usamos los siguientes parámetros:
+En base a el estudio realizado sobre otros trabajos relacionados, sacamos las siguientes \textbf{conclusiones}:
 
 \begin{itemize}
-    \item $P = 100$, $K = 2$
-    \item Una época de entrenamiento
-    \item \textit{Embedding Dimension} = 1
-    \item Enfoque \textit{Lazy} para el aumentado de datos
+    \item \textbf{No existen trabajos previos que empleen \textit{triplet loss} para resolver una tarea de \textit{AIFR}}. Por lo tanto, no podremos contrastar los resultados obtenidos con modelos que operen de una forma parecida
+    \item \textbf{Los mejores modelos sobre \textit{FG-Net} emplean técnicas mucho más avanzadas} que las presentadas en este trabajo. El aprendizaje de dos \textbf{\textit{features} incorreladas}, una para la edad y otra para la identidad es el factor común en los modelos que obtienen mejores resultados. Unos trabajos desarrollan este aprendizaje usando \textbf{modelos basados en mecanismos de atención} o esquemas \textbf{generativos adversarios}
+    \item Por lo tanto, parece que nuestra propuesta no va a ser lo suficientemente potente como para obtener los resultados aquí mostrados. Sin embargo, sería realmente interesante obtener resultados competentes de un modo u otro, pues obtendríamos un modelo mucho más ligero a partir de un entrenamiento mucho más fácil de realizar, tanto por los recursos empleados como por las técnicas empleadas
 \end{itemize}
-
-Visualizamos los resultados del \textit{profile} en la siguiente imagen:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/profiles/third_profile/total}
-    \caption{Visualización global de todo el proceso de entrenamiento.}
-\end{figure}
-
-Podemos ver que la mayor parte del tiempo se corresponde al \textit{logging} de métricas, seguido del acceso a los datos. Sobre el acceso de datos ya hemos trabajado, así que pasamos a estudiar en qué se gasta el tiempo en el \textit{logging}.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/profiles/third_profile/logging}
-    \caption{Visualización de los tiempos de cómputo asociados al \textit{logging} de métricas}
-\end{figure}
-
-Tenemos tres bloques, que podemos expandir, como mostramos en las siguientes imágenes:
-
-\begin{figure}[H]
-\centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{informatica/profiles/third_profile/logging_primero}
-        \caption{\lstinline{calculate_mean_loss_function_online}}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.9\linewidth]{informatica/profiles/third_profile/logging_segundo}
-        \caption{\lstinline{compute_cluster_sizes_metrics}}
-    \end{subfigure}
-
-    \begin{subfigure}{.7\textwidth}
-        \centering
-        \includegraphics[width=0.8\linewidth]{informatica/profiles/third_profile/logging_tercero}
-        \caption{\lstinline{compute_intercluster_metrics}}
-    \end{subfigure}
-\caption{Visualización de los tiempos de cómputo asociados a cada una de las tres métricas que mostramos}
-\end{figure}
-
-En base a estas visualizaciones podemos ver que:
-
-\begin{sloppypar}
-\begin{itemize}
-    \item Las tres métricas que en ese momento estábamos mostrando suponen aproximadamente la misma cantidad de tiempo
-    \item En \lstinline{calculate_mean_loss_function_online}, la mayor parte del tiempo se debe al acceso a los datos
-    \item En \lstinline{compute_cluster_sizes_metrics}, la mayor parte del tiempo se pasa en \lstinline{__get_portion_of_dataset_and_embed}
-    \item En \lstinline[breaklines=true]{compute_inter_cluster_metrics} la mayor parte del tiempo se pasa en \lstinline[breaklines=true]{__get_portion_of_dataset_and_embed}, pero no tanto como en el caso anterior. Le sigue la función \lstinline{__compute_pairwise_distances}
-\end{itemize}
-\end{sloppypar}
-
-Además, estudiando el archivo con los tiempos de cómputo filtrados \lstinline{./src/profiling/third_profile_filtered.txt}, podemos ver que:
-
-\begin{itemize}
-    \item Como ya hemos visto, la mayor parte del tiempo se pasa en \lstinline{log_process}, seguido de \lstinline{calculate_mean_loss_function_online}, \lstinline{__get_portion_of_dataset_and_embed} y \lstinline{compute_cluster_sizes_metrics}
-    \item Una comprensión de diccionarios en \lstinline{precompute_pairwise_distances} supone 1.524 segundos de 1.526 segundos que tarda la función en total
-\end{itemize}
-
-Todo esto justifica que identifiquemos las siguientes partes críticas del código, a tratar en una segunda ronda de optimizaciones:
-
-\begin{itemize}
-    \item \lstinline{calculate_mean_loss_function_online}
-    \item \lstinline{__get_portion_of_dataset_and_embed}
-        \begin{itemize}
-            \item De esta forma, como ya hemos visto previamente, estaríamos optimizando tanto \lstinline{compute_cluster_sizes_metrics} y \lstinline{compute_intercluster_metrics}
-        \end{itemize}
-    \item Mejorar la comprensión de diccionarios en \lstinline{__compute_pairwise_distances}
-\end{itemize}
-
-\subsection{Segunda ronda de optimizaciones} \label{isubs:segunda_ronda_optimizaciones}
-
-Seguimos el mismo enfoque que en la primera ronda de optimizaciones. Ya tenemos un \textit{benchmark} para \lstinline{compute_intercluster_metrics}. Como \lstinline{compute_intercluster_distances} se usa en \lstinline{compute_intercluster_metrics}, no añadimos un nuevo \textit{benchmark}, y veremos el impacto de los cambios a través del primer \textit{benchmark}.
-
-\begin{table}[H]
-    \centering
-    \scalebox{0.8}{
-    \begin{tabular}{lccccc}
-        \toprule
-        \textbf{} & \multicolumn{2}{c}{\textbf{\lstinline|compute_intercluster_metrics|}} & \multicolumn{2}{c}{\textbf{\lstinline|precompute_pairwise_distances|}} & \textbf{Tiempo entrenamiento} \\
-        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-        \textbf{Id. Cambio} & Media & Desv. Típica & Media & Desv. Típica & \\
-        \midrule
-            1 & 2.55  & 1.61 & 12.75 & 1.48 & 625.89  \\
-            2 & 3.03  & 1.90 & 13.62 & 0.50 & -       \\
-            3 & 3.45  & 2.68 & 13.28 & 0.37 & -       \\
-        \bottomrule
-    \end{tabular}
-    }
-    \caption{Tabla que recoge el segundo proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
-    \label{table:optimization_process_second}
-\end{table}
-
-Describimos los cambios realizados:
-
-\begin{enumerate}
-    \item Estado inicial de la base de datos. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
-    \item Refactorizamos \lstinline{__get_portion_of_dataset_and_embed} para usar una única llamada de \lstinline{pytorch} para computar todos los \textit{embeddings}, en vez de usar un bucle \lstinline{for}.
-    \item Mejoramos el diseño de la anterior función. No deberían producirse cambios en el rendimiento
-\end{enumerate}
-
-En \customref{table:optimization_process_second} podemos ver que no estamos mostrando tiempos de cómputo de entrenamiento en las dos últimas entradas. Esto es porque el uso de la función de \lstinline{pytorch} para computar todos los \textit{embeddings} de golpe provoca que el consumo de memoria se eleve hasta abortar el proceso. Además, los \textit{benchmarks} han empeorado algo.
-
-Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar en cada momento. Puede ser que al acceder a los servidores \textit{nGPU} (véase \customref{isec:entorno_ejecucion}), mucho más potentes, la nueva implementación no provoque consumos elevados de memoria y acelere el proceso.
-
-\subsection{Comentarios y mejoras a tener en cuenta}
-
-En el momento de realizar este proceso de optimización, no teníamos acceso a los servidores \textit{nGPU}. Sin embargo, era necesario optimizar el código para seguir avanzando el proyecto sin detenernos.
-
-El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un \textbf{error a tener en cuenta}. Por ejemplo, en \customref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente. Por tanto, \textbf{una posible mejora} es repetir el proceso de optimización sobre \textit{nGPU}.
-
-Sin embargo, al acceder a los servidores \textit{nGPU} y \textit{datasets} más grandes, no hemos tenido problemas de rendimiento. Con ello, un esfuerzo en optimizar el código no estaría del todo justificado. Por tanto, aún con los fallos que hemos comentado, \textbf{el proceso de optimización cumplió con su cometido} en el momento en el que era necesario.
-
-\section{Pipeline} \label{isec:pipeline}
-
-En Aprendizaje Automático, nos referimos por \textit{pipeline} a la descripción e implementación de las distintas fases o etapas que participan en la creación de un modelo \cite{informatica:pipeline_web}.
-
-Existen múltiples soluciones para codificar estos \textit{pipelines}. Estas soluciones se encargan de facilitar la definición de los \textit{pipelines} y la automatización de ciertas tareas. Con estas soluciones podemos, por ejemplo, lanzar todo el proceso cada vez que se actualiza la base de datos, rechazar el nuevo modelo producido si este no cumple con ciertos criterios de calidad, desplegar en producción nuevos modelos, ...
-
-Sin embargo, por la simplicidad de nuestro \textit{pipeline}, codificamos manualmente este proceso. Simplemente, usaremos variables globales, almacenadas en la variable \lstinline{GLOBALS} (véase \customref{isec:loggin_metricas}), para decidir si ejecutar o no ciertas secciones opcionales.
-
-El siguiente diagrama describe el \textit{pipeline} seguido en todos nuestros experimentos:
-
-\begin{figure}[H]
-\centering
-\scalebox{0.9}{
-\begin{tikzpicture}[
-    mandatorynode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
-    optionalnode/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=5mm, align=center},
-]
-    \node [mandatorynode] (wandb) {\textit{Log} en \textit{WANDB}};
-    \node [mandatorynode] (dataset_download) [right=of wandb] {Descarga de los datos};
-    \node [mandatorynode] (dataset_load) [right=of dataset_download] {Carga de los datos en \\ un \lstinline{Dataset} de \lstinline{pytorch}};
-    \node [mandatorynode] (dataset_split) [below=of dataset_load] {Dividir en \textit{train, test, validation}};
-    \node [mandatorynode] (dataloaders) [left=of dataset_split] {Cargar los tres conjuntos de \\ datos en \lstinline{Dataloaders} de \lstinline{pytorch}};
-    \node [optionalnode] (data_augmentation) [left=of dataloaders]{\textit{Data Augmentation}};
-    \node [optionalnode] (hp_tuning) [below=of data_augmentation] {\textit{Hyperparameter Tuning}};
-    \node [optionalnode] (train) [right=of hp_tuning] {Entrenamiento del modelo};
-    \node [mandatorynode] (eval) [right=of train] {Evaluación del modelo};
-
-    \draw[-stealth] (wandb.east) -- (dataset_download.west);
-    \draw[-stealth] (dataset_download.east) -- (dataset_load.west);
-    \draw[-stealth] (dataset_load.south) -- (dataset_split.north);
-    \draw[-stealth] (dataset_split.west) -- (dataloaders.east);
-    \draw[-stealth] (dataloaders.west) -- (data_augmentation.east);
-    \draw[-stealth] (data_augmentation.south) -- (hp_tuning.north);
-    \draw[-stealth] (hp_tuning.east) -- (train.west);
-    \draw[-stealth] (train.east) -- (eval.west);
-
-\end{tikzpicture}
-}
-\caption{Representación gráfica de nuestro \textit{pipeline}. Los nodos azules son nodos obligatorios. Los nodos verdes son nodos opcionales: usando \lstinline{GLOBALS} podemos decidir si ejecutarlos o no}
-\end{figure}
-
-Es claro que podemos saltarnos el proceso de aumento de datos y el \textit{hyperparamenter tuning}. De hecho, este último lo ejecutaremos muy pocas ocasiones. Sin embargo puede extrañar que hayamos marcado el entrenamiento del modelo como un paso opcional.
-
-Cuando terminamos el entrenamiento de un modelo, guardamos los datos de dicho modelo en disco. Podemos recuperar ese modelo sin tener que pasar por todo el proceso de entrenamiento, y evaluarlo. Esto es útil por varias razones:
-
-\begin{itemize}
-    \item Si estamos desarrollando nuevas métricas, y queremos ver cómo funcionan en modelos entrenados, no tenemos que re-entrenar un modelo cada vez que introducimos un cambio
-    \item Podemos verificar que un modelo concreto obtiene ciertas métricas
-    \item Al introducir una nueva métrica, podemos computarla para modelos entrenados previamente a la implementación de dicha métrica
-\end{itemize}
-
-\section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
-
-Disponemos de dos conjuntos o \textit{suites} de \textit{tests}: unitarios y de integración.
-
-Los \textbf{\textit{tests} unitarios} buscan principalmente validar la corrección de los módulos de código desarrollados en la librería. Para ello, usamos algunas técnicas comunes de \textit{testeo}:
-
-\begin{itemize}
-    \item Validación de casos concretos: controlamos los datos de entrada de una funcionalidad, y comprobamos la salida con el resultado esperado. Esto es factible cuando las funciones a validar son deterministas y fáciles de calcular manualmente. Como puede ser el caso de las funciones de pérdida, validadas en \lstinline{src/test/loss_functions.py} usando principalmente este enfoque
-    \item Validación de propiedades \cite{informatica:property_based_testing}: dados unos datos de entrada, comprobamos que ciertas propiedades de la funcionalidad a validar se cumplen. Esta técnica es realmente útil cuando usamos funciones no deterministas, o cuando no es viable computar manualmente la salida esperada. Como puede ser el caso del aumentado de datos (véase \customref{isec:aumentado_datos}), de naturaleza claramente aleatoria. Comprobamos propiedades como:
-
-    \begin{itemize}
-        \item Que el tamaño del \textit{dataset} no aumenta si todos los individuos tienen al menos $K$ imágenes asociadas
-        \item Que tras el aumento de datos todos los individuos tienen al menos $K$ imágenes asociadas
-        \item Que el tamaño del \textit{dataset} aumenta o se mantiene, nunca disminuye
-    \end{itemize}
-
-\end{itemize}
-
-También usamos \textit{tests} unitarios cada vez que encontramos un error en nuestra base de código, siguiendo el siguiente proceso:
-
-\begin{itemize}
-    \item Aislamos el error en una serie de \textit{tests} que comprueban la propiedad que no se está cumpliendo
-    \item Tratamos de localizar y arreglar la fuente del error
-    \item Comprobamos que, tras arreglar el problema, los \textit{tests} introducidos ahora sí que se ejecutan correctamente
-\end{itemize}
-
-Esto permite encontrar y solucionar los problemas más rápidamente, y además documentar errores previamente encontrados y propiedades que son importantes verificar en otros escenarios.
-
-Los \textbf{\textit{tests} de integración} buscan evitar el siguiente problema. Como hemos comentado en \customref{isec:planificacion}, hemos realizado un trabajo iterativo, partiendo de bases de datos más sencillas hacia bases de datos más grandes y complejas. En dicho trabajo iterativo puede ocurrir que, cambiando o añadiendo código a la librería, rompamos \textit{pipelines} en bases de datos previas. Los \textit{tests} de integración buscan verificar que \textit{pipelines} en bases de datos previas sigan funcionando.
-
-Para esto, cada \textit{test} de integración ejecuta el \textit{pipeline} de una base de datos cuando abandonamos esta para pasar a la siguiente. Usamos valores de los parámetros para adecuar la tarea: usamos un subconjunto muy reducido de la base de datos, hacemos \textit{logging} de forma mucho menos frecuente, los valores de $\{P, K\}$ son mucho más bajos, la red neuronal es muy ligera, ...
-
-Por el esfuerzo computacional que suponen, los \textit{tests} de integración únicamente se ejecutan a la hora de validar una \textit{pull request}.
-
-Y como ya hemos comentado en \customref{isec:github_buenas_practicas}, estamos usando \textit{Github Actions} para lanzar las dos \textit{suites} de \textit{tests}, aunque usando la herramienta \lstinline{just} (véase \customref{isec:estructura_carpetas}) se pueden lanzar en local.
