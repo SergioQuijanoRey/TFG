@@ -1,5 +1,67 @@
 \chapter{Experimentación}
 
+\section{Métricas empleadas} \label{isec:metricas_teoria}
+\todo{Leer de nuevo, porque hemos movido esta sección}
+
+Como se comenta en el \entrecomillado{apéndice D} de \cite{informatica:principal}, el proceso de entrenamiento presenta una particularidad: la función de pérdida rápidamente decae hasta un cierto valor en el que prácticamente se mantiene constante durante todo el entrenamiento. Sin embargo, otras métricas relevantes deberían mejorar durante el paso de las épocas de entrenamiento. Por tanto, no es suficiente que observemos únicamente el valor de la función de pérdida, sino que tenemos que seguir muy de cerca el valor de otras métricas relevantes durante el entrenamiento.
+
+En esta sección introduciremos algunas de las métricas más relevantes. En toda esta sección, supondremos que estamos trabajando con $N individuos$, cada individuo $i$ tendrá $N_i$ imágenes asociadas.
+
+\subsection{Distancias intracluster e intercluster} \label{isubs:teoria_distancia_intra_inter_cluster}
+
+Como se comenta en \cite{informatica:paper_cacd}, el comportamiento esperado es el siguiente:
+
+\begin{itemize}
+    \item Al inicio, todos los elementos, independientemente de su identidad, serán atraídos hacia cierto centro de masa
+    \item Una vez hecho esto, elementos de distinta clase irán pasando a través de otro, formando los \textit{clústers} de cada individuo
+    \item Una vez que los \textit{clústers} establecen cierta estructura, estos empiezan a alejarse unos de otros
+\end{itemize}
+
+Todo esto ocurre mientras el valor de la función de pérdida parece no cambiar. Por tanto es relevante observar las siguientes dos métricas:
+
+\begin{itemize}
+    \item \textbf{Distancia intracluster}: para cada individuo (o clase, en un ambiente más general), computamos la media de las distancias entre pares de imágenes de dicho individuo. Con esto, tenemos una lista de $N$ medias. Registraremos algunas estadísticas sobre esta lista de medias, como mínimo, máximo y media
+    \item \textbf{Distancias intercluster}: para cada par de individuos distintos, computaremos la distancia mínima entre pares de puntos correspondientes a cada individuo. De estas distancias entre conjuntos vuelvo a registrar las mismas estadísticas: mínimo, máximo y media
+\end{itemize}
+
+Por lo tanto, lo que buscamos ver es que las distancias intracluster se minimizan, mientras que las intercluster se maximizan.
+
+\subsection{Normas de los \textit{embeddings}} \label{isubs:normas_embeddings}
+
+Como ya hemos comentado en \customref{isec:triplet_loss}, un problema que puede ocurrir es que nuestro modelo decida colapsar cualquier entrada al vector $\vec{0}$. Esto justifica el uso de un margen, pero en \customref{isec:margenes_suaves} hemos introducido una función para computar los márgenes de forma suave, sin especificar un valor del margen $\alpha$, que en principio podría dar lugar a este colapso del modelo. Por tanto, vamos a observar durante el entrenamiento la norma euclídea de todas las salidas de nuestro modelo durante el entrenamiento.
+
+\subsection{Sumandos activos}
+
+En \customref{isubsubs:mejoras_sumandos_no_nulos} ya hemos introducido la noción de sumandos nulos. Estos sumandos nulos pueden llegar a ser nocivos para el aprendizaje de la red. Si demasiados triples no aportan valor a la función de pérdida, o bien no estamos aprovechando los ciclos de entrenamiento (en el caso de que estemos usando $\mathcal{L}_{BH \neq 0}, \mathcal{L}_{BA \neq 0}$) o bien  la red puede que no aprenda de los sumandos no nulos (en el caso de que estemos usando $\mathcal{L}_{BH}, \mathcal{L}_{BA}$). Por tanto, vamos a registrar el porcentaje de sumandos no nulos en la función de pérdida, en cada \textit{P-K batch}.
+
+\subsection{\textit{Rank@k accuracy}} \label{isubs:rank_at_k}
+
+A diferencia de un modelo de clasificación que trabaja con datos de la forma \lstinline{(features, etiqueta)}, no podemos calcular un valor de \textit{accuracy}. Estamos tratando de resolver una tarea de \textit{retrieval}, por tanto, dada una imagen \textit{key} y una base de datos, buscamos las $k$  mejores imágenes dentro de la base de datos. Esto es, las $k$ imágenes que nuestro modelo identifica como las más similares a la identidad de la \textit{key} (gracias a nuestra función de distancia en el \textit{embedding}).
+
+En esta situación podemos calcular es lo que se conoce como \textbf{\textit{Rank@k accuracy}}. Para ello, para cada imágen de nuestro \textit{dataset}:
+
+\begin{itemize}
+    \item Realizamos una \textit{query} a nuestro modelo, usando la imagen actual como \textit{key}, contra el resto de la base de datos, solicitando las $k$ mejores imágenes,
+    \item Calculamos si esta consulta ha tenido éxito. Consideramos por éxito que, entre las $k$ respuestas devueltas por la \textit{query}, al menos haya una que corresponda a la identidad de la \textit{key}
+\end{itemize}
+
+Al final, sumamos los éxitos y dividimos por el tamaño de la base de datos, obteniendo el \textit{Rank@k accuracy}.
+
+\begin{observacion}
+
+    No confudir este valor de $k$, que marca cuántas imágenes consultamos en cada \textit{query}, con el valor de $K$ que usamos en el \textit{P-K sampling}. No tienen nada que ver un parámetro con el otro.
+
+\end{observacion}
+
+\begin{observacion}
+
+    Hemos descrito el proceso usual de cómputo de esta métrica. Sin embargo, nosotros introducimos otra variante, a la que llamaremos \textbf{\textit{Local Rank@k accuracy}}. En esta variante, iteramos los datos en \textit{P-K batches}. Y con esto, las \textit{queries} las realizamos contra el \textit{P-K batch} y no contra toda la base de datos.
+
+    Esta variante la introducimos al intentar solucionar el mal comportamiento de los modelos durante el entrenamiento.
+
+\end{observacion}
+
+
 \section{Selección de hiperparámetros}
 
 Los hiperparámetros elegidos se muestran en la siguiente tabla:
