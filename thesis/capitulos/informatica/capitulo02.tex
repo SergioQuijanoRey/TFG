@@ -336,7 +336,7 @@ Sin embargo, motivados por \cite{informatica:principal}, decidimos usar la dista
 
 En \customref{isec:triplet_loss} hemos justificado por qué es necesario introducir un término $\alpha$ para controlar el margen y evitar que nuestro modelo aprenda a colapsar todas las entradas al vector $\vec{0}$. Con esto llegamos a la ecuación \eqref{ieq:triplet_loss_single_entry}.
 
-En dicha función de pérdida, el propósito de $x \mapsto max\{0, x + \alpha\}$ (conocida comúnmente como \textit{hinge function}), es no corregir ejemplos que, en vista del margen $\alpha$ establecido, ya son correctos. Pero puede ser que estemos interesados en afinar aún más ejemplos que, para dicho valor del margen, sean correctos. Con esto conseguiríamos, principalmente, seguir acercando imágenes del mismo individuo lo máximo posible \cite{informatica:principal}.
+En dicha función de pérdida, el propósito de $x \mapsto \max\{0, x + \alpha\}$ (conocida comúnmente como \textit{hinge function} \cite{informatica:principal}) es no corregir ejemplos que, en vista del margen $\alpha$ establecido, ya son correctos. Pero puede ser que estemos interesados en afinar aún más ejemplos que, para dicho valor del margen, sean correctos. Con esto conseguiríamos seguir acercando imágenes del mismo individuo lo máximo posible \cite{informatica:principal}.
 
 Es por esto que se propone en \cite{informatica:principal} usar la función \textbf{\textit{softplus}}:
 
@@ -344,9 +344,9 @@ Es por esto que se propone en \cite{informatica:principal} usar la función \tex
     x \mapsto ln(1 + exp(x))
 \end{equation}
 
-Dicha función puede verse como una versión suavizada de la función \textit{hinge}. Decae exponencialmente, por lo que ejemplos correctos se penalizarán exponencialmente menos cuanto más cercanos estén, pero contrasta con la función \textit{hinge} que presenta un salto o corte fuerte. Por tanto, se suele decir que estamos usando un \textbf{margen suave}.
+Dicha función puede verse como una versión suavizada de la función \textit{hinge}. Decae exponencialmente, por lo que ejemplos correctos se penalizarán exponencialmente menos cuanto más cercanos estén, pero contrasta con la función \textit{hinge} en que no presenta un salto o corte fuerte. Por tanto, se suele decir que estamos usando un \textbf{margen suave}.
 
-Además, una fuerte ventaja de esta función es que \textbf{desechamos el hiperparámetro $\alpha$}, el cual ya no tenemos que fijar a través de algún método (como podría ser el \textit{hyperparameter tuning}).
+Además, una ventaja de esta función es que \textbf{desechamos el hiperparámetro $\alpha$}, el cual ya no tenemos que fijar a través de algún método (como podría ser el \textit{hyperparameter tuning}).
 
 \begin{figure}[H]
 \centering
@@ -372,5 +372,5 @@ Además, una fuerte ventaja de esta función es que \textbf{desechamos el hiperp
     \label{img:graficas_margenes}
 \end{figure}
 
-Las gráficas mostradas en \customref{img:graficas_margenes} nos sirven para visualizar de forma sencilla todo lo que hemos comentado. La función \textit{softplus} actúa como una \textit{hinge} suavizada. El hecho de que se parezcan tanto cuando hacemos que el margen de \textit{hinge} sea cero, nos hace pensar que va a actuar como una \textit{hinge} en la que no hay margen, y por lo tanto, acercando elementos de la misma clase todo lo que pueda.
+Las gráficas mostradas en \customref{img:graficas_margenes} nos sirven para visualizar de forma sencilla todo lo que hemos comentado. La función \textit{softplus} actúa como una \textit{hinge} suavizada. El hecho de que se parezcan tanto cuando hacemos que el margen de \textit{hinge} sea cero nos hace pensar que \textit{softplus} va a actuar como una \textit{hinge} en la que no hay margen, y por lo tanto, acercará elementos de la misma clase todo lo que pueda.
 
