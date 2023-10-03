@@ -191,11 +191,31 @@ Y para finalizar, introducimos los \textbf{dos enfoques principales usados para 
 \todo{\cite{informatica:paper_cacd} habla en la página 3 de \url{http://www.sirius.umiacs.io/papers/chen14tmm.pdf} de las aproximaciones al problema!}
 
 \section{Motivación}
-% TODO -- seguir por aqui
 
-Por otro lado, el ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la informática forense. Es muy interesante disponer de un modelo que reconozca caras de sospechosos que llevan en busca un tiempo, o de personas que han desaparecido hace un tiempo y de la que no se disponen imágenes actuales. También para verificar fotografías en documentos de identidad, como pasaportes \cite{informatica:tecnica_sintesis_aifr}.
+El ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la informática forense. Algunos ejemplos de aplicación son:
 
-\todo{Desarrollar}
+\begin{itemize}
+    \item Reconocer caras de sospechosos que llevan en busca un tiempo en imágenes de videovigilancia
+    \item Reconocer caras de personas desaparecidas un tiempo considerable, en imágenes de videovigilancia, controles de aeropuertos, ...
+    \item Verificación automática de documentos de identidad en puestos de control \cite{informatica:tecnica_sintesis_aifr}. Por ejemplo, los puestos de control automáticos de aeropuertos. En estos puestos, una máquina verifica que la imagen que aparece en el pasaporte coincida con una imagen tomada en ese momento con una cámara.
+    \item Consultar en una base de datos policial las 10 identidades que más se parecen a la imagen de una persona dada
+\end{itemize}
+
+Por ejemplo, en 2021 se pusieron en marcha en España máquinas \textit{ABC System} para realizar automáticamente el control de pasaportes en aeropuertos \cite{informatica:articulo_abc_system}. Una de las tareas de esta máquina es la de verificar que la fotografía que aparece en el pasaporte se corresponde con la persona que está intentando pasar el control. Esto se muestra en las siguientes imágenes:
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/ejemplo_abc_system_01}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/ejemplo_abc_system_02}
+    \end{subfigure}
+
+    \caption{Máquinas \textit{ABC System} para realizar el control de pasaportes en aeropuertos de forma automática. Entre otras tareas, verifican que la fotografía del pasaporte se corresponda con una imagen tomada por la cámara de la máquina. Imágenes extraídas de \cite{informatica:articulo_abc_system}}
+\end{figure}
+
+Todo esto justifica el interés en disponer de un modelo que resuelva la tarea que hemos propuesto.
 
 \section{Descripción de los objetivos}
 \todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
