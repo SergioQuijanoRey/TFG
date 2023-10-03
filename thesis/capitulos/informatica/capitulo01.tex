@@ -3,7 +3,6 @@
 
 % TODO -- Lista de TODO's:
 %
-% - [ ] Escribir la sección de motivación
 % - [ ] ? Quitar secciones en la parte del estado del arte, hacerlo todo en conjunto. Quitar seccion de conclusiones en el estado del arte
 % - [ ] ? Formateo de las citas
 
@@ -192,7 +191,9 @@ Y para finalizar, introducimos los \textbf{dos enfoques principales usados para 
 
 \section{Motivación}
 
-El ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la informática forense. Algunos ejemplos de aplicación son:
+El ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la \textbf{informática forense}. La informática forense se puede definir como \entrecomillado{la disciplina de las ciencias forenses que, considerando las tareas propias asociadas a la evidencia, procura descubrir e interpretar la información en los medios informáticos para establecer los hechos y formular las hipótesis relacionadas con el caso} \cite{informatica:libro_informatica_forense} o como \entrecomillado{la disciplina científica y especializada que, entendiendo los elementos propios de las tecnologías de los equipos de computación, ofrece un análisis de la información residente en dichos equipos} \cite{informatica:libro_informatica_forense}.
+
+Algunos ejemplos de aplicación son:
 
 \begin{itemize}
     \item Reconocer caras de sospechosos que llevan en busca un tiempo en imágenes de videovigilancia
@@ -218,17 +219,15 @@ Por ejemplo, en 2021 se pusieron en marcha en España máquinas \textit{ABC Syst
 Todo esto justifica el interés en disponer de un modelo que resuelva la tarea que hemos propuesto.
 
 \section{Descripción de los objetivos}
-\todo{Esta sección no me convence nada, volver a ella cuando haya desarrollado más texto}
 
-Por todo esto, los objetivos del presente trabajo son los siguientes:
+Por todo lo que acabamos de comentar, los objetivos del presente trabajo son los siguientes:
 
 \begin{enumerate}
-    \item Realizar una revisión del estado del arte en el ámbito del \textit{AIFR}
-    \item Implementar todos los módulos necesarios para poder aplicar técnicas \textit{online} de cómputo del \textit{triplet loss}
-    \item Realizar un estudio de los \textit{datasets} disponibles
-        \todo{No sé que sentido tiene hablar de esto aquí cuando acabamos de mirar todos los datasets que vamos a usar (aunque no todos los datasets disponibles)}
-    \item Comparar los resultados obtenidos con otros trabajos del mismo ámbito
-    \item Los \textit{scripts} con los que el autor genera las anotaciones de los datos
+    \item Realizar una revisión del estado del arte en el ámbito del \textit{AIFR} (véase \customref{ich:estado_arte})
+    \item Implementar todos los módulos necesarios para poder aplicar técnicas \textit{online} de cómputo del \textit{triplet loss} (véase \customref{ich:implementacion})
+    \item Realizar un estudio de los \textit{datasets} disponibles (véase \customref{isec:base_datos_usada})
+    \item Llevar a cabo el proceso de aprendizaje de un modelo profundo que resuelva la tarea de \textit{AIFR} (véase \customref{ich:Experimentación})
+    \item Comparar los resultados obtenidos por dicho modelo con otros trabajos del mismo ámbito
 \end{enumerate}
 
 \section{Planificación} \label{isec:planificacion}
