@@ -416,9 +416,8 @@ Todo esto plantea los siguientes \textbf{inconvenientes}:
 \end{itemize}
 
 \subsection{Comparación de los \textit{datasets} \textit{FG-Net} y \textit{CACD}} \label{isec:comparaciones_datasets}
-% TODO -- seguir por aqui
 
-Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:dataset_cacd}, usaremos el segundo \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos. Repasaremos los apartados de estudio realizados en los dos últimos \textit{datasets}, comparando los resultados de ambos.
+Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:dataset_cacd}, usaremos el primer \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos. Repasaremos los apartados de estudio realizados en los dos últimos \textit{datasets}, comparando los resultados de ambos.
 
 
 \subsubsection{Distribución del número de imágenes por individuo}
@@ -460,12 +459,12 @@ Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:da
 \caption{Datos estadísticos sobre la distribución del número de imágenes por individuo, en los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
 \end{table}
 
-Podemos ver, a partir de los datos, que:
+Podemos ver que:
 
 \begin{itemize}
-    \item El número de imágenes por individuo es ampliamente superior en \textit{CACD} que en \textit{FG-Net}. Un claro indicador de esto es que el valor máximo en \textit{FG-Net} está por debajo del máximo en \textit{CACD}. Este hecho puede ayudar a solventar algunos de los problemas sobre la diferencia en la distribución de la edad que plantea \textit{FG-Net}
-    \item La desviación típica es mucho menor en \textit{FG-Net}. Por lo tanto, en cuanto a cuántas imágenes podemos encontrar por cada individuo, quizás \textit{CACD} introduzca algo más de dificultad, aunque esto no nos parece un factor realmente relevante
-    \item A la hora de entrenar, vamos a poder usar valores mucho más altos de $K$ en \textit{CACD} (véase \customref{ich:fundamentos_teoricos} para más detalles). Y este valor, en validación, se puede reducir (o directamente ignorar) para actuar sobre \textit{FG-Net}
+    \item El número de imágenes por individuo es ampliamente superior en \textit{CACD} que en \textit{FG-Net}. Un claro indicador de esto es que el valor máximo en \textit{FG-Net} está por debajo del mínimo en \textit{CACD}. Este hecho puede ayudar a solventar algunos de los problemas sobre la diferencia en la distribución de la edad que plantea \textit{FG-Net}
+    \item La desviación típica es mucho menor en \textit{FG-Net}. Por lo tanto, respecto al número de imágenes por individuo, quizás \textit{CACD} suponga algo más de dificultad, aunque esto no nos parece un factor realmente relevante
+    \item A la hora de entrenar, vamos a poder usar valores mucho más altos de $K$ en \textit{CACD} (véase \customref{isubs:muestreo_datos_pk_sampling_teoria}). Y este valor, en validación, se puede reducir (o directamente ignorar) para actuar sobre \textit{FG-Net}
     \item La distribución en \textit{CACD} parece seguir una distribución normal, mientras que en \textit{FG-Net}, a priori, no se ve de forma tan clara. Aunque como ya hemos comentado previamente, no estamos interesados en comprobar estas hipótesis
 \end{itemize}
 
@@ -515,10 +514,9 @@ A partir de estos datos, podemos ver que:
     \item La concentración en edades bajas en \textit{FG-Net} puede presentar un \textbf{serio problema} a la hora de que un modelo entrenado sobre \textit{CACD} funcione correctamente
 \end{itemize}
 
-
 \subsubsection{Distribución del rango de edad por individuo}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
     \begin{subfigure}{.5\textwidth}
         \centering
@@ -556,16 +554,17 @@ A partir de estos datos, podemos ver que:
     \label{table:conjunta_fgnet_estadisticas_rangos_edad}
 \end{table}
 
-A partir de estos datos, podemos observar que:
+A partir de esto, podemos ver que:
 
 \begin{itemize}
-    \item Como muestran tanto \customref{img:conjunta_fgnet_rangos_edades_individuales} como \customref{table:conjunta_fgnet_estadisticas_rangos_edad}, \textit{FG-Net} presenta una variabilidad en los rangos de edad que es prácticamente inexistente en \textit{CACD} (en la que salvo 15 individuos, el rango de edad siempre es de 15 años)
-    \item Este problema se ve agravado cuando nos damos cuenta que la mayoría de individuos en \textit{FG-Net} tienen un rango de edades entre 18 y casi 38 años, que contrasta con el rango de 9 años constante en \textit{CACD}. Si el rango en \textit{CACD} fuese constante pero superior, al menos la falta de variabilidad podría no notarse tanto
+    \item Como muestran tanto \customref{img:conjunta_fgnet_rangos_edades_individuales} como \customref{table:conjunta_fgnet_estadisticas_rangos_edad}, \textit{FG-Net} presenta una variabilidad en los rangos de edad que es prácticamente inexistente en \textit{CACD} (en la que salvo 15 individuos, el rango de edad siempre es de 9 años)
+    \item Este problema se ve agravado cuando nos damos cuenta que la mayoría de individuos en \textit{FG-Net} tienen un rango de edad entre 18 y casi 38 años, que contrasta con el rango de 9 años constante en \textit{CACD}. Si el rango en \textit{CACD} fuese constante pero superior, al menos la falta de variabilidad podría no notarse tanto
     \item Para \textit{FG-Net} tenía sentido mostrar el histograma de la distribución de rangos, en \customref{img:fgnet_rangos_distribucion}. Sin embargo, en \textit{CACD}, como no teníamos variabilidad, no mostramos dicho histograma
     \item Así que las dificultades que veíamos en \customref{isubsubs:conjunta_fgnet_cacd_edades} se ven agravadas al estudiar la distribución de los rangos de edad
 \end{itemize}
 
 \section{Técnicas empleadas}
+% TODO -- seguir por aquí
 
 \subsection{Hyperparameter Tuning usando K-Fold Cross Validation} \label{isec:hptuning_kfold_cross_validation}
 \todo{Leer de nuevo porque hemos cambiado esta sección}
