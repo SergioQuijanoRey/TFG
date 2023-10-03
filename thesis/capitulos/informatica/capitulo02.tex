@@ -196,26 +196,26 @@ Este enfoque supone una serie de \textbf{problemas}:
 
 \subsection{Enfoque \textit{online}} \label{isubs:triples_online}
 
-La idea común será implementar el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio sobre los datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Repetimos este proceso hasta agotar todos las entradas de nuestro \textit{dataset}, completando así una época de entrenamiento.
+La idea común será la de implementar el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio sobre los datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Repetimos este proceso hasta agotar todos las entradas de nuestro \textit{dataset}, completando así una época de entrenamiento.
 
-Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales (muestreo y selección de triples):
+Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales del proceso (muestreo y selección de triples):
 
 \begin{enumerate}
     \item La ventaja más obvia es que, suponiendo que el tamaño de la muestra es significativamente mucho más pequeño que el tamaño de todo el conjunto de datos, la generación de triples consumirá potencialmente menos tiempo y será más efectiva
         \begin{itemize}
             \item Para afirmar esto rotundamente, tendríamos que realizar un estudio del tiempo del minado \textit{offline} en contraste a la suma de todos los tiempos de minado en cada muestreo
-            \item Sin embargo, el tiempo usado es más eficiente, porque en cada paso estamos usando la red actualizada. En el minado \textit{offline} podemos gastar muchísimo tiempo en encontrar triples difíciles que, tras entrenar en pocos ejemplos previos, acaben siendo sencillos, y por tanto, cuando la red vea estos ejemplos, ya sean totalmente inútiles
+            \item Sin embargo, el tiempo usado es más eficiente, porque en cada muestreo estamos usando la red actualizada. En el minado \textit{offline} podemos gastar muchísimo tiempo en encontrar triples difíciles que, tras entrenar en unos pocos triples previos, acaben siendo sencillos. Por tanto, cuando la red vea triples algo avanzados en la lista, estos ya serán totalmente inútiles
         \end{itemize}
-    \item Se facilita en gran parte el ajuste de la dificultad. Podemos buscar triples realmente difíciles, pero como solo se tiene acceso a una pequeña muestra, estamos controlando la dificultad. Aquí podemos variar el tamaño de las muestras para buscar un punto medio entre ejemplos muy difíciles o ejemplos demasiado sencillos. Y todo esto sin contar con el factor de que vamos a usar la red actualizada para la elección de los triples, como comentaremos más adelante
+    \item Se facilita en gran parte el ajuste de la dificultad. Podemos buscar triples realmente difíciles, pero como solo se tiene acceso a una pequeña muestra, estamos controlando la dificultad. Así que podemos variar el tamaño de las muestras para buscar un punto medio entre ejemplos muy difíciles o ejemplos demasiado sencillos. Y todo esto sin contar con el factor de que vamos a usar la red actualizada para la elección de los triples
 \end{enumerate}
 
 Desarrollada esta visión de forma general, veamos cómo se implementa cada una de las partes, siguiendo las técnicas introducidas en \cite{informatica:principal}.
 
 \subsection{Muestreo de los datos con \textit{P-K sampling}} \label{isubs:muestreo_datos_pk_sampling_teoria}
 
-La \textbf{idea principal del muestreo} es lo que definiremos como \textbf{\textit{P-K sampling}}. Como ya hemos comentado en \customref{isubs:triples_online}, nuestra tarea ahora es generar un \textit{batch} de elementos de la forma \lstinline{(imagen, identidad, edad)}. En una segunda etapa (véase \customref{isubs:seleccion_de_triples}), otro algoritmo decide como generar triples a partir de estos datos.
+La \textbf{idea principal del muestreo} es lo que definiremos como \textbf{\textit{P-K sampling}}. Como ya hemos comentado en \customref{isubs:triples_online}, nuestra tarea ahora es generar un \textit{batch} de elementos de la forma \lstinline{(imagen, identidad, edad)}. En una segunda etapa (véase \customref{isubs:seleccion_de_triples}), otro algoritmo decide cómo generar triples a partir de estos datos.
 
-El algoritmo de muestreo \textit{P-K sampling} es muy sencillo. En cada muestreo, seleccionamos aleatoriamente $P$ identidades de individuos (o clases, en un ambiente más general en el que no necesariamente estemos trabajando con imágenes de personas). Por cada una de las identidades, seleccionamos aleatoriamente $K$ imágenes. Por tanto, obtenemos una lista de $P \cdot K$ imágenes, o lo que podemos llamar, un \textbf{\textit{P-K batch}}. Para poder obtener triples interesantes en la siguiente etapa, parece que lo deseable es que ambas selecciones aleatorias (muestreos) sean sin repetición.
+El algoritmo de muestreo \textit{P-K sampling} es muy sencillo. En cada muestreo, seleccionamos aleatoriamente $P$ identidades de individuos (o clases, en un ambiente más general en el que no necesariamente estemos trabajando con imágenes de personas). Por cada una de las identidades, seleccionamos aleatoriamente $K$ imágenes asociadas a esa identidad. Por tanto, obtenemos una lista de $P \cdot K$ imágenes, a la que llamaremos \textbf{\textit{P-K batch}}. Para poder obtener triples interesantes en la siguiente etapa, parece que lo deseable es que ambos muestreos aleatorios sean sin repetición.
 
 El hecho de tener $K$ imágenes por cada uno de los individuos seleccionados es lo que va a permitir al algoritmo de generación de triples obtener rápidamente triples interesantes.
 
@@ -225,11 +225,11 @@ El hecho de tener $K$ imágenes por cada uno de los individuos seleccionados es 
     \caption{Ejemplo gráfico del proceso de \textit{P-K sampling}. Imagen extraída de \cite{informatica:paper_image_pk_sampling}}
 \end{figure}
 
-Queda aquí claro los problemas que introduce este muestreo: si queremos muestrear $K$ imágenes de cada individuo sin repetición, cada individuo debe tener asociadas al menos $K$ imágenes. Así que a la hora de trabajar con un \textit{dataset}, siempre deberíamos comprobar la distribución del número de imágenes por individuo, como hemos hecho en \customref{isec:base_datos_usada}.
+Queda aquí claro el \textbf{problema principal} que introduce esta técnica: si queremos muestrear $K$ imágenes de cada individuo sin repetición, cada individuo debe tener asociadas al menos $K$ imágenes. Así que a la hora de trabajar con un \textit{dataset}, siempre deberíamos comprobar la distribución del número de imágenes por individuo, como haremos en \customref{isec:base_datos_usada}.
 
 \subsection{Selección de triples y funciones de pérdida} \label{isubs:seleccion_de_triples}
 
-Una vez que tenemos un \textit{batch} de $P \cdot K$ elementos, deberemos seleccionar triples de ellos. Una vez se especifica cómo se seleccionan los triples, usando \eqref{ieq:triplet_loss_single_entry}, inducimos de forma natural y directa una cierta función de pérdida que actúa sobre estos \textit{P-K batches}.
+Una vez que tenemos un \textit{batch} de $P \cdot K$ elementos, deberemos generar una lista de triples en base a este \textit{batch}. Una vez se especifica cómo se seleccionan los triples, usando \eqref{ieq:triplet_loss_single_entry}, inducimos de forma natural y directa una cierta función de pérdida que actúa sobre estos \textit{P-K batches}.
 
 \begin{observacion}
 
@@ -252,13 +252,13 @@ Esto introduce la siguiente función de pérdida, a la que llamaremos \textbf{\t
 
 donde $[x]_+ := max \{0, x\} = ReLU(x)$ y $\hat{\Omega}$ se refiere a un \textit{P-K batch}. No olvidemos que no estamos escribiendo la división por el número de sumandos, $P \cdot K$.
 
-Estamos generando \textbf{triples moderados}, porque estamos buscando los triples más difíciles, pero dentro de un \textit{batch} relativamente pequeño comparado a el total del conjunto de datos. Por tanto, estamos ajustando la dificultad de los triples cómodamente, resolviendo el problema que comentábamos en \customref{isubs:enfoque_offline_minado_triples}. Aumentando el valor de $P, K$, aumentamos el espacio de búsqueda, y por tanto podremos encontrar triples mucho más difíciles. Sin embargo, hay que tener siempre en cuenta el coste en tiempo de cómputo.
+Estamos generando \textbf{triples moderados}, porque estamos buscando los triples más difíciles, pero dentro de un \textit{batch} relativamente pequeño comparado a el total del conjunto de datos. Con esto estamos ajustando la dificultad de los triples cómodamente, resolviendo el problema que comentábamos en \customref{isubs:enfoque_offline_minado_triples}. Aumentando el valor de $\{P, K\}$ aumentamos el tamaño del espacio de búsqueda, y por tanto podremos encontrar triples mucho más difíciles. Sin embargo, hay que tener siempre en cuenta el coste en tiempo de cómputo.
 
 Queda claro que, gracias al proceso de \textit{P-K sampling}, ahora es factible realizar una búsqueda de triples interesantes en profundidad, basándonos en el estado más actualizado de la red para calcular la dificultad de los triples. Esta búsqueda extensiva no habría sido posible si la planteásemos sobre todo el conjunto de datos.
 
 \subsubsection{\textit{Batch All}} \label{isubsubs:batch_all}
 
-Motivados por lo comentado en \customref{isubsubs:batch_hard}, podemos plantearnos usar todas los posibles triples dentro de un \textit{P-K batch} como un enfoque que ahora cobra más sentido (ya hemos comentado en \customref{isubs:enfoque_offline_minado_triples} que realizar esto sobre todo el conjunto de datos no parece una buena idea).
+Motivados por lo que acabamos de comentar en \customref{isubsubs:batch_hard}, podemos plantearnos usar todos los posibles triples dentro de un \textit{P-K batch} como un enfoque que ahora cobra más sentido (ya hemos comentado en \customref{isubs:enfoque_offline_minado_triples} que realizar esto sobre todo el conjunto de datos no parece una buena idea).
 
 Realizar esto introduce la función de pérdida que llamaremos \textbf{\textit{Batch All}}:
 
@@ -277,7 +277,7 @@ Está claro que, por el número de sumandos, esta aproximación es viable gracia
     P \cdot K \cdot (K - 1) \cdot (P - 1) \cdot K = P^2 - P + K^3 - K^2 \approx P^2 + K^3
 \end{equation}
 
-Esta aproximación sería completamente inviable sobre un número muy elevado de elementos. Pensemos, por ejemplo, en las 163446 imágenes de \textit{CACD}.
+Esta aproximación sería completamente inviable sobre un número muy elevado de elementos. Pensemos, por ejemplo, en las 163446 imágenes de \textit{CACD} (véase \customref{isec:dataset_cacd}).
 
 \subsubsection{Mejoras introducidas a partir de la experimentación} \label{isubsubs:mejoras_sumandos_no_nulos}
 
@@ -285,7 +285,7 @@ En \cite{informatica:principal}, a raíz de observar los resultados de la experi
 
 Principalmente, en \customref{isubsubs:batch_all}, podemos ver un posible fallo en la función de pérdida \eqref{ieq:batch_all}. Si se da el caso de que la mayoría de triples generados son fáciles (hecho muy probable al estar generando todas las combinaciones de triples), los escasos triples que realmente son difíciles se desvanecerán. Esto porque la mayoría de términos serán cero (al estar aplicando $[x]_+$). Y los pocos términos que no son cero, se dividen por el número total de elementos, que ya hemos visto que es elevado.
 
-Por tanto, una mejora sencilla a esta función de pérdida es dividir únicamente por el número de sumandos no nulos. Esta mejora la podemos aplicar también a \textit{batch hard}, obteniendo dos nuevas funciones de pérdida, a las que llamaremos $\mathcal{L}_{BA \neq 0}$ y $\mathcal{L}_{BH \neq 0}$.
+Por tanto, una mejora sencilla a esta función de pérdida es dividir únicamente por el número de sumandos no nulos. A estos sumandos no nulos también se les llama sumandos activos \cite{informatica:principal}. Esta mejora la podemos aplicar también a \textit{batch hard}, obteniendo dos nuevas funciones de pérdida, a las que denotaremos por $\mathcal{L}_{BA \neq 0}$ y $\mathcal{L}_{BH \neq 0}$.
 
 \subsubsection{Algunas observaciones y conclusiones} \label{isubsubs:observaciones_conclusiones_pksampling}
 
@@ -294,20 +294,20 @@ En primer lugar, cabe destacar que, como señalan \cite{informatica:principal}, 
 El desarrollo que hemos realizado justifica las siguientes \textbf{ventajas} de los nuevos métodos:
 
 \begin{itemize}
-    \item El uso del \textit{P-K sampling} y las dos nuevas funciones de pérdida (con las variantes técnicas) permiten realizar el aprendizaje de forma usual, sin añadir un paso adicional en el bucle de aprendizaje, evitando así la gran complejidad añadida del minado \textit{offline}
+    \item El uso del \textit{P-K sampling} y las dos nuevas funciones de pérdida (con las variantes técnicas que consideran los sumandos activos) permite realizar un aprendizaje \textit{end-to-end}, sin añadir un paso adicional en el bucle de aprendizaje, evitando así la gran complejidad añadida del minado \textit{offline}
     \item Además, conseguimos un manejo preciso de la dificultad de los triples obtenidos. Controlando el valor de $\{P, K\}$, controlamos el espacio de búsqueda y, en definitiva, la dificultad. Todo esto de forma cómoda y sin introducir apenas complejidad en nuestro \textit{pipeline}
     \item Aunque no lo hemos comprobado, pensamos que esto acelera los tiempos de cómputo, al estar realizando el minado de triples sobre \textit{batches} de tamaño considerablemente reducidos
-    \item Y aunque no mejorásemos el tiempo de computo, lo que sí sabemos que mejoramos es la eficacia del minado de triples. El minado de triples usa una red mucho más actualizada, para generar una lista mucho más pequeña que probablemente no se degrade tanto como la generada por un minado \textit{offline} sobre todo el conjunto de datos, mucho más grande
-    \item Es más, estamos controlando el efecto de los triples demasiado sencillos, que no tendremos en cuenta a la hora de dividir los sumandos en la función de pérdida
+    \item Y aunque no mejorásemos el tiempo de computo, lo que sí sabemos que mejoramos es la eficacia del minado de triples. El minado de triples \textit{online} usa una red mucho más actualizada, para generar una lista mucho más pequeña que probablemente no se degrade tanto como la generada por un minado \textit{offline} sobre todo el conjunto de datos, mucho más grande
+    \item Es más, estamos controlando el efecto de los triples demasiado sencillos, que no tendremos en cuenta a la hora de promediar en la función de pérdida
 \end{itemize}
 
 A pesar de esto, a raíz de trabajar con estas nuevas técnicas, identificamos los siguientes \textbf{inconvenientes}:
 
 \begin{itemize}
-    \item Introducimos dos hiperparámetros, $\{P, K\}$, que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \customref{isec:hp_tuning}
-    \item Tenemos que tener mucho cuidado con valores elevados de $\{P, K\}$, por dos motivos. El primero, y como ya hemos comentado, valores altos implicarán que los tiempos de cómputo para la generación de triples crecerán rápidamente. El segundo es que el tamaño de los \textit{batches} crecerán considerablemente, llegando a colapsar la memoria disponible de la \textit{GPU}
-    \item Hemos comprobado en la práctica que es realmente fácil colapsar la memoria \textit{GPU}, usando modelos profundos como \textit{ResNet50} con valores de $P \cdot K = 100$. Esto supone que, aunque no estuviéramos limitados por el tiempo de cómputo, el colapso de la memoria limita el conjunto de valores que $\{P, K\}$ puede tomar, restringiendo fundamentalmente la experimentación que podemos realizar con estos valores
-    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo (por esto, hemos realizado este estudio en \customref{isec:base_datos_usada} para nuestras bases de datos). Se pueden explorar técnicas como el aumentado de datos para aumentar el número de imágenes por individuo, pero solo serán efectivas si dicha distribución es buena para empezar
+    \item Introducimos dos hiperparámetros, $\{P, K\}$ que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \customref{isec:hptuning_kfold_cross_validation} e implementamos en \customref{isec:hp_tuning}
+    \item Tenemos que tener mucho cuidado con usar valores elevados de $\{P, K\}$ por dos motivos. El primero, y como ya hemos comentado, valores altos implicarán que los tiempos de cómputo para la generación de triples crecerán rápidamente. El segundo es que el tamaño de los \textit{batches} crecerán considerablemente, llegando a colapsar la memoria disponible de la \textit{GPU}
+    \item Hemos comprobado en la práctica que es realmente fácil colapsar la memoria \textit{GPU}, usando modelos profundos como \textit{ResNet50} con valores de $P \cdot K = 100$. Esto supone que, aunque no estuviéramos limitados por el tiempo de cómputo, el colapso de la memoria limita el conjunto de valores $\{P, K\}$ con los que podemos experimentar
+    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo. Por este motivo hemos estudiado esta distribución en \customref{isec:base_datos_usada}. Se pueden explorar técnicas como el aumentado de datos para alcanzar el número de imágenes por individuo deseado, pero solo serán efectivas si dicha distribución es buena para empezar (véase \customref{isec:aumentado_datos})
     \item Tanto por el formato de los datos con los que hemos trabajado, como por el cambio fundamental realizado en el \textit{sampling} de los datos, hemos tenido que realizar un \textbf{esfuerzo considerable de implementación}, al no poder basarnos en la mayor parte de los casos en código implementado por alguna biblioteca de aprendizaje automático. Esto se ve reflejado en \customref{ich:implementacion}
 \end{itemize}
 
