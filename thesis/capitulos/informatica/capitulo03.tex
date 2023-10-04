@@ -564,28 +564,26 @@ A partir de esto, podemos ver que:
 \end{itemize}
 
 \section{Técnicas empleadas}
-% TODO -- seguir por aquí
 
 \subsection{Hyperparameter Tuning usando K-Fold Cross Validation} \label{isec:hptuning_kfold_cross_validation}
-\todo{Leer de nuevo porque hemos cambiado esta sección}
 
-Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de fijar una serie de hiperparámetros que afectan de forma esencial a la calidad del modelo obtenido. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase \customref{isubs:muestreo_datos_pk_sampling_teoria}), el número de épocas de entrenamiento, ... Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos.
+Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de \textbf{fijar una serie de hiperparámetros} que afectan de forma esencial a la calidad de dicho modelo. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase \customref{isubs:muestreo_datos_pk_sampling_teoria}), el número de épocas de entrenamiento, ... Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos.
 
-Una técnica de \textit{hyperparameter tuning} estará formada por dos componentes:
+Una técnica de \textbf{\textit{hyperparameter tuning}} estará formada por dos componentes:
 
 \begin{itemize}
     \item Una primera componente que, dada una configuración de hiperparámetros, compute una métrica que podamos optimizar
-    \item Una segunda componente que tome los resultados de la primera componente, y genere nuevas configuraciones de hiperparámetros candidatas a explorar. Es decir, un algoritmo de búsqueda
+    \item Una segunda componente que tome los resultados de la primera componente, y genere nuevas configuraciones de hiperparámetros a explorar. Es decir, un algoritmo de búsqueda
 \end{itemize}
 
-Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search}, \textit{Random Search}, Optimización Bayesiana, algoritmos evolutivos basados en poblaciones, ... \cite{informatica:review_algoritmos_hp} En \customref{isec:hp_tuning} veremos que la librería \lstinline{optuna} se encarga de implementar esta búsqueda.
+Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search}, \textit{Random Search}, Optimización Bayesiana, algoritmos evolutivos basados en poblaciones, ... \cite{informatica:review_algoritmos_hp} En \customref{isec:hp_tuning} veremos que la librería \lstinline{optuna} se encarga de implementar esta búsqueda por nosotros.
 
-Para la primera componente tenemos también varias alternativas. Una alternativa sería la de usar el subconjunto de entrenamiento para probar las configuraciones de hiperparámetros candidatas, y evaluar sobre el conjunto de \textit{test}. \textbf{Esta alternativa es completamente errónea}, pues estamos realizando \textit{data snooping}: incluimos datos de \textit{test} en el proceso de creación del modelo.
+Para la primera componente tenemos también varias alternativas. Una alternativa sería la de usar el subconjunto de entrenamiento para probar las configuraciones candidatas de hiperparámetros, y evaluar sobre el conjunto de \textit{test}. \textbf{Esta alternativa es completamente errónea}, pues estamos realizando \textit{data snooping}: incluimos datos de \textit{test} en el proceso de creación del modelo.
 
-Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, validación y \textit{test}). Entrenamos usando las configuraciones candidatas y evaluamos sobre el conjunto de validación. Este enfoque sí que es correcto pues no estamos usando el conjunto de \textit{test} en ningún momento, pero tiene algunos inconvenientes:
+Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, validación y \textit{test}). El conjunto de validación se genera partiendo el conjunto de entrenamiento. Entrenamos usando las configuraciones candidatas y evaluamos sobre el conjunto de validación. Este enfoque sí que es correcto pues no estamos usando el conjunto de \textit{test} en ningún momento, pero tiene algunos inconvenientes:
 
 \begin{itemize}
-    \item Estamos perdiendo una parte considerable del conjunto de entrenamiento
+    \item Estamos perdiendo una parte considerable del conjunto de entrenamiento para generar el conjunto de validación
     \item Los resultados pueden depender mucho de la selección del subconjunto de validación, y por tanto, no ser robustos
 \end{itemize}
 
@@ -612,8 +610,8 @@ Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta t�
 
 \begin{itemize}
     \item Cuanto mayor sea el valor de $K$ mejor. De esta forma, reducimos la variabilidad que supone elegir determinados \textit{folds} para validar, y la métrica obtenida al final como un promedio es más robusta
-    \item De hecho, cuando tomamos $K$ igual al número de elementos del \textit{dataset}, estamos aplicando la técnica \textit{leave-one-out} \cite{informatica:kfold_cross_val_paper}
-    \item Sin embargo, valores altos de $K$ suponen tiempos de cómputo largos: entrenamos $K$ veces, y sobre un porcentaje grande del \textit{dataset} de entrenamiento $\frac{K - 1}{K}$
+    \item De hecho, cuando tomamos $K$ igual al número de elementos del \textit{dataset}, estamos aplicando la técnica conocida como \textit{leave-one-out} \cite{informatica:kfold_cross_val_paper}
+    \item Sin embargo, valores altos de $K$ suponen tiempos de cómputo grandes: entrenamos $K$ veces, y sobre un porcentaje grande del \textit{dataset} de entrenamiento: $\frac{K - 1}{K}$
 \end{itemize}
 
 Describimos cómo implementamos esta técnica en \customref{isec:hp_tuning}.
