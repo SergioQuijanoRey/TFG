@@ -19,6 +19,7 @@ compile:
     bibtex "{{trim_end_match(texfile, '.tex')}}"
     pdflatex "{{texfile}}"
     pdflatex "{{texfile}}"
+    notify-send "📃" "Latex compiled!"
 
 # Compiles the project from zero
 clean_compile:
