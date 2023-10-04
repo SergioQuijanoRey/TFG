@@ -52,7 +52,7 @@ Tenemos una serie de \textbf{problemas con esta base de datos}, que motiva el us
     \item Este \textit{dataset} no introduce ninguna forma de trabajar la invarianza a cambios de edad, por lo que, en última instancia, no es adecuado para nuestros propósitos
 \end{itemize}
 
-\subsubsection{Distribución del número de imágenes por individuo}
+\subsubsection{Distribución del número de imágenes por individuo} \label{isubsubs:imagenes_por_clase_lfw}
 
 Acabamos de comentar la importancia de la distribución del número de imágenes por individuo. En la siguiente figura podemos observar dicha distribución:
 
@@ -671,3 +671,21 @@ Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta t�
 \end{itemize}
 
 Describimos cómo implementamos esta técnica en \customref{isec:hp_tuning}.
+
+\subsection{Normalización} \label{isubs:normalizacion_teoria}
+
+En \customref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \customref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
+
+\begin{equation} \label{ieq:normalizacion}
+    \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}
+\end{equation}
+
+Además del interés que pueda tener estudiar el comportamiento de los modelos al introducir la normalización, esta técnica introduce el siguiente punto a tener en cuenta. Durante los entrenamientos hemos tenido muchos problemas de inestabilidad:  en la mayoría de ocasiones, el entrenamiento se saturaba tras pocas iteraciones. Es claro que si nuestra red aprende a colapsar todas las entradas a $\vec{0}$, la ecuación \eqref{ieq:normalizacion} falla, con lo que el entrenamiento se detiene. Sin embargo, a raíz de la experimentación, vemos que la normalización ayuda enormemente a que dicho comportamiento no se aprenda. Y con ello, es mucho más fácil conseguir entrenamientos estables. El siguiente diagrama muestra un ejemplo de entrenamiento inestable:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_colapso_entrenamiento}
+    \caption{Histórico de \textit{WANDB} que muestra un entrenamiento inestable que acaba por fallar. En las gráficas, los círculos indican entradas con el valor \lstinline{NaN}}
+\end{figure}
+
+En \customref{isubs:normalization_impl} estudiaremos la implementación de esta técnica en detalle.

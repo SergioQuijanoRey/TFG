@@ -23,7 +23,7 @@ Gracias al uso de \textit{Github} hemos podido implementar fácilmente una serie
 Por la extensión de la base de código, es necesario que comentemos la estructura de carpetas del proyecto. En el directorio raíz tenemos los siguientes ficheros relevantes:
 
 \begin{itemize}
-    \item \lstinline{flake.nix} y \lstinline{flake.lock} especifican el entorno de desarrollo usando el gestor \textit{nix}. El fichero \lstinline{enviroment.yml} especifica el entorno de desarrollo usando el gestor \textit{Conda}
+    \item \lstinline{flake.nix} y \lstinline{flake.lock} especifican el entorno de desarrollo usando el gestor \textit{nix}. El fichero \lstinline{enviroment.yml} especifica el entorno de desarrollo usando el gestor \textit{Conda} (véase \customref{isec:entorno_ejecucion})
     \item Los ficheros \lstinline{interactive_slurm.sh} y \lstinline{launch_server_process.sh} son dos \textit{scripts Bash} que usamos para lanzar procesos en los servidores \textit{nGPU}. El primero lo utilizamos para entrar en una terminal de forma interactiva. El segundo, para lanzar un \textit{script} de \lstinline{Python} para que ejecute el aprendizaje y validación de un modelo
     \item \lstinline{justfile} especifica tareas para ejecutarse con la herramienta \lstinline{just} \cite{informatica:just}. Dicha herramienta es parecida a \lstinline{make}. La usamos para definir tareas como:
         \begin{itemize}
@@ -40,13 +40,13 @@ En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
 
 \begin{itemize}
     \item \lstinline{.github/workflows} en el que definimos las \textit{Github Actions} que ejecutamos (véase \customref{isec:github_buenas_practicas})
-    \item \lstinline{thesis} donde desarrollamos los documentos que componen la presente memoria
+    \item \lstinline{thesis} donde desarrollamos el proyecto \textit{Latex} que compone la presente memoria
     \item \lstinline{src} donde realizamos todo el desarrollo de código. Este a su vez se divide en los siguientes subdirectorios:
         \begin{itemize}
-            \item \lstinline{lib}, donde implementamos toda la librería que usamos en los \textit{Notebooks} y en los \textit{scripts} de entrenamiento. Implementan tareas varias, como el cálculo de funciones de pérdida, el \textit{P-K sampling}, métricas, bucles de entrenamiento, el sistema de \textit{logging}, \ldots
+            \item \lstinline{lib} donde implementamos toda la librería que usamos en los \textit{Notebooks} y en los \textit{scripts} de entrenamiento. Implementan tareas varias, como el cálculo de funciones de pérdida, el \textit{P-K sampling}, métricas, bucles de entrenamiento, el sistema de \textit{logging}, \ldots
             \item \lstinline{test} e \lstinline{integration_tests} donde alojamos toda la \textit{suite} de pruebas unitarias y de integración, para validar las implementaciones realizadas en nuestra librería
             \item \lstinline{benchmarks} donde alojamos los \textit{benchmarks} empleados en \customref{isec:optimizacion_codigo}
-            \item \lstinline{profiling} contiene los datos generados en los \textit{benchmarks} y el proceso explicado de optimización basado en datos
+            \item \lstinline{profiling} contiene los datos generados en los \textit{benchmarks} y la documentación del proceso de optimización basado en datos
         \end{itemize}
     \item En \lstinline{src} tenemos algunos ficheros relevantes:
 
@@ -63,32 +63,29 @@ Empezamos mostrando el diagrama de paquetes de nuestra librería:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{informatica/diagrama_paquetes}
+    \includegraphics[width=1.0\textwidth]{informatica/diagrama_paquetes}
     \caption{Diagrama de paquetes de nuestra librería. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}.}
 \end{figure}
 
-Como deja claro el diagrama, hemos estructura el código de la librería en módulos muy interconectados entre ellos. Comentamos ahora el \textbf{propósito de los módulos más relevantes}:
+Como deja claro el diagrama, hemos estructurado el código de la librería en módulos muy interconectados entre ellos. Comentamos ahora el \textbf{propósito de los módulos más relevantes}:
 
 \begin{itemize}
     \item \lstinline{src.lib.utils} contiene funciones auxiliares que se usan en distintas partes del código. Por ejemplo, comprobar si un tensor de \lstinline{pytorch} representa un vector o una matriz, realizar ciertos pre-cómputos para acelerar la ejecución de módulos, autentificarse en el servicio de logging \lstinline{wandb}, \ldots
     \item \lstinline{src.lib.loss_functions} contiene todo el código para computar las distintas funciones de pérdida que hemos introducido en \customref{ich:fundamentos_teoricos}.
     \item \lstinline{src.lib.sampler} contiene el código que implementa el \textit{P-K sampling}
     \item \lstinline{src.lib.metrics} implementa todas las métricas que hemos introducido en \customref{isec:metricas_teoria}
-    \item \lstinline{src.lib.train_loggers} contiene la lógica para mostrar las métricas deseadas durante el ciclo de entrenamiento de forma cómoda, modular y extensible, como comentaremos en \customref{isec:loggin_metricas}
+    \item \lstinline{src.lib.train_loggers} contiene la lógica para mostrar las métricas deseadas durante el ciclo de entrenamiento de forma cómoda, modular y extensible
     \item \lstinline{src.lib.datasets} contiene la lógica para descargar, extraer, y cargar en una clase accesible para \lstinline{pytorch} los \textit{datasets} \textit{FG-Net} y \textit{CACD}
-
-    \item \lstinline{src.lib.hyperparameter_tuning} contiene el código necesario para realizar \textit{hyperparameter tuning} usando \textit{K-Fold Cross Validation}
-    \todo{Hacer aquí una referencia a esta técnica. Igual debería ir en la parte de teoría}
-
+    \item \lstinline{src.lib.hyperparameter_tuning} contiene el código necesario para realizar \textit{hyperparameter tuning} usando \textit{K-Fold Cross Validation}, como hemos introducido en \customref{isec:hptuning_kfold_cross_validation}
     \item \lstinline{src.lib.split_dataset} contiene el código para dividir un \textit{dataset} en dos porciones, usando dos técnicas distintas. La primera técnica consiste en separar el \textit{dataset} usando muestreo aleatorio. La segunda técnica consiste en realizar la separación usando muestreo aleatorio, pero asegurando que no existan individuos de una clase en ambos \textit{datasets} simultáneamente
-    \item \lstinline{src.lib.data_augmentation} implementa el aumento de datos. Este aumento de datos es necesario porque, como hemos comentado en \customref{isubsubs:observaciones_conclusiones_pksampling}, para realizar \textit{P-K sampling} es obligatorio que todos los individuos tengan al menos $K$ imágenes asociadas. Realizamos el aumento de datos de forma clásica, añadiendo nuevos elementos a nuestro \textit{dataset}, y de forma \textit{lazy} o perezosa. En el aumento de datos \textit{lazy} no generamos nuevos elementos hasta que estos se solicitan en alguna parte del código. En \customref{isec:aumentado_datos} explicamos esto en detalle
+    \item \lstinline{src.lib.data_augmentation} implementa el aumento de datos. Este aumento de datos es necesario porque, como hemos comentado en \customref{isubsubs:observaciones_conclusiones_pksampling}, para realizar \textit{P-K sampling} es necesario que todos los individuos tengan al menos $K$ imágenes asociadas. Realizamos el aumento de datos de forma clásica, añadiendo nuevos elementos a nuestro \textit{dataset}, y de forma \textit{lazy} o perezosa. En el aumento de datos \textit{lazy} no generamos nuevos elementos hasta que estos se solicitan en alguna parte del código. En \customref{isec:aumentado_datos} explicamos esto en detalle
 \end{itemize}
 
 Por la gran extensión de la base de código, mostrar el diagrama de clases completo no aporta apenas información. Pero mostraremos los diagramas de clase de ciertos módulos en \customref{isec:modulos_relevantes}, cuando esto aporte información relevante.
 
 \section{Módulos relevantes} \label{isec:modulos_relevantes}
 
-Por la extensión del proyecto no comentaremos cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos algunos de los módulos más relevantes introducidos en \customref{isec:estructura_paquetes_modulos}.
+Por la extensión del proyecto no comentaremos cada módulo de código desarrollado. Sin embargo, en esta sección, estudiaremos algunos de los módulos más relevantes.
 
 \subsection{\textit{P-K sampling}}
 
@@ -111,7 +108,7 @@ En el diagrama de clases \customref{img:diagrama_clases_CustomSampler} podemos v
         \end{itemize}
 \end{itemize}
 
-En resumen, para realizar \textit{P-K sampling}, especificamos el orden el el que se itera el \textit{dataset} usando la clase \lstinline{CustomSampler}.
+En resumen, para realizar \textit{P-K sampling}, especificamos el orden en el que se itera el \textit{dataset} usando la clase \lstinline{CustomSampler}.
 
 Fijados los valores de $P$ y $K$, debemos indicar que el \textit{batch size} sea $P \cdot K$. Esto es claro, pues de otra forma sería imposible generar \textit{batches} en los que haya $P$ individuos representados cada uno con $K$ imágenes.
 
@@ -128,7 +125,7 @@ Este proceso es realmente sencillo. Sin embargo, realizar optimizaciones para qu
 \begin{itemize}
     \item \lstinline{self.dict_of_classes} es un diccionario en el que cada llave o \textit{key} es el identificador de un individuo (o su clase, en un entorno más amplio que el \textit{AIFR}) y el valor asociado a la llave es una lista de índices de imágenes de ese individuo. Con ello, una vez elegido un individuo al azar, es realmente rápido muestrear $K$ índices de imágenes asociadas
     \item \lstinline{self.classes} es una lista con los identificadores de individuos que tienen al menos $K$ imágenes, y por tanto, que son candidatos a ser elegidos en un ciclo del proceso anteriormente descrito
-    \item Esto supone que, durante el proceso de generación de índices, debemos mantener en un estado válido estas estructuras, lo que añade algo de complejidad a la implementación, aunque supone una mejora en tiempos de ejecución considerable
+    \item Esto supone que, durante el proceso de generación de índices, debemos mantener en un estado válido estas dos estructuras, lo que añade algo de complejidad a la implementación, aunque supone una mejora en tiempos de ejecución considerable
 \end{itemize}
 
 \begin{observacion}
@@ -139,7 +136,7 @@ Este proceso es realmente sencillo. Sin embargo, realizar optimizaciones para qu
 
 \subsection{Aumentado de datos} \label{isec:aumentado_datos}
 
-En \customref{isubsubs:observaciones_conclusiones_pksampling} hemos justificado la necesidad de llevar acabo aumentado de datos en ciertos \textit{datasets}, teniendo mucho cuidado de no saturar la memoria disponible. Por tanto, en el módulo \lstinline{src.lib.data_augmentation} proponemos dos soluciones, que mostramos en el siguiente diagrama de clases:
+En \customref{isubsubs:observaciones_conclusiones_pksampling} hemos justificado la necesidad de realizar un aumentado de datos en ciertos \textit{datasets}, teniendo mucho cuidado de no saturar la memoria disponible. Por tanto, en el módulo \lstinline{src.lib.data_augmentation} proponemos dos soluciones, que mostramos en el siguiente diagrama de clases:
 
 \begin{figure}[H]
     \centering
@@ -148,41 +145,41 @@ En \customref{isubsubs:observaciones_conclusiones_pksampling} hemos justificado 
     \label{img:diagrama_clases_aumentado_datos}
 \end{figure}
 
-En \customref{img:diagrama_clases_aumentado_datos} podemos ver que el aumentado de datos se realiza en dos clases que implementan la clase \lstinline{Dataset} de \lstinline{pytorch}. Gracias a esto, en nuestros \textit{pipelines} trabajamos igualmente con \textit{datasets} aumentados o sin aumentar, sin conocer este detalle. Además, podemos ver que ambas clases exponen la misma interfaz, por lo que podemos intercambiar estas soluciones. Podemos controlar cómo se generan nuevas imágenes gracias al atributo \lstinline{self.transform}.
+En \customref{img:diagrama_clases_aumentado_datos} podemos ver que el aumentado de datos se realiza en dos clases que heredan de la clase \lstinline{Dataset} de \lstinline{pytorch}. Gracias a esto, en nuestros \textit{pipelines} trabajamos igualmente con \textit{datasets} aumentados o sin aumentar, sin conocer este detalle. Además, podemos ver que ambas clases exponen la misma interfaz, por lo que podemos intercambiar estas soluciones. Podemos controlar cómo se generan nuevas imágenes gracias al atributo \lstinline{self.transform}.
 
-Para trabajar con el aumentado de datos, indicamos el \textit{dataset} que queremos aumentar, \lstinline{self.base_dataset}, y el número de imágenes mínimo por individuo, \lstinline{self.min_number_of_images}. Dicho valor siempre lo establecemos al valor de $K$ que usemos en cada proceso de entrenamiento. Con ello, aseguramos que cada individuo puede participar en al menos un \textit{P-K batch}.
+Para trabajar con el aumentado de datos, indicamos el \textit{dataset} que queremos aumentar, \lstinline{self.base_dataset}, y el número de imágenes mínimo por individuo, \lstinline{self.min_number_of_images}. Dicho valor siempre lo establecemos igual al valor de $K$ que usemos en cada proceso de entrenamiento. Con ello, aseguramos que cada individuo puede participar en al menos un \textit{P-K batch}.
 
 En \lstinline{AugmentedDataset}, localizamos los individuos con menos de \lstinline{self.min_number_of_images} imágenes asociadas. Generamos y almacenamos en memoria no permanente nuevas imágenes para estos individuos, en base a las imágenes que ya tenemos de los individuos. Almacenamos estas imágenes al final del \textit{dataset} (tienen los índices más altos). Pero esto no supone ningún problema gracias a estar usando \textit{P-K sampling}.
 
-En \lstinline{LazyAugmentedDataset} localizamos los individuos con menos de \lstinline{self.min_number_of_images} imágenes asociadas. Generamos nuevos índices para estos individuos, que almacenamos como atributo, sin computar todavía las nuevas imágenes. Cuando queremos acceder a una imagen concreta identificada por un índice, comprobamos si este índice corresponde a una imagen original o una de las imágenes generadas por el aumento de datos. En el primer caso, devolvemos la imagen que ya tenemos almacenada en el conjunto de datos \lstinline{self.base_dataset}. En el segundo caso, generamos la imagen en ese preciso instante y la devolvemos. En ningún momento almacenamos la nueva imagen para su uso posterior.
+En \lstinline{LazyAugmentedDataset} localizamos los individuos con menos de \lstinline{self.min_number_of_images} imágenes asociadas. Generamos nuevos índices para estos individuos, que almacenamos como atributo, sin computar todavía las nuevas imágenes. Cuando queremos acceder a una imagen concreta identificada por un índice, comprobamos si este índice corresponde a una imagen original o una de las imágenes generadas por el aumento de datos. En el primer caso, devolvemos la imagen que ya tenemos almacenada en el conjunto de datos \lstinline{self.base_dataset}. En el segundo caso, generamos la imagen en ese preciso instante y la devolvemos. En ningún momento almacenamos la nueva imagen para su uso posterior. Por tanto, este aumentado de datos apenas supone un aumento en el uso de memoria \textit{RAM} o memoria \textit{GPU}.
 
-El aumento de datos puede llegar a generar muchísimas imágenes nuevas si la distribución de número de imágenes por individuo es mala (como ocurre en \textit{LFW}). Por tanto, el proceso de almacenar las imágenes en memoria que hacemos en \lstinline{AugmentedDataset} puede provocar que saturemos la memoria disponible y que el proceso se detenga. Esto motiva el diseño de \lstinline{LazyAugmentedDataset}, que no almacena imágenes en memoria para su posterior uso.
+El aumento de datos puede llegar a generar muchísimas imágenes nuevas si la distribución de número de imágenes por individuo es mala (como ocurre en \textit{LFW}, véase \customref{isubsubs:imagenes_por_clase_lfw}). Por tanto, el proceso de almacenar las imágenes que hacemos en \lstinline{AugmentedDataset} puede provocar que saturemos la memoria disponible y que el proceso se detenga. Esto motiva el diseño de \lstinline{LazyAugmentedDataset}, que no almacena imágenes en memoria para su posterior uso.
 
 No almacenar las nuevas imágenes en memoria supone el siguiente compromiso:
 
 \begin{itemize}
-    \item Si accedemos dos veces al mismo índice no obtenemos la misma imagen
+    \item Si accedemos dos veces al mismo índice, si este se corresponde con una imagen aumentada, no obtendremos la misma imagen
     \item No se produce un aumento en el consumo de memoria, porque no estamos almacenando ninguna imagen nueva
     \item El proceso de crear un \textit{dataset} aumentado es más rápido. Pero el acceso a nuevos datos es más lento. En la variante \textit{lazy} tenemos que esperar a que se genere la nueva imagen. Mientras que en la variante normal, ese proceso ya se ha realizado previamente y el acceso es inmediato
 \end{itemize}
 
-Para realizar el aumento de datos estamos utilizando:
+Para realizar el aumento de datos estamos utilizando el módulo \lstinline{torchvision.transforms}. En concreto, usamos las siguientes transformaciones:
 
 \begin{itemize}
-    \item Un cortado aleatorio de la imagen, usando \lstinline{torchvision.transforms.RandomResizedCrop}. Dicho método toma una porción aleatoria de la imagen, y cambia su tamaño al especificado en la función. El tamaño de las imágenes producidas es igual al tamaño de las imágenes originales
-    \item Una rotación aleatoria, usando \lstinline{torchvision.transforms.RandomRotation}. Rotamos entre 0º y 20º
-    \item Un cambio de contraste aleatorio, usando \lstinline{torchvision.transforms.RandomAutocontrast}
+    \item Un cortado aleatorio de la imagen, usando \lstinline{RandomResizedCrop}. Dicho método toma una porción aleatoria de la imagen, y cambia su tamaño al especificado en la función. El tamaño de las imágenes producidas es igual al tamaño de las imágenes originales
+    \item Una rotación aleatoria, usando \lstinline{RandomRotation}. Rotamos entre 0º y 20º
+    \item Un cambio de contraste aleatorio, usando \lstinline{RandomAutocontrast}
 \end{itemize}
 
 \subsection{Implementaciones propias de \textit{Datasets}} \label{isec:datasets_customs}
 
-Como ya hemos comentado en \customref{isec:base_datos_usada}, las bases de datos \textit{FG-Net} y \textit{CACD} no se ofrecen como parte de ninguna librería asociada a \lstinline{Pytorch}. Por tanto, tendremos que implementar la descarga, extracción y carga en objetos compatibles con \lstinline{Pytorch}. Estas tareas se realizan en el módulo \lstinline{src/lib/datasets}.
+Como ya hemos comentado en \customref{isec:base_datos_usada}, las bases de datos \textit{FG-Net} y \textit{CACD} no se ofrecen como parte de ninguna librería asociada a \lstinline{Pytorch}. Por tanto, tendremos que implementar la descarga, extracción y carga en objetos compatibles con \lstinline{Pytorch}. Estas tareas se realizan en el módulo \lstinline{src.lib.datasets.py}.
 
-Este módulo contiene, además de las dos clases que más adelante estudiamos, las funciones \lstinline{download_fg_dataset} y \lstinline{download_cacd_dataset}, que descargan y extraen los dos \textit{datsets}.
+Este módulo contiene, además de las dos clases que más adelante estudiamos, las funciones \lstinline{download_fg_dataset} y \lstinline{download_cacd_dataset}, que descargan y extraen los dos \textit{datsets} de internet.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{informatica/diagrama_clases_carga_datos}
+    \includegraphics[width=1.0\textwidth]{informatica/diagrama_clases_carga_datos}
     \caption{Diagrama de clases de las implementaciones para los \textit{datasets} \textit{FG-Net} y \textit{CACD}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
     \label{img:diagrama_clases_datasets}
 \end{figure}
@@ -203,21 +200,9 @@ El método \lstinline{check_integrity()} comprueba el tamaño del \textit{datase
 
 \subsection{Normalización} \label{isubs:normalization_impl}
 
-En \customref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \customref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
+En \customref{isubs:normalizacion_teoria} hemos justificado por qué es interesante introducir la técnica de normalización en la salida de nuestra red. Además, hemos especificado en qué consiste exactamente esta técnica.
 
-\begin{equation} \label{ieq:normalizacion}
-    \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}
-\end{equation}
-
-Además del interés que pueda tener estudiar el comportamiento de los modelos al introducir la normalización, esta técnica introduce el siguiente punto a tener en cuenta. Durante los entrenamientos hemos tenido muchos problemas de inestabilidad. Esto es, en la mayoría de ocasiones, el entrenamiento se saturaba tras pocas iteraciones. Es claro que si nuestra red aprende a colapsar todas las entradas a $\vec{0}$, la ecuación \eqref{ieq:normalizacion} falla, con lo que el entrenamiento se detiene. Sin embargo, a raíz de la experimentación, vemos que la normalización ayuda enormemente a que dicho comportamiento no se aprenda. Y con ello, es mucho más fácil conseguir entrenamientos estables. El siguiente diagrama muestra un ejemplo de entrenamiento inestable:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_colapso_entrenamiento}
-    \caption{Histórico de \textit{WANDB} que muestra un entrenamiento inestable que acaba por fallar. En las gráficas, los círculos indican entradas con el valor \lstinline{NaN}}
-\end{figure}
-
-Nuestro objetivo es introducir esta normalización en nuestras redes convolucionales profundas, de forma modular y sencilla. En el módulo \lstinline{src.lib.models}, donde describimos las arquitecturas empleadas a lo largo de toda la experimentación, definimos la clase \lstinline{NormalizedNet}. Dicha clase implementa el patrón de diseño \textit{Decorator} \cite{informatica:design_patterns} \cite{informatica:decorator_pattern}.
+Nuestro objetivo ahora es añadir esta normalización en nuestras redes convolucionales profundas, de forma modular y sencilla. En el módulo \lstinline{src.lib.models}, donde describimos las arquitecturas empleadas a lo largo de toda la experimentación, definimos la clase \lstinline{NormalizedNet}. Dicha clase implementa el patrón de diseño \textit{Decorator} \cite{informatica:design_patterns} \cite{informatica:decorator_pattern}.
 
 En dicho patrón buscamos modificar el comportamiento de un módulo sin cambiar su interfaz. El nuevo comportamiento usa el comportamiento de la clase base, que se adapta de alguna forma. Gracias a no estar modificando la interfaz de la clase base, el resto del código puede trabajar con estos objetos, sin conocer si corresponden a la clase base o a la clase decorada. Esto es justo lo que queremos, porque las funciones que trabajan con nuestra red no deberían depender de la normalización (pensemos por ejemplo en una función que calcula el \textit{Rank@K Accuracy}).
 
@@ -227,14 +212,13 @@ Además, este patrón se basa en la idea de preferir usar composición en vez de
 
     Este patrón se parece mucho al patrón \textit{Adapter} \cite{informatica:design_patterns} \cite{informatica:adapter_pattern}.
 
-    El objetivo es adaptar un módulo de código para que implemente una interfaz dada. Por ejemplo, cuando queremos interactuar con interfaces de terceros usando módulos que no han sido diseñados para esta tarea. Por lo tanto, este patrón puede pensarse como el contrario del patrón \textit{Decorator}. Buscamos cambiar la interfaz manteniendo el comportamiento.
+    El objetivo de este patrón es el de adaptar un módulo de código para que implemente una interfaz dada, sin cambiar su comportamiento. Por ejemplo, cuando queremos interactuar con interfaces de terceros usando módulos que no han sido diseñados con dichas interfaces en mente. Por lo tanto, este patrón puede pensarse como el contrario del patrón \textit{Decorator}. Buscamos cambiar la interfaz manteniendo el comportamiento.
 
 \end{observacion}
-\todo{Todo esto es bastante teórico, quizás no debería ir aquí}
 
 La clase \lstinline{NormalizedNet} toma una red neuronal como parámetro. Las redes neuronales de \lstinline{pytorch} deben implementar el método \lstinline{forward}, que indica cómo la red computa las salidas a partir de las entradas dadas. Nuestra clase \lstinline{NormalizedNet} implementa este método basándose en el mismo método de la clase base. Usamos el método \lstinline{forward} de la clase base y almacenamos la salida, que normalizamos y devolvemos.
 
-Como ya hemos comentado, el uso de este patrón supone que no estamos cambiando la interfaz de un modelo si lo normalizamos, lo que permite que podamos decidir si queremos trabajar o no con normalización sin que el resto del código tenga que saber esto. Por ejemplo:
+Como ya hemos comentado, el uso de este patrón supone que no estamos cambiando la interfaz de un modelo si lo normalizamos, lo que permite que podamos decidir si queremos trabajar o no con normalización sin que el resto del código tenga que saber este detalle de implementación. Por ejemplo:
 
 \begin{lstlisting}[caption={Ejemplo de uso del patrón \textit{Decorator} para decidir si usamos o no normalización. El resto del código no tiene por qué saber este detalle de implementación, porque no cambiamos la interfaz de la clase}, captionpos=b]
 net = LFWResNet18(embedding_dimension = 5)
@@ -245,7 +229,7 @@ net = NormalizedNet(net)
 
 Como hemos comentado en \customref{isec:hptuning_kfold_cross_validation}, usaremos la técnica de \textit{K-Fold Cross Validation} para buscar buenos valores de hiperparámetros. Para facilitar este proceso, desarrollamos un módulo \lstinline{src.lib.hyperparameter_tuning}.
 
-En este módulo definimos la función \lstinline{custom_cross_validation}, que acepta los siguientes parámetros:
+En este módulo definimos la función \lstinline{custom_cross_validation}, cuyo objetivo es implementar la primera componente que mencionamos en \customref{isec:hptuning_kfold_cross_validation}. Por lo tanto, debe generar una métrica a optimizar a partir de una configuración de hiperparámetros dada. La función acepta los siguientes parámetros:
 
 \begin{itemize}
     \item \lstinline{train_dataset}, \textit{dataset} de entrenamiento, sobre el que construiremos los \textit{folds}
@@ -257,9 +241,9 @@ En este módulo definimos la función \lstinline{custom_cross_validation}, que a
     \item \lstinline{loss_function}, función que queremos optimizar usando \textit{hyperparameter tuning}
 \end{itemize}
 
-Estamos aplicando el patrón estrategia \cite{informatica:design_patterns} \cite{informatica:strategy_pattern_web}. Pero en vez de estar usando el enfoque clásico en un ambiente de programación orientada a objetos, estamos usando un enfoque funcional. Gracias a esto, podemos usar esta función configurando muy fácilmente qué redes neuronales queremos usar, cómo queremos entrenar la red, cómo queremos trabajar con los datos, ... Y como comentamos a continuación, todo esto de forma dinámica en base a los hiperparámetros propuestos por el \textit{framework} usado.
+Estamos aplicando el patrón estrategia \cite{informatica:design_patterns} \cite{informatica:strategy_pattern_web}. Pero en vez de estar usando el enfoque clásico en un ambiente de programación orientada a objetos, estamos usando un enfoque funcional. Gracias a esto, podemos usar esta función configurando muy fácilmente qué redes neuronales queremos usar, cómo queremos entrenar la red, cómo queremos trabajar con los datos, ... Y como comentamos a continuación, todo esto de forma dinámica en base a los hiperparámetros propuestos por el \textit{framework} usado (\lstinline{optuna}).
 
-Usando esta función, cada \textit{script} que usemos para entrenar y validar definirá una sección de ajuste de hiperparámetros (como comentamos en \customref{isec:pipeline}). Usaremos el \textit{framework} \lstinline{optuna} para realizar una búsqueda en el espacio de hiperparámetros \cite{informatica:optuna_web}. Este \textit{framework} implementa toda la lógica necesaria para proponer valores de hiperparámetros, y en base a los resultados obtenidos gracias a \lstinline{custom_cross_validation}, proponer nuevos hiperparámetros. Además usa \lstinline{SQLite} para almacenar los resultados e introducir paralelismo, lo que permite que lancemos varios procesos en los servidores \textit{nGPU}, disminuyendo los tiempos de búsqueda. Como ya hemos comentado, el fichero \lstinline{optuna_queries.sql} contiene las consultas \textit{SQL} para poder acceder a la base de datos donde se almacenan los resultados de la búsqueda.
+Usando esta función, cada \textit{script} que usemos para entrenar y validar definirá una sección de ajuste de hiperparámetros (como comentamos en \customref{isec:pipeline}). Usaremos el \textit{framework} \lstinline{optuna} para realizar una búsqueda en el espacio de hiperparámetros \cite{informatica:optuna_web}. Este \textit{framework} implementa toda la lógica necesaria para proponer valores de hiperparámetros, y en base a los resultados obtenidos gracias a \lstinline{custom_cross_validation}, proponer nuevos hiperparámetros. Además, usa \lstinline{SQLite} para almacenar los resultados e introducir paralelismo, lo que permite que lancemos varios procesos en los servidores \textit{nGPU}, disminuyendo los tiempos de búsqueda. Como ya hemos comentado, el fichero \lstinline{optuna_queries.sql} contiene las consultas \textit{SQL} para poder acceder a la base de datos donde se almacenan los resultados de la búsqueda.
 
 En la sección de ajuste de hiperparámetros, deberemos configurar \lstinline{optuna} para realizar la búsqueda:
 
@@ -268,21 +252,24 @@ En la sección de ajuste de hiperparámetros, deberemos configurar \lstinline{op
     \item Configuramos el proceso que produce el valor numérico a optimizar. En nuestro caso, en función de los hiperparámetros elegidos por \lstinline{optuna}, construimos un modelo u otro, adaptamos la red adecuadamente (por ejemplo, añadiendo o no normalización) y lanzamos la función \lstinline{custom_cross_validation} que en definitiva produce la métrica a optimizar
 \end{itemize}
 
+En \customref{isec:experimentacion_hp_tuning} usaremos este módulo para realizar la selección de hiperparámetros.
+
 \subsection{Adaptador para realizar \textit{retrieval}} \label{isubs:impl_retr_adapter}
 
-Como hemos comentado en \customref{isec:triplet_loss}, una de las ventajas de aprender un \textit{embedding} semántico en un modelo es que podemos adaptar dicho modelo para realizar varias tareas. La tarea que nos interesa en este trabajo es la de \textit{retrieval}.
+Como hemos comentado en \customref{isec:triplet_loss}, una de las ventajas de que nuestro modelo aprenda un \textit{embedding} semántico es que podemos adaptar dicho modelo para realizar varias tareas. La tarea que nos interesa en este trabajo es la de \textit{retrieval}.
 
-Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lstinline{FastRetrievalAdapter}, que se encuentran en el módulo \lstinline{src.lib.models}. Mostramos los diagramas de clase asociados:
+Esta adaptación se realiza en las clases \lstinline{RetrievalAdapter} y \lstinline{FastRetrievalAdapter}, que se encuentran en el módulo \lstinline{src.lib.models}. Mostramos los diagramas de clase asociados:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{informatica/diagrama_clases_retrieval}
+    \includegraphics[width=1.0\textwidth]{informatica/diagrama_clases_retrieval}
     \caption{Diagrama de clases de los dos adaptadores. Por el tamaño de \lstinline{torch.nn.Module} solo mostramos los nombres de las clases. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
     \label{img:diagrama_clases_global_adaptadores}
 \end{figure}
 
 \begin{figure}[H]
 \centering
+    \ajustarsubcaptions
     \begin{subfigure}{.6\textwidth}
         \centering
         \includegraphics[width=0.9\linewidth]{informatica/diagrama_clases_retrievaladapter}
@@ -297,7 +284,7 @@ Estas adaptaciones se realizan en las clases \lstinline{RetrievalAdapter} y \lst
 \label{img:diagramas_clase_concretos_adaptadores}
 \end{figure}
 
-En \customref{img:diagrama_clases_global_adaptadores} podemos ver que ambas clases implementan la interfaz \lstinline{torch.nn.Module}, que es la interfaz que las redes neuronales y sus componentes deben implementar en \lstinline{pytorch}. Además, \lstinline{RetrievalAdapter} forma parte de \lstinline{FastRetrievalAdapter}. Sin embargo, vamos a introducir una nueva interfaz, por lo que queda claro que ahora sí que vamos a usar el patrón \textit{Adapter} (véase \customref{isubs:normalization_impl}).
+En \customref{img:diagrama_clases_global_adaptadores} podemos ver que ambas clases implementan la interfaz \lstinline{torch.nn.Module}, que es la interfaz que las redes neuronales y sus componentes deben implementar en \lstinline{pytorch}. Además, \lstinline{RetrievalAdapter} forma parte de \lstinline{FastRetrievalAdapter}. Sin embargo, vamos a introducir una nueva interfaz, por lo que queda claro que ahora sí que vamos a usar el patrón \textit{Adapter} (en \customref{isubs:normalization_impl} hablamos de los patrones \textit{Adapter} y \textit{Decorator} en profundidad).
 
 En \customref{img:diagramas_clase_concretos_adaptadores} podemos ver que no estamos buscando trabajar con la interfaz de \lstinline{torch.nn.Module}, sino que buscamos trabajar con una nueva interfaz, asociada a la tarea de \lstinline{retrieval} (véase \customref{ich:descrp_problema}). Para ello, la clase \lstinline{RetrievalAdapter} define dos métodos relevantes, que son los que introducen una nueva interfaz:
 
@@ -312,7 +299,7 @@ En \customref{img:diagramas_clase_concretos_adaptadores} podemos ver que no esta
             \item Tenemos que tener cuidado de usar la misma red neuronal que la que tenemos almacenada en \lstinline{self.base_net}, para evitar errores lógicos
             \item \lstinline{src.base_net} no participa en el cómputo de este método
         \end{itemize}
-    \item \lstinline{set_permute} trata sobre detalles sobre como trabajamos la representación de los tensores de \textit{batches}
+    \item \lstinline{set_permute} trata sobre detalles sobre como trabajamos la representación de los tensores de \textit{batches} en memoria
 \end{itemize}
 
 La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para acelerar los tiempos de cómputo:
@@ -321,11 +308,11 @@ La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para ace
     \item Podemos ver en \customref{img:diagramas_clase_concretos_adaptadores} que esta clase se compone de un modelo que computa el \textit{embedding} semántico, \lstinline{self.base_net}, y un modelo que ya está adaptado a la tarea de \textit{retrieval}, \lstinline{self.wrapped_net}. \lstinline{self.wrapped_net} es el resultado de construir un objeto de la clase \lstinline{RetrievalAdapter} usando \lstinline{self.base_net}
     \item En \customref{isubs:rank_at_k} se especifica de qué forma se va a usar la adaptación. Siempre tomaremos una base de datos de imágenes, extraeremos una imagen que usaremos como \textit{key}, y realizaremos la \textit{query} contra el resto de imágenes de la base de datos
     \item Por tanto, en el método \lstinline{precompute_embeddings} pasamos toda la base de datos de imágenes, calculamos su proyección en el \textit{embedding} usando \lstinline{self.base_net}, y almacenaremos estos datos
-    \item Con esto, el método \lstinline{query} simplemente especifica el índice de la \textit{key} y el número $k$ de individuos más parecidos que queremos seleccionar. Y usando \lstinline{self.wrapped_net} con su método \lstinline{query_embedding}, realizamos el cómputo sobre los \textit{embeddings}
+    \item Con esto, el método \lstinline{query} simplemente especifica el índice de la \textit{key} y el número $k$ de individuos más parecidos que queremos seleccionar. Y usando \lstinline{self.wrapped_net} con su método \lstinline{query_embedding}, realizamos el cómputo sobre los \textit{embeddings} precomputados
 \end{itemize}
 
 \begin{sloppypar}
-\lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{Decorator} sobre la clase \lstinline{RetrievalAdapter}, del que ya hemos hablado en \customref{isubs:normalization_impl}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y empleamos la implementación de clases previas.
+\lstinline{FastRetrievalAdapter} claramente está utilizando el patrón \textit{Decorator} (del que ya hemos hablado en \customref{isubs:normalization_impl}) sobre la clase \lstinline{RetrievalAdapter}. Para acelerar los tiempos de ejecución, simplemente realizamos un pre-cómputo y utilizamos la implementación de la clase \lstinline{RetrievalAdapter}.
 \end{sloppypar}
 
 \subsection{Separación de datos imponiendo clases disjuntas}
@@ -333,7 +320,7 @@ La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para ace
 A la hora de separar el \textit{dataset} completo en subconjuntos (entrenamiento, validación y \textit{test}), la opción más utilizada es la de usar muestreo aleatorio para seleccionar qué elementos van a un conjunto u otro. En el problema que estamos resolviendo esto puede no ser adecuado por las siguientes peculiaridades:
 
 \begin{itemize}
-    \item Un individuo con al menos $K$ imágenes asociadas puede acabar teniendo menos de $K$ imágenes asociadas en el subconjunto de entrenamiento. Esto provoca que no pueda aparecer en ningún \textit{P-K batch} en el proceso de aprendizaje
+    \item Un individuo con al menos $K$ imágenes asociadas puede acabar teniendo menos de $K$ imágenes asociadas en el subconjunto de entrenamiento. Esto provoca que no pueda participar en ningún \textit{P-K batch} en el proceso de aprendizaje
     \item Además, podemos acabar con conjuntos de validación y \textit{test} en los que muchos individuos han sido vistos durante el proceso de entrenamiento. En la aplicación real del modelo vamos a encontrarnos con muchas identidades nunca vistas (potencialmente siempre será así)
 \end{itemize}
 
@@ -342,16 +329,16 @@ Por tanto, es conveniente que usemos una separación de datos en la que las iden
 Las dos técnicas de separación (clásica e identidades disjuntas) se implementan en el módulo \lstinline{src.lib.split_dataset}, en las funciones \lstinline{split_dataset} y \lstinline{split_dataset_disjoint_classes}
 
 \subsection{Logging de métricas} \label{isec:loggin_metricas}
+% TODO -- seguir por aqui
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{informatica/diagrama_loggers}
-    \includegraphics[width=1.25\textwidth,height=\textheight,keepaspectratio]{informatica/diagrama_loggers}
+    \includegraphics[width=1.0\textwidth,height=\textheight,keepaspectratio]{informatica/diagrama_loggers}
     \caption{Diagrama de clases del módulo \lstinline{src.lib.train_loggers}. Este diagrama ha sido creado usando la herramienta \lstinline{pyreverse}, que se ofrece como parte del programa \lstinline{pylint}}
     \label{img:diagrama_clases_loggers}
 \end{figure}
 
-El módulo \lstinline{src.lib.train_loggers} se encarga de introducir el cálculo y visualización de métricas en el proceso de entrenamiento de forma cómoda, modular y extensible. Nuestro objetivo es definir el proceso de \textit{logging} de forma externa al bucle de entrenamiento. De esta forma, podremos cambiar las métricas observadas sin tener que modificar el código que implementa el bucle de entrenamiento.
+El módulo \lstinline{src.lib.train_loggers} se encarga de introducir el cálculo y visualización de métricas en el proceso de entrenamiento de forma cómoda, modular y extensible. Nuestro objetivo es definir el proceso de \textit{logging} de forma externa al bucle de entrenamiento. Así podremos cambiar las métricas observadas sin tener que modificar el código que implementa el bucle de entrenamiento.
 
 En \customref{img:diagrama_clases_loggers} podemos ver la siguiente estructura:
 
@@ -393,7 +380,7 @@ logger = CompoundLogger([
 ])
 \end{lstlisting}
 
-Hemos usado \textbf{dos técnicas para mostrar las métricas calculadas}. La primera y más sencilla ha sido \textbf{imprimir por pantalla} los valores obtenidos. Esta técnica no es suficiente porque no podemos guardar de forma estructurada los históricos de entrenamientos, ni facilita estudiar de forma visual el comportamiento del entrenamiento. Por tanto, hemos usado como segunda técnica el servicio \textbf{\textit{Weights and Biases} o \textit{WANDB}} \cite{informatica:wandb_web}. Este servicio permite registrar métricas de forma muy sencilla, relegando en dicho servicio:
+Hemos usado \textbf{dos técnicas para mostrar las métricas calculadas}. La primera y más sencilla ha sido \textbf{imprimir por pantalla} los valores obtenidos. Esta técnica no es suficiente porque no podemos guardar de forma estructurada los históricos de entrenamientos, ni facilita estudiar de forma visual el comportamiento del entrenamiento. Por tanto, hemos usado como segunda técnica el servicio \textbf{\textit{Weights and Biases} o \textit{WANDB}} \cite{informatica:wandb_web}. Este servicio permite registrar métricas de forma muy sencilla, relegando a dicho servicio:
 
 \begin{itemize}
     \item El control de históricos de entrenamiento
@@ -401,7 +388,7 @@ Hemos usado \textbf{dos técnicas para mostrar las métricas calculadas}. La pri
     \item El registro de parámetros globales usados en cada entrenamiento
 \end{itemize}
 
-Para registrar todos los parámetros globales, creamos un diccionario de \lstinline{Python} en el que definimos dichos parámetros. Este diccionario, al que llamamos \lstinline{GLOBALS}, se registra directamente en la plataforma \textit{WANDB}. Los parámetros globales definen hiperparámetros del proceso de entrenamiento (por ejemplo, los valores de $\{P, K\}$), directorios en los que guardamos archivos, qué entorno de ejecución estamos usando, si queremos saltar ciertas secciones del \textit{pipeline}, \ldots
+Para registrar todos los parámetros globales, creamos un diccionario de \lstinline{Python} en el que definimos los valores de dichos parámetros. Este diccionario, al que llamamos \lstinline{GLOBALS}, se registra directamente en la plataforma \textit{WANDB}. Los parámetros globales definen hiperparámetros del proceso de entrenamiento (por ejemplo, los valores de $\{P, K\}$), directorios en los que guardamos archivos, qué entorno de ejecución estamos usando, si queremos saltar ciertas secciones del \textit{pipeline} (véase \customref{isec:pipeline}), ...
 
 A continuación mostramos un ejemplo de uso de esta plataforma:
 
@@ -412,6 +399,7 @@ A continuación mostramos un ejemplo de uso de esta plataforma:
 \end{figure}
 
 \section{Optimización del código} \label{isec:optimizacion_codigo}
+% TODO -- seguir por aqui
 
 Como ya se ha comentado en \customref{isec:planificacion}, una parte esperada del proceso de desarrollo es encontrar problemas de rendimiento, localizar qué partes del código están produciendo los problemas, y re-escribir implementaciones mucho más eficientes.
 
