@@ -73,25 +73,72 @@ Al final, sumamos los éxitos y dividimos por el tamaño de la base de datos, ob
 
 \section{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
 
-Los hiperparámetros elegidos se muestran en la siguiente tabla:
+En \customref{isec:hptuning_kfold_cross_validation} describimos detalladamente el proceso para la selección de hiperparámetros. En \customref{isec:hp_tuning} describimos cómo implementamos este proceso.
+
+La siguiente tabla muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar:
+
+\begin{table}[H]
+\centering
+    \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Hiperparámetros} & \textbf{Rango de valores} \\
+    \hline
+
+    P & $[2, 10]$ \\
+    K & $[2, 10]$ \\
+    Arquitectura de la red & \textit{CACDResNet18}, \textit{CACDResNet50}, \textit{FGLightModel} \\
+    Uso de normalización & Sí, No \\
+    Dimensión del \textit{embedding} & $\deltaset{10}$ \\
+    \textit{Learning Rate} & $[0, 0.001]$ \\
+    Uso de \textit{Softplus} & Sí, No \\
+    Penalización en la norma de las salidas & Sí, No \\
+    Factor de penalización en la norma de las salidas (*) & $[0.0001, 2.0]$ \\
+    Uso de \textit{Gradient Clipping} & Sí, No \\
+    Valor máximo del \textit{Gradient Clipping} (*) & $[0.00001, 10.0]$ \\
+    $\alpha$ (*) & $[0.001, 1.0]$ \\
+
+    \hline
+
+\end{tabular}
+\caption{Hiperparámetros a explorar y el rango de valores que pueden tomar. Los hiperparámetro marcados con (*) dependen de que hayamos elegido usar o no esa característica. Por ejemplo, en caso de usar \textit{Softplus} no debemos establecer valor del margen. Los valores de penalización y \textit{gradient clipping} solo se usan si decidimos usar estas técnicas}
+\end{table}
+
+
+Los hiperparámetros elegidos tras realizar el proceso de \textit{hyperparameter tuning} se muestran en la siguiente tabla:
 
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
     \hline
-    \textbf{hiperparámetro} & \textbf{Valor} \\
+    \textbf{Hiperparámetro} & \textbf{Valor escogido} \\
     \hline
 
-    Learning Rate & 0 \\
-    Embedding Dimension & 5 \\
+    P & $[2, 10]$ \\
+    K & $[2, 10]$ \\
+    Arquitectura de la red & \textit{CACDResNet18}, \textit{CACDResNet50}, \textit{FGLightModel} \\
+    Uso de normalización & Sí, No \\
+    Dimensión del \textit{embedding} & $\deltaset{10}$ \\
+    \textit{Learning Rate} & $[0, 0.001]$ \\
+    Uso de \textit{Softplus} & Sí, No \\
+    Penalización en la norma de las salidas & Sí, No \\
+    Factor de penalización en la norma de las salidas & $[0.0001, 2.0]$ \\
+    Uso de \textit{Gradient Clipping} & Sí, No \\
+    Valor máximo del \textit{Gradient Clipping} & $[0.00001, 10.0]$ \\
+    $\alpha$ & $[0.001, 1.0]$ \\
 
     \hline
+
 
 \end{tabular}
 \caption{Valores de los hiperparámetros elegidos a partir del proceso de \textit{hyperparameter tuning}}
+\label{table:hp_escogidos}
 \end{table}
+\todo{Escribir el verdadero valor escogido una vez haga funcionar hp tuning}
 
 \section{Descripción del modelo empleado}
+
+Como hemos visto en \customref{table:hp_escogidos}, hemos decidido usar el modelo . Este modelo se compone de .
+\todo{Completar una vez consiga hacer funcionar el \textit{hp tuning}}
 
 \section{Proceso de entrenamiento}
 
