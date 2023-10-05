@@ -1,11 +1,6 @@
 % !TeX root = ../../libro.tex
 % !TeX encoding = utf8
 
-% TODO -- Lista de TODO's:
-%
-% - [ ] ? Quitar secciones en la parte del estado del arte, hacerlo todo en conjunto. Quitar seccion de conclusiones en el estado del arte
-% - [ ] ? Formateo de las citas
-
 \chapter{Introducción} \label{ich:introduccion}
 
 Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. Dentro de este problema, nos centraremos en resolver una tarea de \textbf{retrieval}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \cite{informatica:principal}. Esta técnica introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Esto evita tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples. Estudiaremos esta técnica detalladamente en \customref{isec:batching}.
