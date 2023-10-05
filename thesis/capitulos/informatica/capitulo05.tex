@@ -749,7 +749,7 @@ Cuando terminamos el entrenamiento de un modelo, guardamos los parámetros de di
 
 \section{\textit{Suite} de \textit{tests}} \label{isec:test_suite}
 
-Disponemos de dos conjuntos o \textit{suites} de \textit{tests}: unitarios y de integración.
+Disponemos de dos conjuntos o \textit{suites} de \textit{tests}: \textit{tests} unitarios y \textit{tests} de integración.
 
 Los \textbf{\textit{tests} unitarios} buscan principalmente validar la corrección de los módulos de código desarrollados en la librería. Para ello, usamos algunas técnicas comunes de \textit{testeo}:
 
@@ -775,9 +775,9 @@ También usamos \textit{tests} unitarios cada vez que encontramos un error en nu
 
 Esto permite encontrar y solucionar los problemas más rápidamente, y además documentar errores previamente encontrados y propiedades que son importantes verificar en otros escenarios.
 
-Los \textbf{\textit{tests} de integración} buscan evitar el siguiente problema. Como hemos comentado en \customref{isec:planificacion}, hemos realizado un trabajo iterativo, partiendo de bases de datos más sencillas hacia bases de datos más grandes y complejas. En dicho trabajo iterativo puede ocurrir que, cambiando o añadiendo código a la librería, rompamos \textit{pipelines} en bases de datos previas. Los \textit{tests} de integración buscan verificar que \textit{pipelines} en bases de datos previas sigan funcionando.
+Los \textbf{\textit{tests} de integración} buscan evitar el siguiente problema. Como hemos comentado en \customref{isec:planificacion}, hemos realizado un trabajo iterativo, partiendo de conjuntos de datos más sencillos hacia conjuntos de datos más grandes y complejos. En dicho trabajo iterativo puede ocurrir que, cambiando o añadiendo código a la librería, rompamos \textit{pipelines} en conjuntos de datos previos. Los \textit{tests} de integración buscan verificar que \textit{pipelines} en conjuntos de datos previos sigan funcionando.
 
-Para esto, cada \textit{test} de integración ejecuta el \textit{pipeline} de una base de datos cuando abandonamos esta para pasar a la siguiente. Usamos valores de los parámetros para adecuar la tarea: usamos un subconjunto muy reducido de la base de datos, hacemos \textit{logging} de forma mucho menos frecuente, los valores de $\{P, K\}$ son mucho más bajos, la red neuronal es muy ligera, ...
+Para esto, cada \textit{test} de integración ejecuta el \textit{pipeline} de un conjunto de datos cuando abandonamos este para pasar al siguiente. Usamos valores de los parámetros para adecuar la tarea: usamos un subconjunto muy reducido de la base de datos, hacemos \textit{logging} de forma mucho menos frecuente, los valores de $\{P, K\}$ son más bajos, la red neuronal es muy ligera, ...
 
 Por el esfuerzo computacional que suponen, los \textit{tests} de integración únicamente se ejecutan a la hora de validar una \textit{pull request}.
 
