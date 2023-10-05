@@ -739,11 +739,11 @@ El siguiente diagrama describe el \textit{pipeline} seguido en todos nuestros ex
 
 Es claro que podemos saltarnos el proceso de aumento de datos y el \textit{hyperparamenter tuning}. De hecho, este último lo ejecutaremos muy pocas ocasiones. Sin embargo puede extrañar que hayamos marcado el entrenamiento del modelo como un paso opcional.
 
-Cuando terminamos el entrenamiento de un modelo, guardamos los datos de dicho modelo en disco. Podemos recuperar ese modelo sin tener que pasar por todo el proceso de entrenamiento, y evaluarlo. Esto es útil por varias razones:
+Cuando terminamos el entrenamiento de un modelo, guardamos los parámetros de dicho modelo en disco. Podemos recuperar ese modelo sin tener que pasar por todo el proceso de entrenamiento, y evaluarlo. Esto es útil por varias razones:
 
 \begin{itemize}
-    \item Si estamos desarrollando nuevas métricas, y queremos ver cómo funcionan en modelos entrenados, no tenemos que re-entrenar un modelo cada vez que introducimos un cambio
-    \item Podemos verificar que un modelo concreto obtiene ciertas métricas
+    \item Si estamos desarrollando nuevas métricas, y queremos ver cómo funcionan en modelos entrenados, no tenemos que re-entrenar un modelo cada vez que introducimos un cambio en la métrica con la que estamos trabajando
+    \item Podemos verificar que un modelo entrenado en el pasado obtiene ciertos valores de las métricas
     \item Al introducir una nueva métrica, podemos computarla para modelos entrenados previamente a la implementación de dicha métrica
 \end{itemize}
 
