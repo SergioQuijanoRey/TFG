@@ -502,18 +502,26 @@ print("=> Putting the dataset into dataloaders")
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
-    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], train_dataset)
+    sampler = CustomSampler(
+        GLOBALS['P'],
+        GLOBALS['K'],
+        train_dataset,
+        avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+    )
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
 validation_loader = torch.utils.data.DataLoader(
     validation_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
-    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], validation_dataset),
+    sampler = CustomSampler(
+        GLOBALS['P'],
+        GLOBALS['K'],
+        dataset = validation_dataset,
+        avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+    ),
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
@@ -521,7 +529,6 @@ test_loader = torch.utils.data.DataLoader(
     test_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
     shuffle = True,
-    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
 )
 
@@ -616,17 +623,25 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
 train_loader_augmented = torch.utils.data.DataLoader(
     train_dataset_augmented,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
-    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], train_dataset_augmented)
+    sampler = CustomSampler(
+        GLOBALS['P'],
+        GLOBALS['K'],
+        train_dataset_augmented,
+        avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+    )
 )
 
 validation_loader_augmented = torch.utils.data.DataLoader(
     validation_dataset_augmented,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    num_workers = GLOBALS['NUM_WORKERS'],
     pin_memory = True,
-    sampler = CustomSampler(GLOBALS['P'], GLOBALS['K'], validation_dataset_augmented)
+    sampler = CustomSampler(
+        GLOBALS['P'],
+        GLOBALS['K'],
+        validation_dataset_augmented,
+        avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+    )
 )
 
 
@@ -809,16 +824,13 @@ def objective(trial):
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
                 batch_size = p * k,
-                num_workers = GLOBALS['NUM_WORKERS'],
-                pin_memory = True,
                 sampler = CustomSampler(p, k, fold_dataset)
             )
         elif fold_type is hptuning.FoldType.VALIDATION_FOLD:
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
                 batch_size = p * k,
-                num_workers = GLOBALS['NUM_WORKERS'],
-                pin_memory = True,
+                pin_memory = False, # TODO -- prev was True, trying to fix mem issues
             )
         else:
             raise ValueError(f"{fold_type} enum value is not managed in if elif construct!")
