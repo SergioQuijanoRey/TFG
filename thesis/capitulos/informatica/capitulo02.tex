@@ -231,7 +231,7 @@ Queda aquí claro el \textbf{problema principal} que introduce esta técnica: si
 
 Una vez que tenemos un \textit{batch} de $P \cdot K$ elementos, deberemos generar una lista de triples en base a este \textit{batch}. Una vez se especifica cómo se seleccionan los triples, usando \eqref{ieq:triplet_loss_single_entry}, inducimos de forma natural y directa una cierta función de pérdida que actúa sobre estos \textit{P-K batches}.
 
-\begin{observacion}
+\begin{observacion}[Notación para los \textit{P-K batches}] \label{iobs:notacion_pk_formulas}
 
     Vamos a trabajar con $P \cdot K$ elementos, cada uno correspondiendo a una clase en concreto. Por tanto, indexaremos los elementos de la forma $x_k^p$ donde $p$ marca el identificador del individuo, y $k$ marca a cuál de las $K$ imágenes del individuo $p$ nos estamos refiriendo
 
