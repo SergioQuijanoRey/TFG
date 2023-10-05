@@ -399,34 +399,16 @@ A continuación mostramos un ejemplo de uso de esta plataforma:
 \end{figure}
 
 \section{Optimización del código} \label{isec:optimizacion_codigo}
-% TODO -- seguir por aqui
 
 Como ya se ha comentado en \customref{isec:planificacion}, una parte esperada del proceso de desarrollo es encontrar problemas de rendimiento, localizar qué partes del código están produciendo los problemas, y re-escribir implementaciones mucho más eficientes.
 
-En esta sección explicamos cómo hemos desarrollado este proceso.
+Además, en \customref{isubs:localizacion_partes_criticas} hemos justificado por qué es necesario realizar un \textit{profile} para identificar las secciones críticas del código. De otra forma, estaríamos realizando optimizaciones con muy poco impacto.
 
-\subsection{Justificación de nuestro enfoque}
-\todo{Debería ir en otra sección}
-
-Hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas, sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con tiempos de ejecución demasiado lentos, identificamos qué partes del código son las responsables. Con ello, sabemos en qué partes concretas debemos concentrar nuestros esfuerzos. De esta forma desarrollamos una amplia base de código inicial de forma rápida, sin aplicar optimizaciones prematuras. Y las optimizaciones que realizamos son óptimas, pues estamos localizando el código responsable de los tiempos de cómputo.
-
-El enfoque que acabamos de describir se fundamenta en la ley de Amdahl \cite{informatica:amdahl_original} \cite{informatica:amdahl_moderno}. Aunque esta ley se centra en medir mejoras de tiempo al introducir paralelismo, es fácilmente aplicable a nuestro ámbito: cambios en las implementaciones para acelerar los tiempos de cómputo. Si optimizamos una fracción de cómputo $f$ obteniendo una mejora en tiempos de cómputo de $S$ para esa fracción, la mejora global (mejora que obtenemos sobre toda la base de código) viene dada por:
-
-\begin{equation} \label{eq:amdahl}
-    S_{global} := \frac{1}{(1 - f) + \frac{f}{S}}
-\end{equation}
-
-Además, suponiendo que optimicemos infinitamente la fracción de cómputo, hasta tal punto que sea instantánea de computar, la mejora global sería:
-
-\begin{equation}
-    S_{max} := \lim_{S \to \infty}\frac{1}{(1 - f) + \frac{f}{S}} = \frac{1}{1 - f}
-\end{equation}
-
-Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el uso que hacemos de diagramas generados por \lstinline{snakeviz} para localizar las funciones a optimizar, como veremos más adelante.
+En esta sección explicamos cómo hemos desarrollado todo este proceso.
 
 \subsection{Identificación del problema}
 
-Identificamos problemas con los tiempos de cómputo por primera vez trabajando con el \textit{dataset} \textit{LFW}. El proceso de identificación y resolución se agrupan en las issues \cite{informatica:issue35_profiling} \cite{informatica:issue36_slowmetrics} y resuelve en la pull request \cite{informatica:pr42_profiling}. El \textit{commit} \lstinline{6aade342e07} \cite{informatica:commit_base_optimizacion} indica el estado original previo a realizar todo el proceso de optimización (\textit{profiling}, identificación de partes críticas del código, \textit{benchmarking} y cambios en las implementaciones).
+Identificamos problemas con los tiempos de cómputo por primera vez trabajando con el \textit{dataset} \textit{LFW}. El proceso de identificación y resolución se agrupan en las issues \cite{informatica:issue35_profiling} y \cite{informatica:issue36_slowmetrics}. Todo el proceso de optimización se resuelve en la \textit{pull request} \cite{informatica:pr42_profiling}. El \textit{commit} \lstinline{6aade342e07} \cite{informatica:commit_base_optimizacion} indica el estado original previo a realizar el proceso de optimización (\textit{profiling}, identificación de cuellos de botella, \textit{benchmarking} y cambios en las implementaciones).
 
 \subsection{Organización del proceso}
 
@@ -434,9 +416,9 @@ El proceso de optimización se compone de los siguientes pasos:
 
 \begin{itemize}
     \item \textit{Profiling} del código. Usamos la librería \lstinline{cProfile}. Esta forma parte de la librería estándar de \lstinline{Python}
-    \item Identificación de las partes críticas del código. Para ello usaremos \lstinline{pstats} (que también forma parte de la librería estándar de \lstinline{python}) para explorar los resultados desde la terminal, y \lstinline{snakeviz} para explorar los datos de forma gráfica e interactiva
-    \item Añadimos \textit{benchmarks} para medir los tiempos de ejecución de las partes críticas que vamos a modificar. Con ello tendremos mayor control sobre el impacto que suponen los cambios introducidos
-    \item Realizamos cambios sobre las partes críticas identificadas y medimos el impacto que suponen
+    \item Identificación de los cuellos de botella. Para ello usaremos \lstinline{pstats} (que también forma parte de la librería estándar de \lstinline{python}) para explorar los resultados desde la terminal, y \lstinline{snakeviz} para explorar los datos de forma gráfica e interactiva
+    \item Introducción de \textit{benchmarks} para medir los tiempos de ejecución en los cuellos de botella que vamos a modificar. Con ello tendremos mayor control sobre el impacto que suponen los cambios introducidos
+    \item Realización de cambios sobre los cuellos de botella identificados y medición el impacto que suponen
 \end{itemize}
 
 En la sección de código donde realizamos el entrenamiento, añadimos la opción de usar la librería \lstinline{cProfile} para generar un \textit{profile}. Guardamos los resultados en la carpeta \lstinline{./src/profiling}, en los archivos \lstinline|{first, second, third}_profile.stat|.
@@ -476,15 +458,15 @@ Obtenemos los siguientes resultados, que visualizamos con \lstinline{snakeviz}:
 \caption{Visualizaciones obtenidas usando \lstinline{snakeviz} para los resultados del \textit{profile} inicial}
 \end{figure}
 
-El tiempo total de cómputo es de 328.638 segundos. Podemos ver en \customref{img:first_profile_global} que la mayor parte del tiempo de entrenamiento se pasa en el método \lstinline{dataloader.__next__()}. En \customref{img:first_profile_dataloader_next} podemos ver que, en dicho método, prácticamente todo el tiempo estamos esperando a que se complete una operación asíncrona, como indica \lstinline{threading.wait()}.
+El tiempo total de cómputo es de 328.638 segundos. Podemos ver en \customref{img:first_profile_global} que la mayor parte del tiempo de entrenamiento se dedica al método \lstinline{dataloader.__next__()}. En \customref{img:first_profile_dataloader_next} podemos ver que, en dicho método, prácticamente todo el tiempo estamos esperando a que se complete una operación asíncrona, como indica \lstinline{threading.wait()}.
 
 Creemos que esto es por estar empleando el enfoque \textit{lazy} para el aumentado de datos. Cada vez que queremos acceder a una nueva imagen, tenemos que generarla en ese preciso instante. Por tanto, en la siguiente iteración no usaremos el enfoque \textit{lazy}. Veremos si los tiempos aumentan o disminuyen, y si aparecen nuevas partes de código a optimizar.
 
 \subsection{Segundo \textit{profile}}
 
-Como ya hemos comentado, esta vez nos centraremos en usar un enfoque no \textit{lazy} para el aumentado de datos. Si intentamos usar los mismos valores $P = 200$, $K = 2$, saturamos la memoria del proceso haciendo que este aborte. Así que tenemos que usar $P = 100, K = 2$, lo que supone un problema para comparar las dos ejecuciones.
+Como ya hemos comentado, esta vez nos centraremos en usar un enfoque no \textit{lazy} para el aumentado de datos. Si intentamos usar los mismos valores $P = 200$, $K = 2$, saturamos la memoria del proceso haciendo que este aborte. Así que tenemos que usar $P = 100, K = 2$, lo que supone un problema para comparar los nuevos resultados con los del primer \textit{profile}.
 
-Para evitar que estas diferencias en los parámetros $\{P, K\}$ interfieran en nuestra optimización, lanzamos las dos versiones (\textit{lazy} y clásico) usando los valores $P = 100$, $K = 2$, y con ello podremos comparar de forma justa los tiempos de ejecución. Los resultados se resumen en la siguiente tabla:
+Para evitar que estas diferencias al cambiar los parámetros $\{P, K\}$ interfieran en nuestra optimización, lanzamos las dos versiones (\textit{lazy} y clásico) usando los valores $P = 100$, $K = 2$, y con ello podremos comparar de forma justa los tiempos de ejecución. Los resultados se resumen en la siguiente tabla:
 
 \begin{table}[H]
 \centering
@@ -502,7 +484,7 @@ Para evitar que estas diferencias en los parámetros $\{P, K\}$ interfieran en n
 \caption{Tiempos de ejecución de los dos enfoques de aumento de datos, usando los valores $P = 100, K = 2$}
 \end{table}
 
-Como era de esperar por lo comentado en \customref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva tiempos de ejecución mayores. Solo estamos midiendo el tiempo de ejecución en el entrenamiento, no tenemos en cuenta los tiempos asociados a generar el \textit{dataset} aumentado. Y de esta forma, el enfoque clásico ya tiene todas las imágenes pre-computadas (lo que conlleva un tiempo considerable que no estamos considerando), mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que permite usar unos valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos (sin considerar lo que tarda en generarse el \textit{dataset} aumentado de forma clásica).
+Como era de esperar por lo comentado en \customref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva un tiempo de ejecución mayor. Solo estamos midiendo el tiempo de ejecución en el entrenamiento, no tenemos en cuenta los tiempos asociados a generar el \textit{dataset} aumentado. Y de esta forma, el enfoque clásico ya tiene todas las imágenes pre-computadas (lo que conlleva un tiempo considerable que no estamos teniendo en cuenta), mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que el enfoque \textit{lazy} permite usar valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos (sin considerar lo que tarda en generarse el \textit{dataset} aumentado de forma clásica).
 
 Una vez resuelto esto, realizamos un segundo \textit{profile} usando los siguientes parámetros:
 
@@ -520,7 +502,7 @@ Los resultados del segundo \textit{profile} se muestran en la siguiente imagen:
     \caption{Visualización obtenida usando \lstinline{snakeviz} para los resultados del segundo \textit{profile}}
 \end{figure}
 
-En este caso, podemos ver que los resultados ya son más ricos y variados. Los tiempos de entrenamiento se dividen principalmente en dos bloques: el asociado a mostrar métricas con nuestra estructura de \textit{logging} (véase \customref{isec:loggin_metricas}) y el asociado al cálculo de la función de pérdida. Empecemos viendo el bloque de los \textit{loggers}:
+En este caso, podemos ver que los resultados ya son más interesantes. Los tiempos de entrenamiento se dividen principalmente en dos bloques: el asociado a mostrar métricas con nuestra estructura de \textit{logging} (véase \customref{isec:loggin_metricas}) y el asociado al cálculo de la función de pérdida. Empecemos viendo el bloque de los \textit{loggers}:
 
 \begin{figure}[H]
     \centering
@@ -529,7 +511,7 @@ En este caso, podemos ver que los resultados ya son más ricos y variados. Los t
     \label{img:second_profile_tiempos_metricas}
 \end{figure}
 
-Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (distancia intercluster que introducimos en \customref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre todos los pares de \textit{embeddings}.
+Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (métrica que introducimos en \customref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre todos los pares de \textit{embeddings}.
 
 Ahora estudiamos el bloque asociado al cálculo de la función de pérdida:
 
@@ -543,7 +525,7 @@ Podemos ver que la mayor parte del tiempo se pasa en realizar una comprensión d
 
 \subsection{Primera ronda de optimizaciones}
 
-Con toda esta información, hemos localizado algunas partes críticas del código. Escribimos \textit{benchmarks} para estas partes del código previo a introducir cambios. Gracias a disponer de \textit{benchmarks}, estudiamos si estos cambios mejoran o empeoran los tiempos de cómputo.
+Con toda esta información, hemos localizado algunos cuellos de botella. Escribimos \textit{benchmarks} para estas partes del código previo a introducir cambios. Gracias a disponer de \textit{benchmarks}, estudiamos si estos cambios mejoran o empeoran los tiempos de cómputo.
 
 Algunos detalles sobre los \textit{benchmarks}:
 
@@ -554,7 +536,7 @@ Algunos detalles sobre los \textit{benchmarks}:
         \begin{itemize}
             \item $P = 100, K = 2$
             \item Enfoque \textit{lazy} para el aumentado de datos
-            \item Dimensión del \textit{embedding} a parender igual a 5
+            \item Dimensión del \textit{embedding} a aprender igual a 5
             \item Una época de entrenamiento
         \end{itemize}
 \end{itemize}
@@ -576,10 +558,10 @@ La siguiente tabla muestra los cambios introducidos y los tiempos de los \textit
         \bottomrule
     \end{tabular}
     }
-    \caption{Tabla que recoge el proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
+    \caption{Tabla que recoge el proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica). Damos los tiempos en segundos}
 \end{table}
 
-Los cambios realizados asociados son:
+Los cambios realizados asociados a los identificadores numéricos son:
 
 \begin{enumerate}
     \item Estado inicial de la base de código. No se han realizado cambios todavía. Los tiempos en este estado se toman como base a mejorar
@@ -591,7 +573,7 @@ Podemos ver que los cambios introducidos mejoran los tiempos de cómputo de form
 
 \subsection{Tercer \textit{profile}}
 
-La primera ronda de optimizaciones potencialmente ha cambiado las partes críticas del código. Así que es necesario llevar a cabo un tercer \textit{profile} para estudiar el estado de la base de código e identificar, si hiciera falta, nuevas partes críticas a optimizar.
+La primera ronda de optimizaciones potencialmente ha cambiado los cuellos de botella del código. Así que es necesario llevar a cabo un tercer \textit{profile} para estudiar el estado de la base de código e identificar, si hiciera falta, nuevos cuellos de botella a optimizar.
 
 En este \textit{profile} usamos los siguientes parámetros:
 
@@ -625,12 +607,12 @@ Tenemos tres bloques, que podemos expandir, como mostramos en las siguientes im�
 \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/profiles/third_profile/logging_primero}
+        \includegraphics[width=0.98\linewidth]{informatica/profiles/third_profile/logging_primero}
         \caption{\lstinline{calculate_mean_loss_function_online}}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/profiles/third_profile/logging_segundo}
+        \includegraphics[width=0.98\linewidth]{informatica/profiles/third_profile/logging_segundo}
         \caption{\lstinline{compute_cluster_sizes_metrics}}
     \end{subfigure}
 
@@ -690,7 +672,7 @@ Seguimos el mismo enfoque que en la primera ronda de optimizaciones. Ya tenemos 
         \bottomrule
     \end{tabular}
     }
-    \caption{Tabla que recoge el segundo proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica)}
+    \caption{Tabla que recoge el segundo proceso de optimización del código. Identificamos numéricamente los cambios realizados, que a continuación describiremos. Por cada cambio, vemos los nuevos resultados en los \textit{benchmarks}. También vemos el tiempo que tarda en completarse el ciclo de entrenamiento. Los tiempos de los \textit{benchmarks} se dan como un par (media, desviación típica). Damos los tiempos en segundos}
     \label{table:optimization_process_second}
 \end{table}
 
@@ -710,7 +692,7 @@ Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar 
 
 En el momento de realizar este proceso de optimización, no teníamos acceso a los servidores \textit{nGPU}. Sin embargo, era necesario optimizar el código para seguir avanzando el proyecto sin detenernos.
 
-El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un \textbf{error a tener en cuenta}. Por ejemplo, en \customref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente. Por tanto, \textbf{una posible mejora} es repetir el proceso de optimización sobre \textit{nGPU}.
+El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un \textbf{error a tener en cuenta}. Por ejemplo, en \customref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente. Por tanto, \textbf{una posible mejora} es repetir el proceso de optimización sobre los servidores \textit{nGPU}.
 
 Sin embargo, al acceder a los servidores \textit{nGPU} y \textit{datasets} más grandes, no hemos tenido problemas de rendimiento. Con ello, un esfuerzo en optimizar el código no estaría del todo justificado. Por tanto, aún con los fallos que hemos comentado, \textbf{el proceso de optimización cumplió con su cometido} en el momento en el que era necesario.
 

@@ -689,3 +689,23 @@ Además del interés que pueda tener estudiar el comportamiento de los modelos a
 \end{figure}
 
 En \customref{isubs:normalization_impl} estudiaremos la implementación de esta técnica en detalle.
+
+\subsection{Localización de cuellos de botella en el código para realizar optimizaciones} \label{isubs:localizacion_partes_criticas}
+
+Como hemos comentado en \customref{isec:planificacion} y \customref{isec:base_datos_usada}, hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con estos problemas, identificamos qué partes del código son las responsables. Llamamos \textbf{cuellos de botella} o \textit{bottlenecks} a estas partes de código responsables de tiempos de ejecución elevados
+
+Realizaremos un \textit{profile} para identificar los cuellos de botella (véase \customref{isec:optimizacion_codigo}). Una vez identificamos \textit{bottlenecks}, sabemos en qué partes concretas debemos concentrar nuestros esfuerzos. De esta forma desarrollamos una amplia base de código inicial de forma rápida, sin aplicar optimizaciones prematuras. Y las optimizaciones que realizamos son óptimas, pues estamos localizando el código responsable de los tiempos de cómputo.
+
+El enfoque que acabamos de describir se fundamenta en la \textbf{ley de Amdahl} \cite{informatica:amdahl_original} \cite{informatica:amdahl_moderno}. Aunque esta ley se centra en medir mejoras de tiempo al introducir paralelismo, es fácilmente aplicable a nuestro ámbito: cambios en las implementaciones para acelerar los tiempos de cómputo. Si optimizamos una fracción de cómputo $f$ obteniendo una mejora en tiempo de cómputo de $S$ para esa fracción, la mejora global (mejora que obtenemos sobre toda la base de código) viene dada por:
+
+\begin{equation} \label{eq:amdahl}
+    S_{global} := \frac{1}{(1 - f) + \frac{f}{S}}
+\end{equation}
+
+Además, suponiendo que optimicemos infinitamente la fracción de cómputo, hasta tal punto que sea instantánea de computar, la mejora estaría limitada de la siguiente forma:
+
+\begin{equation}
+    S_{max} := \lim_{S \to \infty}\frac{1}{(1 - f) + \frac{f}{S}} = \frac{1}{1 - f}
+\end{equation}
+
+Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el enfoque que empleamos en \customref{isec:optimizacion_codigo}.
