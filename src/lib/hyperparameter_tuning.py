@@ -72,13 +72,20 @@ def custom_cross_validation(
         train_fold = WrappedSubset(Subset(train_dataset, train_index))
         validation_fold = WrappedSubset(Subset(train_dataset, validation_index))
 
+
         # Transform dataset folds to dataloaders
         train_loader = loader_generator(train_fold, FoldType.TRAIN_FOLD)
         validation_loader = loader_generator(validation_fold, FoldType.VALIDATION_FOLD)
 
         # Generate a network, train it and get the trained network
+        # Training can fail (i.e. backward losses can be None if parameters are
+        # really bad)
         net = network_creator()
-        net = network_trainer(train_loader, net)
+        try:
+            net = network_trainer(train_loader, net)
+        except Exception as e:
+            print("Failed training in one of the k-folds ")
+            raise e
 
         # This is useful for trying to avoid memory issues
         del train_fold
