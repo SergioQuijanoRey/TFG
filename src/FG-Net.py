@@ -150,6 +150,9 @@ GLOBALS['USE_GT_ZERO_MEAN_LOSS'] = True
 # Wether or not use lazy computations in the data augmentation
 GLOBALS['LAZY_DATA_AUGMENTATION'] = True
 
+# Wether or not fail when calling `CustomSampler.__len__` without having previously
+# computed the index list
+GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'] = True
 # Where or not add penalty term to the loss function
 GLOBALS['ADD_NORM_PENALTY'] = True
 
@@ -825,6 +828,7 @@ def objective(trial):
                 fold_dataset_augmented,
                 batch_size = p * k,
                 sampler = CustomSampler(p, k, fold_dataset)
+                    avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
             )
         elif fold_type is hptuning.FoldType.VALIDATION_FOLD:
             loader = torch.utils.data.DataLoader(
