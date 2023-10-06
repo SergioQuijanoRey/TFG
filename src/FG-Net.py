@@ -506,7 +506,6 @@ print("=> Putting the dataset into dataloaders")
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    pin_memory = True,
     sampler = CustomSampler(
         GLOBALS['P'],
         GLOBALS['K'],
@@ -519,7 +518,6 @@ train_loader = torch.utils.data.DataLoader(
 validation_loader = torch.utils.data.DataLoader(
     validation_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    pin_memory = True,
     sampler = CustomSampler(
         GLOBALS['P'],
         GLOBALS['K'],
@@ -533,7 +531,6 @@ test_loader = torch.utils.data.DataLoader(
     test_dataset,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
     shuffle = True,
-    pin_memory = True,
 )
 
 
@@ -627,7 +624,6 @@ if GLOBALS['USE_CACHED_AUGMENTED_DATASET'] == False or train_dataset_augmented.m
 train_loader_augmented = torch.utils.data.DataLoader(
     train_dataset_augmented,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    pin_memory = True,
     sampler = CustomSampler(
         GLOBALS['P'],
         GLOBALS['K'],
@@ -639,7 +635,6 @@ train_loader_augmented = torch.utils.data.DataLoader(
 validation_loader_augmented = torch.utils.data.DataLoader(
     validation_dataset_augmented,
     batch_size = GLOBALS['ONLINE_BATCH_SIZE'],
-    pin_memory = True,
     sampler = CustomSampler(
         GLOBALS['P'],
         GLOBALS['K'],
@@ -1261,7 +1256,6 @@ with torch.no_grad():
 
     # With hopefully enough memory, try to convert the embedding to a classificator
     classifier = EmbeddingToClassifier(net, k = GLOBALS['NUMBER_NEIGHBOURS'], data_loader = train_loader_augmented, embedding_dimension = GLOBALS['EMBEDDING_DIMENSION'])
-
 
 # See how it works on a small test set
 with torch.no_grad():
