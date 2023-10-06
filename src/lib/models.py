@@ -268,6 +268,7 @@ class FGLigthModel(torch.nn.Module):
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
 
+# TODO -- DOCS -- Some content is in spanish
 class CACDResnet18(torch.nn.Module):
     """
     Pretrained ResNet18 on ImageNet, for CACD dataset. Some slight changes have been made:
