@@ -230,7 +230,7 @@ class FGLigthModel(torch.nn.Module):
         self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
         self.conv5 = nn.Conv2d(in_channels = 32, out_channels = 32, kernel_size = 3)
         self.conv6 = nn.Conv2d(in_channels = 32, out_channels = 32, kernel_size = 3)
-        self.fc = nn.Linear(in_features = 36992, out_features = self.embedding_dimension)
+        self.fc = nn.Linear(in_features = 14112, out_features = self.embedding_dimension)
         self.should_permute = True
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -294,7 +294,11 @@ class CACDResnet18(torch.nn.Module):
         # para calcular un embedding de dimension mucho menor, especificada por parameatro
         # TODO -- comentar en la memoria el cambio de ERROR que hacer esto nos ha supuesto
         previous_in_features = self.pretrained.fc.in_features
-        self.pretrained.fc = nn.Linear(in_features=previous_in_features, out_features=self.embedding_dimension, bias=True)
+        self.pretrained.fc = nn.Linear(
+            in_features=previous_in_features,
+            out_features=self.embedding_dimension,
+            bias=True
+        )
 
         # Por defecto siempre realizamos la permutacion del tensor de entrada
         self.should_permute = True
@@ -343,7 +347,11 @@ class CACDResnet50(torch.nn.Module):
         # para calcular un embedding de dimension mucho menor, especificada por parameatro
         # TODO -- comentar en la memoria el cambio de ERROR que hacer esto nos ha supuesto
         previous_in_features = self.pretrained.fc.in_features
-        self.pretrained.fc = nn.Linear(in_features=previous_in_features, out_features=self.embedding_dimension, bias=True)
+        self.pretrained.fc = nn.Linear(
+            in_features=previous_in_features,
+            out_features=self.embedding_dimension,
+            bias=True
+        )
 
         # Por defecto siempre realizamos la permutacion del tensor de entrada
         self.should_permute = True

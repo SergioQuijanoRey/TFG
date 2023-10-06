@@ -77,8 +77,8 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 
 # Parameters of P-K sampling
-GLOBALS['P'] = 10    # Number of classes used in each minibatch
-GLOBALS['K'] = 5     # Number of images sampled for each selected class
+GLOBALS['P'] = 8    # Number of classes used in each minibatch
+GLOBALS['K'] = 8    # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -91,10 +91,10 @@ GLOBALS['K'] = 5     # Number of images sampled for each selected class
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Epochs for hard triplets, online training
-GLOBALS['TRAINING_EPOCHS'] = 500
+GLOBALS['TRAINING_EPOCHS'] = 1
 
 # Learning rate for hard triplets, online training
-GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
+GLOBALS['ONLINE_LEARNING_RATE'] = 10**(-6)
 
 # How many single elements we want to see before logging
 # It has to be a multiple of P * K, otherwise `should_log` would return always
@@ -103,7 +103,7 @@ GLOBALS['ONLINE_LEARNING_RATE'] = 0.00005
 # `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
 # minibatches
 #  GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 500
-GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 3_000
+GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 10_000
 
 # Which percentage of the training and validation set we want to use for the logging
 GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 0.005
@@ -112,7 +112,7 @@ GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE'] = 0.005
 # Choose which model we're going to use
 # Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel",
 #        "CACDResNet18", "CACDResNet50"
-GLOBALS['NET_MODEL'] = "CACDResNet50"
+GLOBALS['NET_MODEL'] = "CACDResNet18"
 
 # Epochs used in k-Fold Cross validation
 # k-Fold Cross validation used for parameter exploration
@@ -131,7 +131,7 @@ GLOBALS['NUMBER_OF_FOLDS'] = 3
 GLOBALS['MARGIN'] = 0.5
 
 # Dim of the embedding calculated by the network
-GLOBALS['EMBEDDING_DIMENSION'] = 3
+GLOBALS['EMBEDDING_DIMENSION'] = 5
 
 # Number of neighbours considered in K-NN
 # K-NN used for transforming embedding task to classification task
@@ -153,15 +153,16 @@ GLOBALS['LAZY_DATA_AUGMENTATION'] = True
 # Wether or not fail when calling `CustomSampler.__len__` without having previously
 # computed the index list
 GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'] = True
+
 # Where or not add penalty term to the loss function
-GLOBALS['ADD_NORM_PENALTY'] = True
+GLOBALS['ADD_NORM_PENALTY'] = False
 
 # If we add that penalty term, which scaling factor to use
 GLOBALS['PENALTY_FACTOR'] = 0.6
 
 # If we want to wrap our model into a normalizer
 # That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
-GLOBALS['NORMALIZED_MODEL_OUTPUT'] = False
+GLOBALS['NORMALIZED_MODEL_OUTPUT'] = True
 
 # If its None, we do not perform gradient clipping
 # If its a Float value, we perform gradient clipping, using that value as a
@@ -175,7 +176,7 @@ GLOBALS['ACCURACY_AT_K_VALUE'] = 5
 
 # Images in this dataset have different shapes. So this parameter fixes one shape
 # so we can normalize the images to have the same shape
-GLOBALS['IMAGE_SHAPE'] = (300, 300)
+GLOBALS['IMAGE_SHAPE'] = (200, 200)
 
 # Degrees that we are going to use in data augmentation rotations
 GLOBALS['ROTATE_AUGM_DEGREES'] = (0, 20)
@@ -713,19 +714,15 @@ def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
         k = 1,
         data_loader = validation_fold,
         network = net,
-        max_examples = len(validation_fold)
+        max_examples = len(validation_fold),
+        fast_implementation = False,
     )
 
 def objective(trial):
     """Optuna function that is going to be used in the optimization process"""
 
-    # Fixed parameters
-    # This parameters were explored using previous hp tuning experiments
-    # Fixing the parameters lets us explore other parameters in a better way
-    # TODO -- we don't have fixed parameters
-
     # Parameters that we are exploring
-    p = trial.suggest_int("P", 2, 50)
+    p = trial.suggest_int("P", 2, 10)
     k = trial.suggest_int("K", 2, 10)
     net_election = trial.suggest_categorical(
         "Network",
@@ -734,8 +731,8 @@ def objective(trial):
     normalization_election = trial.suggest_categorical(
         "UseNormalization", [True, False]
     )
-    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 20)
-    learning_rate = trial.suggest_float("Learning rate", 0, 0.1)
+    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
+    learning_rate = trial.suggest_float("Learning rate", 0, 0.001)
     softplus = trial.suggest_categorical("Use Softplus", [True, False])
     use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
 
@@ -743,7 +740,7 @@ def objective(trial):
         "UseGradientClipping", [True, False]
     )
 
-
+    norm_penalty = None
     if use_norm_penalty is True:
         norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
 
@@ -787,7 +784,7 @@ def objective(trial):
     def loader_generator(
         fold_dataset: split_dataset.WrappedSubset,
         fold_type: hptuning.FoldType
-    ) -> DataLoader:
+        ) -> DataLoader:
 
 
         # When doing the split, we can end with less than p classes with at least
@@ -797,11 +794,11 @@ def objective(trial):
         # erased in `LazyAugmentatedDataset`. But this does not create more
         # classes, if fold has already less than P classes
         #
-        # We only perform data augmentation in the training fold
+        # As we are computing Rank@k we need to augment both fold types
         #
         # NOTE -- this can affect the optimization process, but otherwise most
         # of the tries will fail because of this problem
-        if fold_type is hptuning.FoldType.TRAIN_FOLD:
+        if fold_type is hptuning.FoldType.TRAIN_FOLD or fold_type is hptuning.FoldType.VALIDATION_FOLD:
             fold_dataset_augmented = LazyAugmentatedDataset(
                 base_dataset = fold_dataset,
                 min_number_of_images = k,
@@ -816,8 +813,10 @@ def objective(trial):
 
             )
         else:
-            # Do not perform any augmentation
-            fold_dataset_augmented = fold_dataset
+            # We are always doing data augmentation
+            # NOTE: this `if else` is useless, but for other target metrics might
+            # be needed
+            raise ValueError(f"Got {fold_type=} which is not a valid fold type")
 
         # In the same line, we only use our custom sampler for the training fold
         # Otherwise, we use a normal sampler
@@ -827,17 +826,20 @@ def objective(trial):
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
                 batch_size = p * k,
-                sampler = CustomSampler(p, k, fold_dataset)
+                sampler = CustomSampler(
+                    p,
+                    k,
+                    fold_dataset,
                     avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+                )
             )
         elif fold_type is hptuning.FoldType.VALIDATION_FOLD:
             loader = torch.utils.data.DataLoader(
                 fold_dataset_augmented,
                 batch_size = p * k,
-                pin_memory = False, # TODO -- prev was True, trying to fix mem issues
             )
         else:
-            raise ValueError(f"{fold_type} enum value is not managed in if elif construct!")
+            raise ValueError(f"{fold_type=} enum value is not managed in if elif construct!")
 
         # To avoid accessing loader.__len__ without computing the necessary data
         _ = loader.__iter__()
@@ -873,7 +875,11 @@ def objective(trial):
         parameters = dict()
         parameters["epochs"] = GLOBALS['HYPERPARAMETER_TUNING_EPOCHS']
         parameters["lr"] = learning_rate
-        parameters["criterion"] = BatchHardTripletLoss(margin, use_softplus = softplus)
+        parameters["criterion"] = BatchHardTripletLoss(
+            margin,
+            use_softplus = softplus,
+            use_gt_than_zero_mean = True
+        )
 
         # Wether or not use norm penalization
         if use_norm_penalty:
@@ -911,8 +917,8 @@ def objective(trial):
             loader_generator = loader_generator,
             loss_function = loss_function,
         )
-        print(f"Obtained loss (cross validation mean) is {losses.mean()}")
-        print("")
+        print(f"Array of losses: {losses=}")
+        print(f"Obtained loss (cross validation mean) is {losses.mean()=}")
 
     except Exception as e:
 
@@ -922,9 +928,8 @@ def objective(trial):
         print(msg)
         file_logger.warn(msg)
 
-        # Return None so this trial is not considered
+        # Return None so optuna knows this trial failed
         return None
-
 
     # If everything went alright, return the mean of the loss
     return losses.mean()
@@ -969,9 +974,9 @@ elif GLOBALS['NET_MODEL'] == "LFWLightModel":
 elif GLOBALS['NET_MODEL'] == "FGLightModel":
     net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
 elif GLOBALS['NET_MODEL'] == "CACDResNet18":
-    net = CACDResNet50(GLOBALS['EMBEDDING_DIMENSION'])
-elif GLOBALS['NET_MODEL'] == "CACDResNet18":
-    net = CACDResNet50(GLOBALS['EMBEDDING_DIMENSION'])
+    net = CACDResnet18(GLOBALS['EMBEDDING_DIMENSION'])
+elif GLOBALS['NET_MODEL'] == "CACDResNet50":
+    net = CACDResnet50(GLOBALS['EMBEDDING_DIMENSION'])
 else:
     raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
@@ -1081,7 +1086,7 @@ if GLOBALS['USE_CACHED_MODEL'] is False:
 
     # Run the training with the profiling
     if GLOBALS['PROFILE_TRAINING'] is True:
-        training_history = cProfile.run(
+        _ = cProfile.run(
             f"""train_model_online(
                 net = net,
                 path = os.path.join(BASE_PATH, 'tmp'),
@@ -1133,9 +1138,9 @@ else:
     elif GLOBALS['NET_MODEL'] == "FGLightModel":
         net_func = lambda: FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
     elif GLOBALS['NET_MODEL'] == "CADResNet18":
-        net_func = lambda: CADResNet18(GLOBALS['EMBEDDING_DIMENSION'])
-    elif GLOBALS['NET_MODEL'] == "CADResNet50":
-        net_func = lambda: CADResNet50(GLOBALS['EMBEDDING_DIMENSION'])
+        net_func = lambda: CACDResnet18(GLOBALS['EMBEDDING_DIMENSION'])
+    elif GLOBALS['NET_MODEL'] == "CACDResNet50":
+        net_func = lambda: CACDResnet50(GLOBALS['EMBEDDING_DIMENSION'])
     else:
         raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
@@ -1168,25 +1173,29 @@ with torch.no_grad():
         k = 1,
         data_loader = train_loader_augmented,
         network = net,
-        max_examples = len(train_loader_augmented)
+        max_examples = len(train_loader_augmented),
+        fast_implementation = False
     )
     test_rank_at_one = metrics.rank_accuracy(
         k = 1,
         data_loader = test_loader,
         network = net,
-        max_examples = len(test_loader)
+        max_examples = len(test_loader),
+        fast_implementation = False,
     )
     train_rank_at_five = metrics.rank_accuracy(
         k = 5,
         data_loader = train_loader_augmented,
         network = net,
-        max_examples = len(train_loader_augmented)
+        max_examples = len(train_loader_augmented),
+        fast_implementation = False
     )
     test_rank_at_five = metrics.rank_accuracy(
         k = 5,
         data_loader = test_loader,
         network = net,
-        max_examples = len(test_loader)
+        max_examples = len(test_loader),
+        fast_implementation = False
     )
 
     print(f"Train Rank@1 Accuracy: {train_rank_at_one}")
