@@ -80,10 +80,23 @@ def custom_cross_validation(
         net = network_creator()
         net = network_trainer(train_loader, net)
 
+        # This is useful for trying to avoid memory issues
+        del train_fold
+        del train_index
+        del train_loader
+        torch.cuda.empty_cache()
+
         # Evaluate  the network on the validation fold
         net.eval()
-        loss = loss_function(net, validation_loader)
+        loss: torch.Tensor = loss_function(net, validation_loader)
+
+        # Before appending this loss to a list, we must detach the tensor from
+        # the computation graph. Otherwise we will run out of memory
+        # This was indicated at:
+        # https://discuss.pytorch.org/t/memory-management-using-pytorch-cuda-alloc-conf/157850/8
+        loss: float = float(loss.detach())
         losses.append(loss)
+        torch.cuda.empty_cache() # Trying to avoid mem issues
 
         # k-fold cross validation can be very slow
         # So this logs are very important to watch the process
