@@ -17,3 +17,11 @@
 /wandb/
 /wandb_data/
 /src/benchmarks/__pycache__/
+/.venv/
+/.worktree/
+/src/__init__.py
+/cached_augmented_dataset.pt
+/.ipynb_checkpoints/
+/cached_models/
+/tmp/
+/training.log
