@@ -219,8 +219,8 @@ Estudiemos detenidamente la ecuación \eqref{eq:descomposicion_ht}. Para facilit
 \begin{itemize}
     \item El superíndice $l$ indica en que nivel de la descomposición nos encontramos. Consideraremos que en total tenemos $L$ capas
     \item El superíndice $j$ indica la posición en la que nos encontramos dentro del nivel $l$
-    \item El superíndice $\gamma$ indica con qué tensor de la capa $l$ estamos trabajando
-    \item Los valores $r_l$, que llamaremos \textbf{rango de nivel $l$}, marcan el número de tensores con los que podemos trabajar en la capa $l$. Salvo en la primera ecuación, en la que no trabajamos con tensores sino con vectores
+    \item El superíndice $\gamma$ indica con qué tensor de la capa $l$ y posición $j$ estamos trabajando. Es decir, podemos tener más de un tensor en un nivel y posición dentro del nivel
+    \item Los valores $r_l$, que llamaremos \textbf{rango de nivel $l$}, marcan el número de tensores que hay en cada posición $j$ de la capa $l$. Considerando que en la primera ecuación no trabajamos con tensores sino con vectores
 \end{itemize}
 
 En primer lugar, estamos construyendo el tensor de coeficientes $\mathcal{A}^y$ de forma claramente recursiva. Empezamos construyendo los tensores $\phi^{1, j, \gamma}$ a partir de unos vectores iniciales $\{\nv{\varphi^{j, \alpha}} \in \R^M: j \in \deltaset{N}, \alpha \in \deltaset{r_0}  \}$  y unos coeficientes reales $\{a_{\alpha}^{1, j, \gamma}: \alpha \in \deltaset{r_0}\}$. Los tensores del nivel $l$ se construyen en función de los tensores del nivel $l-1$.
@@ -236,6 +236,40 @@ estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$, para o
 Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta asunción también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
 
 Cabe destacar también que estamos considerando solo productos tensoriales de dos elementos. Además, estamos combinando únicamente tensores contiguos de cada capa.
+
+El siguiente diagrama muestra el proceso de generación de los tensores. Por simplicidad, suponemos que $r = 1$. Es decir, que en cada localización $j$ solo tenemos un tensor, independientemente del nivel $l$ en el que nos encontremos.
+
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    squarenode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
+]
+
+    \node (capa_0_pos_1){$\varphi^{j = 1, \gamma = 1}$};
+    \node (capa_0_pos_2)[right=of capa_0_pos_1]{$\varphi^{j = 2, \gamma = 1}$};
+    \node (capa_0_pos_3)[right=of capa_0_pos_2]{$\varphi^{j = 3, \gamma = 1}$};
+    \node (capa_0_pos_4)[right=of capa_0_pos_3]{$\varphi^{j = 4, \gamma = 1}$};
+
+    \node (capa_1_pos_1)[below=of capa_0_pos_2]{$\phi^{l = 1, j = 1, \gamma = 1}$};
+    \node (capa_1_pos_2)[right=of capa_1_pos_1]{$\phi^{l = 1, j = 2, \gamma = 1}$};
+
+    \node (capa_2_pos_1)[below=of capa_1_pos_1]{$\mathcal{A}^y = \phi^{l = 2, j = 1, \gamma = 1}$};
+
+    \draw[-stealth] (capa_0_pos_1.south) -- (capa_1_pos_1.north);
+    \draw[-stealth] (capa_0_pos_2.south) -- (capa_1_pos_1.north);
+
+    \draw[-stealth] (capa_0_pos_3.south) -- (capa_1_pos_2.north);
+    \draw[-stealth] (capa_0_pos_4.south) -- (capa_1_pos_2.north);
+
+    \draw[-stealth] (capa_1_pos_1.south) -- (capa_2_pos_1.north);
+    \draw[-stealth] (capa_1_pos_2.south) -- (capa_2_pos_1.north);
+
+\end{tikzpicture}
+    \caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Por simplicidad, estamos suponiendo que $r = 1$}
+\end{figure}
+\todo{Explicar más cosas en la caption. Por ejemplo, valores de los parametros como capas, orden de los tensores, ...}
+
 
 \subsection{Parámetros del modelo}
 
@@ -282,5 +316,3 @@ coeficientes. Si asumimos que todos los rangos son iguales, $r := r_0 = \ldots =
 \end{split}
 \end{equation}
 \todo{La sumatoria que estamos despejando a mi me da $\frac{L-1}{L}$ y no $1$. Algo estoy haciendo mal}
-
-
