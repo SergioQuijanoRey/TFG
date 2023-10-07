@@ -219,7 +219,7 @@ Estudiemos detenidamente la ecuación \eqref{eq:descomposicion_ht}. Para facilit
 \begin{itemize}
     \item El superíndice $l$ indica en que nivel de la descomposición nos encontramos. Consideraremos que en total tenemos $L$ capas
     \item El superíndice $j$ indica la posición en la que nos encontramos dentro del nivel $l$
-    \item El superíndice $\gamma$ indica con qué tensor de la capa $l$ y posición $j$ estamos trabajando. Es decir, podemos tener más de un tensor en un nivel y posición dentro del nivel
+    \item El superíndice $\gamma$ indica con qué tensor de la capa $l$ y posición $j$ estamos trabajando. Es decir, dados un nivel y una posición, podemos tener más de un tensor
     \item Los valores $r_l$, que llamaremos \textbf{rango de nivel $l$}, marcan el número de tensores que hay en cada posición $j$ de la capa $l$. Considerando que en la primera ecuación no trabajamos con tensores sino con vectores
 \end{itemize}
 
@@ -237,38 +237,31 @@ Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deb
 
 Cabe destacar también que estamos considerando solo productos tensoriales de dos elementos. Además, estamos combinando únicamente tensores contiguos de cada capa.
 
-El siguiente diagrama muestra el proceso de generación de los tensores. Por simplicidad, suponemos que $r = 1$. Es decir, que en cada localización $j$ solo tenemos un tensor, independientemente del nivel $l$ en el que nos encontremos.
+El siguiente diagrama muestra el proceso de generación de los tensores, que deja claro todo lo que acabamos de comentar. Por simplicidad, suponemos que $r = 1$. Es decir, que en cada localización $j$ solo tenemos un tensor, independientemente del nivel $l$ en el que nos encontremos.
 
-
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}[
-    squarenode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
-]
-
-    \node (capa_0_pos_1){$\varphi^{j = 1, \gamma = 1}$};
-    \node (capa_0_pos_2)[right=of capa_0_pos_1]{$\varphi^{j = 2, \gamma = 1}$};
-    \node (capa_0_pos_3)[right=of capa_0_pos_2]{$\varphi^{j = 3, \gamma = 1}$};
-    \node (capa_0_pos_4)[right=of capa_0_pos_3]{$\varphi^{j = 4, \gamma = 1}$};
-
-    \node (capa_1_pos_1)[below=of capa_0_pos_2]{$\phi^{l = 1, j = 1, \gamma = 1}$};
-    \node (capa_1_pos_2)[right=of capa_1_pos_1]{$\phi^{l = 1, j = 2, \gamma = 1}$};
-
-    \node (capa_2_pos_1)[below=of capa_1_pos_1]{$\mathcal{A}^y = \phi^{l = 2, j = 1, \gamma = 1}$};
-
-    \draw[-stealth] (capa_0_pos_1.south) -- (capa_1_pos_1.north);
-    \draw[-stealth] (capa_0_pos_2.south) -- (capa_1_pos_1.north);
-
-    \draw[-stealth] (capa_0_pos_3.south) -- (capa_1_pos_2.north);
-    \draw[-stealth] (capa_0_pos_4.south) -- (capa_1_pos_2.north);
-
-    \draw[-stealth] (capa_1_pos_1.south) -- (capa_2_pos_1.north);
-    \draw[-stealth] (capa_1_pos_2.south) -- (capa_2_pos_1.north);
-
-\end{tikzpicture}
-    \caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Por simplicidad, estamos suponiendo que $r = 1$}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{matematicas/descomp_ht_rank_1}
+    \caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Por simplicidad, estamos suponiendo que $r = 1$. Tenemos $L = 2$ capas o niveles}
 \end{figure}
-\todo{Explicar más cosas en la caption. Por ejemplo, valores de los parametros como capas, orden de los tensores, ...}
+
+Veamos ahora este mismo diagrama, pero suponiendo que $r = 2$. Por tanto, en cada posición de cada nivel, tendremos dos tensores en vez de uno.
+
+\begin{figure}[H]
+\centering
+    \ajustarsubcaptions
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{matematicas/descomp_ht_rank_2_paso_1}
+        \caption{Primer paso. En la construcción de cada tensor $\phi^{l, j, \gamma}$ participan cuatro tensores $\varphi^{j, \gamma}$}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{matematicas/descomp_ht_rank_2_paso_2}
+        \caption{Segundo paso. En la construcción del tensor $\mathcal{A}^y$ participan los cuatro tensores $\phi^{l=2, j, \gamma}$}
+    \end{subfigure}
+    \caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Hemos dividido el proceso de construcción en dos pasos. Ahora $r = 2$. Por lo tanto, en cada posición de cada capa, tenemos dos tensores. Seguimos teniendo $L = 2$ capas. }
+\end{figure}
 
 
 \subsection{Parámetros del modelo}
@@ -302,7 +295,7 @@ Nuestro modelo viene dado por los siguientes parámetros:
 Es decir, que nuestro modelo tiene
 
 \begin{equation}
-    M \cdot r_0 \cdot N + \sum_{l = 1}^{L-1} r_{l-1} \cdot \frac{N}{2^l} \cdot r_l +
+    M \cdot r_0 \cdot N + \sum_{l = 1}^{L-1} (r_{l-1} \cdot \frac{N}{2^l} \cdot r_l ) +
     r_{L-1} \cdot Y
 \end{equation}
 
@@ -310,9 +303,42 @@ coeficientes. Si asumimos que todos los rangos son iguales, $r := r_0 = \ldots =
 
 \begin{equation}
 \begin{split}
-    M \cdot r \cdot N + \sum_{l = 1}^{L-1} r^2 \cdot \frac{N}{2^l} + r \cdot Y = \ldots \\
-    \ldots =
-    M \cdot r \cdot N + N r^2 + r \cdot Y
+    M \cdot r \cdot N + \sum_{l = 1}^{L-1} r^2 \cdot \frac{N}{2^l} + r \cdot Y &= M \cdot r \cdot N + N \cdot r^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + r \cdot Y \longmapsto \ldots \\
+    \ldots & \encima{\longmapsto}{L \mapsto \infty} M \cdot r \cdot N + N \cdot r^2 + r \cdot Y
 \end{split}
 \end{equation}
-\todo{La sumatoria que estamos despejando a mi me da $\frac{L-1}{L}$ y no $1$. Algo estoy haciendo mal}
+
+donde hemos usado que:
+
+\begin{equation}
+    \sum_{l = 1}^{L-1} \frac{1}{2^l} = \frac{2^{L-1} - 1}{2^{L-1}}
+\end{equation}
+
+Podemos comprobar esto fácilmente:
+
+\begin{proposicion}
+    \begin{equation}
+        \sum_{k = 1}^{N} \frac{1}{2^k} = \frac{2^N - 1}{2^N}; \dspace \forall N \in \N
+    \end{equation}
+\end{proposicion}
+
+\begin{proof}
+    Procederemos por inducción. Veamos que la ecuación se verifica para $N = 1$:
+
+    \begin{equation}
+        \sum_{k = 1}^{1} \frac{1}{2^k} = \frac{1}{2} = \frac{2^1 - 1}{2^1}
+    \end{equation}
+
+    Supuesto que la ecuación se cumple para $N$, veamos si la ecuación se cumple para $N + 1$:
+
+    \begin{equation}
+    \begin{split}
+        \sum_{k = 1}^{N+1} \frac{1}{2^k} &= \sum_{k = 1}^{N} (\frac{1}{2^k}) + \frac{1}{2^{N+1}} \encima{=}{\text{hip. ind.}} \ldots \\
+        \ldots &= \frac{2^N - 1}{2^N} + \frac{1}{2^{N+1}} = \ldots \\
+        \ldots &= \frac{2^{N+1} - 2 + 1}{2^{N+1}} = \ldots \\
+        \ldots &= \frac{2^{N+1} - 1}{2^{N+1}}
+    \end{split}
+    \end{equation}
+\end{proof}
+
+\todo{En el \textit{paper} esta ecuación la hacen igual a uno. Estoy bastante seguro de las cuentas pero no sé si me estoy confundiendo en algún detalle previo a plantear este paso}
