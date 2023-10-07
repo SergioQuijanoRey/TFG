@@ -124,6 +124,10 @@ GLOBALS['HYPERPARAMETER_TUNING_EPOCHS'] = 1
 # hyperparameter configurations
 GLOBALS['HYPERPARAMETER_TUNING_TRIES'] = 300
 
+# Wether to use the validation set in the hp tuning process or to use k-fold
+# cross validation (which is more robust but way slower)
+GLOBALS['FAST_HP_TUNING'] = True
+
 # Number of folds used in k-fold Cross Validation
 GLOBALS['NUMBER_OF_FOLDS'] = 3
 
@@ -186,7 +190,6 @@ GLOBALS['ROTATE_AUGM_DEGREES'] = (0, 20)
 
 # - Flags to choose if some sections will run or not
 # - This way we can skip some heavy computations when not needed
-
 
 # Skip hyper parameter tuning for online training
 GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = False
@@ -333,6 +336,9 @@ from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 if GLOBALS['RUNNING_ENV'] == "ugr" and torch.cuda.is_available() is False:
     raise Exception("`torch.cuda.is_available()` returned false, so we dont have access to GPU's")
 
+
+# TODO -- DELETE
+torch.autograd.set_detect_anomaly(True)
 
 # Configuration of the logger
 # ==============================================================================
@@ -713,8 +719,13 @@ def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
         fast_implementation = False,
     )
 
-def objective(trial):
-    """Optuna function that is going to be used in the optimization process"""
+def slow_objective(trial):
+    """
+    Optuna function that is going to be used in the optimization process
+
+    It is based in k-fold cross validation
+
+    """
 
     # Parameters that we are exploring
     p = trial.suggest_int("P", 2, 10)
@@ -929,11 +940,160 @@ def objective(trial):
     # If everything went alright, return the mean of the loss
     return losses.mean()
 
+def fast_objective(trial):
+    """
+    Optuna function that is going to be used in the optimization process
 
+    It is based on evaluating in the validation subset
+    """
+
+    # Parameters that we are exploring
+    p = trial.suggest_int("P", 2, 10)
+    k = trial.suggest_int("K", 2, 10)
+    net_election = trial.suggest_categorical(
+        "Network",
+        ["CACDResNet18", "CACDResNet50", "FGLightModel"]
+    )
+    normalization_election = trial.suggest_categorical(
+        "UseNormalization", [True, False]
+    )
+    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
+    learning_rate = trial.suggest_float("Learning rate", 0, 0.001)
+    softplus = trial.suggest_categorical("Use Softplus", [True, False])
+    use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
+
+    use_gradient_clipping = trial.suggest_categorical(
+        "UseGradientClipping", [True, False]
+    )
+
+    norm_penalty = None
+    if use_norm_penalty is True:
+        norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
+
+    margin = None
+    if softplus is False:
+        margin = trial.suggest_float("Margin", 0.001, 1.0)
+
+    gradient_clipping = None
+    if use_gradient_clipping is True:
+        gradient_clipping = trial.suggest_float("Gradient Clipping Value", 0.00001, 10.0)
+
+    # Log that we are going to do k-fold cross validation and the values of the
+    # parameters. k-fold cross validation can be really slow, so this logs are
+    # useful for babysitting the process
+    print("")
+    print(f"🔎 Starting cross validation for trial {trial.number}")
+    print(f"🔎 Parameters for this trial are:\n{trial.params}")
+    print("")
+
+    # With all parameters set, we can create all the necessary elements for
+    # running k-fold cross validation with this configuration
+
+    # With P, K values, we can generate the augmented dataset
+    train_dataset_augmented = LazyAugmentatedDataset(
+        base_dataset = train_dataset,
+        min_number_of_images = k,
+
+        # Remember that the trasformation has to be random type
+        # Otherwise, we could end with a lot of repeated images
+        # Again, we want to end with the normalized shape
+        transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
+            transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
+            transforms.RandomAutocontrast(),
+        ])
+    )
+
+    # Put some dataloaders
+    train_loader = torch.utils.data.DataLoader(
+        dataset = train_dataset,
+        batch_size = p * k,
+        sampler = CustomSampler(
+            p,
+            k,
+            train_dataset,
+            avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+        ),
+    )
+
+    # Wrap the network in a lambda function so we can use it in `custom_cross_validation`
+    def network_creator():
+
+        # Model that we have chosen
+        if net_election == "FGLightModel":
+            net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+        elif net_election == "CACDResNet18":
+            net = CACDResnet18(GLOBALS['EMBEDDING_DIMENSION'])
+        elif net_election == "CACDResNet50":
+            net = CACDResnet50(GLOBALS['EMBEDDING_DIMENSION'])
+        else:
+            err_msg = "Parameter `net_election` has not a valid value \n"
+            err_msg += f"{net_election=}"
+            raise Exception(err_msg)
+
+        # Wether or not use normalization
+        if normalization_election is True:
+            net = NormalizedNet(net)
+
+        net.set_permute(False)
+        return net
+
+    # The function that takes a training fold loader and a network, and returns
+    # a trained net. This is a parameter for our `custom_cross_validation`
+    def network_trainer(fold_dataloader: DataLoader, net: torch.nn.Module) -> torch.nn.Module:
+
+        parameters = dict()
+        parameters["epochs"] = GLOBALS['HYPERPARAMETER_TUNING_EPOCHS']
+        parameters["lr"] = learning_rate
+        parameters["criterion"] = BatchHardTripletLoss(
+            margin,
+            use_softplus = softplus,
+            use_gt_than_zero_mean = True
+        )
+
+        # Wether or not use norm penalization
+        if use_norm_penalty:
+            parameters["criterion"] = AddSmallEmbeddingPenalization(
+                base_loss = parameters["criterion"],
+                penalty_factor = norm_penalty,
+            )
+
+        _ = train_model_online(
+            net = net,
+            path = os.path.join(GLOBALS['BASE_PATH'], "tmp_hp_tuning"),
+            parameters = parameters,
+            train_loader = fold_dataloader,
+            validation_loader = None,
+            name = "Hyperparameter Tuning Network",
+            logger = SilentLogger(),
+            snapshot_iterations = None,
+            gradient_clipping = gradient_clipping,
+            fail_fast = True,
+        )
+
+        return net
+
+    # Train the model, might fail
+    net = network_creator()
+    try:
+        net = network_trainer(train_loader, net)
+    except Exception as e:
+        print(f"Error training the network, reason was: {e}")
+
+        # Let optuna know that this set of parameters produced a failure in the
+        # training process
+        return None
+
+    # Evaluate the model
+    loss = loss_function(net, validation_loader_augmented)
+    return loss
+
+# Launch the hp tuning process
 if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
 
-    # We want to maximize silhouete value
     print("🔎 Started hyperparameter tuning")
+
+    objective = fast_objective if GLOBALS['FAST_HP_TUNING'] is True else slow_objective
 
     study = optuna.create_study(
         direction = "maximize",
