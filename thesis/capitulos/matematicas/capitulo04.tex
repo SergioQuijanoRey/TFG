@@ -197,6 +197,10 @@ Podemos representar este modelo gráficamente como sigue:
 
 \todo{Más tarde, en la sección 3.3 del paper de referencia, se habla más en profundidad de esto}
 
+\subsection{Parámetros del modelo} \label{msubsec:parametros_modelo_cp}
+
+\todo{Desarrollar esta sección}
+
 \section{Modelo HT}
 
 En esta sección pasamos a presentar el segundo y último modelo con el que trabajaremos. A diferencia del modelo anterior, esta vez terminaremos con una arquitectura que puede considerarse como profunda. La idea principal consiste en expresar el tensor de coeficientes $\mathcal{A}^y$ con su descomposición jerárquica de \textit{Tucker}, o como se la conoce por sus siglas en inglés, \textbf{descomposición \textit{HT}} \footnote{Dicha descomposición se introduce en \cite{matematicas:descomposicion_ht}. Nosotros usaremos una versión concreta, introducida por \cite{matematicas:principal}, restringiendo las matrices de \cite{matematicas:descomposicion_ht}}.
@@ -264,7 +268,7 @@ Veamos ahora este mismo diagrama, pero suponiendo que $r = 2$. Por tanto, en cad
 \end{figure}
 
 
-\subsection{Parámetros del modelo}
+\subsection{Parámetros del modelo} \label{msubs:parametros_modelo_ht}
 
 Nuestro modelo viene dado por los siguientes parámetros:
 
@@ -340,5 +344,41 @@ Podemos comprobar esto fácilmente:
     \end{split}
     \end{equation}
 \end{proof}
+\todo{Tengo hecha esta demostración de forma directa en la página 49 de mis notas}
 
 \todo{En el \textit{paper} esta ecuación la hacen igual a uno. Estoy bastante seguro de las cuentas pero no sé si me estoy confundiendo en algún detalle previo a plantear este paso}
+
+\begin{proposicion}
+
+    La descomposición \textit{HT} es universal. Es más, extiende la descomposición \textit{CP}. Esto es, cualquier tensor que pueda expresarse como la descomposición \textit{CP} con rango \textit{CP} $Z$, admite una descomposición \textit{HT} con rangos $r_1 = r_2 = \ldots = r_{L - 1} = Z$
+\end{proposicion}
+
+\begin{proof}
+
+    \todo{En la página 8 del paper se da una indicación de cómo se hace esto}
+
+\end{proof}
+
+\begin{observacion}
+
+    Aunque \textit{HT} sea una extensión de \textit{CP}, hay que tener en cuenta que el número de coeficientes crece.
+
+    En el modelo \textit{CP} tenemos $N \cdot M \cdot Z + Z \cdot Y$ coeficientes que especificar (\customref{msubsec:parametros_modelo_cp}).
+
+    En el modelo \textit{HT} tenemos $N \cdot M \cdot Z + N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + Z \cdot Y$, teniendo en cuenta que estamos considerando $r = Z$ (\customref{msubs:parametros_modelo_ht}).
+
+    Por lo tanto, la diferencia en número de coeficientes viene dada por:
+
+    \begin{equation}
+        Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2
+    \end{equation}
+
+    Por lo tanto, el número de parámetros crece de forma cuadrática. Sin embargo, como veremos más adelante, la ganancia en expresividad del modelo es exponencial.
+    \todo{Revisitar esto cuando haya especificado formalmente qué significa ganancia exponencial en expresividad}
+
+\end{observacion}
+
+\subsection{Desarrollo del modelo}
+\todo{Es muy mal nombre}
+
+
