@@ -247,6 +247,7 @@ El siguiente diagrama muestra el proceso de generación de los tensores, que dej
     \centering
     \includegraphics[width=0.6\textwidth]{matematicas/descomp_ht_rank_1}
     \caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Por simplicidad, estamos suponiendo que $r = 1$. Tenemos $L = 2$ capas o niveles}
+    \label{img:diagrama_ht_simple}
 \end{figure}
 
 Veamos ahora este mismo diagrama, pero suponiendo que $r = 2$. Por tanto, en cada posición de cada nivel, tendremos dos tensores en vez de uno.
@@ -265,8 +266,10 @@ Veamos ahora este mismo diagrama, pero suponiendo que $r = 2$. Por tanto, en cad
         \caption{Segundo paso. En la construcción del tensor $\mathcal{A}^y$ participan los cuatro tensores $\phi^{l=2, j, \gamma}$}
     \end{subfigure}
     \caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Hemos dividido el proceso de construcción en dos pasos. Ahora $r = 2$. Por lo tanto, en cada posición de cada capa, tenemos dos tensores. Seguimos teniendo $L = 2$ capas. }
+    \label{img:diagrama_ht_complejo}
 \end{figure}
 
+\todo{Comentar en algún lado que $L = log_2(N)$. Además, estamos viendo en estos diagramas y en la ecuación principal \eqref{eq:descomposicion_ht} que estamos combinando dos a dos tensores, reduciendo en 2. Por eso es conveniente suponer que el orden de $\mathcal{A}^y$ es una potencia de dos}
 
 \subsection{Parámetros del modelo} \label{msubs:parametros_modelo_ht}
 
@@ -379,6 +382,24 @@ Podemos comprobar esto fácilmente:
 \end{observacion}
 
 \subsection{Desarrollo del modelo}
+
+El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en nuestra función de puntuación \eqref{eq:puntuacion_general}. En esta sección, describiremos el modelo producido.
+
+Como en el modelo \textit{CP}, el primer paso consiste en computar la capa de representación, $\{f_d(\nv{x_i}): d \in \deltaset{N}, i \in \deltaset{M}\}$. Tras la capa de representación, aplicamos las $L$ capas ocultas \eqref{eq:descomposicion_ht} que producen la salida.
+
+Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{product pooling} con tamaño de ventana 2. En el modelo \textit{CP}, el \textit{product pooling} era global, colapsando las \textit{feature maps}. En este \textit{product pooling} reducimos el número de \textit{feature maps} a la mitad en cada paso.
+
+Por lo tanto, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} iniciales acaban siendo una sola. Por lo tanto, acabamos con una lista de $r_{L - 1}$ coeficientes sobre los que aplicamos una última capa oculta, dada por la última ecuación de \eqref{eq:descomposicion_ht}.
+
+Nuestra red realiza \textit{product pooling} con un tamaño de ventana 2, sin \textit{overlapping} gracias al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican \customref{img:diagrama_ht_simple} y \customref{img:diagrama_ht_complejo}. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{product pooling} y, por tanto, distintas profundidades.
+
+
+\todo{Escribir esta capa de representación}
+
+\todo{Escribir en algún lugar que $L = log_2(N)$}
+
 \todo{Es muy mal nombre}
+
+\todo{Revisar la escritura de este apartado, porque es muy importante en el \textit{TFG}}
 
 
