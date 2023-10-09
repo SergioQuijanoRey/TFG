@@ -214,7 +214,14 @@ Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos represen
 
 \subsection{Parámetros del modelo} \label{msubsec:parametros_modelo_cp}
 
-\todo{Desarrollar esta sección}
+A partir de la ecuación \eqref{eq:cp_model} vemos que para definir nuestro modelo debemos definir los coeficientes:
+
+\begin{itemize}
+    \item $\{a_z^y \in \R : z \in \deltaset{Z}, \dspace y \in \deltaset{Y}\}$, lo que supone $Y \cdot Z$ coeficientes
+    \item $\{\omega_d^{z, i} \in \R: i \in \deltaset{N}, \dspace z \in \deltaset{Z}, \dspace d \in \deltaset{M}\}$, lo que lo que supone $N \cdot M \cdot Z$ coeficientes
+\end{itemize}
+
+Es decir, que en total nuestro modelo viene dado al especificar $N \cdot M \cdot Z + Y \cdot Z$ coeficientes.
 
 \section{Modelo HT} \label{sec:modelo_ht}
 
