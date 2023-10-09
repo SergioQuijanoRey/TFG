@@ -197,11 +197,15 @@ Podemos representar este modelo gráficamente como sigue:
 
 \todo{Más tarde, en la sección 3.3 del paper de referencia, se habla más en profundidad de esto}
 
+\subsection{Compartición de parámetros} \label{subs:comparticion_parametros_cp}
+
+\todo{Ya he hablado de esto, pero por darle la misma estructura que en HT}
+
 \subsection{Parámetros del modelo} \label{msubsec:parametros_modelo_cp}
 
 \todo{Desarrollar esta sección}
 
-\section{Modelo HT}
+\section{Modelo HT} \label{sec:modelo_ht}
 
 En esta sección pasamos a presentar el segundo y último modelo con el que trabajaremos. A diferencia del modelo anterior, esta vez terminaremos con una arquitectura que puede considerarse como profunda. La idea principal consiste en expresar el tensor de coeficientes $\mathcal{A}^y$ con su descomposición jerárquica de \textit{Tucker}, o como se la conoce por sus siglas en inglés, \textbf{descomposición \textit{HT}} \footnote{Dicha descomposición se introduce en \cite{matematicas:descomposicion_ht}. Nosotros usaremos una versión concreta, introducida por \cite{matematicas:principal}, restringiendo las matrices de \cite{matematicas:descomposicion_ht}}.
 
@@ -385,7 +389,7 @@ Podemos comprobar esto fácilmente:
 
 El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en nuestra función de puntuación \eqref{eq:puntuacion_general}. En esta sección, describiremos el modelo producido.
 
-Como en el modelo \textit{CP}, el primer paso consiste en computar la capa de representación, $\{f_d(\nv{x_i}): d \in \deltaset{N}, i \in \deltaset{M}\}$. Tras la capa de representación, aplicamos las $L$ capas ocultas \eqref{eq:descomposicion_ht} que producen la salida.
+Como en el modelo \textit{CP}, el primer paso consiste en computar la capa de representación, $\{f_d(\nv{x_i}): d \in \deltaset{N}, i \in \deltaset{M}\}$. Esto genera $N \cdot M$ números reales, que serán transformados en las $L$ capas ocultas \eqref{eq:descomposicion_ht} que producen la salida.
 
 Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{product pooling} con tamaño de ventana 2. En el modelo \textit{CP}, el \textit{product pooling} era global, colapsando las \textit{feature maps}. En este \textit{product pooling} reducimos el número de \textit{feature maps} a la mitad en cada paso.
 
@@ -402,4 +406,30 @@ Nuestra red realiza \textit{product pooling} con un tamaño de ventana 2, sin \t
 
 \todo{Revisar la escritura de este apartado, porque es muy importante en el \textit{TFG}}
 
+\subsection{Compartición de coeficientes}
 
+Al igual que ocurría en el modelo \textit{CP}, nuestras convoluciones $1 \times 1$ son dependientes de la localización. En la práctica, las convoluciones en los modelos convolucionales son independientes de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
+
+La compartición de coeficientes es necesaria porque identificar ciertos patrones en la imagen no debería depender de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de esta.
+
+En el modelo \textit{HT} es muy fácil imponer la compartición de coeficientes, teniendo en cuenta los comentarios que hemos hecho en \customref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
+
+\begin{equation}
+    \phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
+\end{equation}
+
+En $\phi^{l, j, \gamma}$:
+
+\begin{itemize}
+    \item $l$ indica la capa en la que nos encontramos
+    \item $j$ indica la posición del tensor en la capa $l$
+    \item $\gamma$ indica con qué tensor trabajamos en la posición $j$, porque podemos tener más de un tensor en cada posición (cuando $r_l > 1$)
+\end{itemize}
+
+Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \ldots, a^{l, j, \gamma}_{r_{l-1}})$ no deberían depender de la posición $j$, es decir:
+
+\begin{equation}
+    \nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \ldots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}
+\end{equation}
+
+Como ocurría en \customref{subs:comparticion_parametros_cp}, la compartición de parámetros provoca que nuestro modelo pierda la universalidad. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
