@@ -143,6 +143,9 @@ Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
     h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})
 \end{equation}
 
+\subsection{Desarrollo del modelo}
+\todo{Mejor nombre para esta sección}
+
 Veamos cómo esta ecuación se relaciona con un modelo usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en \customref{sec:repr_funciones_puntuacion}, el primer paso de nuestro modelo puede considerarse computar la capa de representación, esto es, los valores
 
 $$\{f_{\theta_d}(\nv{x_i}) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
@@ -153,7 +156,7 @@ Una vez hecho esto, en \eqref{eq:cp_model} podemos ver $\sum_{d = 1}^{M} \omega^
     h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i)
 \end{equation}
 
-Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado.
+Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en \customref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado.
 
 Escrito así, también es claro que el productorio está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps}. Es un \textit{pooling} de tipo producto que nos devuelve un escalar. De nuevo, re-escribimos la ecuación:
 
@@ -187,19 +190,27 @@ Podemos representar este modelo gráficamente como sigue:
 \caption{Representación gráfica del modelo \textit{CP}}
 \end{figure}
 
-\begin{observacion}
-    Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización. De esta forma, una convolución detecta los mismos patrones independientemente de donde se encuentren estos situados en la imagen.
-
-    Esta variación de coeficientes dependiendo de la localización vienen dada por la dependencia en $i$ de $\sum_{d = 1}^M \omega_d^{z ,i}$.
-
-    Por tanto, para forzar el deseado \textit{coefficient sharing} basta con imponer en nuestro modelo que $w_d^{z, i} = w_d^{z, i'}; \dspace \forall i, i' \in \deltaset{N}$.
-\end{observacion}
-
-\todo{Más tarde, en la sección 3.3 del paper de referencia, se habla más en profundidad de esto}
-
 \subsection{Compartición de parámetros} \label{subs:comparticion_parametros_cp}
 
-\todo{Ya he hablado de esto, pero por darle la misma estructura que en HT}
+Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de parámetros}.
+
+La compartición de coeficientes es necesaria para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de esta.
+
+En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de $\sum_{d = 1}^M \omega_d^{z ,i}$.
+
+Por tanto, para forzar el deseado \textit{coefficient sharing} basta con imponer en \eqref{eq:cp_decomp_conjunta}:
+
+\begin{equation}
+    \nv{w^{z, 1}} = \ldots = \nv{w^{z, N}} =: \nv{w^z}
+\end{equation}
+
+Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP} simétrica, es decir:
+
+\begin{equation}
+    \mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{a^z} \otimes \ldots \otimes \nv{a^z}}{N veces}; \dspace \nv{a^z} \in \R^M
+\end{equation}
+
+Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos.
 
 \subsection{Parámetros del modelo} \label{msubsec:parametros_modelo_cp}
 
@@ -397,20 +408,17 @@ Por lo tanto, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature map
 
 Nuestra red realiza \textit{product pooling} con un tamaño de ventana 2, sin \textit{overlapping} gracias al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican \customref{img:diagrama_ht_simple} y \customref{img:diagrama_ht_complejo}. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{product pooling} y, por tanto, distintas profundidades.
 
-
-\todo{Escribir esta capa de representación}
-
 \todo{Escribir en algún lugar que $L = log_2(N)$}
 
 \todo{Es muy mal nombre}
 
 \todo{Revisar la escritura de este apartado, porque es muy importante en el \textit{TFG}}
 
+\todo{Crear un diagrama para explicar este modelo}
+
 \subsection{Compartición de coeficientes}
 
-Al igual que ocurría en el modelo \textit{CP}, nuestras convoluciones $1 \times 1$ son dependientes de la localización. En la práctica, las convoluciones en los modelos convolucionales son independientes de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
-
-La compartición de coeficientes es necesaria porque identificar ciertos patrones en la imagen no debería depender de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de esta.
+Al igual que ocurría en el modelo \textit{CP}, nuestras convoluciones $1 \times 1$ son dependientes de la localización. En la práctica, las convoluciones en los modelos convolucionales son independientes de la localización, lo que se conoce como \textbf{compartición de coeficientes}. En \customref{subs:comparticion_parametros_cp} ya hemos comentado por qué es necesaria esta compartición de parámetros.
 
 En el modelo \textit{HT} es muy fácil imponer la compartición de coeficientes, teniendo en cuenta los comentarios que hemos hecho en \customref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
 
@@ -432,4 +440,4 @@ Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \l
     \nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \ldots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}
 \end{equation}
 
-Como ocurría en \customref{subs:comparticion_parametros_cp}, la compartición de parámetros provoca que nuestro modelo pierda la universalidad. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
+Como ocurría en \customref{subs:comparticion_parametros_cp}, la compartición de parámetros provoca que nuestro modelo pierda la universalidad. Esto es, nuestro modelo no puede representar cualquier tensor, independientemente de los valores de $L$ o $r_l$. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
