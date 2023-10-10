@@ -11,11 +11,27 @@ Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq
 \end{teorema}
 \todo{Este teorema está muy mal escrito en el \textit{paper}}
 
+\begin{observacion}
+
+    Casi todos los tensores que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$.
+
+\end{observacion}
+
+\begin{observacion}
+    $\mathcal{A}^y$ claramente es realizable, por ser el resultado de un modelo \textit{HT}
+\end{observacion}
+
+\begin{observacion}
+
+    Que $\mathcal{A}^y$ tenga rango \textit{CP} igual a $r^{N/2}$ implica que en la ecuación \eqref{eq:cp_decomp}, el número de sumandos deberá ser al menos $r^{N/2}$. Luego, conforme el tamaño de la imagen $N$ aumenta, el número de parámetros del modelo \textit{CP} crece exponencialmente. Conforme el número de canales $M$ de la imagen crece, el número de parámetros del modelo \textit{CP} crece pero de forma potencial.
+
+\end{observacion}
+
 A partir de este teorema, obtenemos el siguiente corolario:
 
 \begin{corolario}[Darle nombre] \label{corol:corol_principal}
 
-Dado un conjunto de funciones de representación $\{f_{\theta_d}: d \in \deltaset{M} \}$ linealmente independientes, aleatorizando los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando la compartición de coeficientes en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
+Dado un conjunto de funciones de representación $\{f_{\theta_d}: d \in \deltaset{M} \}$ linealmente independientes, aleatorizando los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua, induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando la compartición de coeficientes en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
 
 \end{corolario}
 \todo{Este teorema está muy mal escrito en el \textit{paper}}
