@@ -45,8 +45,59 @@ Estos resultados también mejoran los trabajos previos sobre análisis tensorial
 Teniendo en cuenta que cualquier tensor realizable por un modelo \textit{CP} puede ser realizado por un modelo \textit{HT} con un aumento polinomial del número de coeficientes (véase \customref{msubs:parametros_modelo_ht}), esto implica que la descomposición \textit{HT} es asintóticamente más eficiente que la \textit{CP}.
 \todo{Aquí no he definido lo que entendemos por eficiencia. Creo que sería \textit{depth efficiency}}
 
-\subsection{Esquemas de las demostraciones?}
-
 \section{Lemas previos}
+
+En esta sección introduciremos algunos resultados que serán usados en las demostraciones del teorema \customref{} y el corolario \customref{}. Empezamos con los siguientes resultados de teoría de la medida de Lebesgue:
+
+\begin{lema}[Propiedades fundamentales de la medida] Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
+
+\begin{enumerate}
+    \item La unión contable de conjuntos de medida nula es un conjunto de medida nula
+    \item Si $A \subseteq \R^{N_1}$ tiene medida nula, entonces $A \times R^{N_2} \subseteq R^{N_1 + N_2}$ también tiene medida nula
+    \item Sea $p \in \R^d[x]$, es decir, un polinomio sobre los números reales con $d$ variables. Si $p$ no es el polinomio idénticamente nulo, entonces el conjunto de ceros del polinomio es un conjunto de medida nula.
+\end{enumerate}
+
+\end{lema}
+
+Usaremos la siguiente \textbf{matrización} de un tensor:
+
+\begin{definicion}[Matrización de un tensor]
+
+Sea $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ un tensor de orden $N$ y dimensión $M_i, i \in \deltaset{N}$ en cada modo. Por simplicidad, supondremos que el orden del tensor es par. Denotaremos por $[\mathcal{A}]$ a la \textbf{matrización} del tensor $\mathcal{A}$. $[\mathcal{A}]$ es una matriz donde las filas corresponden a modos impares del tensor, y las columnas corresponden a los modos pares. Por lo tanto, $[\mathcal{A}]$ tiene $M_1 \cdot M_3 \cdot \ldots \cdot M_{N-1}$ filas y $M_2 \cdot M_4 \cdot \ldots \cdot M_N$ columnas. Asignaremos el valor $\mathcal{A}_{d_1, \ldots, d_N}$ en $[\mathcal{A}]$ en la posición:
+
+\begin{itemize}
+    \item Fila $1 + \sum_{i = 1}^{N/2} (d_{2i - 1} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j - 1}$
+    \item Columna $1 + \sum_{i = 1}^{N/2} (d_{2i} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j}$
+\end{itemize}
+
+\end{definicion}
+
+Con esto, tenemos que saber cómo se comporta la matrización con el producto tensorial. Esto lo introduce la siguiente proposición:
+
+\begin{definicion}[Producto de Kronecker]
+
+\end{definicion}
+
+\begin{proposicion}[Matrización y producto tensorial]
+
+    Sean $\mathcal{A}, \mathcal{B}$ dos tensores. Entonces se verifica:
+
+    \begin{equation}
+        [\mathcal{A} \otimes \mathcal{B}] = [\mathcal{A}] \odot [\mathcal{B}]
+    \end{equation}
+
+\end{proposicion}
+
+También tenemos que saber cómo se comporta el producto de Kronecker entre matrices y el rango matricial:
+
+\begin{proposicion}[Rangos matriciales y producto de Kronecker]
+
+    Sean $A, B$ dos matrices. Entonces se verifica que:
+
+    \begin{equation}
+        rank(A \odot B) = rank(A) \cdot rank(B)
+    \end{equation}
+
+\end{proposicion}
 
 \section{Demostración de los teoremas}

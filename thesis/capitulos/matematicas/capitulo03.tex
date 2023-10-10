@@ -281,4 +281,58 @@ La tarea de aprendizaje ahora será aprender los valores de los parámetros $\th
     \todo{Tengo que comentar en la introducción que el número de elementos de un tensor N, M es M elevado a N}
 \end{observacion}
 
-\endinput
+% Ejemplo de la pagina 58 de mis notas
+\begin{ejemplo}[Función de puntuación sencilla] \label{ejemplo:funcion_puntuacion}
+
+Supongamos que trabajamos con $N = 3, M = 2$. En este caso, una imagen de entrada se compone de los vectores $\nv{x_1}, \nv{x_2}, \nv{x_3} \in \R^s$ (no estamos interesados en el valor de $s \in \N$). Y tenemos dos funciones de representación $f_1, f_2: \R^s \to \R$.
+
+El primer paso es computar la capa de representación, que son los $N \cdot M$ coeficientes reales dados por:
+
+\begin{equation}
+\begin{split}
+    f_1(\nv{x_1}), f_1(\nv{x_2}), f_1(\nv{x_3}) \\
+    f_2(\nv{x_1}), f_2(\nv{x_2}), f_2(\nv{x_3})
+\end{split}
+\end{equation}
+
+Y con esto ya podemos expresar nuestra función de puntuación:
+
+\begin{equation}
+\begin{split}
+    h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, d_2, d_3 = 1}^{2} \mathcal{A}^y_{d_1 d_2 d_3} \prod_{i = 1}^3 f_{d_i}(\nv{x_i}) = \ldots \\
+    \ldots &= A_{111} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_1(\nv{x_2}) + \\
+           &+ A_{112} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_2(\nv{x_2}) + \ldots \\
+           \ldots &+ A_{321} \; f_3(\nv{x_1}) \; f_2(\nv{x_2}) \; f_1(\nv{x_2}) + \ldots \\
+           \ldots &+ A_{333} \; f_3(\nv{x_1}) \; f_3(\nv{x_2}) \; f_3(\nv{x_3})
+\end{split}
+\end{equation}
+
+Queda claro que el tensor $\mathcal{A}^y$ contiene los coeficientes que realizan una combinación lineal sobre todos los posibles productos de nuestros $N \cdot M$ valores reales de la capa de representación
+
+\end{ejemplo}
+
+\section{Resumen}
+\todo{Mal nombre. Sección muy importante porque deja claro el estado en el que nos encontramos en los dos modelos que trabajamos más adelante}
+
+En resumen, buscamos resolver una tarea de clasificación. Es decir, buscamos clasificar imágenes en una de las etiquetas $\mathcal{Y} := \{1, \ldots, Y\} = \deltaset{Y}$.
+
+Las imágenes de entrada se dividen en parches. Esto es, una imagen viene dada por $N$ vectores $x = (\nv{x_1}, \ldots, \nv{x_N}), \dspace \nv{x_i} \in \R^s \dspace \forall i \in \deltaset{N}$.
+
+Al disponer de $M$ funciones de representación, cada vector $\nv{x_i}$ acabará siendo \textbf{representado} por un descriptor de longitud $M$, es decir:
+
+\begin{equation}
+    \nv{x_i} \to (f_1(\nv{x_i}), \ldots, f_M(\nv{x_i})) \in \R^M
+\end{equation}
+
+Para resolver la tarea de clasificación, buscamos aprender $Y$ funciones de puntuación $h_y$. Para ello, tomamos los $N \cdot M$ coeficientes resultado de tomar $N$ descriptores de longitud $M$. La función de puntuación $h_y$ es el resultado de combinar linealmente los $M^N$ posibles productos de los $N \cdot M$ coeficientes. La combinación lineal se describe con los coeficientes de $\mathcal{A}^y \in \espaciotensores{N}{M}$. Todo esto quedó claro en \customref{ejemplo:funcion_puntuacion}.
+
+Las dos arquitecturas que introducimos más adelante son el resultado de factorizar el tensor de coeficientes $\mathcal{A}^y$ con una descomposición u otra. Ambas incorporan conceptos claves en la práctica del aprendizaje automático, como la localidad, compartición de coeficientes y \textit{pooling}.
+
+El siguiente diagrama muestra el primer paso, que es computar los $N \cdot M$ coeficientes reales que componen la capa de presentación:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{matematicas/computo_capa_representacion}
+    \caption{}
+\end{figure}
+\todo{Hacer con tikz o con draw.io. Dar una caption apropiada. Quizas en un diagrama escribir todo el proceso}
