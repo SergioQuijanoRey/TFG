@@ -190,24 +190,24 @@ Podemos representar este modelo gráficamente como sigue:
 \caption{Representación gráfica del modelo \textit{CP}}
 \end{figure}
 
-\subsection{Compartición de parámetros} \label{subs:comparticion_parametros_cp}
+\subsection{Compartición de coeficientes} \label{subs:comparticion_parametros_cp}
 
 Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de parámetros}.
 
 La compartición de coeficientes es necesaria para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de esta.
 
-En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de $\sum_{d = 1}^M \omega_d^{z ,i}$.
+En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de los vectores $\nv{\omega^{z,i}} := (\omega^{z, i}_1, \ldots, \omega^{z, i}_M)$.
 
 Por tanto, para forzar el deseado \textit{coefficient sharing} basta con imponer en \eqref{eq:cp_decomp_conjunta}:
 
 \begin{equation}
-    \nv{w^{z, 1}} = \ldots = \nv{w^{z, N}} =: \nv{w^z}
+    \nv{\omega^{z, 1}} = \ldots = \nv{\omega^{z, N}} =: \nv{\omega^z}
 \end{equation}
 
 Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP} simétrica, es decir:
 
 \begin{equation}
-    \mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{a^z} \otimes \ldots \otimes \nv{a^z}}{N veces}; \dspace \nv{a^z} \in \R^M
+    \mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \ldots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M
 \end{equation}
 
 Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos.
@@ -414,6 +414,13 @@ Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{produc
 Por lo tanto, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} iniciales acaban siendo una sola. Por lo tanto, acabamos con una lista de $r_{L - 1}$ coeficientes sobre los que aplicamos una última capa oculta, dada por la última ecuación de \eqref{eq:descomposicion_ht}.
 
 Nuestra red realiza \textit{product pooling} con un tamaño de ventana 2, sin \textit{overlapping} gracias al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican \customref{img:diagrama_ht_simple} y \customref{img:diagrama_ht_complejo}. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{product pooling} y, por tanto, distintas profundidades.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{matematicas/diagrama_paper_modelo_ht}
+    \caption{Imagen extraída de \cite{matematicas:principal}}
+\end{figure}
+\todo{Poner esta imagen en un sitio mejor, darle contexto y un buen \textit{caption}}
 
 \todo{Escribir en algún lugar que $L = log_2(N)$}
 
