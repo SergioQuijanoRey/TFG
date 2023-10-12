@@ -76,28 +76,67 @@ Con esto, tenemos que saber cómo se comporta la matrización con el producto te
 
 \begin{definicion}[Producto de Kronecker]
 
+    Sean $A \in \espaciomatrices{N}{M}$ y  $B \in \espaciomatrices{P}{Q}$ dos matrices cualesquiera. Se define su producto de Kronecker $A \odot B$ como la matriz dada por:
+
+    \begin{equation}
+        (A \odot B)_{i,j} := (A_{i, j} B)_{i, j}
+    \end{equation}
+
+    Donde estamos usando una notación por bloques.
 \end{definicion}
 
-\begin{proposicion}[Matrización y producto tensorial]
+\begin{ejemplo}[Producto de Kronecker con dos matrices sencillas]
 
-    Sean $\mathcal{A}, \mathcal{B}$ dos tensores. Entonces se verifica:
+Sean las siguientes matrices:
 
     \begin{equation}
-        [\mathcal{A} \otimes \mathcal{B}] = [\mathcal{A}] \odot [\mathcal{B}]
+        A := \begin{pmatrix}
+            a_{11} & a_{12} \\
+            a_{21} & a_{22} \\
+        \end{pmatrix}
     \end{equation}
+
+    \begin{equation}
+        B := \begin{pmatrix}
+            b_{11} & b_{12} \\
+            b_{21} & b_{22} \\
+        \end{pmatrix}
+    \end{equation}
+
+    Entonces, la matriz $A \odot B$ se computa de la siguiente forma:
+
+    \begin{equation}
+        (A \odot B) = \begin{pmatrix}
+            a_{11}B & a_{12}B \\
+            a_{21}B & a_{22}B \\
+        \end{pmatrix} =
+        \begin{pmatrix}
+            a_{11} b_{11} & a_{11} b_{12} & a_{12} b_{11} & a_{12} b_{12} \\
+            a_{11} b_{21} & a_{11} b_{22} & a_{12} b_{21} & a_{12} b_{22} \\
+            a_{21} b_{11} & a_{11} b_{12} & a_{22} b_{11} & a_{22} b_{12} \\
+            a_{21} b_{21} & a_{11} b_{22} & a_{22} b_{21} & a_{22} b_{22} \\
+        \end{pmatrix}
+    \end{equation}
+
+\end{ejemplo}
+
+\begin{observacion}
+    El anterior ejemplo nos muestra cómo con el producto de Kronecker podemos operar dos matrices cualesquiera, independientemente de sus dimensiones.
+\end{observacion}
+
+Vemos ahora tres propiedades fundamentales:
+
+\begin{proposicion}[Propiedades fundamentales] Las siguientes afirmaciones son ciertas:
+
+    \begin{enumerate}
+        \item Matrización y producto tensorial: Sean $\mathcal{A}, \mathcal{B}$ dos tensores. Entonces se verifica que $[\mathcal{A} \otimes \mathcal{B}] = [\mathcal{A}] \odot [\mathcal{B}]$ \label{prop:prop_fundamentales_primera}
+        \item Rangos matriciales y producto de Kronecker: sean $A, B$ dos matrices. Entonces se verifica que $rank(A \odot B) = rank(A) \cdot rank(B)$
+        \item Linealidad de la matrización: sean $\mathcal{A}_1, \ldots, \mathcal{A}_N$ tensores del mismo orden y mismas dimensiones, y $\alpha_1, \ldots, \alpha_N \in \R$, entonces $[\sum_{i = 1}^N \alpha_i \cdot \mathcal{A}_i] = \sum_{i = 1}^N \alpha_i \cdot [\mathcal{A}_i]$
+    \end{enumerate}
 
 \end{proposicion}
 
-También tenemos que saber cómo se comporta el producto de Kronecker entre matrices y el rango matricial:
-
-\begin{proposicion}[Rangos matriciales y producto de Kronecker]
-
-    Sean $A, B$ dos matrices. Entonces se verifica que:
-
-    \begin{equation}
-        rank(A \odot B) = rank(A) \cdot rank(B)
-    \end{equation}
-
-\end{proposicion}
+\begin{observacion} A partir de \customref{prop:prop_fundamentales_primera} es directo ver que el producto de Kronecker verifica las mismas propiedades que el producto tensorial (véase \customref{prop:tensores_propiedades}).
+\end{observacion}
 
 \section{Demostración de los teoremas}
