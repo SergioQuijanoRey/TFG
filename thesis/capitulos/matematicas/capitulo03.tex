@@ -33,7 +33,7 @@ Nuestro objetivo en esta sección es justificar la elección de las funciones $h
 
 A continuación, introduciremos algunos conceptos sobre espacios de funciones que serán fundamentales en la justificación de la elección de las funciones $h_y$. Empezamos introduciendo el siguiente espacio de funciones, que es de sobra conocido:
 
-\begin{definicion}
+\begin{definicion}[Espacio de Lebesgue]
 
     Dado $\Omega \subseteq \R^N$ definimos el siguiente espacio de funciones:
 
@@ -56,7 +56,7 @@ A continuación, introduciremos algunos conceptos sobre espacios de funciones qu
 
 Y ahora, introducimos el siguiente espacio de funciones:
 
-\begin{definicion}
+\begin{definicion}[Espacios de Lebesgue $L^p$]
     Dado $\Omega \subseteq \R^N$ definimos
 
     \begin{equation}
@@ -79,12 +79,15 @@ A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, esc
 \end{equation}
 
 Todos estos son conceptos que conocemos del grado. A partir de ahora introducimos algunos conceptos nuevos que nos serán de utilidad. Estos conceptos tratarán de caracterizar algunos subconjuntos de $L^2$ interesantes. Empezamos por el concepto de totalidad:
+\todo{Cuidado con esta frase. En los apuntes de análisis funcional se habla de bases ortonormales, que guardan relación con estos conceptos}
 
-\begin{definicion}
+\begin{definicion}[Subconjuntos de funciones totales]
     Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$
 \end{definicion}
 
-\begin{proposicion} \label{prop:conjuntos_totales_epsilon_aproximacion}
+La principal ventaja de trabajar con un subconjunto de funciones de este tipo viene dada por la siguiente proposición:
+
+\begin{proposicion}[Aproximaciones con subconjuntos totales de funciones] \label{prop:conjuntos_totales_epsilon_aproximacion}
     Sea $\mathcal{F} \subseteq L^2$ total. Entonces podemos aproximar arbitrariamente bien cualquier función $g \in L^2$ usando combinaciones lineales finitas, es decir:
 
     \begin{equation} \label{eq:conjuntos_totales_epsilon_aproximacion}
@@ -96,13 +99,13 @@ Todos estos son conceptos que conocemos del grado. A partir de ahora introducimo
 
 \end{proposicion}
 
-\begin{definicion}
+\begin{definicion}[Subconjuntos de funciones linealmente independientes]
 
     Un subconjunto $\mathcal{F} \subseteq L^2$ se dice \textbf{linealmente independiente} cuando todos sus subconjuntos finitos son linealmente independientes.
 
 \end{definicion}
 
-\begin{proposicion}
+\begin{proposicion}[Producto tensorial, independencia lineal y totalidad]
     Todo espacio $L^2(\R^N)$ admite un subconjunto numerable que sea linealmente independiente y total. Estos conjuntos actuarán como bases en nuestro espacio de funciones
 \end{proposicion}
 \todo{Qué relación tiene esto con el hecho de que sabemos que todo espacio de Hilbert admite una base ortonormal. Hay estamos usando <fi, fi'> = 0 en vez de la indp. lineal pero claramente están relacionados}

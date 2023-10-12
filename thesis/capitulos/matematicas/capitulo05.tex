@@ -54,7 +54,7 @@ En esta sección introduciremos algunos resultados que serán usados en las demo
 \begin{enumerate}
     \item La unión contable de conjuntos de medida nula es un conjunto de medida nula
     \item Si $A \subseteq \R^{N_1}$ tiene medida nula, entonces $A \times R^{N_2} \subseteq R^{N_1 + N_2}$ también tiene medida nula
-    \item Sea $p \in \R^d[x]$, es decir, un polinomio sobre los números reales con $d$ variables. Si $p$ no es el polinomio idénticamente nulo, entonces el conjunto de ceros del polinomio es un conjunto de medida nula.
+    \item Sea $p \in \R^d[x]$, es decir, un polinomio sobre los números reales con $d$ variables. Si $p$ no es el polinomio idénticamente nulo, entonces el conjunto de ceros del polinomio es un conjunto de medida nula \cite{informatica:zeros_of_polynomial}.
 \end{enumerate}
 
 \end{lema}
@@ -76,7 +76,7 @@ Con esto, tenemos que saber cómo se comporta la matrización con el producto te
 
 \begin{definicion}[Producto de Kronecker]
 
-    Sean $A \in \espaciomatrices{N}{M}$ y  $B \in \espaciomatrices{P}{Q}$ dos matrices cualesquiera. Se define su producto de Kronecker $A \odot B$ como la matriz dada por:
+    Sean $A \in \espaciomatrices{N}{M}$ y  $B \in \espaciomatrices{P}{Q}$ dos matrices cualesquiera. Se define su producto de Kronecker $A \odot B$ como la matriz en $\espaciomatrices{N \cdot P}{M \cdot Q}$ dada por:
 
     \begin{equation}
         (A \odot B)_{i,j} := (A_{i, j} B)_{i, j}
@@ -139,4 +139,68 @@ Vemos ahora tres propiedades fundamentales:
 \begin{observacion} A partir de \customref{prop:prop_fundamentales_primera} es directo ver que el producto de Kronecker verifica las mismas propiedades que el producto tensorial (véase \customref{prop:tensores_propiedades}).
 \end{observacion}
 
+\begin{proposicion}[Rango matricial de la descomposición \textit{CP}]
+
+    \begin{equation}
+        rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) = Z
+    \end{equation}
+
+    Es decir, un tensor de orden $2^L$ dado como descomposición \textit{CP} con $Z$ términos tiene una matrización de rango matricial como mucho $Z$.
+
+\end{proposicion}
+
+\begin{proof}
+
+    Empezamos viendo la siguiente igualdad:
+
+    \begin{equation}
+    \begin{split}
+        rank([\nv{v_1^{(z)}}  \otimes \ldots \otimes \nv{v_{2^L}^{(z)}}]) &= \ldots \text{  agrupo dos a dos   } \ldots = \\
+        \ldots &= \prod_{i = 1}^{2^{L/2}} rank([\nv{v_{2i - 1}^{(z)}} \otimes\nv{v_{2i}^{(z)}}]) = \ldots   \\
+        \ldots &= \prod_{i = 1}^{2^{L/2}} rank(\nv{v_{2i - 1}^{(z)}} \nv{v_{2i}^{(z)}}^T) = \ldots \\
+        \ldots &= \prod_{i = 1}^{2^{L/2}} 1 = 1
+    \end{split}
+    \end{equation}
+
+    Usamos esto para calcular nuestra ecuación
+
+    \begin{equation}
+    \begin{split}
+        rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) &\encima{=}{linealidad} rank(\sum_{z = 1}^Z \lambda_z [\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) \leq \ldots \\
+        \ldots &\leq \sum_{z = 1}^Z rank([\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) = \sum_{z = 1}^Z 1 = Z
+    \end{split}
+    \end{equation}
+    \todo{No sé de donde sale la desigualdad!}
+    \todo{No estoy explicando qué propiedades fundamentales que acabo de introducir uso en la prueba}
+\end{proof}
+
 \section{Demostración de los teoremas}
+
+Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema.
+
+\begin{lema}
+
+    Sean $M, N \in \N$, $\nv{x} \in \R^{2MN + N}$ y definimos tres funciones que llevan $\nv{x}$ a una matriz:
+
+    \begin{enumerate}
+        \item $A(\nv{x}) \in \espaciomatrices{M}{N}$ contiene los primeros $MN$ elementos de $\nv{x}$
+        \item $B(\nv{x}) \in \espaciomatrices{M}{N}$ contiene los siguientes $MN$ elementos de $\nv{x}$
+        \item $D(\nv{x}) \in \espaciomatrices{N}{N}$ es una matriz diagonal con los últimos $N$ elementos de $\nv{x}$ en la diagonal
+    \end{enumerate}
+
+    Definimos con ello la matriz $U(\nv{x}) := A(\nv{x}) D(\nv{x}) B(\nv{x})^T \in \espaciomatrices{M}{M}$. Entonces el conjunto de puntos $\nv{x} \in \R^{2MN + N}$ para los cuales el rango de $U(\nv{x})$ es distinto de $r := \min \{M, N\}$ tienen medida nula.
+
+    El resultado sigue siendo cierto si consideramos $\nv{x} \in \R^{MN+N}$ y cambiamos la asignación de $B(x)$ por $B(x) := A(x)$.
+\end{lema}
+
+\begin{proof}
+    Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ es claro que
+
+    \begin{equation}
+        rank(U(\nv{x})) \leq M \leq r := \min \{N, M \}; \dspace \forall \nv{x} \in \R^{2MN + N}
+    \end{equation}
+    \todo{No se si $M \leq min$ porque M puede ser mas grande que r}.
+
+    Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{cpd } x \in \R^{2MN + N}$.
+
+\end{proof}
