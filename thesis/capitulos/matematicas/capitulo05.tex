@@ -49,12 +49,12 @@ Teniendo en cuenta que cualquier tensor realizable por un modelo \textit{CP} pue
 
 En esta sección introduciremos algunos resultados que serán usados en las demostraciones del teorema \customref{} y el corolario \customref{}. Empezamos con los siguientes resultados de teoría de la medida de Lebesgue:
 
-\begin{lema}[Propiedades fundamentales de la medida] Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
+\begin{lema}[Propiedades fundamentales de la medida] \label{lema:prop_fundamentales_medida} Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
 
 \begin{enumerate}
     \item La unión contable de conjuntos de medida nula es un conjunto de medida nula
     \item Si $A \subseteq \R^{N_1}$ tiene medida nula, entonces $A \times R^{N_2} \subseteq R^{N_1 + N_2}$ también tiene medida nula
-    \item Sea $p \in \R^d[x]$, es decir, un polinomio sobre los números reales con $d$ variables. Si $p$ no es el polinomio idénticamente nulo, entonces el conjunto de ceros del polinomio es un conjunto de medida nula \cite{informatica:zeros_of_polynomial}.
+    \item Sea $p \in \R^d[x]$, es decir, un polinomio sobre los números reales con $d$ variables. Si $p$ no es el polinomio idénticamente nulo, entonces el conjunto de ceros del polinomio es un conjunto de medida nula \cite{informatica:zeros_of_polynomial}
 \end{enumerate}
 
 \end{lema}
@@ -194,13 +194,56 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
 \end{lema}
 
 \begin{proof}
-    Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ es claro que
+    Sin pérdida de generalidad, supondré que $M \leq N$, luego $r = M$. Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ es claro que
 
     \begin{equation}
         rank(U(\nv{x})) \leq M \leq r := \min \{N, M \}; \dspace \forall \nv{x} \in \R^{2MN + N}
     \end{equation}
-    \todo{No se si $M \leq min$ porque M puede ser mas grande que r}.
+    \todo{No se si $M \leq min$ porque M puede ser mas grande que r}
 
-    Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{cpd } x \in \R^{2MN + N}$.
+    Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{cpd } x \in \R^{2MN + N}$. Definimos $U_r(x)$ como la submatriz superior izquierda $r \times r$ de $U(x)$.
 
+    Si fuese $U_r(x)$ no singular para cierto $x$, claramente sabríamos que $r = rank(U_r(x)) \leq rank(U(x))$. Por tanto, buscamos probar que $U_r(x)$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{x \in \R^{2MN + N} : det(U_r(x)) = 0 }$ tiene medida nula.
+
+    Para ver esto tenemos en cuenta que $det(U_r(\nv{x}))$ es un polinomio con entradas en $x \in \R^{2MN + N}$. Por \customref{lema:prop_fundamentales_medida} sabemos que entonces o bien es el polinomio idénticamente nulo o bien el conjunto de sus ceros tiene medida nula. Basta ver por tanto que no es el polinomio idénticamente nulo.
+
+    Para ello basta ver que $\exists \nv{x_0} \in \R^{2MN + N}$ de forma que $det(U_r(\nv{x})) \neq 0$. Para ello, tomamos $x_0$ de forma que $D(x_0) = \mathbb{I}_d$ y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0}), B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. En esta situación tenemos:
+
+    \begin{equation}
+    \begin{split}
+        U_r(\nv{x_0}) &= \begin{pmatrix}
+            \mathbb{I}d_{r \times r} & \vline & 0 \\
+        \end{pmatrix}_{M \times N}
+        \mathbb{I}d_{N \times N}
+        \begin{pmatrix}
+            \mathbb{I}d_{r \times r} & \vline & 0 \\
+        \end{pmatrix}^T_{N \times M} = \ldots \\
+        \ldots &= \begin{pmatrix}
+            \mathbb{I}d_{r \times r} & \vline & 0 \\
+        \end{pmatrix}_{M \times N}
+        \mathbb{I}d_{N \times N}
+        \begin{pmatrix}
+            0 \\
+            \hline
+            \mathbb{I}d_{r \times r}
+        \end{pmatrix}{N \times M} = \ldots \\
+        \ldots &= \begin{pmatrix}
+            \mathbb{I}d_{r \times r} & \vline & 0 \\
+        \end{pmatrix}_{M \times N}
+        \begin{pmatrix}
+            0 \\
+            \hline
+            \mathbb{I}d_{r \times r}
+        \end{pmatrix}_{N \times M} = \ldots \\
+        \ldots &= \mathbb{I}d_M
+    \end{split}
+    \end{equation}
+
+    Por tanto, es claro que
+
+    \begin{equation}
+        det(U_r(\nv{x_0})) = det(\mathbb{I}d_M) = 1 \neq -1
+    \end{equation}
+
+    como buscábamos probar.
 \end{proof}
