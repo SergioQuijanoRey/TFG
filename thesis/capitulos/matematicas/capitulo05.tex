@@ -199,7 +199,6 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
     \begin{equation}
         rank(U(\nv{x})) \leq M \leq r := \min \{N, M \}; \dspace \forall \nv{x} \in \R^{2MN + N}
     \end{equation}
-    \todo{No se si $M \leq min$ porque M puede ser mas grande que r}
 
     Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{cpd } x \in \R^{2MN + N}$. Definimos $U_r(x)$ como la submatriz superior izquierda $r \times r$ de $U(x)$.
 
@@ -246,4 +245,37 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
     \end{equation}
 
     como buscábamos probar.
+\end{proof}
+
+Veamos ahora el segundo lema:
+
+\begin{lema}
+    Sean $p$ funciones continuas de $\R^d$ a $\espaciomatrices{M}{N}$, que llevan un punto $\nv{y} \in \R^d$ a las matrices $A_1(\nv{y}), \ldots, A_p(\nv{y})$. Supongamos que con estas funciones el siguiente conjunto tiene medida nula:
+
+    \begin{equation}
+        \conjunto{\nv{y} \in \R^d : rank(A_i(\nv{y})) < r, \dspace \forall i \in \deltaset{p}}
+    \end{equation}
+
+    Definimos la función
+
+    \begin{equation}
+    \begin{split}
+        A: \R^P \times R^d &\to \espaciomatrices{M}{N} \\
+        (x, y) &\mapsto \sum_{i = 1}^p x_i A_i(\nv{y})
+    \end{split}
+    \end{equation}
+
+    Entonces el conjunto de puntos $(x, y) \in \R^p \times \R^d$ para los cuales $A(x, y) < r$ forman un conjunto de medida nula
+\end{lema}
+
+\begin{proof}
+
+    Definimos el conjunto
+
+    \begin{equation}
+        S := \conjunto{(x, y) \in  \R^p \times \R^d: rank(A(\nv{x}, \nv{y})) < r} \subseteq \R^p \times \R^d
+    \end{equation}
+
+    y lo que buscamos es probar que tiene medida nula.
+
 \end{proof}
