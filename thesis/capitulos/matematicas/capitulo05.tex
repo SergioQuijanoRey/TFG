@@ -139,7 +139,7 @@ Vemos ahora tres propiedades fundamentales:
 \begin{observacion} A partir de \customref{prop:prop_fundamentales_primera} es directo ver que el producto de Kronecker verifica las mismas propiedades que el producto tensorial (véase \customref{prop:tensores_propiedades}).
 \end{observacion}
 
-\begin{proposicion}[Rango matricial de la descomposición \textit{CP}]
+\begin{proposicion}[Rango matricial de la descomposición \textit{CP}] \label{prop:rango_matricial_descomp_cp}
 
     \begin{equation}
         rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) = Z
@@ -154,21 +154,21 @@ Vemos ahora tres propiedades fundamentales:
     Empezamos viendo la siguiente igualdad:
 
     \begin{equation}
-    \begin{split}
-        rank([\nv{v_1^{(z)}}  \otimes \ldots \otimes \nv{v_{2^L}^{(z)}}]) &= \ldots \text{  agrupo dos a dos   } \ldots = \\
-        \ldots &= \prod_{i = 1}^{2^{L/2}} rank([\nv{v_{2i - 1}^{(z)}} \otimes\nv{v_{2i}^{(z)}}]) = \ldots   \\
-        \ldots &= \prod_{i = 1}^{2^{L/2}} rank(\nv{v_{2i - 1}^{(z)}} \nv{v_{2i}^{(z)}}^T) = \ldots \\
-        \ldots &= \prod_{i = 1}^{2^{L/2}} 1 = 1
-    \end{split}
+        \begin{split}
+            rank([\nv{v_1^{(z)}}  \otimes \ldots \otimes \nv{v_{2^L}^{(z)}}]) &= \ldots \text{  agrupo dos a dos   } \ldots = \\
+            \ldots &= \prod_{i = 1}^{2^{L/2}} rank([\nv{v_{2i - 1}^{(z)}} \otimes\nv{v_{2i}^{(z)}}]) = \ldots   \\
+            \ldots &= \prod_{i = 1}^{2^{L/2}} rank(\nv{v_{2i - 1}^{(z)}} \nv{v_{2i}^{(z)}}^T) = \ldots \\
+            \ldots &= \prod_{i = 1}^{2^{L/2}} 1 = 1
+        \end{split}
     \end{equation}
 
     Usamos esto para calcular nuestra ecuación
 
     \begin{equation}
-    \begin{split}
-        rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) &\encima{=}{linealidad} rank(\sum_{z = 1}^Z \lambda_z [\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) \leq \ldots \\
-        \ldots &\leq \sum_{z = 1}^Z rank([\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) = \sum_{z = 1}^Z 1 = Z
-    \end{split}
+        \begin{split}
+            rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) &\encima{=}{linealidad} rank(\sum_{z = 1}^Z \lambda_z [\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) \leq \ldots \\
+            \ldots &\leq \sum_{z = 1}^Z rank([\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) = \sum_{z = 1}^Z 1 = Z
+        \end{split}
     \end{equation}
     \todo{No sé de donde sale la desigualdad!}
     \todo{No estoy explicando qué propiedades fundamentales que acabo de introducir uso en la prueba}
@@ -192,7 +192,7 @@ Vemos ahora tres propiedades fundamentales:
 
 Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema.
 
-\begin{lema}
+\begin{lema}[Rango de una matrización de la forma $A D B^T$] \label{lema:primer_lema}
 
     Sean $M, N \in \N$, $\nv{x} \in \R^{2MN + N}$ y definimos tres funciones que llevan $\nv{x}$ a una matriz:
 
@@ -223,33 +223,33 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
     Para ello basta ver que $\exists \nv{x_0} \in \R^{2MN + N}$ de forma que $det(U_r(\nv{x})) \neq 0$. Para ello, tomamos $x_0$ de forma que $D(x_0) = \mathbb{I}_d$ y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0}), B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. En esta situación tenemos:
 
     \begin{equation}
-    \begin{split}
-        U_r(\nv{x_0}) &= \begin{pmatrix}
-            \mathbb{I}d_{r \times r} & \vline & 0 \\
-        \end{pmatrix}_{M \times N}
-        \mathbb{I}d_{N \times N}
-        \begin{pmatrix}
-            \mathbb{I}d_{r \times r} & \vline & 0 \\
-        \end{pmatrix}^T_{N \times M} = \ldots \\
-        \ldots &= \begin{pmatrix}
-            \mathbb{I}d_{r \times r} & \vline & 0 \\
-        \end{pmatrix}_{M \times N}
-        \mathbb{I}d_{N \times N}
-        \begin{pmatrix}
-            0 \\
-            \hline
-            \mathbb{I}d_{r \times r}
-        \end{pmatrix}{N \times M} = \ldots \\
-        \ldots &= \begin{pmatrix}
-            \mathbb{I}d_{r \times r} & \vline & 0 \\
-        \end{pmatrix}_{M \times N}
-        \begin{pmatrix}
-            0 \\
-            \hline
-            \mathbb{I}d_{r \times r}
-        \end{pmatrix}_{N \times M} = \ldots \\
-        \ldots &= \mathbb{I}d_M
-    \end{split}
+        \begin{split}
+            U_r(\nv{x_0}) &= \begin{pmatrix}
+                \mathbb{I}d_{r \times r} & \vline & 0 \\
+            \end{pmatrix}_{M \times N}
+            \mathbb{I}d_{N \times N}
+            \begin{pmatrix}
+                \mathbb{I}d_{r \times r} & \vline & 0 \\
+            \end{pmatrix}^T_{N \times M} = \ldots \\
+            \ldots &= \begin{pmatrix}
+                \mathbb{I}d_{r \times r} & \vline & 0 \\
+            \end{pmatrix}_{M \times N}
+            \mathbb{I}d_{N \times N}
+            \begin{pmatrix}
+                0 \\
+                \hline
+                \mathbb{I}d_{r \times r}
+            \end{pmatrix}{N \times M} = \ldots \\
+            \ldots &= \begin{pmatrix}
+                \mathbb{I}d_{r \times r} & \vline & 0 \\
+            \end{pmatrix}_{M \times N}
+            \begin{pmatrix}
+                0 \\
+                \hline
+                \mathbb{I}d_{r \times r}
+            \end{pmatrix}_{N \times M} = \ldots \\
+            \ldots &= \mathbb{I}d_M
+        \end{split}
     \end{equation}
 
     Por tanto, es claro que
@@ -259,11 +259,12 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
     \end{equation}
 
     como buscábamos probar.
+    \todo{No he visto la parte en la que $Ax = Bx$}
 \end{proof}
 
 Veamos ahora el segundo lema:
 
-\begin{lema}
+\begin{lema} \label{lema:segundo_lema}
     Sean $p$ funciones continuas de $\R^d$ a $\espaciomatrices{M}{N}$, que llevan un punto $\nv{y} \in \R^d$ a las matrices $A_1(\nv{y}), \ldots, A_p(\nv{y})$. Supongamos que con estas funciones el siguiente conjunto tiene medida nula:
 
     \begin{equation}
@@ -273,10 +274,10 @@ Veamos ahora el segundo lema:
     Definimos la función
 
     \begin{equation}
-    \begin{split}
-        A: \R^P \times R^d &\to \espaciomatrices{M}{N} \\
-        (x, y) &\mapsto \sum_{i = 1}^p x_i A_i(\nv{y})
-    \end{split}
+        \begin{split}
+            A: \R^P \times R^d &\to \espaciomatrices{M}{N} \\
+            (x, y) &\mapsto \sum_{i = 1}^p x_i A_i(\nv{y})
+        \end{split}
     \end{equation}
 
     Entonces el conjunto de puntos $(x, y) \in \R^p \times \R^d$ para los cuales $A(x, y) < r$ forman un conjunto de medida nula
@@ -309,9 +310,9 @@ Veamos ahora el segundo lema:
     Por las hipótesis del lema, sabemos que $\mathcal{C}$ tiene medida nula. Luego queda ver que para $\nv{y_0} \in S - \mathcal{C}$ el conjunto $S^{\nv{y_0}}$ tiene medida nula.
 
     \begin{equation}
-    \begin{split}
-        \nv{y_o} \in S - \mathcal{C} \encima{\then}{\nv{y_o} \notin \mathcal{C}} \substack{\exists i \in \deltaset{p}: \\ rank(A_i(\nv{y_o})) \geq r}
-    \end{split}
+        \begin{split}
+            \nv{y_o} \in S - \mathcal{C} \encima{\then}{\nv{y_o} \notin \mathcal{C}} \substack{\exists i \in \deltaset{p}: \\ rank(A_i(\nv{y_o})) \geq r}
+        \end{split}
     \end{equation}
 
     Sin pérdida de generalidad, supongo que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_o}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que
@@ -325,20 +326,20 @@ Veamos ahora el segundo lema:
     Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar lo que buscamos. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
 
     \begin{equation}
-    \begin{split}
-        S_n &:= S \interseccion [-n, n]^{p+d} \\
-        \R_n &:= \R \interseccion [-n, n]^{p+d} = [-n, n]^{p+d}
-    \end{split}
+        \begin{split}
+            S_n &:= S \interseccion [-n, n]^{p+d} \\
+            \R_n &:= \R \interseccion [-n, n]^{p+d} = [-n, n]^{p+d}
+        \end{split}
     \end{equation}
 
     Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con $[-n, n]^{p+d}$, además, tendrán medida finita. Aplicamos ahora el teorema de Fubini para desarrollar:
 
     \begin{equation}
-    \begin{split}
-        \int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} &= \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} = \ldots \\
-        \ldots &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{y}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = \ldots \\
-        \ldots &= 0 + 0 = 0
-    \end{split}
+        \begin{split}
+            \int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} &= \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} = \ldots \\
+            \ldots &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{y}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = \ldots \\
+            \ldots &= 0 + 0 = 0
+        \end{split}
     \end{equation}
     \todo{Habría que comprobar los supuestos de Fubini}
 
@@ -346,7 +347,7 @@ Veamos ahora el segundo lema:
 
     \begin{itemize}
         \item (1): hemos visto que la medida del conjunto $\mathcal{C}$ es cero
-        \item (2): hemos visto que si $\nv{y_0} \in \R_n^d$, entonces el conjunto $S^{y_0}$ tiene medida nula
+        \item (2): hemos visto que si $\nv{y} \in \R_n^d$, entonces el conjunto $S^{y}$ tiene medida nula
     \end{itemize}
 
     Y con ello hemos probado que $\int \mathbb{1}_{S_n} = 0$, sea cual sea el valor de $n \in \N$. Usamos ahora el \textbf{teorema de convergencia monótona} para calcular:
@@ -359,3 +360,111 @@ Veamos ahora el segundo lema:
     Por lo tanto, la medida del conjunto $S$ es cero, como queríamos probar.
 
 \end{proof}
+
+Estamos ya en condiciones de probar el teorema principal del trabajo:
+
+\begin{teorema}
+\end{teorema}
+\begin{proof}
+    \textbf{Caso 1: sin compartición de coeficientes}
+
+    \todo{Escribir en algun lado que es suficiente con mostrar que las matrizaciones tienen cierto rango}
+    Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$.
+    \todo{En la página 7 del \textit{paper} dicen que por completitud, $r_L = Y$}
+
+    Probamos por inducción en $l = 1, \ldots, L$ que, en casi todo punto respecto al conjunto $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$, el rango \textit{CP} de los tensores $\conjunto{\phi^{l, j, \gamma}: j \in \deltaset{N/2^l}, \gamma \in \deltaset{r_l}}$ es al menos $r^{2^{l/2}}$.
+
+    Por \customref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{2^{l/2}}$ en casi todo punto. Comenzamos la inducción viendo el \textbf{caso $l = 1$}.
+
+    Por definición, tenemos que para unos valores concretos de $j, \gamma$:
+
+    \begin{equation}
+        \phi^{1, j, \gamma} = \sum_{\alpha = 1}^{r_0} \comentardebajo{a_{\alpha}^{1, j, \gamma}}{\text{diagonal } D} \comentarencima{\varphi^{0, 2j - 1, \alpha}}{A \text{ por columnas}} \otimes \comentardebajo{\varphi^{0, 2j, \alpha}}{B \text{ por columnas}}
+    \end{equation}
+
+    Definimos tres matrices $A, B, D$:
+
+    \begin{itemize}
+        \item $A \in \espaciomatrices{M}{r_0}$ con columnas $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$
+        \item $B \in \espaciomatrices{M}{r_o}$ con columnas $\conjunto{\varphi^{0, 2j, \alpha}: \alpha \in \deltaset{r_0}}$
+        \item $D \in \espaciomatrices{r_0}{r_0}$ con valores en la diagonal $a_{\alpha}^{1, j, \gamma}, \; \alpha \in \deltaset{r_0}$
+    \end{itemize}
+
+    Con ello podemos escribir $[\phi^{1, j, \gamma}] = A D B^T$. Aplicando \customref{lema:primer_lema}, sabemos que $rank([\phi^{1, j, \gamma}]) = r := \min \conjunto{r_0, M}$ en casi todo punto, respecto al conjunto de todos los parámetros que conforman $\phi^{1, j, \gamma}$. Estos parámetros son:
+
+    \begin{itemize}
+        \item $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$
+        \item $\conjunto{\varphi^{0, 2j, \alpha}: \alpha \in \deltaset{r_0}}$
+        \item $\conjunto{\nv{a^{1, j, \alpha}} : \alpha \in \deltaset{r_0}}$ donde $\nv{a^{1, j, \alpha}} := (a^{1, j, \alpha}_1, \ldots,  a^{1, j, \alpha}_{r_0})$
+    \end{itemize}
+
+    Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando \customref{lema:prop_fundamentales_medida}.
+
+    Ahora sabemos que $rank([\phi^{1, j, \gamma}]) = r$ en casi todo punto (respecto al conjunto de todos los parámetros que definen el modelo), para valores concretos de $j \in \deltaset{N/2}, \gamma \in r_1$. Veamos que esto implica que la igualdad sigue siendo válida para cualquier $j, \gamma$ de forma conjunta:
+
+    \begin{equation}
+    \begin{split}
+        \phi_1^\gamma &:= \conjunto{j \in \deltaset{N/2}: rank([\phi^{1, j, \gamma}] \neq r} \text{ tiene medida } 0 \then \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma \text{ tiene medida } 0 \then \ldots \\
+        \ldots &\then \phi_1 \times \R \text{ tiene medida } 0 \then \ldots \\
+        \ldots &\then \phi := \conjunto{(j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}: rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R \text{ tiene medida } 0
+    \end{split}
+    \end{equation}
+
+    Esto prueba el caso $l = 1$.
+
+    \textbf{Hipótesis de inducción}: supuesto que es cierto para $l - 1$, ¿esto implica que sea cierto para $l$?.
+
+    Usando la hipótesis de inducción sabemos que
+
+    \begin{equation}
+        rank(\phi^{l-1, j', \gamma'}) \geq r^{2^{\frac{l - 1}{2}}},
+        \; \forall j' \in \deltaset{N/2^{l-1}}, \forall \gamma' \in \deltaset{r_{l-1}}
+    \end{equation}
+
+    en casi todo punto (respecto al conjunto de todos los parámetros del modelo). Fijados unos valores concretos para $j' \in \deltaset{N/2^{l-1}}$, $\gamma' \in \deltaset{r_{l-1}}$, tenemos que:
+
+    \begin{equation}
+    \begin{split}
+        \phi^{l, j, \gamma} &:= \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha} \then \\
+        &\then [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]
+    \end{split}
+    \end{equation}
+
+    Ahora definimos $M_\alpha := [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]$, $\forall \alpha \in \deltaset{r_{l-1}}$ y aplicamos la hipótesis de inducción junto al hecho de que $rank(A \odot B) = rank(A) \cdot rank(B)$:
+
+    \begin{equation}
+    \begin{split}
+        \substack{rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} cpd \\ rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} cpd} \then         rank(M_\alpha) \geq r^{\frac{2^{l-1}}{2}} \cdot r^{\frac{2^{l-1}}{2}} = r^{\frac{2^{l-1}}{2} + \frac{2^{l-1}}{2}} =
+        r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \\
+    \end{split}
+    \end{equation}
+    \todo{Corregir los exponentes r elevado a algo antes de este punto. estos son los correctos creo}
+
+    Ahora, usando la definición de $M_\alpha$, calculamos:
+
+    \begin{equation}
+        [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot M_\alpha
+    \end{equation}
+
+    Como $\conjunto{M_\alpha}_\alpha$ no depende de $\nv{a^{l, j, \gamma}}$ porque solo codifica las entradas tensoriales del nivel anterior, podemos aplicar \customref{lema:segundo_lema}:
+
+    \begin{equation}
+    \begin{split}
+        \substack{
+            rank(M_\alpha) \geq r^{\frac{2^l}{2}}\\
+            \conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha \text{ continuo } \\
+            \text{por ser productos tensoriales, sumas, matrizaciones}
+        } \then \\
+        \then [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \text{ tiene rango al menos } r^{\frac{2^l}{2}} \text{ c.p.d. }
+    \end{split}
+    \end{equation}
+
+    Como $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por doquier para $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$, podemos hacer un argumento análogo al anterior para extender esta propiedad a todo el espacio.
+
+    Esto concluye la prueba para el caso no compartido
+
+    \textbf{Caso 2: Compartición de coeficientes}
+
+    Es totalmente análogo al caso 1. En la inducción, en el paso $l = 1$, usamos la versión del lema \customref{lema:primer_lema} en la que $A(\nv{x}) = B(\nv{x})$
+\end{proof}
+
