@@ -322,7 +322,7 @@ Veamos ahora el segundo lema:
 
     que no es singular, luego su determinante no se anula. Por tanto, usando \customref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
 
-    Ahora, usaremos el teorema de Fubini para demostrar lo que buscamos. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
+    Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar lo que buscamos. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
 
     \begin{equation}
     \begin{split}
@@ -335,8 +335,27 @@ Veamos ahora el segundo lema:
 
     \begin{equation}
     \begin{split}
-        \int_{(x,y)} \mathbb{1}_{S_n} =
+        \int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} &= \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} = \ldots \\
+        \ldots &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{y}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = \ldots \\
+        \ldots &= 0 + 0 = 0
     \end{split}
     \end{equation}
+    \todo{Habría que comprobar los supuestos de Fubini}
+
+    Donde hemos usado:
+
+    \begin{itemize}
+        \item (1): hemos visto que la medida del conjunto $\mathcal{C}$ es cero
+        \item (2): hemos visto que si $\nv{y_0} \in \R_n^d$, entonces el conjunto $S^{y_0}$ tiene medida nula
+    \end{itemize}
+
+    Y con ello hemos probado que $\int \mathbb{1}_{S_n} = 0$, sea cual sea el valor de $n \in \N$. Usamos ahora el \textbf{teorema de convergencia monótona} para calcular:
+    \todo{Comprobar explícitamente los supuestos del TCM}
+
+    \begin{equation}
+        \int \mathbb{1}_S = \int \lim_{n \to \infty} \mathbb{1}_{S_n} \encima{=}{T.C.M} \lim_{n \to \infty} \int \mathbb{1}_{S_n} = \lim_{n \to \infty} 0  = 0
+    \end{equation}
+
+    Por lo tanto, la medida del conjunto $S$ es cero, como queríamos probar.
 
 \end{proof}
