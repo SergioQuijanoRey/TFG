@@ -4,7 +4,7 @@
 
 Los teoremas principales de este trabajo se presentan en esta sección. Comenzamos por el siguiente:
 
-\begin{teorema}[Darle nombre]
+\begin{teorema}[Darle nombre] \label{teorema:teorema_principal_introduccion}
 
 Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo $\{ \nv{a^{l, j, \gamma}} \}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de tensores generados con rango \textit{CP} menor que $r^{N/2}$ tiene medida cero. El resultado se mantiene si forzamos la compartición de coeficientes en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 
@@ -363,7 +363,7 @@ Veamos ahora el segundo lema:
 
 Estamos ya en condiciones de probar el teorema principal del trabajo:
 
-\begin{teorema}
+\begin{teorema}[Teorema principal] \label{teorema:teorema_principal_especificacion}
 \end{teorema}
 \begin{proof}
     \textbf{Caso 1: sin compartición de coeficientes}
@@ -470,7 +470,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
 
 Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
 
-\begin{lema}
+\begin{lema}[TODO -- dar nombre] \label{lema:lema_previo_corolario}
     Sean $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ un conjunto de funciones linealmente independientes. Dado un tensor $\mathcal{A} \in \espaciotensores{N}{M}$ definimos la siguiente función:
 
     \begin{equation}
@@ -558,4 +558,44 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
 Estamos ya en condiciones de enunciar el corolario:
 
 \begin{corolario}
+    Dado un conjunto de funciones de representación $\conjunto{f_{\theta_d}: d \in \deltaset{M}}$ linealmente independientes, aleatorizar los pesos del modelo \textit{HT} con una distribución de probabilidad continua induce una función de probabilidad $h_y$ que, con probabilidad uno, no puede ser aproximada arbitrariamente bien (en el sentido $L^2$ ) por un modelo \textit{CP} con menos de $r := \min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. El resultado se mantiene aunque forcemos la compartición de parámetros en el modelo \textit{HT}, dejando al modelo \textit{CP} en su forma general.
 \end{corolario}
+
+\begin{proof}
+    En \customref{teorema:teorema_principal_especificacion} hemos visto que un tensor generado por un modelo \textit{HT} tiene rango \textit{CP} de al menos $\min \conjunto{r_0, M}^{\frac{N}{2}}$  en casi todo punto del espacio de parámetros que definen el modelo \textit{HT}, $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. Es decir, que el modelo \textit{CP} requerirá un tamaño exponencial: $Z \geq \min \conjunto{r_0, M}^{\frac{N}{2}}$.
+
+    Pero el corolario da un paso más. Partimos de que las funciones de representación son linealmente independientes (ya hemos visto que en la práctica del \textit{deep learning} esto es lo común). El corolario afirma que no es que sea prácticamente imposible realizar el coeficientes de tensores con un modelo \textit{CP} con menos de un número exponencial de canales en la capa oculta, sino que es prácticamente imposible aproximar la función de puntuación con menos de un número exponencial de canales en la capa oculta.
+
+    En la prueba de \customref{teorema:teorema_principal_especificacion}, para mostrar la separación entre coeficientes del modelo \textit{HT} y el modelo \textit{CP} usamos como herramienta el rango de la matrización.
+
+    En concreto, habíamos encontrado constantes $Rank^{HT}, Rank^{CP} \in \N$ con $Rank^{HT} > Rank^{CP}$ de forma que el modelo \textit{HT} tenía rango mayor o igual que $Rank^{HT}$ mientras que el modelo \textit{CP} tenía rango menor o igual que $Rank^{CP}$.
+
+    Usando este hecho, aplicamos el \customref{lema:lema_previo_corolario}:
+
+    \begin{itemize}
+        \item Considero como $\mathcal{A}^*$ el tensor de coeficientes generado por el modelo \textit{HT}. Por tanto, $h(\mathcal{A}^*)$ es la función de puntuación que dicho modelo implementa como una red profunda
+        \item Considero como $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ el conjunto de tensores generados por un modelo \textit{CP} de tamaño $Z < \min \conjunto{r_0, M}^{\frac{N}{2}}$
+    \end{itemize}
+
+    El teorema \customref{teorema:teorema_principal_especificacion} nos dice que con probabilidad 1 que $\mathcal{A}^*$ no puede ser generado por un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. Luego $\mathcal{A}^* \notin \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$.
+    \todo{Relacionar el \entrecomillado{con probabilidad 1} con que nuestro teorema habla de medida nula}
+
+    Además, ya sabemos que $rank([\mathcal{A}^\lambda]) < \frac{N}{2} \leq rank([\mathcal{A}^*]), \; \forall \lambda \in \Lambda$.
+
+    Por lo tanto, se cumplen todos los supuestos del lema \customref{lema:lema_previo_corolario}, luego la distancia $L^2$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon_0 > 0:$
+
+    \begin{equation}
+        d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}^\lambda)) \geq \epsilon_0, \; \forall \lambda \in \Lambda
+    \end{equation}
+
+    Por tanto, no podemos aproximar arbitrariamente bien, estamos limitados por la constante $\epsilon_0$.
+
+    Es decir, no es cierto que dada $h_y$ inducida al tomar coeficientes aleatorios en un modelo \textit{HT}, podamos aproximar arbitrariamente bien con un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}} = r^{frac{N}{2}}$. De ser cierto, $\forall \epsilon > 0, \exists \mathcal{A}_\epsilon \in \Omega$ de forma que $d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}_\epsilon)) < \epsilon$ donde
+
+    \begin{equation}
+    \Omega := \conjunto{\mathcal{A} \in \espaciotensores{N}{M}: \mathcal{A} \text{ es realizable por un modelo \textit{CP} con menos de } r^{\frac{N}{2}} \text{ canales en la capa oculta}}
+    \end{equation}
+
+    Pero acabamos de ver que esto es falso $\forall \epsilon < \epsilon_0$.
+    \todo{Hay que ver que el tamaño de un modelo \textit{CP} coincide con la desigualdad apropiada. Puede ser directo por la definición de \textit{CP rank}}
+\end{proof}
