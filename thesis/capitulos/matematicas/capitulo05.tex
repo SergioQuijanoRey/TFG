@@ -468,3 +468,86 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
     Es totalmente análogo al caso 1. En la inducción, en el paso $l = 1$, usamos la versión del lema \customref{lema:primer_lema} en la que $A(\nv{x}) = B(\nv{x})$
 \end{proof}
 
+Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
+
+\begin{lema}
+    Sean $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ un conjunto de funciones linealmente independientes. Dado un tensor $\mathcal{A} \in \espaciotensores{N}{M}$ definimos la siguiente función:
+
+    \begin{equation}
+    \begin{split}
+        h(\mathcal{A}): (\R^s)^N &\to \R \\
+        (\nv{x_1}, \ldots, \nv{x_N}) &\mapsto \sum_{d_1, \ldots, d_N = 1}^M \mathcal{A}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+    \end{split}
+    \end{equation}
+
+    Que es la función de puntuación introducida en \eqref{eq:puntuacion_general}. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^*$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\forall \epsilon > 0$ se tiene que
+
+    \begin{equation}
+        \int |h(\mathcal{A}^\lambda) - h(\mathcal{A}^*)|^2 > \epsilon; \; \forall \lambda \in \Lambda
+    \end{equation}
+\end{lema}
+
+\begin{proof}
+    Como la familia de funciones $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ son linealmente independientes, sabemos que la familia de funciones producto inducida
+
+    \begin{equation}
+        \zeta = \conjunto{\prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}): d_1, \ldots d_N \in \deltaset{M}}
+    \end{equation}
+
+    también es linealmente independiente (\customref{prop:conservacion_totalidad_indp_lineal_func_prod}).
+
+    Consideramos ahora una secuencia de funciones $\conjunto{h^{(t)}}_{t \in \N}$ que vivan en $span \zeta$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la \entrecomillado{base} dada por $\zeta$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene dado por:
+
+    \begin{equation}
+        h^{(t)}(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1 = 1, \ldots, d_N = 1}^M \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+    \end{equation}
+
+    Supongamos que $\conjunto{h^{(t)}}_{t \in \N}$ converge a $h(\mathcal{A}^*)$ en $L^2((\R^s)^N)$, es decir:
+
+    \begin{equation}
+        \lim_{t \to \infty} d_{L^2}(h^{(t)}, h(\mathcal{A}^*)) = 0
+    \end{equation}
+
+    O lo que es lo mimso:
+
+    \begin{equation}
+        \lim_{t \to \infty} \int | h^{(t)} - h(\mathcal{A}^*)|^2 = 0
+    \end{equation}
+
+    En un espacio de Hilbert de dimensión finita, como es nuestro caso, convergencia en norma implica convergencia en los coeficientes de representación. Como hemos supuesto la convergencia en norma, con lo anterior tenemos que:
+    \todo{Tendría que justificar esto de alguna forma}
+
+    \begin{equation}
+        \mathcal{A}^{(t)} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^*_{d_1, \ldots, d_N},
+        \; \forall d_1, \ldots, d_N \in \deltaset{M}
+    \end{equation}
+
+    Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Por tanto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Y esto equivale finalmente a ver que la distancia entre $[\mathcal{A}^*]$ y $\conjunto{[\mathcal{A}^\lambda]: \lambda \in \Lambda}$ es estrictamente positiva.
+
+    Veamos esto:
+
+    \begin{equation}
+    \begin{split}
+        h^{(t)} \encima{\longmapsto}{t \mapsto \infty} h(\mathcal{A}^*) &\iif \sum \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) = \sum \mathcal{A}^*_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \then \ldots \\
+        \ldots &\then \mathcal{A}^{(t)} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^* \then \ldots \\
+        \ldots &\then \lim_{t \to \infty} d(A^{(t)}, \mathcal{A}^*) =
+    \end{split}
+    \end{equation}
+
+    y con ello es claro que
+
+    \begin{equation}
+        d(A^{(t)}, \mathcal{A}^*) \not\longto 0 \then h^{(t)} \not\longto h(\mathcal{A}^*)
+    \end{equation}
+
+    \todo{Entiendo la equivalencia, y es intuitivo, pero no veo la conexión entre el argumento anterior y la equivalencia}
+    \todo{También habrá que ver que la matrización conserva distancias}
+
+    Ahora, esto último es claro puesto que:
+
+    \begin{equation}
+        rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*]), \; \forall \lambda \in \Lambda \then d(\mathcal{A}^*, \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} > 0
+    \end{equation}
+    \todo{Obvio pero habŕa que demostrarlo. No conocemos $\Lambda$ y podríamos tener una sucesión de distancias que converge a cero}
+    \todo{Para que usamos que la familia de funciones sea linealmente independiente?}
+\end{proof}
