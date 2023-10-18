@@ -488,6 +488,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
 \end{lema}
 
 \begin{proof}
+    \todo{Revisar esta prueba porque doy algunos pasos de los que no estoy nada seguro}
     Como la familia de funciones $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ son linealmente independientes, sabemos que la familia de funciones producto inducida
 
     \begin{equation}
@@ -496,13 +497,15 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
 
     también es linealmente independiente (\customref{prop:conservacion_totalidad_indp_lineal_func_prod}).
 
-    Consideramos ahora una secuencia de funciones $\conjunto{h^{(t)}}_{t \in \N}$ que vivan en $span \zeta$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la \entrecomillado{base} dada por $\zeta$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene dado por:
+    Consideramos ahora una secuencia de funciones $\conjunto{h^{(t)}}_{t \in \N}$ que vivan en $span \zeta$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la \entrecomillado{base} dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene dado por:
+
+    \todo{No estoy seguro de la frase \entrecomillado{gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente}, repasarlo bien}
 
     \begin{equation}
         h^{(t)}(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1 = 1, \ldots, d_N = 1}^M \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
     \end{equation}
 
-    Supongamos que $\conjunto{h^{(t)}}_{t \in \N}$ converge a $h(\mathcal{A}^*)$ en $L^2((\R^s)^N)$, es decir:
+    En el caso que $\conjunto{h^{(t)}}_{t \in \N}$ no converge a $h(\mathcal{A}^*)$ nuestra proposición es trivial. Por lo tanto, supongamos que $\conjunto{h^{(t)}}_{t \in \N}$ converge a $h(\mathcal{A}^*)$ en $L^2((\R^s)^N)$, es decir:
 
     \begin{equation}
         \lim_{t \to \infty} d_{L^2}(h^{(t)}, h(\mathcal{A}^*)) = 0
@@ -522,23 +525,23 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
         \; \forall d_1, \ldots, d_N \in \deltaset{M}
     \end{equation}
 
-    Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Por tanto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Y esto equivale finalmente a ver que la distancia entre $[\mathcal{A}^*]$ y $\conjunto{[\mathcal{A}^\lambda]: \lambda \in \Lambda}$ es estrictamente positiva.
-
-    Veamos esto:
+    Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Por tanto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Veamos esto
 
     \begin{equation}
     \begin{split}
         h^{(t)} \encima{\longmapsto}{t \mapsto \infty} h(\mathcal{A}^*) &\iif \sum \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) = \sum \mathcal{A}^*_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \then \ldots \\
         \ldots &\then \mathcal{A}^{(t)} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^* \then \ldots \\
-        \ldots &\then \lim_{t \to \infty} d(A^{(t)}, \mathcal{A}^*) =
+        \ldots &\then \lim_{t \to \infty} d(A^{(t)}, \mathcal{A}^*) = 0
     \end{split}
     \end{equation}
 
-    y con ello es claro que
+    Y por contrarrecíproco, es claro entonces que
 
     \begin{equation}
         d(A^{(t)}, \mathcal{A}^*) \not\longto 0 \then h^{(t)} \not\longto h(\mathcal{A}^*)
     \end{equation}
+
+    Que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva equivale a su vez a que la distancia entre $[\mathcal{A}^*]$ y $\conjunto{[\mathcal{A}^\lambda]: \lambda \in \Lambda}$ es estrictamente positiva.
 
     \todo{Entiendo la equivalencia, y es intuitivo, pero no veo la conexión entre el argumento anterior y la equivalencia}
     \todo{También habrá que ver que la matrización conserva distancias}
@@ -551,3 +554,8 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
     \todo{Obvio pero habŕa que demostrarlo. No conocemos $\Lambda$ y podríamos tener una sucesión de distancias que converge a cero}
     \todo{Para que usamos que la familia de funciones sea linealmente independiente?}
 \end{proof}
+
+Estamos ya en condiciones de enunciar el corolario:
+
+\begin{corolario}
+\end{corolario}
