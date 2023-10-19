@@ -13,7 +13,7 @@ Denotaremos a los vectores con flechas sobre las letras que los identifican, tal
 
 Aunque más tarde definamos qué significan estos conceptos, introducimos ahora la notación usada respecto a los tensores.
 
-Para denotar a los tensores usaremos tipografía caligráfica, por ejemplo, $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
+Para denotar a los tensores usaremos tipografía caligráfica, por ejemplo, $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$. Cada una de las entradas de dicho tensor serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
 
 Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo lo denotaremos por $\espaciotensores{N}{M}$. Al espacio de matrices de dimensiones $p, q$ lo denotaremos de la forma usual como  $\espaciomatrices{p}{q}$.
 
@@ -59,7 +59,7 @@ Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar toma
 Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
 \todo{\textbf{Para Javier}: no sé si estos ejemplos son necesarios. Los he puesto porque lo tenía apuntado en mis notas cuando estaba estudiando el producto tensorial, pero ahora no le veo demasiado el valor a dejarlo aquí}
 
-\begin{ejemplo} \label{ej:prod_formal}
+\begin{ejemplo}[Producto formal sencillo] \label{ej:prod_formal}
 
 Sea $\Omega := \R^2 \ast \R^3$. Entonces tenemos que:
 
@@ -251,11 +251,7 @@ Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se a
 Con toda esta base podemos ver algunos ejemplos interesantes, con los que comprenderemos aún mejor la naturaleza del producto tensorial.
 
 \begin{ejemplo}
-    Sea $\Omega := \R^2 \otimes \R^3$.
-
-    En primer lugar, sabemos que $dim(\Omega) = 2 \cdot 6$. Por ser un espacio vectorial real, de dimensión $6$, sabemos que $\Omega \cong \R^6$.
-
-    Ahora, consideramos las bases usuales de $\R^2, \R^3$, y usando el teorema \ref{th:base_prod_tensorial}, construimos una base, que podríamos considerar la base usual para el producto tensorial:
+    Sea $\Omega := \R^2 \otimes \R^3$. Usando \customref{th:base_prod_tensorial} sabemos que $dim(\Omega) = 2 \cdot 3 = 6$. Por ser un espacio vectorial real, de dimensión $6$, sabemos que $\Omega \cong \R^6$. El mismo teorema nos permite calcular una base del espacio, tomando las dos bases usuales de los espacios $\R^2$ y $\R^3$, que podríamos considerar la base usual para el producto tensorial:
 
     \begin{equation}
     \begin{split}
@@ -269,18 +265,6 @@ Con toda esta base podemos ver algunos ejemplos interesantes, con los que compre
     & \}
     \end{split}
     \end{equation}
-
-    Ahora, retomamos una operación del \ref{ej:prod_formal} (solo que esta vez con el producto tensorial, y no con el producto formal):
-
-    $$
-    2 \left[ \begin{pmatrix}1 \\ 2\end{pmatrix} \otimes \begin{pmatrix}3 \\ 2 \\ 1 \end{pmatrix} \right]
-    - 3 \left[ \begin{pmatrix}1 \\ 0\end{pmatrix} \otimes \begin{pmatrix}1 \\ 2 \\ 3 \end{pmatrix} \right]
-    $$
-
-    Tenemos distintas formas para desarrollar esta expresión, por ejemplo:
-
-    \todo{Desarrollar algo esta expresión}
-
 \end{ejemplo}
 
 A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes de hacer el producto tensorial, siendo uno de los dos espacios un cierto $\R^N$. Empezamos con el siguiente ejemplo:
@@ -288,15 +272,15 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
 \begin{ejemplo}
     Sea $\mathbb{V}$ un espacio vectorial real y considero $\Omega := \R \otimes \mathbb{V}$.
 
-    Comienzo considerando un tensor de la forma $\gamma = a(x \otimes \nv{u}) + b(y \otimes \nv{v})$ con $a, b \in \R, x, y \in \R, \nv{u}, \nv{v} \in \mathbb{V}$. Usando las propiedades de los tensores (\ref{prop:tensores_propiedades}), desarrollo esta expresión:
+    Comienzo considerando un tensor de la forma $\gamma = a(x \otimes \nv{u}) + b(y \otimes \nv{v})$ con $a, b \in \R$, $x, y \in \R$, $\nv{u}, \nv{v} \in \mathbb{V}$. Usando las propiedades de los tensores (\ref{prop:tensores_propiedades}), desarrollo esta expresión:
 
     \begin{equation}
     \begin{split}
         a(x \otimes \nv{u}) + b(y \otimes \nv{v}) &\eqtext{2.} \\
-        = & x \otimes (a\nv{u}) + y \otimes (b\nv{v}) \eqtext{2} \ldots \text{ usando que }  x,y \in \R \ldots \\
-        \ldots = & 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} \\
-        = & 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = \\
-        = & 1 \otimes \nv{w} \quad \text{con } \nv{w} := (ax)\nv{u} + (by), \quad \text{luego }\nv{w} \in \mathbb{V}
+        &= x \otimes (a\nv{u}) + y \otimes (b\nv{v}) \eqtext{2} \ldots \text{ usando que }  x,y \in \R \ldots \\
+        \ldots &= 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} \\
+        &= 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = \\
+        &= 1 \otimes \nv{w} \quad \text{con } \nv{w} := (ax)\nv{u} + (by) \; \text{luego } \nv{w} \in \mathbb{V}
     \end{split}
     \end{equation}
 
@@ -312,24 +296,24 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
 
     Buscamos extender este resultado para un tensor cualquiera (no necesariamente puro) del espacio $\R \otimes \mathbb{V}$:
 
-    \begin{proposicion}
-        Sea $\gamma \in \R \otimes \mathbb{V}$. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$
+    \begin{proposicion} \label{prop:r_otimes_v_es_v}
+        Sea $\gamma \in \R \otimes \mathbb{V}$ donde $\mathbb{V}$ es un espacio vectorial real de \textbf{dimensión finita}. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$
     \end{proposicion}
     \begin{proof}
-        Usando \ref{th:base_prod_tensorial}, podemos expresar:
+        Como ahora consideramos que $\mathbb{V}$ tiene dimensión finita, podemos usar \ref{th:base_prod_tensorial} para expresar:
 
         \begin{equation}
-            \gamma = \sum_{\substack{\nv{v_i} \in \mathbb{V}\\ \nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} \otimes \nv{w_i}, \dspace\dspace c_{i} \in \R \dspace \forall i \in \deltaset{n}
+            \gamma = \sum_{\substack{a_i \in \R\\ \nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot a_i \otimes \nv{v_i}, \dspace\dspace c_{i} \in \R \dspace \forall i \in \deltaset{n}
         \end{equation}
 
         Usando ahora la proposición anterior en los tensores puros de la sumatoria, podemos re-escribir como:
 
         \begin{equation}
         \begin{split}
-            \gamma &= \sum_{\substack{\nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot 1 \otimes \nv{w_i} \eqtext{2.} \\
-            & = \sum_{\substack{\nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} 1 \otimes (c_{i} \cdot \nv{w_i}) \eqtext{3.} \\
-            & = 1 \otimes ( \sum_{\substack{\nv{w_i} \in \mathbb{W} \\ i \in \deltaset{n}}} c_{i} \cdot \nv{w_i} ) = \\
-            & = 1 \otimes \nv{w} \dspace\dspace \text{con } \nv{w} := \sum_{\substack{\nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \nv{w_i} \implies \nv{w} \in \mathbb{V}
+            \gamma &= \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot 1 \otimes \nv{v_i} \eqtext{2.} \\
+            & = \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} 1 \otimes (c_{i} \cdot \nv{v_i}) \eqtext{3.} \\
+            & = 1 \otimes ( \sum_{\substack{\nv{v_i} \in \mathbb{W} \\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} ) = \\
+            & = 1 \otimes \nv{v} \dspace\dspace \text{con } \nv{v} := \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \nv{v_i} \implies \nv{v} \in \mathbb{V}
         \end{split}
         \end{equation}
 
@@ -339,7 +323,7 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
     Con esto, podemos pasar al siguiente resultado que nos permitirá ver de una forma mucho más clara en que espacio nos encontramos:
 
     \begin{proposicion}
-        $\R \otimes \mathbb{V} \isomorfismo{\text{vec}} \mathbb{V}$
+        Sea $\mathbb{V}$ un espacio vectorial de dimensión finita. Entonces $\R \otimes \mathbb{V} \isomorfismo{\text{vec}} \mathbb{V}$
     \end{proposicion}
     \begin{proof}
         Basta con considerar
@@ -347,11 +331,11 @@ A partir de lo anterior, podemos ir abstrayendo ciertas propiedades resultantes 
         \begin{equation}
         \begin{split}
             \phi: \R \otimes \mathbb{V} &\to \mathbb{V} \\
-            \nv{v} = 1 \otimes \nv{w} \in \mathbb{V} &\mapsto \nv{w}
+            \nv{v} = 1 \otimes \nv{w} &\mapsto \nv{w}
         \end{split}
         \end{equation}
 
-        Veamos, aunque sea prácticamente inmediato, que $\phi$ es biyectiva y lineal:
+        Donde hemos usado \customref{prop:r_otimes_v_es_v} para expresar cualquier elemento del producto tensorial como $1 \otimes \nv{w}$ con $\nv{w} \in \mathbb{V}$. Veamos, aunque sea prácticamente inmediato, que $\phi$ es biyectiva y lineal:
 
         Inyectividad: $\phi(1 \otimes \nv{w_1}) = \phi(1 \otimes \nv{w_2}) \underset{def.\ \phi}{\iif} \nv{w_1} = \nv{w_2}$
 
@@ -459,15 +443,15 @@ Veamos ahora un ejemplo que nos clarifique la naturaleza del espacio $\R^N \otim
     \end{split}
     \end{equation}
 
+    Es decir, $\R^N \otimes \mathbb{V} \cong \mathbb{V}^N$
+
 
 \end{ejemplo}
 
 \subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
+% TODO -- me quedo por aqui
 
-Por lo visto anteriormente, tenemos una forma más concreta de entender los tensores.
-\todo{Esta frase es rara. Especificar lo que hemos visto anteriormente}
-
-Podemos ver un tensor $\mathcal{A} \in \R^{M_1, \ldots, M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $idx \in \deltaset{M_i}$. Usaremos
+Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos ver un tensor $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $idx \in \deltaset{M_i}$.
 
 Con esta visión, podemos desarrollar los siguientes conceptos básicos sobre tensores:
 
