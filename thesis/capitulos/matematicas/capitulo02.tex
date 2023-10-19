@@ -94,37 +94,35 @@ Por cómo hemos definido el producto formal de dos espacios vectoriales, tenemos
 
 \subsubsection{Producto tensorial a partir del producto formal} \label{sec:cociente_prod_formal}
 
-Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que ciertas propiedades deseables no se cumplen, en general, en el producto formal:
+Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que en general las siguientes igualdades no se cumplen:
 
 \begin{enumerate}
     \item $c [\nv{v} \ast \nv{w}] = (c\nv{v}) \ast \nv{w}$
     \item $c[\nv{v} \ast \nv{w}] = \nv{v} \ast (c\nv{w})$
     \item $(\nv{v_1} + \nv{v_2}) \ast \nv{w} = \nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}$
     \item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$
-
-Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$
 \end{enumerate}
 
-Estas igualdades representan las propiedades que queremos que se cumplan, para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan una especie de asociatividad, mientras que 3 y 4 nos dan la propiedad distributiva.
+Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$
+
+Estas igualdades representan las propiedades que queremos que se cumplan para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan la asociatividad, mientras que 3 y 4 nos dan la propiedad distributiva.
 
 Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir estas propiedades. Para ello definimos:
 
 \begin{equation}
 \begin{split}
-    I := span\{& \\
-               & (c\nv{v}) \ast \nv{w} - c(\nv{v} \ast \nv{w}), \\
-               & \nv{v} \ast (c\nv{w}) - c(\nv{v} \ast \nv{w}), \\
-               & (\nv{v_1} + \nv{v_2}) \ast \nv{w} - (\nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}), \\
-               & \nv{v} \ast (\nv{w_1} + \nv{w_2}) - (\nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}): \\
-               & \\
-               & \nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}; \dspace \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}; \dspace c \in \R \\
-\}&
+    I &:= span\{ \\
+        & \dspace (c\nv{v}) \ast \nv{w} - c(\nv{v} \ast \nv{w}), \\
+        & \dspace \nv{v} \ast (c\nv{w}) - c(\nv{v} \ast \nv{w}), \\
+        & \dspace (\nv{v_1} + \nv{v_2}) \ast \nv{w} - (\nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}), \\
+        & \dspace \nv{v} \ast (\nv{w_1} + \nv{w_2}) - (\nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}): \\
+        & \dspace \\
+        & \dspace \nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}; \dspace \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}; \dspace c \in \R \\
+     \} &
 \end{split}
 \end{equation}
 
-que claramente también es un espacio vectorial.
-
-Con esto, ya podemos definir el producto tensorial:
+que claramente también es un espacio vectorial. Con esto, ya podemos definir el producto tensorial.
 
 \begin{definicion}[Producto tensorial]
     Dados dos espacios vectoriales $\mathbb{V}, \mathbb{W}$, se define su \textbf{producto tensorial} $\mathbb{V} \otimes \mathbb{W}$ como:
@@ -133,7 +131,9 @@ Con esto, ya podemos definir el producto tensorial:
 
     con lo que dados $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$, tenemos que
 
-    $$\nv{v} \otimes \nv{w} = \nv{v} \ast \nv{w} + I$$
+    \begin{equation}
+        \nv{v} \otimes \nv{w} := \nv{v} \ast \nv{w} + I
+    \end{equation}
 \end{definicion}
 
 A partir de esta definición, son directas las siguientes propiedades:
@@ -144,9 +144,9 @@ A partir de esta definición, son directas las siguientes propiedades:
         \item $\lambda [\nv{v} \otimes \nv{w}] = (\lambda \nv{v}) \otimes \nv{w}$
         \item $\lambda [\nv{v} \otimes \nv{w}] = \nv{v} \otimes (\lambda \nv{w})$
         \item $\nv{v} \otimes (\nv{w_1} + \nv{w_2}) = \nv{v} \otimes \nv{w_1} + \nv{v} \otimes \nv{w_2}$
+        \item ($\nv{v_1} + \nv{v_2}) \otimes \nv{w} = \nv{v_1} \otimes \nv{w} + \nv{v_2} \otimes \nv{w}$
     \end{enumerate}
 \end{proposicion}
-\todo{Creo que falta la distributividad respecto (v1 * v2) * w2}
 
 \begin{proof} $\newline \newline$
     1.
@@ -160,14 +160,18 @@ A partir de esta definición, son directas las siguientes propiedades:
     \end{split}
     \end{equation}
 
-    $\customqed$
-    $\newline$
-    2. \todo{Escribir esta demostración o decir que es muy parecida}
-    $\newline$
-    3. \todo{Escribir esta demostración o decir que es muy parecida}
+    El resto de propiedades se comprueban de forma análoga, introduciendo la propiedad que queremos probar gracias a que $\nv{a} + I = \nv{a} + \nv{i}$, $\forall \nv{i} \in I$ y operando con esto
+
 \end{proof}
 
-También sabemos que por ser $\mathbb{V} \ast \mathbb{W}$ un espacio vectorial, y al definir el producto tensorial como un cociente, $\mathbb{V} \otimes \mathbb{W}$ es también un espacio vectorial.
+\begin{proposicion}
+    Sean $\mathbb{V}$, $\mathbb{W}$ dos espacios vectoriales reales. Entonces el espacio producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial real.
+\end{proposicion}
+
+\begin{proof}
+    Al definir el producto tensorial como el cociente de $\mathbb{V} \ast \mathbb{W}$ (espacio vectorial) por $I$ (subespacio vectorial), claramente acabamos con un espacio vectorial.
+\end{proof}
+
 
 Ahora, enunciamos un importante teorema que nos ayudará a entender la naturaleza del producto vectorial:
 
@@ -181,14 +185,15 @@ Ahora, enunciamos un importante teorema que nos ayudará a entender la naturalez
     $$dim(\mathbb{V} \otimes \mathbb{W}) = dim(\mathbb{V}) \cdot dim(\mathbb{W})$$
 \end{teorema}
 
-\begin{proof} $\newline$
-    % En el video esta la prueba, pero no la tengo copiada
-    \todo{Escribir esta prueba. En la página 20 de mis notas tengo probado que es sistema de generadores, falta ver la independencia lineal}
-\end{proof}
+\begin{observacion}
+    Al estar tomando bases vectoriales (finitas), esta proposición solo es válida en espacios vectoriales de dimensión finita.
+\end{observacion}
 
-Notar que podríamos haber usado este teorema como forma de definir el producto tensorial de dos espacios vectoriales. Sin embargo, limitaríamos esta construcción a espacios vectoriales que admitiesen una base.
+\begin{observacion}
+    Notar que podríamos haber usado este teorema como forma de definir el producto tensorial de dos espacios vectoriales. Sin embargo, limitaríamos esta construcción a espacios vectoriales que admitiesen una base.
+\end{observacion}
 
-Una consecuencia inmediata es que, en caso de que $\mathbb{V}, \mathbb{W}$ admitan base, todo tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se escribe de la forma:
+Una consecuencia inmediata es que, en caso de que $\mathbb{V}$ y $\mathbb{W}$ admitan base, todo tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se puede escribir de la forma:
 
 \begin{equation}
     \gamma = \sum_{\substack{\nv{v_i} \in \mathbb{V}\\ \nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} \otimes \nv{w_i}, \dspace\dspace c_i \in \R \dspace \forall i \in \deltaset{n}
@@ -197,24 +202,33 @@ Una consecuencia inmediata es que, en caso de que $\mathbb{V}, \mathbb{W}$ admit
 La expresión anterior motiva la siguiente definición:
 
 \begin{definicion}[Tensor puro]
-    Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$ tales que $\gamma = \nv{v} \otimes \nv{w}$.
-    \todo{¿Esto no habría que hacerlo con el producto tensorial de n vectores, en general?}
+    Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $\nv{v} \in \mathbb{V}$, $\nv{w} \in \mathbb{W}$ tales que $\gamma = \nv{v} \otimes \nv{w}$.
 \end{definicion}
 
-Otra consecuencia del \customref{th:base_prod_tensorial} es que, en general, $v \otimes w \neq w \otimes v$, en el caso en el que tengan sentido las dos operaciones.
+\begin{proposicion}
+    Como consecuencia directa de \customref{th:base_prod_tensorial}, dados $\nv{v}, \nv{w} \in \mathbb{V}$, en general no es cierto que:
 
-Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $v \otimes \vv{0_w} = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
+    \begin{equation}
+        \nv{v} \otimes \nv{w} \neq \nv{w} \otimes \nv{v}
+    \end{equation}
+
+    \begin{observacion}
+        En la anterior proposición estamos tomando el espacio $\mathbb{V} \otimes \mathbb{V}$ para que tenga sentido permutar los vectores $\nv{v}$ y $\nv{w}$ en el producto tensorial.
+    \end{observacion}
+\end{proposicion}
+
+Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $\nv{v} \otimes \nv{0_w} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
 
 \begin{proposicion}
-    Sean $\mathbb{V}, \mathbb{W}$ espacios vectoriales sobre $\R$. Sean $v \in \mathbb{V}, w \in \mathbb{W}$. Entonces se verifica:
+    Sean $\mathbb{V}, \mathbb{W}$ espacios vectoriales sobre $\R$. Sean $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$. Entonces se verifica:
 
     \begin{enumerate}
-        \item $v \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
-        \item $\nv{0_{\mathbb{V}}} \otimes w = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+        \item $\nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+        \item $\nv{0_{\mathbb{V}}} \otimes \nv{w} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
     \end{enumerate}
 \end{proposicion}
 \begin{proof}
-    Empezamos con la primera igualdad. Sabemos que en un espacio vectorial (como es el caso del producto tensorial) se verifica que:
+    Empezamos con la primera igualdad. Sabemos que en un espacio vectorial se verifica que:
 
     \begin{equation} \label{eq:dem_tensor_cero}
         \nv{v} + \nv{w} = \nv{w} \then \nv{v} = \nv{0}
@@ -228,13 +242,13 @@ Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se a
     \end{split}
     \end{equation}
 
-    La demostración para $\vv{0_{\mathbb{V}}} \otimes w = \vv{0_{\mathbb{V} \otimes \mathbb{W}}}$ es completamente análoga.
-
-    \todo{En la pagina 18 de mis apuntes veo otra forma de demostrar esto, usando las propiedades 1, 2 en vez de usando la 3}
-
+    La demostración para $\nv{0_{\mathbb{V}}} \otimes w = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$ es completamente análoga.
 \end{proof}
 
-Con esto podemos pasar a ver algunos ejemplos:
+\subsubsection{Algunos ejemplos}
+\todo{\textbf{Para Javier}: lo mismo que antes, creo que estos ejemplos ahora mismo no aportan demasiado valor y lían algo el desarrollo}
+
+Con toda esta base podemos ver algunos ejemplos interesantes, con los que comprenderemos aún mejor la naturaleza del producto tensorial.
 
 \begin{ejemplo}
     Sea $\Omega := \R^2 \otimes \R^3$.
