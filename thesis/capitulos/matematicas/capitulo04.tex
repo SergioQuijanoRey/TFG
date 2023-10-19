@@ -384,25 +384,6 @@ Podemos comprobar esto fácilmente:
 
 \end{proof}
 
-\begin{observacion}
-
-    Aunque \textit{HT} sea una extensión de \textit{CP}, hay que tener en cuenta que el número de coeficientes crece.
-
-    En el modelo \textit{CP} tenemos $N \cdot M \cdot Z + Z \cdot Y$ coeficientes que especificar (\customref{msubsec:parametros_modelo_cp}).
-
-    En el modelo \textit{HT} tenemos $N \cdot M \cdot Z + N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + Z \cdot Y$, teniendo en cuenta que estamos considerando $r = Z$ (\customref{msubs:parametros_modelo_ht}).
-
-    Por lo tanto, la diferencia en número de coeficientes viene dada por:
-
-    \begin{equation}
-        Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2
-    \end{equation}
-
-    Por lo tanto, el número de parámetros crece de forma cuadrática. Sin embargo, como veremos más adelante, la ganancia en expresividad del modelo es exponencial.
-    \todo{Revisitar esto cuando haya especificado formalmente qué significa ganancia exponencial en expresividad}
-
-\end{observacion}
-
 \subsection{Desarrollo del modelo}
 
 El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en nuestra función de puntuación \eqref{eq:puntuacion_general}. En esta sección, describiremos el modelo producido.
@@ -455,3 +436,22 @@ Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \l
 \end{equation}
 
 Como ocurría en \customref{subs:comparticion_parametros_cp}, la compartición de parámetros provoca que nuestro modelo pierda la universalidad. Esto es, nuestro modelo no puede representar cualquier tensor, independientemente de los valores de $L$ o $r_l$. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
+
+\section{Comparativa de los dos modelos}
+
+\subsection{Parámetros de los modelos}
+
+Aunque \textit{HT} sea una extensión de \textit{CP}, hay que tener en cuenta que el número de coeficientes crece.
+
+En el modelo \textit{CP} tenemos $N \cdot M \cdot Z + Z \cdot Y$ coeficientes que especificar (\customref{msubsec:parametros_modelo_cp}).
+
+En el modelo \textit{HT} tenemos $N \cdot M \cdot Z + N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + Z \cdot Y$, teniendo en cuenta que estamos considerando $r = Z$ (\customref{msubs:parametros_modelo_ht}).
+
+Por lo tanto, la diferencia en número de coeficientes viene dada por:
+
+\begin{equation}
+    Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2
+\end{equation}
+
+Por lo tanto, el número de parámetros crece de forma cuadrática. Sin embargo, como veremos más adelante, la ganancia en expresividad del modelo es exponencial.
+\todo{Revisitar esto cuando haya especificado formalmente qué significa ganancia exponencial en expresividad}
