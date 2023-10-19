@@ -3,15 +3,13 @@
 
 \chapter{Introducción}\label{ch:introduccion}
 
-El objetivo de este trabajo, desde la perspectiva de las matemáticas, es \textbf{analizar las redes neuronales profundas, basadas en convoluciones, y explicar por qué estas funcionan mejor que las redes neuronales no profundas}, conocidas en la literatura como redes neuronales \textit{``shallow"}.
+El objetivo de este trabajo, desde la perspectiva de las matemáticas, es \textbf{analizar las redes neuronales profundas, basadas en convoluciones, y explicar por qué en ciertos escenarios estas funcionan mejor que las redes neuronales no profundas}, conocidas en la literatura como redes neuronales \entrecomillado{shallow}.
 
-% TODO -- aqui habria que introducir algunas referencias de trabajos que esten
-% analizando las redes neuronales pero que no tengan en cuenta estas
-% particularidades. Por ejemplo, en la introduccion del paper de referencia
-% comentan muchos trabajos que estudian el depth efficiency pero para redes
-% muy concretas que no tienen nada que ver con las usadas en la practica
-%
-Este mejor comportamiento es muy conocido en la práctica, pero pocos son los trabajos que han analizado formalmente esta diferencia entre ambos tipos de redes. Además, \textbf{en la mayoría de trabajos de este tipo, no se han tenido en cuenta propiedades fundamentales de las redes profundas ni de las redes convolucionales}. Además, suelen ser trabajos en los que se muestran ejemplos concretos de funciones implementables (de forma eficiente) con redes profundas pero no con redes no profundas, sin dar ningún tipo de información sobre cómo de frecuente ocurre esto. En base a esto, las \textbf{principales fortalezas de este trabajo respecto a otros} es que consideramos:
+En este escenario ocurre que para replicar redes profundas con un número polinomial de coeficientes, necesitamos que las redes \textit{shallow} tengan un número de coeficientes superior al polinomial (en nuestro modelo \textit{shallow}, el número de coeficientes será exponencial). En este escenario hablamos de \textbf{eficiencia en profundidad} o \textbf{\entrecomillado{depth efficiency}}.
+\todo{Poner aquí una referencia a otra parte del paper sobre esto de tamaño exponencial}
+
+% TODO -- aqui habria que introducir algunas referencias de trabajos que esten analizando las redes neuronales pero que no tengan en cuenta estas particularidades. Por ejemplo, en la introduccion del paper de referencia comentan muchos trabajos que estudian el depth efficiency pero para redes muy concretas que no tienen nada que ver con las usadas en la practica
+El \textit{depth efficiency} es muy conocido en la práctica, pero pocos son los trabajos que han tratado de justificar matemáticamente por qué ocurre este fenómeno. Además, \textbf{en la mayoría de trabajos de este tipo, no se han tenido en cuenta propiedades fundamentales de las redes profundas ni de las redes convolucionales}. Por otro lado, suelen ser trabajos en los que \textbf{se muestran ejemplos concretos} de funciones implementables (de forma eficiente) con redes profundas pero no con redes \textit{shallow}, sin dar \textbf{ningún tipo de información sobre con qué frecuencia ocurre esto}. En base a esto, las \textbf{principales fortalezas de este trabajo respecto a otros} es que consideramos:
 \todo{Aquí he copiado una frase de la introducción del trabajo, que quizás debería referenciar propiamente}
 \todo{Debería referenciar algunos trabajos que estudien las redes neuronales como ya he comentado. Por ejemplo, en la introducción del paper de referencia comentan muchos trabajos que estudian el depth efficiency pero para redes muy concretas que no tienen nada que ver con las usadas en la práctica. Podría tomar esas referencias para mi trabajo}
 
@@ -23,11 +21,13 @@ Este mejor comportamiento es muy conocido en la práctica, pero pocos son los tr
             \item Localidad de la operación de convolución
             \item Uso de la operación de \textit{pooling}
         \end{itemize}
-    \item Un estudio de lo frecuente que es tener funciones que sean implementables (de forma eficiente) por redes profundas, pero no por redes no profundas
+    \item Un estudio de lo frecuente que es tener funciones que sean implementables (de forma eficiente) por redes profundas, pero no por redes \textit{shallow}
 \end{itemize}
 \todo{Desarrollar más qué significan estas propiedades. En la introducción del paper se explica esto más o menos}
 
-El desarrollo que hacemos en el presente trabajo puede resumirse en los siguientes \textbf{objetivos}:
+\section{Objetivos}
+
+Los principales \textbf{objetivos} del presente trabajo son:
 
 \begin{enumerate}
     \item Modelar matemáticamente la tarea de aprendizaje. Para esto, modelamos los datos de entrada, la tarea a resolver y el espacio de hipótesis en el que buscaremos la mejor solución
@@ -47,5 +47,9 @@ Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas
     \item Teoría de la medida
     \item Álgebra de matrices
 \end{itemize}
+
+\section{Estructura del trabajo}
+
+\todo{Escribir}
 
 \endinput
