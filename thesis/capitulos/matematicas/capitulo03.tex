@@ -78,6 +78,48 @@ A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, esc
     \innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu
 \end{equation}
 
+Además, usaremos el siguiente hecho:
+
+\begin{proposicion}
+    En un espacio vectorial $\mathbb{V}$ de \textit{Hilbert} de dimensión finita, donde tenemos una base vectorial, convergencia en norma implica convergencia en los coeficientes en dicha base
+\end{proposicion}
+
+\begin{proof}
+    Disponemos de una base vectorial $\mathbb{B} = \conjunto{e_1, \ldots, e_N}$. Además, por el método de Gram–Schmidt, podemos tomarla para que sea ortogonal, es decir, $\innerproduct{e_i}{e_j} = \delta_{i, j}$.
+
+    En un espacio normado de dimensión finita, todas las normas son equivalentes, así que trabajaremos con la norma infinito:
+
+    \begin{equation}
+    \begin{split}
+        N: \mathbb{V} &\to \R_0^+ \\
+         v = \sum a_i e_i &\mapsto \sup_{i \in \deltaset{N}} |\innerproduct{v}{e_i}| = \sup_{i \in \deltaset{N}} |\innerproduct{\sum_{j = 1}^N a_j e_j}{e_i}| = \sup_{i \in \deltaset{N}} |a_i e_i| = \sup_{i \in \deltaset{N}} |a_i|
+    \end{split}
+    \end{equation}
+
+
+    Tomo una sucesión $\conjunto{\nv{v_n}}_{n \in \N} \subseteq \mathbb{V}$ y supongo que converge en norma (en dimensión finita, todas las normas son equivalentes) a un vector $\nv{v} \in \mathbb{V}$, es decir:
+
+    \begin{equation}
+        N(\nv{v_n} - \nv{v}) \to 0
+    \end{equation}
+
+    Y desarrollamos, expresando $v_n := \sum_{i = 1}^N b_i^n e_i$:
+
+    \begin{equation}
+    \begin{split}
+        N(\nv{v_n} - \nv{v}) &= N((\sum_{i = 1}^N b_i^n e_i) - (\sum_{i = 1}^N a_i e_i)) = N(\sum_{i = 1}^n (b_i^n - a_i) e_i) = \sup_{i \in \deltaset{N}} |b_i^n - a_i | \to 0
+    \end{split}
+    \end{equation}
+
+    Luego $sup_{i \in \deltaset{N}} |b_i^n - a_i| \to 0$ y por ello
+
+    \begin{equation}
+        \conjunto{b_i^n}_{n \in \N} \to a_i, \dspace \forall i \in \deltaset{N}
+    \end{equation}
+
+    como queríamos demostrar.
+\end{proof}
+
 Todos estos son conceptos que conocemos del grado. A partir de ahora introducimos algunos conceptos nuevos que nos serán de utilidad. Estos conceptos tratarán de caracterizar algunos subconjuntos de $L^2$ interesantes. Empezamos por el concepto de totalidad:
 \todo{Cuidado con esta frase. En los apuntes de análisis funcional se habla de bases ortonormales, que guardan relación con estos conceptos}
 
