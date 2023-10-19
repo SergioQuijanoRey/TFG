@@ -3,35 +3,34 @@
 
 \chapter{Herramientas matemáticas fundamentales} \label{ch:matematicas_fundamentales}
 
-En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas y no aportan nada nuevo al estudio que hacemos sobre las redes neuronales, por lo que el lector puede pasar directamente a \customref{ch:modelizacion}
+En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas y no aportan nada nuevo al estudio que hacemos sobre las redes neuronales, por lo que el lector puede pasar directamente a \customref{ch:tarea_aprendizaje}.
 
-\section{Tensores}
-
-\subsection{Notación}
-
-% TODO -- en la pagina 23 se añade una notacion que parece ser muy comoda
-% TODO -- Tau_{N, M} el espacio euclídeo de los tensores con entradas reales, orden N y dimensión M en todos los modos
+\section{Notación}
 
 Seguiremos en parte la notación del \textit{paper} de referencia \cite{matematicas:principal}, aunque introducimos varios cambios por claridad, para no confundir en las fórmulas escalares, vectores y tensores.
 
-Denotaremos a los vectores con flechas sobre las letras que los identifican, tal que $\nv{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $\nv{v_i}$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$. En algunas ocasiones usaremos la notación $\doubledeltaset{n}{m} := \{n, \ldots, m\}$ donde $n \leq m$.
+Denotaremos a los vectores con flechas sobre las letras que los identifican, tal que $\nv{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $\nv{v_i}$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$. También usaremos la notación $\doubledeltaset{n}{m} := \{n, \ldots, m\}$ donde $n \leq m$. En algunas ocasiones usaremos la notación $\nv{v_i^n}$ para indicar que estamos trabajando con el índice $i$ del vector $n$-ésimo de un conjunto de vectores.
 
-Para denotar a los tensores (que introduciremos más adelante), usaremos la tipografía caligráfica. Por ejemplo $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor (más adelante, en \customref{sec:deftensor}, veremos que significa esto) serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
+Aunque más tarde definamos qué significan estos conceptos, introducimos ahora la notación usada respecto a los tensores.
 
-Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo (de nuevo, \customref{sec:deftensor}) lo denotaremos por $\espaciotensores{N}{M}$. Al espacio de matrices de dimensiones $p, q$ lo denotaremos, como es usual, como $\espaciomatrices{p}{q}$.
+Para denotar a los tensores usaremos tipografía caligráfica, por ejemplo, $\mathcal{A} \in \R^{M_1 \times \ldots M_N}$. Cada una de las entradas de dicho tensor serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
+
+Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo lo denotaremos por $\espaciotensores{N}{M}$. Al espacio de matrices de dimensiones $p, q$ lo denotaremos de la forma usual como  $\espaciomatrices{p}{q}$.
 
 Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\nv{v_1}, \ldots, \nv{v_N} \in \R^{M_1}, \ldots, \R^{M_N}$, denotaremos su producto tensorial $\nv{v_1} \otimes \ldots \otimes \nv{v_N}$ como $\otimes_{i = 1}^N \nv{v_i}$.
 
 Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
+
+\section{Tensores}
 
 \subsection{Definición del producto tensorial} \label{sec:deftensor}
 \todo{Tengo que referenciar algún recurso sobre esto. Yo lo he visto a partir de unos vídeos}
 
 Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa. Especificaremos esto en \customref{sec:cociente_prod_formal}
 
-Para la construcción del producto tensorial de espacios vectoriales, necesitaremos primero introducir conceptos previos que serán fundamentales en la construcción del objeto matemático que buscamos.
-
 \subsubsection{Producto formal de dos espacios vectoriales}
+
+Para la construcción del producto tensorial de espacios vectoriales necesitaremos primero introducir el concepto de producto formal entre dos espacios vectoriales, que será fundamental en la construcción del objeto matemático que buscamos.
 
 \begin{definicion}[Producto formal de dos espacios vectoriales]
     Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales reales. Se define su \textbf{producto formal} como:
@@ -40,27 +39,32 @@ Para la construcción del producto tensorial de espacios vectoriales, necesitare
         \mathbb{V} \ast \mathbb{W} := span_{\mathbb{R}} \{v \ast w / v \in \mathbb{V}, w \in \mathbb{W} \}
     \end{equation}
 
-    Donde $span$ denota el conjunto formado por todas las combinaciones lineales finitas de los elementos del conjunto, es decir,
+    donde $*$ es un símbolo con el que no sabemos operar. Por tanto, ahora mismo no sabemos simplificar muchas expresiones en este espacio.
 
-    \begin{equation}
-        span_{\mathbb{R}}(A) := \{ \sum_{k = 1}^n \alpha_i a_i / n \in \N, \alpha_i \in \R, a_i \in A \}
-    \end{equation}
-
-    Hay que tener en cuenta que en $v \ast w$, $\ast$ es un símbolo con el que no sabemos operar. Por tanto, ahora mismo no sabemos simplificar muchas expresiones en este espacio.
 \end{definicion}
 
+\begin{observacion}
+
+    $span$ denota el conjunto formado por todas las combinaciones lineales finitas de los elementos del conjunto, es decir,
+
+    \begin{equation}
+        span_{\mathbb{R}}(A) := \{ \sum_{k = 1}^n \alpha_i a_i : n \in \N, \; \alpha_i \in \R, \; a_i \in A \}
+    \end{equation}
+
+
+\end{observacion}
+
 Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar tomando combinaciones lineales finitas, $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial.
-\todo{Realmente no sé si esto es claro, por culpa de estar usando $*$, pero seguramente sea directo comprobarlo}
 
 Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
+\todo{\textbf{Para Javier}: no sé si estos ejemplos son necesarios. Los he puesto porque lo tenía apuntado en mis notas cuando estaba estudiando el producto tensorial, pero ahora no le veo demasiado el valor a dejarlo aquí}
 
 \begin{ejemplo} \label{ej:prod_formal}
-\todo{No sé si estos ejemplos sobran del documento al ser muy simples. Los he introducido porque los usé al principio para entender mejor los tensores, pero ahora no sé si tiene sentido dejar esto aquí}
 
 Sea $\Omega := \R^2 \ast \R^3$. Entonces tenemos que:
 
 \begin{equation}
-    \Omega = span \{
+    \Omega = span \conjunto{
         \begin{pmatrix}
             a \\
             b
@@ -72,7 +76,7 @@ Sea $\Omega := \R^2 \ast \R^3$. Entonces tenemos que:
             z
         \end{pmatrix}
         / a, b, x, y, z \in \R
-    \}
+    }
 \end{equation}
 
 Un elemento de dicho espacio puede ser
