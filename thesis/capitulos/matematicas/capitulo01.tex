@@ -35,15 +35,20 @@ Los principales \textbf{objetivos} del presente trabajo son:
             \item Descomposición \textit{HT}, que equivale al uso de redes profundas
         \end{enumerate}
     \item Demostrar dos resultados centrales que pondrán de manifiesto la superioridad de las redes profundas, en lo que se conoce como \textit{depth efficiency}, a través de las ya mencionadas descomposiciones tensoriales
-    \todo{Debería hablar más sobre lo que dicen en concreto los resultados, aunque sea en un lenguaje sencillo y de forma resumida}
+        \begin{itemize}
+            \item El teorema principal, \customref{teorema:teorema_principal_especificacion}, que dice que si tenemos un modelo profundo con un número polinomial de coeficientes, el modelo \textit{shallow} necesitará al menos un número exponencial de coeficientes para poder implementar el mismo modelo. Esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo
+            \item El corolario principal, \customref{lema:lema_previo_corolario}, indica que no es que un modelo \textit{shallow} no pueda realizar el modelo profundo con menos de un número exponencial de parámetros, sino que no es capaz ni de aproximar al modelo profundo con menos de un número exponencial de parámetros. De nuevo, esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo
+        \end{itemize}
 \end{enumerate}
 
 Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas de las herramientas que usaremos serán:
 
 \begin{itemize}
     \item Teoría básica sobre tensores
+    \item Descomposiciones tensoriales \textit{CP} y \textit{HT}
+    \item Matrización de tensores
     \item Teoría de la medida
-    \item Álgebra de matrices
+    \item Álgebra de matrices básica
 \end{itemize}
 
 \section{Estructura del trabajo}
