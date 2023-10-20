@@ -449,35 +449,37 @@ Veamos ahora un ejemplo que nos clarifique la naturaleza del espacio $\R^N \otim
 \end{ejemplo}
 
 \subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
-% TODO -- me quedo por aqui
 
-Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos ver un tensor $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $idx \in \deltaset{M_i}$.
+Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos ver un tensor $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $i \in \deltaset{M_i}$.
 
 Con esta visión, podemos desarrollar los siguientes conceptos básicos sobre tensores:
 
 \begin{itemize}
     \item Modos: cada una de las entradas $d_1, \ldots, d_N$ que podemos usar para indexar los elementos del tensor
     \item Orden: el número de modos del tensor. En el caso de nuestro tensor $\mathcal{A}$, tenemos $N$ modos, y por tanto ese es su orden
-    \item Dimensión: el número de valores que puede tomar cada uno de los modos. Por lo tanto, si en el primer modo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que el modo $i$-ésimo tiene dimensión $M$.
+    \item Dimensión: el número de valores que puede tomar cada uno de los modos. Por lo tanto, si el modo $i$-ésimo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que este modo tiene dimensión $M$.
         \begin{itemize}
-            \item Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos
-            \item Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero en ocasiones se abusa del lenguaje
+            \item Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos. En cuyo caso denotaremos por $\espaciotensores{N}{M}$ al conjunto de tensores de orden $N$ y dimensión $M$ en cada modo
+            \item Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero cuando no de lugar a confusión abusaremos del lenguaje
         \end{itemize}
 \end{itemize}
 
-Ahora, respecto al \textbf{producto tensorial}, por los isomorfismos que hemos introducido previamente, podemos ver el producto tensorial entre dos tensores reales de una forma más sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P, Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
-\todo{Tenemos que desarrollar estos isomorfismos o dejarlos indicados!}
-
+Podemos definir el \textbf{producto tensorial} de una forma muy sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P, Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
 
 $$(A \otimes B)d_1, \ldots d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}$$
 
-En el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}, \nv{v} \in \R^{N_2}$, tenemos que $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$. Esto coincide con lo que vimos en \customref{ejemplo:R2xR2}, a partir de un isomorfismo natural.
+\begin{ejemplo}
+    En el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}, \nv{v} \in \R^{N_2}$, es directo comprobar que $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$.
+
+    Esto coincide con lo que vimos en \customref{ejemplo:R2xR2}, tras introducir un isomorfismo natural. Lo que nos muestra que podemos tomar el desarrollo realizado en \customref{sec:deftensor} y conectarlo con este desarrollo mucho más concreto, usando unos isomorfismos adecuados.
+    \todo{Tenemos que desarrollar estos isomorfismos o dejarlos indicados!}
+\end{ejemplo}
 
 \subsection{Propiedad Universal del producto tensorial}
 
 El siguiente teorema será de gran utilidad a la hora de entender la naturaleza del producto tensorial entre dos espacios vectoriales.
 
-\begin{teorema}[Propiedad Universal del producto tensorial] Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales. Su producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial con una aplicación bilineal:
+\begin{teorema}[Propiedad Universal del producto tensorial] Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales. Su producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial con una aplicación bilineal asociada:
 
 \begin{equation}
 \begin{split}
@@ -499,7 +501,8 @@ de forma que:
 es decir:
 
 \begin{equation}
-    h(\nv{u}, \nv{v}) = \hat{h}(\nv{u} \otimes \nv{v}); \dspace \forall \nv{u} \in \mathbb{V}, \forall \nv{v} \in \mathbb{W}
+    h(\nv{u}, \nv{v}) = \hat{h}(\nv{u} \otimes \nv{v});
+    \dspace \forall \nv{u} \in \mathbb{V}, \; \forall \nv{v} \in \mathbb{W}
 \end{equation}
 
 Esto se resume en que el siguiente diagrama es conmutativo:
@@ -515,7 +518,7 @@ Esto se resume en que el siguiente diagrama es conmutativo:
 
 Es decir, dada una aplicación bilineal en el producto cartesiano de dos espacios vectoriales, podemos asociar unívocamente una aplicación lineal en el producto tensorial de los dos espacios vectoriales. Esto sigue siendo cierto para aplicaciones multilineales en el producto cartesiano de un número arbitrario de espacios vectoriales.
 
-Este teorema, que se puede probar a partir de todo lo que hemos visto hasta ahora, \textbf{sirve para dar una definición no constructiva del producto tensorial} de dos espacios vectoriales. A diferencia de lo que pasaba con la definición alternativa que se puede dar usando \customref{th:base_prod_tensorial}, esta definición no depende de ninguna base, y por lo tanto es igual de general que la definición por la que hemos optado.
+Este teorema, que se puede probar a partir de todo lo que hemos visto hasta ahora, \textbf{sirve para dar una definición equivalente no constructiva del producto tensorial} de dos espacios vectoriales. A diferencia de lo que pasaba con la definición alternativa que se puede dar usando \customref{th:base_prod_tensorial}, esta definición no depende de ninguna base, y por lo tanto es igual de general que la definición por la que hemos optado.
 
 \subsection{Descomposición CANDECOMP/PARAFAC}
 \todo{Esta sección igual debería colocarla más adelante, porque no es del todo introductoria. Podría considerar que forma parte del paper, aunque realmente no sé cómo de conocida es la descomposición como para poder considerarse introducción}
@@ -651,6 +654,4 @@ Una propiedad interesante es la siguiente:
 \todo{TODO -- hay que demostrarlo}
 
 \end{proof}
-\section{Teoría de la medida}
 
-\endinput
