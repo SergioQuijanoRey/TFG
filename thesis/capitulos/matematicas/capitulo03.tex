@@ -34,27 +34,28 @@ Nuestro objetivo en esta sección es justificar la elección de las funciones $h
 
 Usaremos bastantes hechos básicos sobre análisis funcional, que hemos introducidos en \customref{sec:preliminares_funcional}.
 
-\subsection{Justificación para la representación de las funciones de puntuación} \label{sec:justificacion_func_repr}
+\subsection{Planteamiento para construir el espacio de hipótesis} \label{sec:justificacion_func_repr}
 
-Recordemos que, como ya hemos introducido en \customref{seq:planteamiento_problema}, nuestros datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$, y que tenemos que tomar la etiqueta cuya función de puntuación $\{h_y: \mathcal{X} = (\R^s)^N \to \R \dspace / \dspace y \in \mathcal{Y} \}$ sea máxima.
+Recordemos que, como ya hemos introducido en \customref{seq:planteamiento_problema}, nuestros datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$, y que tomamos la etiqueta $y \in \mathcal{Y}$ cuya función de puntuación $\{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y} \}$ sea máxima.
 
-Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ en el que mover nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
+Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ donde elegir nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
 
-En \customref{sec:preliminares_funcional} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, (tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas), entonces el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total (y por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$).
+En \customref{subs:caracterizaciones_familias_funciones} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas. Es más, en este caso el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total y, por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$.
 
-Con ello, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in L^2((R^s)^N$, podemos aproximar dicha función de puntuación arbitrariamente bien con combinaciones lineales finitas. Planteemos esto de forma más clara.
+Con ello, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in L^2((R^s)^N$, podemos aproximar dicha función de puntuación arbitrariamente bien con combinaciones lineales finitas.
 
-En primer lugar, partimos de un conjunto $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ total. Por tanto, el conjunto inducido $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N} \subseteq L^2((R^s)^N$ es total también.
-
-En segundo lugar, consideramos una función de puntuación $h_y \in L^2((R^s)^N$ que queremos aproximar usando el conjunto de funciones producto punto a punto.
-
-Para ello, fijamos una cota de error $\varepsilon > 0$. Gracias a \customref{prop:conjuntos_totales_epsilon_aproximacion}, sabemos que  podemos tomar una combinación lineal finita que aproxime con un error menor que $\varepsilon$.
+Decimos que podemos aproximar arbitrariamente bien con combinaciones lineales finitas porque, fijada cualquier cota de error $\varepsilon > 0$, usando \customref{prop:conjuntos_totales_epsilon_aproximacion} nos da una combinación lineal finita a una distancia menor que $\varepsilon$.
 
 \begin{observacion}
     Si modificamos la cota de error $\varepsilon$, es razonable pensar que el número de elementos de la combinación lineal crezca. Y de momento no tenemos control sobre cómo es este crecimiento en el número de sumandos.
 \end{observacion}
 
-Reflejamos este planteamiento de forma que sea más útil en la búsqueda de nuestro modelo. Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita contable (podemos considerar que tenemos $N$ sucesiones). Usando la expresión dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion} podemos expresar la combinación lineal usando un tensor formal $\mathcal{A}^y \in \espaciotensores{N}{\N}$ con todas las entradas cero, salvo un conjunto finito, de forma que:
+\subsection{Implementación del planteamiento}
+% TODO -- seguir por aqui
+
+Reflejamos este planteamiento de forma que sea más manejable en la búsqueda de un modelo matemático. Queremos expresar de forma compacta la aproximación por combinaciones lineales finitas a partir de $\conjunto{f_d: \; d \in \N}$ que \customref{prop:conjuntos_totales_epsilon_aproximacion} nos da.
+
+Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita numerable (podemos considerar que tenemos $N$ sucesiones). El papel de estos tensores formales será el de almacenar los coeficientes de la combinación lineal finita dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion} Como esa combinación lineal es finita, nuestro tensor formal tendrá todas las entradas nulas, salvo un conjunto finito. Y con esto,
 
 \begin{equation} \label{eq:hipotesis_en_general}
     h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} A^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i})
