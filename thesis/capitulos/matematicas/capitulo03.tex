@@ -2,7 +2,9 @@
 
 \section{Planteamiento del problema} \label{seq:planteamiento_problema}
 
-La tarea de aprendizaje que consideramos es la de clasificación. Durante todo el desarrollo, pensaremos en la \textbf{clasificación de imágenes}. En este caso, el enfoque que más éxito ha tenido históricamente es el uso de redes convolucionales profundas y, más actualmente, el uso del modelo \entrecomillado{transformer}.
+La tarea de aprendizaje que consideramos es la de \textbf{clasificación de imágenes}. El uso de redes convolucionales profundas supuso un gran avance a la hora de resolver esta tarea, enfoque que introduje \textit{AlexNet} en 2012 \cite{matematicas:alexnet_original_paper}. A partir de estos modelos se han construido otros más potentes, como por ejemplo, modelos de atención basados en el módulo \entrecomillado{transformer}.
+
+Por lo tanto, nos centraremos en modelar redes convolucionales (profundas y no profundas) para clasificar imágenes.
 
 Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \} = \deltaset{Y}$.
 
@@ -10,10 +12,11 @@ Con esto, podemos ver que los datos de entrada viven en el espacio
 
 $$\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N$$
 
-Esta representación de los datos de entrada es natural en muchas situaciones. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen. Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Podemos incluso considerar \textit{pixels} que aparezcan en más de un vector. Por ejemplo, podemos considerar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
+Esta representación de los datos de entrada es natural en muchos escenarios. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen (parche o \textit{patch}, \cite{matematicas:principal}). Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Puede ocurrir que existan \textit{pixels} que aparezcan en más de un parche.
 
-Por ejemplo, el trabajo que presenta el conocido modelo  de deep learning \textit{VIT} propone una arquitectura \entrecomillado{transformer} a la que que se le pasa \entrecomillado{patches} de la imagen para poder explotar el mecanismo de atención: \entrecomillado{we split an image into patches and provide the sequence of linear embeddings of these patches as an input to a Transformer} \footnote{\cite{matematicas:vit}}
-\todo{No sé si así está bien referenciado el trabajo al que me refiero}
+Una forma natural de generar estos parches a partir de las imágenes consiste en tomar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
+
+Por ejemplo, el trabajo que presenta el conocido modelo  de deep learning \textit{VIT} propone una arquitectura basada en el módulo \entrecomillado{transformer} a la que que se le pasa parches de la imagen para poder explotar el mecanismo de atención: \entrecomillado{we split an image into patches and provide the sequence of linear embeddings of these patches as an input to a Transformer} \cite{matematicas:vit}.
 
 Para decidir la etiqueta de un elemento, consideramos $Y$ \textbf{funciones de puntuación}:
 
@@ -27,7 +30,7 @@ Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de fun
 
 \section{Espacio de hipótesis general}
 
-Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ en \customref{sec:repr_funciones_puntuacion}, que conformarán el espacio de hipótesis sobre el que trabajaremos.
+Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ que conformarán el espacio de hipótesis sobre el que trabajaremos. Si el lector no está interesado en esta justificación, en \customref{sec:repr_funciones_puntuacion} mostramos cuál es esta elección.
 
 \subsection{Preliminares sobre los espacios $L^2$} \label{sec:preliminares_funcional}
 
@@ -44,7 +47,7 @@ A continuación, introduciremos algunos conceptos sobre espacios de funciones qu
     Sobre dicho espacio, definimos la siguiente relación de equivalencia:
 
     \begin{equation}
-        f \sim g \iff f = g \dspace \text{cpd en } \Omega
+        f \sim g \iff f = g \dspace \text{c.p.d. en } \Omega
     \end{equation}
 
     Y con ello definimos el \textbf{espacio de Lebesgue sobre $\Omega$} como:
@@ -54,10 +57,10 @@ A continuación, introduciremos algunos conceptos sobre espacios de funciones qu
     \end{equation}
 \end{definicion}
 
-Y ahora, introducimos el siguiente espacio de funciones:
+Y ahora, introducimos los siguientes espacios de funciones:
 
 \begin{definicion}[Espacios de Lebesgue $L^p$]
-    Dado $\Omega \subseteq \R^N$ definimos
+    Dados $\Omega \subseteq \R^N$ y $p \in [1, \infty)$, definimos
 
     \begin{equation}
         \mathcal{L}^p := \{ f \in \mathcal{L} : \int_{\Omega} |f|^p d\mu < \infty \}
@@ -70,9 +73,12 @@ Y ahora, introducimos el siguiente espacio de funciones:
     \end{equation}
 
 \end{definicion}
-\todo{\textbf{CUIDADO} Revisar que esto es correcto porque lo estoy haciendo de cabeza mientras escribo el Latex}
 
-A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, escribiendo $L^2$ cuando esto no de lugar a confusión. Sabemos de sobra que este espacio es de Hilbert, considerando el producto escalar:
+A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, escribiendo simplemente $L^2$ cuando esto no de lugar a confusión.
+
+\subsection{Espacios de Hilbert}
+
+Sabemos que el espacio $L^2$ es de Hilbert, considerando el producto escalar:
 
 \begin{equation}
     \innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu
@@ -85,7 +91,7 @@ Además, usaremos el siguiente hecho:
 \end{proposicion}
 
 \begin{proof}
-    Disponemos de una base vectorial $\mathbb{B} = \conjunto{e_1, \ldots, e_N}$. Además, por el método de Gram–Schmidt, podemos tomarla para que sea ortogonal, es decir, $\innerproduct{e_i}{e_j} = \delta_{i, j}$.
+    Además de disponer de una base vectorial $\mathbb{B} = \conjunto{e_1, \ldots, e_N}$, por el método de Gram–Schmidt, podemos tomarla para que sea ortogonal: $\innerproduct{e_i}{e_j} = \delta_{i, j}$.
 
     En un espacio normado de dimensión finita, todas las normas son equivalentes, así que trabajaremos con la norma infinito:
 
@@ -120,8 +126,9 @@ Además, usaremos el siguiente hecho:
     como queríamos demostrar.
 \end{proof}
 
-Todos estos son conceptos que conocemos del grado. A partir de ahora introducimos algunos conceptos nuevos que nos serán de utilidad. Estos conceptos tratarán de caracterizar algunos subconjuntos de $L^2$ interesantes. Empezamos por el concepto de totalidad:
-\todo{Cuidado con esta frase. En los apuntes de análisis funcional se habla de bases ortonormales, que guardan relación con estos conceptos}
+\subsubsection{Dos caracterizaciones sobre familias de funciones}
+
+Introducimos ahora dos caracterizaciones fundamentales sobre familias de funciones, que serán de gran importancia a la hora de desarrollar nuestros resultados:
 
 \begin{definicion}[Subconjuntos de funciones totales]
     Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$
@@ -147,10 +154,12 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 
 \end{definicion}
 
-\begin{proposicion}[Producto tensorial, independencia lineal y totalidad]
-    Todo espacio $L^2(\R^N)$ admite un subconjunto numerable que sea linealmente independiente y total. Estos conjuntos actuarán como bases en nuestro espacio de funciones
+\begin{proposicion}[Existencia de \entrecomillado{bases} numerables en espacios de funciones]
+    Todo espacio $L^2(\R^N)$ admite un subconjunto numerable que sea linealmente independiente y total. Estos conjuntos actuarán de forma similar a una base vectorial
 \end{proposicion}
 \todo{Qué relación tiene esto con el hecho de que sabemos que todo espacio de Hilbert admite una base ortonormal. Hay estamos usando <fi, fi'> = 0 en vez de la indp. lineal pero claramente están relacionados}
+
+En nuestros dos modelos, trabajaremos con la familia de funciones producto inducida. Así que vemos como se comporta esta transformación respecto a las dos caracterizaciones que acabamos de introducir:
 
 \begin{proposicion}[Conservación de la totalidad e independencia lineal en la familia de funciones producto inducida] \label{prop:conservacion_totalidad_indp_lineal_func_prod}
     Sea $\{f_d\} \subseteq L^2(\R^s): d \in \deltaset{N} \}$ total (resp. linealmente independiente). Entonces el subconjunto:
@@ -163,15 +172,23 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 \end{proposicion}
 \todo{Añadir la referencia del paper Hackbusch}
 
+\subsection{Relación del producto tensorial con los espacios de Hilbert y las dos caracterizaciones}
+
+En esta sección vamos a ver cómo se relaciona el producto tensorial con todos los conceptos que hemos introducido previamente. Empecemos viendo que la estructura de espacio de Hilbert se conserva por el producto tensorial:
+
 \begin{proposicion}
 
     Si los espacios $\mathbb{V}_1, \ldots, \mathbb{V}_N$ son espacios de Hilbert, podemos dotar de forma natural al espacio $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ de un producto escalar, siendo así $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ un espacio de Hilbert
 
 \end{proposicion}
 
+Y ahora veamos cómo se relaciona el producto tensorial con las dos caracterizaciones:
+
 \begin{proposicion}
     Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(1)}_{\alpha_1}} \otimes \ldots \otimes  \nv{v^{(N)}_{\alpha_N}}  \} \subseteq \mathbb{V}_1 \otimes \ldots \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
 \end{proposicion}
+
+Como ya hemos comentado, será importante estudiar la familia de funciones producto inducida. El siguiente teorema da un paso en este estudio.
 
 \begin{teorema}
     La siguiente función induce un isomorfismo entre espacios de Hilbert:
