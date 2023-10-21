@@ -201,7 +201,7 @@ Una consecuencia inmediata es que, en caso de que $\mathbb{V}$ y $\mathbb{W}$ ad
 
 La expresión anterior motiva la siguiente definición:
 
-\begin{definicion}[Tensor puro]
+\begin{definicion}[Tensor puro] \label{def:tensor_puro}
     Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $\nv{v} \in \mathbb{V}$, $\nv{w} \in \mathbb{W}$ tales que $\gamma = \nv{v} \otimes \nv{w}$.
 \end{definicion}
 
@@ -519,6 +519,12 @@ Esto se resume en que el siguiente diagrama es conmutativo:
 Es decir, dada una aplicación bilineal en el producto cartesiano de dos espacios vectoriales, podemos asociar unívocamente una aplicación lineal en el producto tensorial de los dos espacios vectoriales. Esto sigue siendo cierto para aplicaciones multilineales en el producto cartesiano de un número arbitrario de espacios vectoriales.
 
 Este teorema, que se puede probar a partir de todo lo que hemos visto hasta ahora, \textbf{sirve para dar una definición equivalente no constructiva del producto tensorial} de dos espacios vectoriales. A diferencia de lo que pasaba con la definición alternativa que se puede dar usando \customref{th:base_prod_tensorial}, esta definición no depende de ninguna base, y por lo tanto es igual de general que la definición por la que hemos optado.
+
+\subsection{Descomposiciones tensoriales}
+
+En el presente trabajo usaremos dos descomposiciones tensoriales para modelizar dos tipos de arquitecturas: profundas y no profundas. Así que explicaremos muy brevemente qué es una descomposición tensorial.
+
+Una \textbf{descomposición tensorial} es una forma de expresar cierto tensor como función de otros tensores más sencillos. Tenemos también descomposiciones que expresan el tensor en función de ciertos vectores (como es el caso de la descomposición \textit{CP}).
 
 \section{Análisis Funcional} \label{sec:preliminares_funcional}
 

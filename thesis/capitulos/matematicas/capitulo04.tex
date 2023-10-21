@@ -10,12 +10,11 @@ A partir de las herramientas matemáticas que hemos introducido en \customref{ch
 Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
 
 \begin{itemize}
-    \item Redes neuronales no profundas, a partir
-    \todo{no se que nombre le dan a cada una de las redes en el paper!}
-    \item Redes convolucionales profundas, a partir de los \textit{circuitos convolucionales aritméticos}
+    \item Redes neuronales no profundas, a partir de la descomposición \textit{CP}
+    \item Redes convolucionales profundas, a partir de la descomposición \textit{HT}
 \end{itemize}
 
-Creemos que la \textbf{modelización es muy cercana a las redes usadas en la práctica}. Principalmente, porque tiene en cuenta las tres propiedades características de una red convolucional:
+Las \textbf{modelizaciones son muy cercanas a las arquitecturas usadas en la práctica del aprendizaje automático}. Principalmente, porque tienen en cuenta las tres propiedades características de una red convolucional:
 
 \begin{enumerate}
     \item Localidad
@@ -24,29 +23,29 @@ Creemos que la \textbf{modelización es muy cercana a las redes usadas en la pr�
 \end{enumerate}
 \todo{Esto ya lo digo antes en la introducción. No sé si aquí sería buen momento para desarrollar lo que significa cada cosa o si es mejor quitarlo de alguna parte}
 
-Además, los \textit{circuitos convolucionales aritméticos} son equivalentes a las redes conocidas como \textit{SimNets}, lo que reafirma el hecho de que la modelización es muy buena.
-\todo{Esta afirmación la tendría que justificar, aunque sea referenciando al paper principal}
+Además, el modelo profundo es equivalente a las redes conocidas como \textit{SimNets} \cite{matematicas:principal}, lo que reafirma el hecho de que la modelización es muy buena.
 
 \section{Modelo \textit{CP}}
 
+Este modelo será el resultado de aplicar la descomposición tensorial \textit{CP} en la función de puntuación dada por \eqref{eq:puntuacion_general}. Como veremos más adelante, esto resultará en un modelo \textit{shallow}, con una única capa convolucional oculta.
+
 \subsection{Descomposición CANDECOMP/PARAFAC}
-\todo{Revisar, porque he movido esta sección de sitio}
 
-Como ya se ha comentado en \customref{ch:introduccion}, las descomposiciones tensoriales van a ser fundamentales en este estudio. Las descomposiciones tensoriales buscan, en general, expresar un tensor cualquiera como función de otros tensores más sencillos, o incluso en función de vectores.
+En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/PARAFAC}. Esta es la descomposición más sencilla de las dos descomposiciones que vamos a manejar.
 
-La primera descomposición con la que trabajamos (y la más sencilla de las dos que usamos) es la descomposición \textit{CANDECOMP/PARAFAC}. Para ello, comenzamos estudiando la siguiente propiedad:
+Empecemos introduciendo la siguiente propiedad sobre los tensores puros:
 
-\begin{proposicion}[Producto tensorial de dos vectores]
-    Sean $\nv{v} \in R^{N}, \nv{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
+\begin{proposicion}[Rango matricial de los tensores puros]
+    Sean $\nv{v} \in \R^{N}, \nv{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
 
     $$\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T \in \espaciomatrices{N}{M}$$
 
-    Además, esta matriz es de rango uno o cero (este último caso cuando alguno de los dos vectores es $\vec{0}$)
+    Además, esta matriz es de rango uno o cero (este último caso ocurre únicamente cuando alguno de los dos vectores es $\vec{0}$)
 \end{proposicion}
 
 \begin{proof}
 
-Sean $\nv{v} = (v_1, \ldots, v_N)$ y $\nv{w} = (w_1, \ldots, w_M)$, ambos no nulos. Entonces, usando la expresión del producto tensorial que introducimos en \customref{sec:otra_forma_tensores}, tenemos que:
+Sean $\nv{v} = (v_1, \ldots, v_N)$ y $\nv{w} = (w_1, \ldots, w_M)$ dos vectores cualesquiera. Entonces, usando la expresión del producto tensorial que introducimos en \customref{sec:otra_forma_tensores}, tenemos que:
 
 \begin{equation}
     \nv{v} \otimes \nv{w} = (v_i w_j)_{i \in \deltaset{N},\ j \in \deltaset{M}}
@@ -69,9 +68,9 @@ $$(v_i w_1, v_i w_2, \ldots, v_i w_M) = v_i (w_1, \ldots, w_M) = v_i \nv{w}^T$$
 
 Por tanto, todas las filas son combinación lineal de una de las filas.
 
-En el caso de que alguno de los dos vectores sea $\vec{0}$, tenemos que la matriz $\nv{v} \otimes \nv{w}$ es la matriz de ceros, y por tanto su rango es cero.
+En el caso de que alguno de los dos vectores $\nv{v}$ o $\nv{w}$ sea $\vec{0}$, tenemos que la matriz $\nv{v} \otimes \nv{w}$ es la matriz de ceros, y por tanto su rango es cero.
 
-Estudiado ese caso, ahora podemos suponer $\nv{v}, \nv{w} \neq \vec{0}$, y por tanto se debe cumplir que $\exists i_0 \in \deltaset{N}: v_{i_0} \neq 0$. Esa será la fila que escogemos para expresar el resto de filas como combinación lineal de esta, aprovechando de que es no nula. Dicha fila se puede expresar como $v_{i_0} \nv{w}^T$. La fila $i$-ésima se puede expresar como $v_i \nv{w}^T$. Y por tanto:
+Estudiado ese caso, ahora podemos suponer que $\nv{v}, \nv{w} \neq \vec{0}$, y por tanto se debe cumplir que $\exists i_0 \in \deltaset{N}: v_{i_0} \neq 0$. Esa será la fila que escogemos para expresar el resto de filas como combinación lineal de esta, aprovechando de que es no nula. Dicha fila se puede expresar como $v_{i_0} \nv{w}^T$. La fila $i$-ésima se puede expresar como $v_i \nv{w}^T$. Y por tanto:
 
 \begin{equation}
 \begin{split}
@@ -88,36 +87,38 @@ Con esto sabemos que $rank(\nv{v} \otimes \nv{w}) \leq 1$, pero podría darse el
     Estamos escribiendo la igualdad $\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T$ sin definir lo que significa la igualdad entre un tensor de orden 2 y una matriz. Sin embargo, esta igualdad es totalmente natural. Decimos que un tensor de orden dos y una matriz son iguales cuando las dimensiones de la matriz y las dos dimensiones del tensor coinciden, y cuando las entradas de ambos coinciden.
 \end{observacion}
 
-Con esto, hemos caracterizado a aquellos tensores que se expresan como producto tensorial de dos vectores. Podemos generalizar esto al producto tensorial de $N$ vectores:
+Recordemos que en \customref{def:tensor_puro} hemos definido estos tensores como \textbf{tensores puros}. La anterior proposición muestra que los tensores puros que vienen dados como producto tensorial de dos vectores tienen un rango matricial igual a uno (en caso de que no sean ambos vectores nulos).
 
-\begin{definicion}[Tensores puros]
-    Un tensor $\mathcal{A}$ se dice que es \textbf{puro} (o también \textbf{elemental}) cuando es de la forma $\mathcal{A} = \otimes_{i = 1}^N \nv{v}^{(i)}$ con $\nv{v}^{(i)} \in \R^{N_i},\ \forall i \in \deltaset{N}$.
-\end{definicion}
-\todo{Esta definición está repetida de otra que ya teníamos}
-
-\begin{observacion}
-    A diferencia de lo que pasaba anteriormente, ahora no tenemos una forma tan directa de comparar estos tensores (de orden $N$) con matrices. Esto motiva en parte las siguientes herramientas que vamos a introducir.
-\end{observacion}
-
-Estamos ya en condiciones de introducir nuestra primera descomposición tensorial:
+Es natural plantearse generalizar esta propiedad a tensores puros que vengan dados como producto tensorial de $N$ vectores. Pero de momento no tenemos una herramienta para comparar tensores de orden $N > 2$ con matrices. Esto motiva la introducción de la descomposición tensorial \textit{CP}:
 
 \begin{proposicion}[\textbf{Descomposición \textit{CP}}]
     Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros, es decir:
 
     \begin{equation} \label{eq:cp_decomp}
-        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \ldots \nv{v_i^{(N)}}; \qquad
-        \dspace \nv{v_i^{(k)}} \in,\R^{M_k}, \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
+        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \ldots \otimes \nv{v_i^{(N)}};
+        \qquad \nv{v_i^{(k)}} \in \R^{M_k},
+        \dspace \forall i \in \deltaset{Z},
+        \dspace \forall k \in \deltaset{N},
+        \dspace Z \in \N
     \end{equation}
 \end{proposicion}
+
+\begin{proof} \label{proof:demostracion_cp_es_universal}
+    \todo{Hacer esta demostración. Más adelante hacemos otra en el que vemos que podemos hacerlo con $M^N$ sumandos. Pero ahí usamos $\espaciotensores{N}{M}$, aquí las dimensiones varían!}
+\end{proof}
 
 A la descomposición anterior se le llama \textbf{descomposición \textit{CANDECOMP/PARAFAC}}, o abreviadamente, \textbf{descomposición \textit{CP}}
 
 \begin{observacion}
-    Esto descomposición es equivalente a:
+    Esta descomposición es equivalente a la siguiente descomposición:
 
-    \begin{equation} \label{eq:cp_decomp}
-        \mathcal{A} = \sum_{i = 1}^Z \lambda_i \cdot \nv{v_i^{(1)}} \otimes \ldots \nv{v_i^{(N)}}; \qquad
-        \dspace \nv{v_i^{(k)}} \in \R^{M_k}, \lambda_i \in \R \dspace \forall i \in \deltaset{Z}, \forall k \in \deltaset{N}
+    \begin{equation}
+        \mathcal{A} = \sum_{i = 1}^Z \lambda_i \cdot \nv{v_i^{(1)}} \otimes \ldots \otimes \nv{v_i^{(N)}};
+        \qquad \nv{v_i^{(k)}} \in \R^{M_k},
+        \dspace \lambda_i \in \R,
+        \dspace \forall i \in \deltaset{Z},
+        \dspace \forall k \in \deltaset{N},
+        \dspace Z \in \N
     \end{equation}
 
     Puesto que podemos considerar:
@@ -133,61 +134,51 @@ A la descomposición anterior se le llama \textbf{descomposición \textit{CANDEC
     \end{equation}
 \end{observacion}
 
-\begin{proof}
-    \todo{Hacer esta demostración. Más adelante hacemos otra en el que vemos que podemos hacerlo con $M^N$ sumandos. Pero ahí usamos $\espaciotensores{N}{M}$, aquí las dimensiones varían!}
-\end{proof}
-
 \begin{observacion}
     Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
 \begin{observacion}
 
-En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. Esto motivará la definición que haremos más adelante de \textit{rango CP}. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
-\todo{Escribir el valor de Z cuando hagamos la demostración}
+    En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
+    \todo{Escribir el valor de Z cuando hagamos la demostración}
 
+    Esto motivará la siguiente definición.
 \end{observacion}
 
 \begin{definicion}[Rango \textit{CP}]
     Dado un tensor $\mathcal{A}$, se define su rango \textit{CP} como el mínimo valor de $Z$ para el cual la ecuación \eqref{eq:cp_decomp} se mantiene
+
 \end{definicion}
 
 Una propiedad interesante es la siguiente:
 
 \begin{proposicion}[]
-    Para un tensor de orden dos (que podemos ver como una matriz, por los isomorfismos previamente introducidos), su rango \textit{CP} coincide con el rango matricial usual
+    Para un tensor de orden dos, que podemos ver como una matriz, su rango \textit{CP} coincide con el rango matricial usual
 \end{proposicion}
 
-\begin{proof}
+\subsection{Aplicando la descomposición a la función de puntuación}
 
-\todo{TODO -- hay que demostrarlo}
-
-\end{proof}
-
-
-
-Como ya hemos comentado en \customref{sec:repr_funciones_puntuacion}, buscaremos descomponer el tensor de coeficientes $\mathcal{A}^y$ que aparece en la ecuación \eqref{eq:puntuacion_general}, para que el aprendizaje de sus coeficientes sea computacionalmente factible.
-
-La idea más simple es aplicar la \textit{descomposición CP}, que introducimos en \eqref{eq:cp_decomp}, en la ecuación \eqref{eq:puntuacion_general}. Usaremos una descomposición conjunta para los tensores:
+Nuestra tarea ahora es aplicar la descomposición \textit{CP} que acabamos de introducir en \eqref{eq:puntuacion_general}, para expresar el tensor de coeficientes $\mathcal{A}^y$. Usaremos una descomposición conjunta, de la siguiente forma:
 
 \begin{equation} \label{eq:cp_decomp_conjunta}
     \mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}}
 \end{equation}
 
-\todo{En la ecuación que introduzco antes no tengo escalares en la sumatoria!}
+Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por \eqref{eq:cp_decomp} que $a_z^y \in \R$, y por tanto, podemos expresar $\nv{a^y} := (a_1^y, \ldots, a_Z^y) \in \R^Z$. En segundo lugar, y de nuevo, conforme a \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien refleja los índices de la fórmula.
 
-Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por \eqref{eq:cp_decomp} que $a_z^y \in \R$, y por tanto, podemos considerar $\nv{a^y} := (a_1^y, \ldots, a_Z^y)^T \in \R^Z$. En segundo lugar, y de nuevo, conforme a \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien refleja la elección de índices de la fórmula.
+Veamos que esta descomposición conjunta es universal:
 
 \begin{proposicion}
     Tomando $Z = M^N$ en la ecuación \refeq{eq:cp_decomp_conjunta}, la descomposición es universal. Esto es, podemos fijar un conjunto de vectores $\{\nv{\omega^{z, i}} \in \R^M / z \in \deltaset{Z}, i \in \deltaset{N} \}$ de forma que cualquier tensor $\mathcal{A}^y$ de orden $N$ y dimensión $M$ en cada modo puede ser representado. Es decir:
 
     \begin{equation}
-        \forall \mathcal{A}^y \in \espaciotensores{N}{M}, \exists \nv{a^y} \in \R^Z: \text{la ecuación \refeq{eq:cp_decomp_conjunta} se verifica}
+        \forall \mathcal{A}^y \in \espaciotensores{N}{M}, \; \exists \nv{a^y} \in \R^Z: \text{la ecuación \refeq{eq:cp_decomp_conjunta} se verifica}
     \end{equation}
 \end{proposicion}
 
 \begin{proof}
-    La idea de la demostración es muy sencilla. Tenemos que expresar un tensor arbitrario $\mathcal{A}$ de orden $N$ y dimensión $M$ en cada modo (es decir, de $M^N$ elementos) como una suma de $M^N$ elementos. Por tanto, en cada sumando, buscamos generar un único elemento del tensor y colocarlo en los índices apropiados. Es decir, cada sumando será un tensor de todo ceros salvo la entrada de la que nos ocupamos en esa iteración.
+    La idea de la demostración es muy sencilla, y será muy parecida a la realizada en \customref{proof:demostracion_cp_es_universal}. Tenemos que expresar un tensor arbitrario $\mathcal{A}$ de orden $N$ y dimensión $M$ en cada modo (es decir, de $M^N$ elementos) como una suma de $M^N$ elementos. Por tanto, en cada sumando, buscamos generar un único elemento del tensor y colocarlo en los índices apropiados. Es decir, cada sumando será un tensor de todo ceros salvo la entrada de la que nos ocupamos en esa iteración.
 
     Para que la demostración sea más clara cambiaremos la forma de indexar la suma. En la proposición estamos usando un único índice que llega hasta $Z = M^N$. Esto es lo mismo que usar $N$ índices que lleguen hasta $M$, y así la sumatoria queda:
 
@@ -237,8 +228,8 @@ Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sa
     como buscábamos. Para concluir la demostración, fijamos el conjunto de vectores de forma que:
 
     \begin{equation} \label{eq:cp_decomp_asignacion_vectores}
-        \{\nv{\omega^{z, i}} \in \R^M / z \in \deltaset{Z}, i \in \deltaset{N} \} =
-        \{ \nv{\delta_{i_j, N}} / j \in \deltaset{N}, i_j \in \deltaset{M} \}
+        \{\nv{\omega^{z, i}} \in \R^M : \; z \in \deltaset{Z}, i \in \deltaset{N} \} =
+        \{ \nv{\delta_{i_j, N}} : \; j \in \deltaset{N}, i_j \in \deltaset{M} \}
     \end{equation}
 
 \end{proof}
@@ -280,30 +271,33 @@ Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
     h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})
 \end{equation}
 
-\subsection{Desarrollo del modelo}
-\todo{Mejor nombre para esta sección}
+\subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
 
-Veamos cómo esta ecuación se relaciona con un modelo usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en \customref{sec:repr_funciones_puntuacion}, el primer paso de nuestro modelo puede considerarse computar la capa de representación, esto es, los valores
+Veamos cómo esta modelización se relaciona con una arquitectura usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en \customref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores
 
-$$\{f_{\theta_d}(\nv{x_i}) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
+\begin{equation}
+    \{f_{\theta_d}(\nv{x_i}) : \; d \in \deltaset{M}, \; i \in \deltaset{N} \}
+\end{equation}
 
-Una vez hecho esto, en \eqref{eq:cp_model} podemos ver $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $d$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
+Una vez hecho esto, en \eqref{eq:cp_model} podemos ver $\; \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $M$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
 
 \begin{equation}
     h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i)
 \end{equation}
 
-Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en \customref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado.
+Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en \customref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales.
 
-Escrito así, también es claro que el productorio está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps}. Es un \textit{pooling} de tipo producto que nos devuelve un escalar. De nuevo, re-escribimos la ecuación:
+Escrito así, también es claro que el productorio está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps} por cada valor de $z$. Diremos que es un \textit{pooling} producto de tipo \textbf{global}, porque toma los $N$ \textit{feature maps} de una posición y nos devuelve un único escalar. Por tanto, tras hacer el \textit{pooling} de los $Z$ grupos de $M$ \textit{feature maps}, acabamos con $Z$ valores escalares.
+
+De nuevo, re-escribimos la ecuación:
 
 \begin{equation}
     h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace ProdPooling( Conv(i) )
 \end{equation}
 
-Y con esto, vemos que la sumatoria final está combinando los escalares producidos por la convolución seguida del \textit{pooling} de forma lineal. Esto es, una \textit{linear dense layer} sobre dichos $Z$ escalares.
+Y con esto, vemos que la sumatoria final está combinando los $Z$ escalares producidos por la convolución seguida del \textit{pooling} de forma lineal. Esto es, una \textit{linear dense layer} sobre dichos $Z$ escalares.
 
-En resumen, tras computar la capa de representación, nuestro modelo tiene una capa oculta sobre la que aplicamos \textit{pooling}, que combinamos en una capa densa. Y por tanto, es razonable considerar este modelo con lo que se conoce comúnmente como una \textbf{red \textit{shallow}}.
+En resumen, tras computar la capa de representación, nuestro modelo tiene una capa oculta convolucional con $M$ canales, tras la que aplicamos \textit{pooling} global en cada canal, produciendo $M$ escalares que combinamos en una capa lineal densa. Y por tanto, es razonable considerar este modelo con lo que se conoce comúnmente como una \textbf{red \textit{shallow}}.
 
 Podemos representar este modelo gráficamente como sigue:
 
@@ -329,7 +323,7 @@ Podemos representar este modelo gráficamente como sigue:
 
 \subsection{Compartición de coeficientes} \label{subs:comparticion_parametros_cp}
 
-Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de parámetros}.
+Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
 
 La compartición de coeficientes es necesaria para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de esta.
 
@@ -349,16 +343,16 @@ Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP}
 
 Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos.
 
-\subsection{Parámetros del modelo} \label{msubsec:parametros_modelo_cp}
+\subsection{Número de parámetros del modelo} \label{msubsec:parametros_modelo_cp}
 
-A partir de la ecuación \eqref{eq:cp_model} vemos que para definir nuestro modelo debemos definir los coeficientes:
+A partir de la ecuación \eqref{eq:cp_model} vemos que para definir nuestro modelo debemos definir los siguientes parámetros:
 
 \begin{itemize}
     \item $\{a_z^y \in \R : z \in \deltaset{Z}, \dspace y \in \deltaset{Y}\}$, lo que supone $Y \cdot Z$ coeficientes
     \item $\{\omega_d^{z, i} \in \R: i \in \deltaset{N}, \dspace z \in \deltaset{Z}, \dspace d \in \deltaset{M}\}$, lo que lo que supone $N \cdot M \cdot Z$ coeficientes
 \end{itemize}
 
-Es decir, que en total nuestro modelo viene dado al especificar $N \cdot M \cdot Z + Y \cdot Z$ coeficientes.
+Es decir, que en total nuestro modelo viene dado al especificar $N \cdot M \cdot Z + Y \cdot Z$ coeficientes reales.
 
 \section{Modelo HT} \label{sec:modelo_ht}
 
