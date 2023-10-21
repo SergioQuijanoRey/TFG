@@ -1,51 +1,43 @@
 \chapter{Teoremas de la capacidad de las redes neuronales} \label{chapter:teoremas_y_demostraciones}
 
-\section{Introducción a los teoremas}
+\section{Introducción a los resultados principales}
 
-Los teoremas principales de este trabajo se presentan en esta sección. Comenzamos por el siguiente:
+En esta sección introduciremos los dos resultados principales del trabajo. En el resto de secciones trabajaremos en demostrar estos dos resultados.
 
-\begin{teorema}[Darle nombre] \label{teorema:teorema_principal_introduccion}
+El teorema principal del trabajo es el siguiente:
 
-Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo $\{ \nv{a^{l, j, \gamma}} \}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de tensores generados con rango \textit{CP} menor que $r^{N/2}$ tiene medida cero. El resultado se mantiene si forzamos la compartición de coeficientes en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+\begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_introduccion}
+
+Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos la compartición de coeficientes en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 
 \end{teorema}
-\todo{Este teorema está muy mal escrito en el \textit{paper}}
 
-\begin{observacion}
+En resumen, casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$. Esto implica que en la ecuación de la descomposición \textit{CP} \eqref{eq:cp_decomp}, el número de sumandos deberá ser al menos $r^{N/2}$. Luego, conforme el tamaño de la imagen $N$ aumenta, el número de parámetros del modelo \textit{CP} crece exponencialmente. Y cuando el número de canales $M$ aumenta, el número de paráemtros del modelo \textit{CP} crece de forma potencial.
 
-    Casi todos los tensores que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$.
+A partir de este teorema, obtenemos el corolario, que es el segundo resultado principal en nuestro trabajo:
 
-\end{observacion}
+\begin{corolario}[Incapacidad del modelo \textit{CP} para aproximar eficientemente el modelo \textit{HT}] \label{corol:corol_principal}
 
-\begin{observacion}
-    $\mathcal{A}^y$ claramente es realizable, por ser el resultado de un modelo \textit{HT}
-\end{observacion}
+    Dado un conjunto de funciones de representación linealmente independientes
 
-\begin{observacion}
+    \begin{equation}
+        \conjunto{f_{\theta_d}: \; d \in \deltaset{M}}
+    \end{equation}
 
-    Que $\mathcal{A}^y$ tenga rango \textit{CP} igual a $r^{N/2}$ implica que en la ecuación \eqref{eq:cp_decomp}, el número de sumandos deberá ser al menos $r^{N/2}$. Luego, conforme el tamaño de la imagen $N$ aumenta, el número de parámetros del modelo \textit{CP} crece exponencialmente. Conforme el número de canales $M$ de la imagen crece, el número de parámetros del modelo \textit{CP} crece pero de forma potencial.
-
-\end{observacion}
-
-A partir de este teorema, obtenemos el siguiente corolario:
-
-\begin{corolario}[Darle nombre] \label{corol:corol_principal}
-
-Dado un conjunto de funciones de representación $\{f_{\theta_d}: d \in \deltaset{M} \}$ linealmente independientes, aleatorizando los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua, induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando la compartición de coeficientes en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
+     aleatorizar los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando la compartición de coeficientes en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
 
 \end{corolario}
-\todo{Este teorema está muy mal escrito en el \textit{paper}}
 
-Es decir, salvo un conjunto de medida nula, todos los tensores realizables por una descomposición \textit{HT} no pueden realizarse, ni siquiera aproximarse, por una descomposición \textit{CP} con menos de un número exponencial de parámetros.
+El teorema anterior nos afirmaba que casi todos los tensores realizables por una descomposición \textit{HT} no pueden realizarse eficientemente por un modelo \textit{CP}. El corolario añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
 
-El \customref{corol:corol_principal} introduce una mejora muy grande respecto a los trabajos previos. En estos, se aportan ejemplos de funciones realizables por el modelo \textit{HT} que no son realizables por un modelo \textit{CP} con un número de parámetros sustancialmente superior al número de parámetros del modelo \textit{HT}. Es decir, establecen la \textit{depth efficiency} de ejemplos concretos de funciones. Nuestro corolario establece la \textit{depth efficiency} casi por doquier.
+El corolario \customref{corol:corol_principal} introduce una mejora muy grande respecto a los trabajos previos. En estos, se aportan ejemplos de funciones realizables por el modelo \textit{HT} que no son realizables por un modelo \textit{CP} con un número de parámetros sustancialmente superior al número de parámetros del modelo \textit{HT}. Es decir, establecen la \textit{depth efficiency} de ejemplos concretos de funciones. Nuestro corolario establece la \textit{depth efficiency} casi por doquier.
 
-Estos resultados también mejoran los trabajos previos sobre análisis tensorial. El trabajo que introduce la descomposición \textit{HT} \cite{matematicas:descomposicion_ht} da ejemplos específicos de tensores realizables por el modelo \textit{HT} y no por un modelo \textit{CP} con un número exponencial de parámetros. Nuestro corolario indica que esto no ocurre en ejemplos aislados, sino en casi todos los tensores realizables por un modelo \textit{HT}.
+Estos resultados también mejoran los trabajos previos sobre análisis tensorial. El trabajo que introduce la descomposición \textit{HT} \cite{matematicas:descomposicion_ht} da ejemplos específicos de tensores realizables por el modelo \textit{HT} y no por un modelo \textit{CP} con un número exponencial de parámetros. Nuestro corolario indica que esto no ocurre únicamente en ejemplos aislados, sino en casi todos los tensores realizables por un modelo \textit{HT}.
 
 Teniendo en cuenta que cualquier tensor realizable por un modelo \textit{CP} puede ser realizado por un modelo \textit{HT} con un aumento polinomial del número de coeficientes (véase \customref{msubs:parametros_modelo_ht}), esto implica que la descomposición \textit{HT} es asintóticamente más eficiente que la \textit{CP}.
-\todo{Aquí no he definido lo que entendemos por eficiencia. Creo que sería \textit{depth efficiency}}
 
 \section{Lemas previos}
+% TODO -- seguir por aqui
 
 En esta sección introduciremos algunos resultados que serán usados en las demostraciones del teorema \customref{} y el corolario \customref{}. Empezamos con los siguientes resultados de teoría de la medida de Lebesgue:
 
