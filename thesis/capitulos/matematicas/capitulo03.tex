@@ -66,11 +66,17 @@ Por tanto, \eqref{eq:hipotesis_en_general} \textbf{define un modelo universal}, 
 
 \subsection{Elección de la familia de funciones de representación}
 
-Como hemos justificado, tenemos que escoger una familia de funciones de representación que sea numerable y además total. Las opciones más usadas en la práctica del aprendizaje automático son:
+Como hemos justificado, tenemos que escoger una familia paramétrica de funciones de representación que sea numerable y además total, es decir:
+
+\begin{equation}
+    \mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta, \; \# \Theta = \# \N }
+\end{equation}
+
+Las opciones más usadas en la práctica del aprendizaje automático son:
 
 \begin{enumerate}
     \item Wavelets
-    \item Gaussiana con matriz de covarianzas diagonal:
+    \item Funciones de base radial (RBF), en concreto, la Gaussiana con matriz de covarianzas diagonal:
 
         \begin{equation}
             f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
@@ -111,8 +117,11 @@ Usando este hecho, tomaremos $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2
 
 \end{observacion}
 
+\begin{observacion}
+    Usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$
+\end{observacion}
+
 \subsection{Representación de las funciones de puntuación} \label{sec:repr_funciones_puntuacion}
-\todo{Algunas cosas ya las he comentado en la sección anterior}
 
 Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
@@ -122,13 +131,11 @@ Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
 Explicamos ahora algunos detalles sobre esta ecuación, que será central en nuestro trabajo.
 
-En primer lugar, usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$
-
 Las funciones $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ son las \textbf{funciones de representación}. Cada una de estas funciones se selecciona de una familia paramétrica
 
-$$\mathcal{F} = \{ f_{\theta}: \R^s \to \R / \theta \in \Theta \}$$
+$$\mathcal{F} = \{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta \}$$
 
-Algunas funciones de representación usuales son:
+Algunas funciones de representación usuales en la práctica son:
 
 \begin{itemize}
     \item \textit{Wavelets}
@@ -138,42 +145,47 @@ Algunas funciones de representación usuales son:
 
 El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumatoria en \eqref{eq:puntuacion_general}, es claro que tiene orden $N$ y dimensión $M$ en cada modo. Es decir, $\mathcal{A} \in \espaciotensores{N}{M}$.
 
-La tarea de aprendizaje ahora será aprender los valores de los parámetros $\theta_1, \ldots, \theta_M$ y los valores de los tensores de coeficientes $\mathcal{A}^1, \ldots, \mathcal{A}^Y$.
+Por lo tanto, la tarea de aprendizaje consistirá en optimizar los valores de los parámetros $\theta_1, \ldots, \theta_M$ y los valores de los tensores de coeficientes $\mathcal{A}^1, \ldots, \mathcal{A}^Y$.
 
 \begin{observacion}
+    Por lo comentado previamente, estamos trabajando con un conjunto de funciones de representación $\conjunto{f_d: \; d \in \deltaset{M}}$ total y linealmente independiente. Por tanto, el conjunto de funciones producto punto a punto también será total y linealmente independiente (\customref{prop:conservacion_totalidad_indp_lineal_func_prod}):
 
-    Estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de representación $h_y, y \in \mathcal{Y}$, lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$.
+    \begin{equation}
+        \conjunto{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\nv{x_i}): \dspace d_i \in \deltaset{M} \dspace \forall i \in \deltaset{N} }
+    \end{equation}
 
 
-    Notar además que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\nv{x_i}$ solo participan en el productorio que involucra computar $f_{\theta_{d_i}}(\mathbf{x_i})$.
-
-    Por tanto, aunque esto se corresponda más con el posterior diseño de las redes neuronales que vamos a realizar, podemos considerar como paso inicial, compartido en los dos modelos que proponemos, el cómputo de los valores:
-
-    $$\{f_{\theta_d}(\nv{x_i}) / d \in \deltaset{M},\ i \in \deltaset{N} \}$$
-
-    Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los valores $\nv{x_i}$ para nada más. Con esto, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores. Podemos considerar dicha capa como una \textbf{primera capa convolucional} con $M$ canales, a la que llamaremos \textbf{capa de representación}.
-
-    Y como ya hemos comentado, estamos usando las mismas funciones de representación para las $Y$ funciones de puntuación. Por tanto, fijados los parámetros $\theta_i$, en todas las funciones de puntuación la capa de representación será la misma.
+    Sabemos entonces que esta familia de funciones actuará como una \entrecomillado{base} del espacio $L^2((\R^s)^N)$. Y por lo tanto podemos pensar que el tensor $\mathcal{A}^y$ nos da los coeficientes de la función de puntuación $h_y$ en dicha \entrecomillado{base}.
 \end{observacion}
 
 \begin{observacion}
-    Sabemos, por lo comentado en \customref{sec:justificacion_func_repr}, que al trabajar con \textit{wavelets}, \textit{RBFs} y neuronas, podemos extraer un conjunto numerable de funciones que sea total y linealmente independiente. También gracias a \customref{sec:justificacion_func_repr}, que por tanto el siguiente espacio de funciones es total y linealmente independiente:
-    \todo{Tengo que mirar esto bien. Creo que aquí es cuando discuten el valor de $M$ para saber que me vale con un subconjunto finito de funciones de representación. \textbf{MIRAR BIEN}}
-
-    $$\{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\nv{x_i}) \dspace / \dspace d_i \in \deltaset{M} \dspace \forall i \in \deltaset{N}\}$$
-
-    Por tanto, actúa de forma parecida a una base de un espacio vectorial. Teniendo en cuenta este comportamiento similar, podemos pensar que el tensor $\mathcal{A}^y$ nos da los coeficientes de la función de puntuación $h_y$ en dicha \entrecomillado{base}.
-
-    \todo{Tengo que desarrollar bien esa sección para justificar todas estas cosas que estoy diciendo}
+    Como $\mathcal{A} \in \espaciotensores{N}{M}$, tenemos que optimizar el valor de $M^N$ valores reales a través del proceso de aprendizaje. Esto supone un reto, que \textbf{motiva el uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje del tensor de coeficientes sea más factible.
 \end{observacion}
 
-\begin{observacion}
-    Como ya sabemos, como $\mathcal{A} \in \espaciotensores{N}{M}$, tenemos que optimizar el valor de $M^N$ valores reales a través del proceso de aprendizaje. Esto supone un reto, que \textbf{motiva el uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje del tensor de coeficientes sea más factible.
-    \todo{Tengo que comentar en la introducción que el número de elementos de un tensor N, M es M elevado a N}
-\end{observacion}
+\subsection{Capa de representación}
 
-% Ejemplo de la pagina 58 de mis notas
-\begin{ejemplo}[Función de puntuación sencilla] \label{ejemplo:funcion_puntuacion}
+En \eqref{eq:puntuacion_general} estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de puntuación $h_y$. Lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$.
+
+Notar además que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\nv{x_i}$ solo participan en el productorio que involucra computar $f_{\theta_{d_i}}(\mathbf{x_i})$.
+
+Por tanto, podemos considerar un paso inicial, compartido en los dos modelos que proponemos, el cómputo de los valores:
+
+$$\{f_{\theta_d}(\nv{x_i}): \; d \in \deltaset{M},\ i \in \deltaset{N} \}$$
+
+Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los valores $\nv{x_i}$ para nada más. Con esto, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores. Podemos considerar dicha capa como una \textbf{primera capa convolucional} con $M$ canales, a la que llamaremos \textbf{capa de representación}. Por tanto, cada parche de entrada $\nv{x_i} \in \R^s$ acaba siendo representando por un descriptor de longitud $M$.
+
+Y como ya hemos comentado, estamos usando las mismas funciones de representación para las $Y$ funciones de puntuación. Por tanto, fijados los parámetros $\theta_i$, en todas las funciones de puntuación la capa de representación será la misma.
+
+El siguiente diagrama muestra gráficamente cómo actúa la capa de representación, calculando los $N \cdot M$ coeficientes reales que componen dicha capa:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{matematicas/computo_capa_representacion}
+    \caption{Ejemplo gráfico sobre cómo actúa la capa de representación. A partir de $N$ parches en $\R^s$, acabamos con $N \cdot M$ coeficientes reales}
+\end{figure}
+
+
+\subsection{Ejemplo de cómputo} \label{ejemplo:funcion_puntuacion}
 
 Supongamos que trabajamos con $N = 3, M = 2$. En este caso, una imagen de entrada se compone de los vectores $\nv{x_1}, \nv{x_2}, \nv{x_3} \in \R^s$ (no estamos interesados en el valor de $s \in \N$). Y tenemos dos funciones de representación $f_1, f_2: \R^s \to \R$.
 
@@ -200,10 +212,7 @@ Y con esto ya podemos expresar nuestra función de puntuación:
 
 Queda claro que el tensor $\mathcal{A}^y$ contiene los coeficientes que realizan una combinación lineal sobre todos los posibles productos de nuestros $N \cdot M$ valores reales de la capa de representación
 
-\end{ejemplo}
-
 \section{Resumen}
-\todo{Mal nombre. Sección muy importante porque deja claro el estado en el que nos encontramos en los dos modelos que trabajamos más adelante}
 
 En resumen, buscamos resolver una tarea de clasificación. Es decir, buscamos clasificar imágenes en una de las etiquetas $\mathcal{Y} := \{1, \ldots, Y\} = \deltaset{Y}$.
 
@@ -218,12 +227,3 @@ Al disponer de $M$ funciones de representación, cada vector $\nv{x_i}$ acabará
 Para resolver la tarea de clasificación, buscamos aprender $Y$ funciones de puntuación $h_y$. Para ello, tomamos los $N \cdot M$ coeficientes resultado de tomar $N$ descriptores de longitud $M$. La función de puntuación $h_y$ es el resultado de combinar linealmente los $M^N$ posibles productos de los $N \cdot M$ coeficientes. La combinación lineal se describe con los coeficientes de $\mathcal{A}^y \in \espaciotensores{N}{M}$. Todo esto quedó claro en \customref{ejemplo:funcion_puntuacion}.
 
 Las dos arquitecturas que introducimos más adelante son el resultado de factorizar el tensor de coeficientes $\mathcal{A}^y$ con una descomposición u otra. Ambas incorporan conceptos claves en la práctica del aprendizaje automático, como la localidad, compartición de coeficientes y \textit{pooling}.
-
-El siguiente diagrama muestra el primer paso, que es computar los $N \cdot M$ coeficientes reales que componen la capa de presentación:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{matematicas/computo_capa_representacion}
-    \caption{}
-\end{figure}
-\todo{Hacer con tikz o con draw.io. Dar una caption apropiada. Quizas en un diagrama escribir todo el proceso}
