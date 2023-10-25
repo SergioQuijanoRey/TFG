@@ -36,10 +36,9 @@ Estos resultados también mejoran los trabajos previos sobre análisis tensorial
 
 Teniendo en cuenta que cualquier tensor realizable por un modelo \textit{CP} puede ser realizado por un modelo \textit{HT} con un aumento polinomial del número de coeficientes (véase \customref{msubs:parametros_modelo_ht}), esto implica que la descomposición \textit{HT} es asintóticamente más eficiente que la \textit{CP}.
 
-\section{Lemas previos}
-% TODO -- seguir por aqui
+\section{Lemas previos} \label{sec:lemas_previos}
 
-En esta sección introduciremos algunos resultados que serán usados en las demostraciones del teorema \customref{} y el corolario \customref{}. Empezamos con los siguientes resultados de teoría de la medida de Lebesgue:
+En esta sección introduciremos algunos resultados que serán usados en las demostraciones del teorema \customref{teorema:teorema_principal_especificacion} y el corolario \customref{corolario:corolario_principal_concreto}. Empezamos con los siguientes resultados de teoría de la medida de Lebesgue:
 
 \begin{lema}[Propiedades fundamentales de la medida] \label{lema:prop_fundamentales_medida} Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
 
@@ -55,7 +54,7 @@ Usaremos la siguiente \textbf{matrización} de un tensor:
 
 \begin{definicion}[Matrización de un tensor]
 
-Sea $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ un tensor de orden $N$ y dimensión $M_i, i \in \deltaset{N}$ en cada modo. Por simplicidad, supondremos que el orden del tensor es par. Denotaremos por $[\mathcal{A}]$ a la \textbf{matrización} del tensor $\mathcal{A}$. $[\mathcal{A}]$ es una matriz donde las filas corresponden a modos impares del tensor, y las columnas corresponden a los modos pares. Por lo tanto, $[\mathcal{A}]$ tiene $M_1 \cdot M_3 \cdot \ldots \cdot M_{N-1}$ filas y $M_2 \cdot M_4 \cdot \ldots \cdot M_N$ columnas. Asignaremos el valor $\mathcal{A}_{d_1, \ldots, d_N}$ en $[\mathcal{A}]$ en la posición:
+Sea $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ un tensor de orden $N$ y dimensión $M_i$ en cada modo $i \in \deltaset{N}$. Por simplicidad, supondremos que el orden del tensor es par. Denotaremos por $[\mathcal{A}]$ a la \textbf{matrización} del tensor $\mathcal{A}$, que será una matriz donde las filas corresponden a modos impares del tensor, y las columnas corresponden a los modos pares. Por lo tanto, $[\mathcal{A}]$ tiene $M_1 \cdot M_3 \cdot \ldots \cdot M_{N-1}$ filas y $M_2 \cdot M_4 \cdot \ldots \cdot M_N$ columnas. Asignaremos el valor de $\mathcal{A}_{d_1, \ldots, d_N}$ en $[\mathcal{A}]$ en la posición:
 
 \begin{itemize}
     \item Fila $1 + \sum_{i = 1}^{N/2} (d_{2i - 1} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j - 1}$
@@ -64,7 +63,7 @@ Sea $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$ un tensor de orden $N$ y
 
 \end{definicion}
 
-Con esto, tenemos que saber cómo se comporta la matrización con el producto tensorial. Esto lo introduce la siguiente proposición:
+Queremos saber cómo se comporta la matrización con el producto tensorial. Para ello, será fundamental la siguiente herramienta:
 
 \begin{definicion}[Producto de Kronecker]
 
@@ -116,9 +115,9 @@ Sean las siguientes matrices:
     El anterior ejemplo nos muestra cómo con el producto de Kronecker podemos operar dos matrices cualesquiera, independientemente de sus dimensiones.
 \end{observacion}
 
-Vemos ahora tres propiedades fundamentales:
+Vemos ahora tres propiedades fundamentales que tratan sobre la matrización, producto de Kronecker y el producto tensorial
 
-\begin{proposicion}[Propiedades fundamentales] Las siguientes afirmaciones son ciertas:
+\begin{proposicion}[Propiedades fundamentales de la matrización y producto de Kronecker] Las siguientes afirmaciones son ciertas:
 
     \begin{enumerate}
         \item Matrización y producto tensorial: Sean $\mathcal{A}, \mathcal{B}$ dos tensores. Entonces se verifica que $[\mathcal{A} \otimes \mathcal{B}] = [\mathcal{A}] \odot [\mathcal{B}]$ \label{prop:prop_fundamentales_primera}
@@ -130,6 +129,8 @@ Vemos ahora tres propiedades fundamentales:
 
 \begin{observacion} A partir de \customref{prop:prop_fundamentales_primera} es directo ver que el producto de Kronecker verifica las mismas propiedades que el producto tensorial (véase \customref{prop:tensores_propiedades}).
 \end{observacion}
+
+La siguiente proposición será clave a la hora de desarrollar nuestras demostraciones:
 
 \begin{proposicion}[Rango matricial de la descomposición \textit{CP}] \label{prop:rango_matricial_descomp_cp}
 
@@ -166,6 +167,8 @@ Vemos ahora tres propiedades fundamentales:
     \todo{No estoy explicando qué propiedades fundamentales que acabo de introducir uso en la prueba}
 \end{proof}
 
+La siguiente proposición será necesaria para ver un detalle técnico en la prueba de \customref{lema:segundo_lema}:
+
 \begin{proposicion}
     Dado $r \in \R$, el siguiente conjunto es cerrado:
 
@@ -178,15 +181,13 @@ Vemos ahora tres propiedades fundamentales:
     \todo{Importante, es parte importante del trabajo}
 \end{proof}
 
+\section{Demostración del teorema principal}
 
-
-\section{Demostración de los teoremas}
-
-Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema.
+Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema principal, y por ello los presentamos aquí y no en \customref{sec:lemas_previos}. Veamos el primero:
 
 \begin{lema}[Rango de una matrización de la forma $A D B^T$] \label{lema:primer_lema}
 
-    Sean $M, N \in \N$, $\nv{x} \in \R^{2MN + N}$ y definimos tres funciones que llevan $\nv{x}$ a una matriz:
+    Sean $M, N \in \N$, $\nv{x} \in \R^{2MN + N}$ y definimos tres funciones $A, B, D$ que llevan $\nv{x}$ a una matriz de la siguiente forma:
 
     \begin{enumerate}
         \item $A(\nv{x}) \in \espaciomatrices{M}{N}$ contiene los primeros $MN$ elementos de $\nv{x}$
@@ -194,7 +195,7 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
         \item $D(\nv{x}) \in \espaciomatrices{N}{N}$ es una matriz diagonal con los últimos $N$ elementos de $\nv{x}$ en la diagonal
     \end{enumerate}
 
-    Definimos con ello la matriz $U(\nv{x}) := A(\nv{x}) D(\nv{x}) B(\nv{x})^T \in \espaciomatrices{M}{M}$. Entonces el conjunto de puntos $\nv{x} \in \R^{2MN + N}$ para los cuales el rango de $U(\nv{x})$ es distinto de $r := \min \{M, N\}$ tienen medida nula.
+    Definimos con ello la función $U$ que lleva $\nv{x}$ a la matriz $U(\nv{x}) := A(\nv{x}) D(\nv{x}) B(\nv{x})^T \in \espaciomatrices{M}{M}$. Entonces el conjunto de puntos $\nv{x} \in \R^{2MN + N}$ para los cuales el rango de $U(\nv{x})$ es distinto de $r := \min \{M, N\}$ tienen medida nula.
 
     El resultado sigue siendo cierto si consideramos $\nv{x} \in \R^{MN+N}$ y cambiamos la asignación de $B(x)$ por $B(x) := A(x)$.
 \end{lema}
@@ -206,13 +207,13 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
         rank(U(\nv{x})) \leq M \leq r := \min \{N, M \}; \dspace \forall \nv{x} \in \R^{2MN + N}
     \end{equation}
 
-    Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{cpd } x \in \R^{2MN + N}$. Definimos $U_r(x)$ como la submatriz superior izquierda $r \times r$ de $U(x)$.
+    Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{c.p.d. } x \in \R^{2MN + N}$. Definimos $U_r(x)$ como la submatriz superior izquierda $r \times r$ de $U(x)$.
 
     Si fuese $U_r(x)$ no singular para cierto $x$, claramente sabríamos que $r = rank(U_r(x)) \leq rank(U(x))$. Por tanto, buscamos probar que $U_r(x)$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{x \in \R^{2MN + N} : det(U_r(x)) = 0 }$ tiene medida nula.
 
     Para ver esto tenemos en cuenta que $det(U_r(\nv{x}))$ es un polinomio con entradas en $x \in \R^{2MN + N}$. Por \customref{lema:prop_fundamentales_medida} sabemos que entonces o bien es el polinomio idénticamente nulo o bien el conjunto de sus ceros tiene medida nula. Basta ver por tanto que no es el polinomio idénticamente nulo.
 
-    Para ello basta ver que $\exists \nv{x_0} \in \R^{2MN + N}$ de forma que $det(U_r(\nv{x})) \neq 0$. Para ello, tomamos $x_0$ de forma que $D(x_0) = \mathbb{I}_d$ y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0}), B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. En esta situación tenemos:
+    Para ello es suficiente probar que $\exists \nv{x_0} \in \R^{2MN + N}$ con el que se verifique que $det(U_r(\nv{x})) \neq 0$. Tomamos $x_0$ de forma que $D(x_0) = \mathbb{I}_d$ y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0}), B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. Por cómo definimos las matrices $A(\nv{x})$, $B(\nv{x})$ y $D(\nv{x})$, es trivial realizar esta elección de $\nv{x_0}$. En esta situación tenemos:
 
     \begin{equation}
         \begin{split}
@@ -231,7 +232,7 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
                 0 \\
                 \hline
                 \mathbb{I}d_{r \times r}
-            \end{pmatrix}{N \times M} = \ldots \\
+            \end{pmatrix}_{N \times M} = \ldots \\
             \ldots &= \begin{pmatrix}
                 \mathbb{I}d_{r \times r} & \vline & 0 \\
             \end{pmatrix}_{M \times N}
@@ -247,14 +248,14 @@ Necesitaremos probar dos lemas que serán fundamentales en la prueba del teorema
     Por tanto, es claro que
 
     \begin{equation}
-        det(U_r(\nv{x_0})) = det(\mathbb{I}d_M) = 1 \neq -1
+        det(U_r(\nv{x_0})) = det(\mathbb{I}d_M) = 1 \neq 0
     \end{equation}
 
     como buscábamos probar.
-    \todo{No he visto la parte en la que $Ax = Bx$}
+    \todo{No he visto el caso en la que $A(x) = B(x)$}
 \end{proof}
 
-Veamos ahora el segundo lema:
+Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
 \begin{lema} \label{lema:segundo_lema}
     Sean $p$ funciones continuas de $\R^d$ a $\espaciomatrices{M}{N}$, que llevan un punto $\nv{y} \in \R^d$ a las matrices $A_1(\nv{y}), \ldots, A_p(\nv{y})$. Supongamos que con estas funciones el siguiente conjunto tiene medida nula:
@@ -267,12 +268,12 @@ Veamos ahora el segundo lema:
 
     \begin{equation}
         \begin{split}
-            A: \R^P \times R^d &\to \espaciomatrices{M}{N} \\
-            (x, y) &\mapsto \sum_{i = 1}^p x_i A_i(\nv{y})
+            A: \R^P \times \R^d &\to \espaciomatrices{M}{N} \\
+            (\nv{x}, \nv{y}) &\mapsto \sum_{i = 1}^p x_i A_i(\nv{y})
         \end{split}
     \end{equation}
 
-    Entonces el conjunto de puntos $(x, y) \in \R^p \times \R^d$ para los cuales $A(x, y) < r$ forman un conjunto de medida nula
+    Entonces el conjunto de puntos $(\nv{x}, \nv{y}) \in \R^p \times \R^d$ para los cuales $A(\nv{x}, \nv{y}) < r$ forman un conjunto de medida nula
 \end{lema}
 
 \begin{proof}
@@ -285,7 +286,7 @@ Veamos ahora el segundo lema:
 
     y lo que buscamos es probar que tiene medida nula.
 
-    Como $A(x, y)$ es continua, y $\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r}$ es cerrado, entonces sabemos que $S$ es cerrado, y por tanto, medible.
+    Como $A(x, y)$ es continua, y hemos probado que $\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r}$ es cerrado, entonces sabemos que $S$ es cerrado, y por tanto, medible.
 
     Ahora buscamos calcular la medida de $S$. Empezamos definiendo, para cada $y \in \R^d$, el siguiente conjunto marginal:
 
@@ -293,11 +294,15 @@ Veamos ahora el segundo lema:
         S^{\nv{y}} := \conjunto{x \in \R^p: rank(A(\nv{x}, \nv{y})) < r} \subseteq \R^p
     \end{equation}
 
-    Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier. Para ello definimos también
+    Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier, porque en tal caso $S \subseteq S^{\nv{y}} \times \R^d$ siendo $S^{\nv{y}} \times \R^d$ de medida nula y podemos aplicar el segundo apartado de \customref{lema:prop_fundamentales_medida}. Para ello definimos también
 
     \begin{equation}
         \mathcal{C} := \conjunto{\nv{y} \in \R^d: rank(A_i(y)) < r, \forall i \in \deltaset{p}}
     \end{equation}
+
+    % TODO -- seguir por aquí
+    La idea de este conjunto es
+    \todo{Definir la idea de este conjunto. En el papel de JMeri daba una explicación muy buena de este}
 
     Por las hipótesis del lema, sabemos que $\mathcal{C}$ tiene medida nula. Luego queda ver que para $\nv{y_0} \in S - \mathcal{C}$ el conjunto $S^{\nv{y_0}}$ tiene medida nula.
 
@@ -549,7 +554,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema:
 
 Estamos ya en condiciones de enunciar el corolario:
 
-\begin{corolario}
+\begin{corolario}[Incapacidad del modelo \textit{CP} para aproximar eficientemente el modelo \textit{HT}] \label{corolario:corolario_principal_concreto}
     Dado un conjunto de funciones de representación $\conjunto{f_{\theta_d}: d \in \deltaset{M}}$ linealmente independientes, aleatorizar los pesos del modelo \textit{HT} con una distribución de probabilidad continua induce una función de probabilidad $h_y$ que, con probabilidad uno, no puede ser aproximada arbitrariamente bien (en el sentido $L^2$ ) por un modelo \textit{CP} con menos de $r := \min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. El resultado se mantiene aunque forcemos la compartición de parámetros en el modelo \textit{HT}, dejando al modelo \textit{CP} en su forma general.
 \end{corolario}
 
