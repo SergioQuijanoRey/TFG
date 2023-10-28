@@ -178,7 +178,29 @@ La siguiente proposición será necesaria para ver un detalle técnico en la pru
 \end{proposicion}
 
 \begin{proof}
-    \todo{Importante, es parte importante del trabajo}
+    Defino $\zeta := \conjunto{M \in \espaciomatrices{M}{N}: \; rank(M) < r}$ y busco probar que todas las sucesiones de elementos de $\zeta$ que convergen lo hacen a un elemento de $\zeta$. Es decir
+
+    \begin{equation}
+        \begin{split}
+            \conjunto{M_n}_{n \in \N} \subseteq \zeta \\
+            \conjunto{M_n} \to M \in \espaciomatrices{M}{N} \\
+        \end{split}
+        \then M \in \zeta
+    \end{equation}
+
+    Sea $A_n$ un menor cualquiera de orden $r$ de $M_n$. Sea $A$ el menor de orden $r$ de $M$ asociado a las mismas entradas que el orden que hemos tomado en $M_n$. Entonces es claro que
+
+    \begin{equation}
+        \conjunto{A_n} \to A
+    \end{equation}
+
+    Como el determinante es una función continua, es claro entonces que
+
+    \begin{equation}
+        \conjunto{0}_{n \in \N} = \conjunto{det(A_n)} \to det(A)
+    \end{equation}
+
+    Y con ello, hemos probado que $det(A) = 0$. Como podemos hacer esto con todos los posibles menores de orden $r$, hemos probado que $M$ tiene rango menor que $r$, y por tanto $M \in \zeta$.
 \end{proof}
 
 \section{Demostración del teorema principal}
