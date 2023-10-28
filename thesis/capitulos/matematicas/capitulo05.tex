@@ -577,14 +577,14 @@ Estamos ya en condiciones de probar el corolario fundamental de este trabajo:
 
     En concreto, habíamos encontrado constantes $Rank^{HT}, Rank^{CP} \in \N$ con $Rank^{HT} > Rank^{CP}$ de forma que el modelo \textit{HT} tenía rango mayor o igual que $Rank^{HT}$ mientras que el modelo \textit{CP} tenía rango menor o igual que $Rank^{CP}$.
 
-    Usando este hecho, aplicamos el \customref{lema:lema_previo_corolario}:
+    Usando este hecho, aplicamos el lema \customref{lema:lema_previo_corolario}:
 
     \begin{itemize}
         \item Considero como $\mathcal{A}^*$ el tensor de coeficientes generado por el modelo \textit{HT}. Por tanto, $h(\mathcal{A}^*)$ es la función de puntuación que dicho modelo implementa como una red profunda
         \item Considero como $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ el conjunto de tensores generados por un modelo \textit{CP} de tamaño $Z < \min \conjunto{r_0, M}^{\frac{N}{2}}$
     \end{itemize}
 
-    El teorema \customref{teorema:teorema_principal_especificacion} nos dice que con probabilidad 1 que $\mathcal{A}^*$ no puede ser generado por un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. Luego $\mathcal{A}^* \notin \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$.
+    El teorema \customref{teorema:teorema_principal_especificacion} nos dice con probabilidad 1 que $\mathcal{A}^*$ no puede ser generado por un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. Luego $\mathcal{A}^* \notin \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$.
     \todo{Relacionar el \entrecomillado{con probabilidad 1} con que nuestro teorema habla de medida nula}
 
     Además, ya sabemos que $rank([\mathcal{A}^\lambda]) < \frac{N}{2} \leq rank([\mathcal{A}^*]), \; \forall \lambda \in \Lambda$.
@@ -595,14 +595,13 @@ Estamos ya en condiciones de probar el corolario fundamental de este trabajo:
         d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}^\lambda)) \geq \epsilon_0, \; \forall \lambda \in \Lambda
     \end{equation}
 
-    Por tanto, no podemos aproximar arbitrariamente bien, estamos limitados por la constante $\epsilon_0$.
+    Por tanto, no podemos aproximar arbitrariamente bien, estamos limitados por la constante $\epsilon_0$. Es decir, no es cierto que dada $h_y$ inducida al tomar coeficientes aleatorios en un modelo \textit{HT}, podamos aproximar arbitrariamente bien con un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}} = r^{\frac{N}{2}}$ canales en la capa oculta.
 
-    Es decir, no es cierto que dada $h_y$ inducida al tomar coeficientes aleatorios en un modelo \textit{HT}, podamos aproximar arbitrariamente bien con un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}} = r^{frac{N}{2}}$. De ser cierto, $\forall \epsilon > 0, \exists \mathcal{A}_\epsilon \in \Omega$ de forma que $d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}_\epsilon)) < \epsilon$ donde
+    De ser cierto, tendríamos que $\forall \epsilon > 0$, $\exists \mathcal{A}_\epsilon \in \Omega$ de forma que $d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}_\epsilon)) < \epsilon$ donde
 
     \begin{equation}
-    \Omega := \conjunto{\mathcal{A} \in \espaciotensores{N}{M}: \mathcal{A} \text{ es realizable por un modelo \textit{CP} con menos de } r^{\frac{N}{2}} \text{ canales en la capa oculta}}
+        \Omega := \conjunto{\mathcal{A} \in \espaciotensores{N}{M}: \mathcal{A} \text{ es realizable por un modelo \textit{CP} con menos de } r^{\frac{N}{2}} \text{ canales en la capa oculta}}
     \end{equation}
 
     Pero acabamos de ver que esto es falso $\forall \epsilon < \epsilon_0$.
-    \todo{Hay que ver que el tamaño de un modelo \textit{CP} coincide con la desigualdad apropiada. Puede ser directo por la definición de \textit{CP rank}}
 \end{proof}
