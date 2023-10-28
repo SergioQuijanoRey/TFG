@@ -185,7 +185,7 @@ La siguiente proposición será necesaria para ver un detalle técnico en la pru
 
 Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema principal, y por ello los presentamos aquí y no en \customref{sec:lemas_previos}. Veamos el primero:
 
-\begin{lema}[Rango de una matrización de la forma $A D B^T$] \label{lema:primer_lema}
+\begin{lema}[Primer lema fundamental, rango de una matrización de la forma $A D B^T$] \label{lema:primer_lema}
 
     Sean $M, N \in \N$, $\nv{x} \in \R^{2MN + N}$ y definimos tres funciones $A, B, D$ que llevan $\nv{x}$ a una matriz de la siguiente forma:
 
@@ -257,7 +257,7 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
 
 Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
-\begin{lema} \label{lema:segundo_lema}
+\begin{lema}[Segundo lema fundamental] \label{lema:segundo_lema}
     Sean $p$ funciones continuas de $\R^d$ a $\espaciomatrices{M}{N}$, que llevan un punto $\nv{y} \in \R^d$ a las matrices $A_1(\nv{y}), \ldots, A_p(\nv{y})$. Supongamos que con estas funciones el siguiente conjunto tiene medida nula:
 
     \begin{equation}
@@ -366,20 +366,21 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
 \end{proof}
 
-Estamos ya en condiciones de probar el teorema principal del trabajo:
+Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos su enunciado y pasamos a ver la prueba:
 
-\begin{teorema}[Teorema principal] \label{teorema:teorema_principal_especificacion}
+\begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
+    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos la compartición de coeficientes en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 \end{teorema}
+
 \begin{proof}
     \textbf{Caso 1: sin compartición de coeficientes}
 
-    \todo{Escribir en algun lado que es suficiente con mostrar que las matrizaciones tienen cierto rango}
     Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$.
     \todo{En la página 7 del \textit{paper} dicen que por completitud, $r_L = Y$}
 
     Probamos por inducción en $l = 1, \ldots, L$ que, en casi todo punto respecto al conjunto $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$, el rango \textit{CP} de los tensores $\conjunto{\phi^{l, j, \gamma}: j \in \deltaset{N/2^l}, \gamma \in \deltaset{r_l}}$ es al menos $r^{2^{l/2}}$.
 
-    Por \customref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{2^{l/2}}$ en casi todo punto. Comenzamos la inducción viendo el \textbf{caso $l = 1$}.
+    Por \customref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{2^{l/2}}$ en casi todo punto (respecto al conjunto de los parámetros que definen el modelo \textit{HT}: $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$). Comenzamos la inducción viendo el \textbf{caso $l = 1$}.
 
     Por definición, tenemos que para unos valores concretos de $j, \gamma$:
 
@@ -395,7 +396,8 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
         \item $D \in \espaciomatrices{r_0}{r_0}$ con valores en la diagonal $a_{\alpha}^{1, j, \gamma}, \; \alpha \in \deltaset{r_0}$
     \end{itemize}
 
-    Con ello podemos escribir $[\phi^{1, j, \gamma}] = A D B^T$. Aplicando \customref{lema:primer_lema}, sabemos que $rank([\phi^{1, j, \gamma}]) = r := \min \conjunto{r_0, M}$ en casi todo punto, respecto al conjunto de todos los parámetros que conforman $\phi^{1, j, \gamma}$. Estos parámetros son:
+    Con ello podemos escribir $[\phi^{1, j, \gamma}] = A D B^T$. Aplicando \customref{lema:primer_lema}, sabemos que $rank([\phi^{1, j, \gamma}]) = r = \min \conjunto{r_0, M}$ en casi todo punto, respecto al conjunto de todos los parámetros que conforman $\phi^{1, j, \gamma}$. Estos parámetros son:
+    \todo{Hay que probar o desarrollar mejor esta matrización}
 
     \begin{itemize}
         \item $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$
@@ -403,7 +405,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
         \item $\conjunto{\nv{a^{1, j, \alpha}} : \alpha \in \deltaset{r_0}}$ donde $\nv{a^{1, j, \alpha}} := (a^{1, j, \alpha}_1, \ldots,  a^{1, j, \alpha}_{r_0})$
     \end{itemize}
 
-    Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando \customref{lema:prop_fundamentales_medida}.
+    Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo \textit{HT}, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando \customref{lema:prop_fundamentales_medida}.
 
     Ahora sabemos que $rank([\phi^{1, j, \gamma}]) = r$ en casi todo punto (respecto al conjunto de todos los parámetros que definen el modelo), para valores concretos de $j \in \deltaset{N/2}, \gamma \in r_1$. Veamos que esto implica que la igualdad sigue siendo válida para cualquier $j, \gamma$ de forma conjunta:
 
@@ -422,11 +424,11 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
     Usando la hipótesis de inducción sabemos que
 
     \begin{equation}
-        rank(\phi^{l-1, j', \gamma'}) \geq r^{2^{\frac{l - 1}{2}}},
-        \; \forall j' \in \deltaset{N/2^{l-1}}, \forall \gamma' \in \deltaset{r_{l-1}}
+        rank(\phi^{l-1, j, \gamma}) \geq r^{\frac{2^{l - 1}}{2}},
+        \; \forall j \in \deltaset{N/2^{l-1}}, \forall \gamma \in \deltaset{r_{l-1}}
     \end{equation}
 
-    en casi todo punto (respecto al conjunto de todos los parámetros del modelo). Fijados unos valores concretos para $j' \in \deltaset{N/2^{l-1}}$, $\gamma' \in \deltaset{r_{l-1}}$, tenemos que:
+    en casi todo punto (respecto al conjunto de todos los parámetros del modelo). Fijados unos valores concretos para $j \in \deltaset{N/2^{l-1}}$, $\gamma \in \deltaset{r_{l-1}}$, tenemos que:
 
     \begin{equation}
     \begin{split}
@@ -439,11 +441,10 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
 
     \begin{equation}
     \begin{split}
-        \substack{rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} cpd \\ rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} cpd} \then         rank(M_\alpha) \geq r^{\frac{2^{l-1}}{2}} \cdot r^{\frac{2^{l-1}}{2}} = r^{\frac{2^{l-1}}{2} + \frac{2^{l-1}}{2}} =
-        r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \\
+        \substack{rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} c.p.d. \\ rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} c.p.d.} \then         rank(M_\alpha) \geq r^{\frac{2^{l-1}}{2}} \cdot r^{\frac{2^{l-1}}{2}} = r^{\frac{2^{l-1}}{2} + \frac{2^{l-1}}{2}} =
+        r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \; \text{c.p.d.} \\
     \end{split}
     \end{equation}
-    \todo{Corregir los exponentes r elevado a algo antes de este punto. estos son los correctos creo}
 
     Ahora, usando la definición de $M_\alpha$, calculamos:
 
@@ -451,17 +452,15 @@ Estamos ya en condiciones de probar el teorema principal del trabajo:
         [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot M_\alpha
     \end{equation}
 
-    Como $\conjunto{M_\alpha}_\alpha$ no depende de $\nv{a^{l, j, \gamma}}$ porque solo codifica las entradas tensoriales del nivel anterior, podemos aplicar \customref{lema:segundo_lema}:
+    Como $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ porque solo codifica las entradas tensoriales del nivel anterior, podemos aplicar \customref{lema:segundo_lema}:
 
     \begin{equation}
-    \begin{split}
         \substack{
             rank(M_\alpha) \geq r^{\frac{2^l}{2}}\\
             \conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha \text{ continuo } \\
             \text{por ser productos tensoriales, sumas, matrizaciones}
-        } \then \\
-        \then [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \text{ tiene rango al menos } r^{\frac{2^l}{2}} \text{ c.p.d. }
-    \end{split}
+        } \then
+        [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \text{ tiene rango al menos } r^{\frac{2^l}{2}} \text{ c.p.d. }
     \end{equation}
 
     Como $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por doquier para $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$, podemos hacer un argumento análogo al anterior para extender esta propiedad a todo el espacio.
