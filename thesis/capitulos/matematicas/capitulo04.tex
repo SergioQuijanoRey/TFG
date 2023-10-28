@@ -92,14 +92,13 @@ Recordemos que en \customref{def:tensor_puro} hemos definido estos tensores como
 Es natural plantearse generalizar esta propiedad a tensores puros que vengan dados como producto tensorial de $N$ vectores. Pero de momento no tenemos una herramienta para comparar tensores de orden $N > 2$ con matrices. Esto motiva la introducción de la descomposición tensorial \textit{CP}:
 
 \begin{proposicion}[\textbf{Descomposición \textit{CP}}]
-    Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros, es decir:
+    Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros. Es decir, $\forall \mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$, $\exists Z \in \N$:
 
     \begin{equation} \label{eq:cp_decomp}
         \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \ldots \otimes \nv{v_i^{(N)}};
         \qquad \nv{v_i^{(k)}} \in \R^{M_k},
         \dspace \forall i \in \deltaset{Z},
         \dspace \forall k \in \deltaset{N},
-        \dspace Z \in \N
     \end{equation}
 \end{proposicion}
 
@@ -128,6 +127,10 @@ A la descomposición anterior se le llama \textbf{descomposición \textit{CANDEC
     \begin{equation}
         \lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}}
     \end{equation}
+\end{observacion}
+
+\begin{observacion}
+    Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
 \begin{proof} \label{proof:demostracion_cp_es_universal}
@@ -187,25 +190,21 @@ A la descomposición anterior se le llama \textbf{descomposición \textit{CANDEC
     como buscábamos. Y con esto es trivial ver nuestra descomposición:
 
     \begin{equation}
-        \mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \lambda_{i_1, \ldots, i_N} \cdot \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}
+        \mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \cdot \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}
     \end{equation}
 \end{proof}
 
 
 \begin{observacion}[Descomposición conjunta] \label{observacion:descomposicion_cp_conjunta}
 
-    Notar que en la demostración hemos fijado un cojunto de vectores independientemente del tensor que queremos descomponer. Es decir, hemos fijado el conjunto de vectores
-
-    % TODO -- seguir aqui
+    Notar que en la demostración hemos fijado un cojunto de vectores que solo depende del tensor a descomponer en cuanto que tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots M_N}$, entonces este conjunto de vectores no depende del tensor a descomponer. Es decir, podemos usar estos vectores para descomponer cualquier tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$. Este conjunto de vectores es:
 
     \begin{equation}
-        \conjunto{\delta_{j, N}: \; N \in \N}
+        \conjunto{\delta_{k, L}: \; L \in \deltaset{M}, \; k \in \deltaset{L}}
     \end{equation}
 
-\end{observacion}
+    donde $M := \max \conjunto{M_1, \ldots, M_N}$.
 
-\begin{observacion}
-    Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
 \begin{observacion}
@@ -247,54 +246,8 @@ Veamos que esta descomposición conjunta es universal:
 \end{proposicion}
 
 \begin{proof}
-    La idea de la demostración es muy sencilla, y será muy parecida a la realizada en \customref{proof:demostracion_cp_es_universal}. Tenemos que expresar un tensor arbitrario $\mathcal{A}$ de orden $N$ y dimensión $M$ en cada modo (es decir, de $M^N$ elementos) como una suma de $M^N$ elementos. Por tanto, en cada sumando, buscamos generar un único elemento del tensor y colocarlo en los índices apropiados. Es decir, cada sumando será un tensor de todo ceros salvo la entrada de la que nos ocupamos en esa iteración.
 
-    Para que la demostración sea más clara cambiaremos la forma de indexar la suma. En la proposición estamos usando un único índice que llega hasta $Z = M^N$. Esto es lo mismo que usar $N$ índices que lleguen hasta $M$, y así la sumatoria queda:
-
-    \begin{equation}
-        \mathcal{A} = \sum_{i_1 = 1, \ldots, i_N = 1}^M a_{(i_1, \ldots, i_N)} \cdot \nv{\omega^{(i_1, \ldots, i_N), 1}} \otimes \ldots \otimes \nv{\omega^{(i_1, \ldots, i_N), N}}
-    \end{equation}
-
-    Para llevar a cabo la idea de usar cada sumando para colocar un elemento de $\mathcal{A}$ en sus índices correctos, haremos que en cada sumando se verifique
-
-    \begin{itemize}
-        \item $a_{i_1, \ldots, i_N} = \mathcal{A}_{i_1, \ldots, i_N}$. Esto es inmediato y no necesita más explicación
-        \item $\nv{\omega^{(i_1, \ldots, i_N), 1}} \otimes \ldots \otimes \nv{\omega^{(i_1, \ldots, i_N), N}}$ genere el tensor en $\espaciotensores{N}{M}$ que sea cero en todas las entradas salvo en el índice $(i_1, \ldots, i_N)$, donde valdrá 1. Dicho tensor lo podemos denotar como  $\mathcal{B}^{(i_1, \ldots, i_N)}$
-    \end{itemize}
-
-    Ahora, veamos cómo podemos generar el tensor $\mathcal{B}^{(i_1, \ldots, i_N)}$ como producto tensorial de ciertos vectores. La propiedad fundamental que queremos que ese tensor cumpla es:
-
-    \begin{equation}
-        \mathcal{B}^{(i_1, \ldots, i_N)}_{j_1, \ldots, j_N} =
-        \begin{cases}
-            1 & \text{si } i_1 = j_1, \ldots, i_N = j_N \\
-            0 & \text{en otro caso}
-        \end{cases}
-    \end{equation}
-
-    Definimos $\nv{\delta_{i, N}}$ como el vector de longitud $N$, con todas las entradas nulas salvo la entrada de la posición $i$, en la que ponemos un uno. Por tanto, es claro que:
-
-    \begin{equation}
-        (\nv{\delta_{i, N}})_k =  \delta_{i, k}
-    \end{equation}
-
-    Definimos
-
-    \begin{equation}
-        \mathcal{B}^{(i_1, \ldots, i_N)} := \nv{\delta_{i_1, N}} \otimes \ldots \otimes \nv{\delta_{i_N, N}}
-    \end{equation}
-
-    y por tanto se verifica que:
-
-    \begin{equation}
-        \mathcal{B}^{(i_1, \ldots, i_N)}_{j_1, \ldots, j_N} = (\vec{\delta}_{i_1, N})_{j_1} \cdot \ldots \cdot (\vec{\delta}_{i_N, N})_{j_N} = \delta_{i_1, j_1} \cdot \ldots \cdot \delta_{i_N, j_N} =
-        \begin{cases}
-            1 & \text{si } i_1 = j_1, \ldots, i_N = j_N \\
-            0 & \text{en otro caso}
-        \end{cases}
-    \end{equation}
-
-    como buscábamos. Para concluir la demostración, fijamos el conjunto de vectores de forma que:
+    Esta demostración es prácticamente la misma que \customref{proof:demostracion_cp_es_universal}. Ahora tenemos que $M_1 = M_2 = \ldots = M_N = M$ y nuestro conjunto de vectores es:
 
     \begin{equation} \label{eq:cp_decomp_asignacion_vectores}
         \{\nv{\omega^{z, i}} \in \R^M : \; z \in \deltaset{Z}, i \in \deltaset{N} \} =
