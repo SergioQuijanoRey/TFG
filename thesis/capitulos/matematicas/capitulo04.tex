@@ -103,10 +103,6 @@ Es natural plantearse generalizar esta propiedad a tensores puros que vengan dad
     \end{equation}
 \end{proposicion}
 
-\begin{proof} \label{proof:demostracion_cp_es_universal}
-    \todo{Hacer esta demostración. Más adelante hacemos otra en el que vemos que podemos hacerlo con $M^N$ sumandos. Pero ahí usamos $\espaciotensores{N}{M}$, aquí las dimensiones varían!}
-\end{proof}
-
 A la descomposición anterior se le llama \textbf{descomposición \textit{CANDECOMP/PARAFAC}}, o abreviadamente, \textbf{descomposición \textit{CP}}
 
 \begin{observacion}
@@ -134,14 +130,87 @@ A la descomposición anterior se le llama \textbf{descomposición \textit{CANDEC
     \end{equation}
 \end{observacion}
 
+\begin{proof} \label{proof:demostracion_cp_es_universal}
+    Queremos descomponer el tensor $\mathcal{A}$ que tiene orden $N$ y dimensión $M_k$ en cada dimensión $k \in \deltaset{N}$. Por tanto, $\mathcal{A}$ tiene $M_1 \cdot M_2 \cdot \ldots \cdot M_N$ elementos. En base a esto, tomamos $Z = M_1 \cdot M_2 \cdot \ldots \cdot M_N$ y en cada sumando de la descomposición buscamos colocar un único coeficiente del tensor en su índice correspondiente.
+
+    Por tanto, en cada sumando buscamos encontrar vectores cuyo producto tensorial genere un tensor, de dimensiones adecuadas, con todas las entradas nulas salvo la entrada de la que nos ocupamos en esa iteración.
+
+    Para que la demostración sea más clara cambiaremos la forma de indexar la suma. En la proposición estamos usando un único índice que llega hasta $Z = M_1 \cdot \ldots \cdot M_N$. Esto es lo mismo que usar $N$ índices que lleguen hasta $M_k$, y así la sumatoria queda:
+
+    \begin{equation}
+        \mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \lambda_{i_1, \ldots, i_N} \cdot \nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \ldots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}
+    \end{equation}
+
+    Para llevar a cabo la idea de usar cada sumando para colocar un elemento de $\mathcal{A}$ en sus índices correctos, haremos que en cada sumando se verifique
+
+    \begin{itemize}
+        \item $\lambda_{i_1, \ldots, i_N} = \mathcal{A}_{i_1, \ldots, i_N}$. Esto es inmediato y no necesita más explicación
+        \item $\nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \ldots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}$ genere el tensor en $\R^{M_1 \times \cdots \times M_N}$ que sea cero en todas las entradas salvo en el índice $(i_1, \ldots, i_N)$, donde valdrá 1. Dicho tensor lo podemos denotar como  $\mathcal{B}^{(i_1, \ldots, i_N)}$
+    \end{itemize}
+
+    Ahora, veamos cómo podemos generar el tensor $\mathcal{B}^{(i_1, \ldots, i_N)}$ como producto tensorial de ciertos vectores. La propiedad fundamental que queremos que ese tensor cumpla es:
+
+    \begin{equation}
+        \mathcal{B}^{(i_1, \ldots, i_N)}_{j_1, \ldots, j_N} =
+        \begin{cases}
+            1 & \text{si } i_1 = j_1, \ldots, i_N = j_N \\
+            0 & \text{en otro caso}
+        \end{cases}
+    \end{equation}
+
+    Definimos $\nv{\delta_{i, N}}$ como el vector de longitud $N$, con todas las entradas nulas salvo la entrada de la posición $i$, en la que ponemos un uno. Por tanto, es claro que:
+
+    \begin{equation}
+        (\nv{\delta_{i, N}})_k =  \delta_{i, k} =
+        \begin{cases}
+            1 & \text{si } i = k \\
+            0 & \text{en otro caso}
+        \end{cases}
+    \end{equation}
+
+    Definimos
+
+    \begin{equation}
+        \mathcal{B}^{(i_1, \ldots, i_N)} := \nv{\delta_{i_1, M_1}} \otimes \ldots \otimes \nv{\delta_{i_N, M_N}}
+    \end{equation}
+
+    y por tanto se verifica que:
+
+    \begin{equation}
+        \mathcal{B}^{(i_1, \ldots, i_N)}_{j_1, \ldots, j_N} = (\vec{\delta}_{i_1, M_1})_{j_1} \cdot \ldots \cdot (\vec{\delta}_{i_N, M_N})_{j_N} = \delta_{i_1, j_1} \cdot \ldots \cdot \delta_{i_N, j_N} =
+        \begin{cases}
+            1 & \text{si } i_1 = j_1, \ldots, i_N = j_N \\
+            0 & \text{en otro caso}
+        \end{cases}
+    \end{equation}
+
+    como buscábamos. Y con esto es trivial ver nuestra descomposición:
+
+    \begin{equation}
+        \mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \lambda_{i_1, \ldots, i_N} \cdot \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}
+    \end{equation}
+\end{proof}
+
+
+\begin{observacion}[Descomposición conjunta] \label{observacion:descomposicion_cp_conjunta}
+
+    Notar que en la demostración hemos fijado un cojunto de vectores independientemente del tensor que queremos descomponer. Es decir, hemos fijado el conjunto de vectores
+
+    % TODO -- seguir aqui
+
+    \begin{equation}
+        \conjunto{\delta_{j, N}: \; N \in \N}
+    \end{equation}
+
+\end{observacion}
+
 \begin{observacion}
     Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
 \begin{observacion}
 
-    En la demostración, hemos tomado $Z = TODO$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
-    \todo{Escribir el valor de Z cuando hagamos la demostración}
+    En la demostración, hemos tomado $Z = M_1 \cdot \ldots \cdot M_N$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
 
     Esto motivará la siguiente definición.
 \end{observacion}
