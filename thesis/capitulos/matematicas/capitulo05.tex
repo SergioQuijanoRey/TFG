@@ -223,6 +223,8 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
 \end{lema}
 
 \begin{proof}
+    \textbf{Caso General}
+
     Sin pérdida de generalidad, supondré que $M \leq N$, luego $r = M$. Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ es claro que
 
     \begin{equation}
@@ -274,8 +276,20 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
     \end{equation}
 
     como buscábamos probar.
-    \todo{No he visto el caso en la que $A(x) = B(x)$}
+
+    \textbf{Caso específico}. Más adelante, usaremos este caso cuando estudiemos las modelizaciones imponiendo compartición de parámetros.
+
+    La asignación ahora es, dado $\nv{x} \in \R^{MN + N}$:
+
+    \begin{itemize}
+        \item $A(\nv{x})$ contiene los primeros $MN$ elementos de $\nv{x}$
+        \item $D(\nv{x})$ contiene los últimos $N$ elementos de $\nv{x}$ en la diagonal
+        \item $U(\nv{x}) := A(\nv{x}) \; D(\nv{x}) \; A(\nv{x})^T$
+    \end{itemize}
+
+    Es claro que $U(\nv{x}) \in \espaciomatrices{M}{M}$. A partir de esto, podemos repetir análogamente todo el razonamiento, y en el último paso tomar de forma todavía más sencilla $\nv{x_0} \in \R^{MN + N}$ para que $D(\nv{x}) = \mathbb{I}_d$ y que $A(\nv{x}) = (\delta_{i, j})_{i, j}$.
 \end{proof}
+
 
 Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
@@ -359,7 +373,9 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         \end{split}
     \end{equation}
 
-    Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con $[-n, n]^{p+d}$, además, tendrán medida finita. Aplicamos ahora el teorema de Fubini para desarrollar:
+    Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con $[-n, n]^{p+d}$, además, tendrán medida finita. Por tanto, la función indicadora sobre estos conjuntos medibles de medida finita será integrable \footnotemark. Y con ello, estamos en condiciones de aplicar ahora el teorema de Fubini para desarrollar:
+
+    \footnotetext{Porque claramente $\int |\mathbb{1}_{S_n}| = \int \mathbb{1}_{S_n} = \lambda(S_n) < \infty$ }
 
     \begin{equation}
         \begin{split}
@@ -377,8 +393,7 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         \item (2): hemos visto que si $\nv{y} \not\in \mathcal{C}$, entonces el conjunto $S^{y}$ tiene medida nula
     \end{itemize}
 
-    Y con ello hemos probado que $\int \mathbb{1}_{S_n} = 0$, sea cual sea el valor de $n \in \N$. Usamos ahora el \textbf{teorema de convergencia monótona} para calcular:
-    \todo{Comprobar explícitamente los supuestos del TCM}
+    Y con ello hemos probado que $\int \mathbb{1}_{S_n} = 0$, sea cual sea el valor de $n \in \N$. Es claro que, como $S$ es un conjunto medible, $\mathbb{1}_{S_n}$ es una sucesión de funciones medibles creciente, y por tanto, podemos aplicar el \textbf{teorema de convergencia monótona} para calcular:
 
     \begin{equation}
         \int \mathbb{1}_S = \int \lim_{n \to \infty} \mathbb{1}_{S_n} \encima{=}{T.C.M} \lim_{n \to \infty} \int \mathbb{1}_{S_n} = \lim_{n \to \infty} 0  = 0
