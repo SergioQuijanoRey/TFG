@@ -294,17 +294,22 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         S^{\nv{y}} := \conjunto{x \in \R^p: rank(A(\nv{x}, \nv{y})) < r} \subseteq \R^p
     \end{equation}
 
-    Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier, porque en tal caso $S \subseteq S^{\nv{y}} \times \R^d$ siendo $S^{\nv{y}} \times \R^d$ de medida nula y podemos aplicar el segundo apartado de \customref{lema:prop_fundamentales_medida}. Para ello definimos también
+    que también es medible.
+
+    Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier (respecto $\nv{y} \in \R^d$). Porque en tal caso, usando \customref{lema:prop_fundamentales_medida}, sabremos que:
+
+    \begin{enumerate}
+        \item $S^{\nv{y}} \times \R^d$ tiene medida nula para casi todo $\nv{y} \in \R^d$
+        \item $S$ tiene medida nula por ser $S \subseteq S^{\nv{y}} \times \R^d$
+    \end{enumerate}
+
+    Para probar que $S^{\nv{y}}$ tiene medida nula casi por doquier, usaremos el siguiente conjunto:
 
     \begin{equation}
-        \mathcal{C} := \conjunto{\nv{y} \in \R^d: rank(A_i(y)) < r, \forall i \in \deltaset{p}}
+        \mathcal{C} := \conjunto{\nv{y} \in \R^d: rank(A_i(\nv{y})) < r, \forall i \in \deltaset{p}}
     \end{equation}
 
-    % TODO -- seguir por aquí
-    La idea de este conjunto es
-    \todo{Definir la idea de este conjunto. En el papel de JMeri daba una explicación muy buena de este}
-
-    Por las hipótesis del lema, sabemos que $\mathcal{C}$ tiene medida nula. Luego queda ver que para $\nv{y_0} \in S - \mathcal{C}$ el conjunto $S^{\nv{y_0}}$ tiene medida nula.
+    que es el conjunto de funciones que aparece en el enunciado del lema, por lo que sabemos que $\mathcal{C}$ tiene medida nula. Si tomamos $\nv{y_0} \in \mathcal{C}$ es claro que $S^{\nv{y_0}} = \R^p$. Pero esto no supone un problema puesto que $\mathcal{C}$ es de medida nula. Queda ver qué pasa en $S - \mathcal{C}$, buscando que en dicho conjunto $S^{\nv{y_0}}$ tenga medida nula:
 
     \begin{equation}
         \begin{split}
@@ -312,15 +317,18 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         \end{split}
     \end{equation}
 
-    Sin pérdida de generalidad, supongo que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_o}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que
+    Sin pérdida de generalidad, supongo que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_o}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y_0})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que
 
     \begin{equation}
-        A(\nv{x}, \nv{y_0}) = \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0})
+    \begin{split}
+        A(\nv{x}, \nv{y_0}) &= \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0}) \then \ldots \\
+        \ldots \then det(A(\nv{x}, \nv{y_0})) &= det(A_1(\nv{y_0})) \neq 0
+    \end{split}
     \end{equation}
 
-    que no es singular, luego su determinante no se anula. Por tanto, usando \customref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
+    Por tanto, usando \customref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver. Con esto, hemos probado que la medida de $S^{\nv{y_0}}$ es nula.
 
-    Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar lo que buscamos. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
+    Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar que el conjunto $S$ tiene medida nula. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
 
     \begin{equation}
         \begin{split}
@@ -334,7 +342,7 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
     \begin{equation}
         \begin{split}
             \int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} &= \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} = \ldots \\
-            \ldots &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{y}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = \ldots \\
+            \ldots &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = \ldots \\
             \ldots &= 0 + 0 = 0
         \end{split}
     \end{equation}
@@ -344,7 +352,7 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
     \begin{itemize}
         \item (1): hemos visto que la medida del conjunto $\mathcal{C}$ es cero
-        \item (2): hemos visto que si $\nv{y} \in \R_n^d$, entonces el conjunto $S^{y}$ tiene medida nula
+        \item (2): hemos visto que si $\nv{y} \not\in \mathcal{C}$, entonces el conjunto $S^{y}$ tiene medida nula
     \end{itemize}
 
     Y con ello hemos probado que $\int \mathbb{1}_{S_n} = 0$, sea cual sea el valor de $n \in \N$. Usamos ahora el \textbf{teorema de convergencia monótona} para calcular:
