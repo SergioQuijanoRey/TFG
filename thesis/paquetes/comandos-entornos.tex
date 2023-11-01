@@ -26,11 +26,14 @@
 % == Mis comandos propios ==
 % ==============================================================================
 
-% Comando que uso para expresar el conjunto {1, ..., n}
+% Comando que uso para expresar el conjunto {1, ..., param_1}
 \newcommand{\deltaset}[1]{\Delta_{#1}}
 
+% Comando que uso para expresar el conjunto {param_1, ..., param_2}
+\newcommand{\doubledeltaset}[2]{\Delta_{#1}^{#2}}
+
 % Para hacer referencias con el numero y el nombre de lo que estoy referenciando
-\newcommand{\customref}[1]{''\ref{#1}, \nameref{#1}"}
+\newcommand{\customref}[1]{"\ref{#1}, \nameref{#1}"}
 
 % Espacio de matrices pxq
 \newcommand{\espaciomatrices}[2]{\mathbb{M}_{#1 \times #2}}
@@ -44,6 +47,9 @@
 \renewcommand{\qedsymbol}{$\customqed$}
 
 % Elementos con explicaciones encima:
+
+    % Para poner cualquier cosa encima de otra dada
+    \newcommand{\encima}[2]{\ensuremath{\stackrel{#2}{#1}}}
 
     % Igualdades
     \newcommand{\eqtext}[1]{\ensuremath{\stackrel{\text{#1}}{=}}}
@@ -71,7 +77,7 @@
 \DeclareMathOperator*{\MediumOtimes}{\text{\raisebox{0.25ex}{\scalebox{0.8}{$\bigotimes$}}}}
 \newcommand{\esptensores}[2]{\overset{#1} \MediumOtimes \R^{#2}}
 
-% Notacion para los vectores
+% (N)otacion para los (v)ectores => (nv)
 % En el paper usan negrita, pero yo quiero usar una flechita encima
 % Con este comand, si luego quiero cambiar la notación para los vectores (ie. volver
 % a usar la notacion del paper) el cambio es sencillo
@@ -88,3 +94,17 @@
 % Para añadir comentarios debajo o encima de elementos de una formula
 \newcommand{\comentardebajo}[2]{\underbrace{#1}_\textrm{#2}}
 \newcommand{\comentarencima}[2]{\overbrace{#1}^\textrm{#2}}
+
+% Comando para evitar que las captions de las subfiguras colisionen entre si
+\newcommand{\ajustarsubcaptions}{\captionsetup[subfigure]{width=0.9\textwidth}}
+
+% Comando para escribir conjuntos matematicos
+\newcommand{\conjunto}[1]{\{ #1 \}}
+
+% Para escribir union e interesccion
+\newcommand{\interseccion}{\bigcap}
+\newcommand{\union}{\bigcup}
+
+% Para hacer `\to` pero de forma larga, como con \longmapsto
+\newcommand{\longto}{\longrightarrow}
+

@@ -4,11 +4,6 @@
 % General TODO
 % [ ] Remove `dedicatoria.tex`, we already have `agradecimientos.tex`
 % [ ] Remove the use of apendixes, we are not using them yet
-% [ ] In first two chapters, some vectors are not well typed, that's to say,
-%     they're not in the form $\mathbf{v}$
-% [ ] Use \observacion command when doing remarks
-% TODO -- me quedo en la página 48 de mis notas
-% TODO -- me quedo en la página 6 del paper
 
 % Sergio Quijano Rey
 % Doble Grado Ingenieria Informatica y Matematicas, UGR
@@ -232,7 +227,7 @@
 
 % TODO -- hay que poner un titulo al trabajo
 % TODO -- hay que poner informacion de los tutores
-\newcommand{\miTitulo}{Título del trabajo\xspace}
+\newcommand{\miTitulo}{Estudio sobre la expresividad de las redes neuronales profundas y no profundas a través de análisis tensorial y reconocimiento facial invariante a la edad introduciendo una variante \textit{online} en \textit{Triplet Loss}\xspace}
 \newcommand{\miNombre}{Sergio Quijano Rey\xspace}
 \newcommand{\miGrado}{Doble Grado en Ingeniería Informática y Matemáticas}
 \newcommand{\miFacultad}{Facultad de Ciencias, Escuela Superior Ingeniería Informática y Telecomunicaciones}
@@ -287,7 +282,7 @@
     % Deja un espacio vertical en la parte superior
 	\bigskip
 
-    En esta primera parte del trabajo, introduciremos dos modelizaciones matemáticas muy cercanas a los modelos reales que se usan en la práctica del aprendizaje automático. Un modelo será no profundo (\entrecomillado{shallow})  y otro será profundo. Demostraremos que los modelos profundos son más eficientes que los modelos no profundos.
+    En esta primera parte del trabajo, introduciremos dos modelizaciones matemáticas muy cercanas a los modelos reales que se usan en la práctica del aprendizaje automático. Un modelo será no profundo (\entrecomillado{shallow}) y otro será profundo. La distinción entre los dos modelos viene dada por la descomposición tensorial que usamos para construir el tensor de coeficientes. Demostraremos que los modelos profundos son más eficientes que los modelos no profundos en la mayoría de los casos. Es más, demostraremos que los modelos no profundos no pueden aproximar de forma eficiente a los modelos profundos, en la mayoría de los casos.
 }
 \part{Primera parte}
 
@@ -295,13 +290,13 @@
 \input{capitulos/matematicas/capitulo02}
 \input{capitulos/matematicas/capitulo03}
 \input{capitulos/matematicas/capitulo04}
+\input{capitulos/matematicas/capitulo05}
 
 \setpartpreamble[c][0.75\linewidth]{
     % Deja un espacio vertical en la parte superior
 	\bigskip
 
-    En esta segunda parte del trabajo, introduciremos un nuevo método para computar el \entrecomillado{Triplet Loss}. Aplicaremos este nuevo método a una tarea de reconocimiento facial invariante a cambios de edad, y justificaremos por qué esta técnica parece no ser adecuada para resolver este problema
-    % \todo{Revisar esta brevísima introducción porque la escribo al principio. Igual cuando lleve más escrito este enfoque ha cambiado}
+    En esta segunda parte del trabajo, introduciremos un nuevo método para computar el \entrecomillado{Triplet Loss}. Aplicaremos este nuevo método a una tarea de reconocimiento facial invariante a cambios de edad, y justificaremos por qué esta técnica parece no ser adecuada para resolver este problema.
 }
 \cleardoublepage\part{Segunda parte}
 
@@ -311,6 +306,7 @@
 \input{capitulos/informatica/capitulo04}
 \input{capitulos/informatica/capitulo05}
 \input{capitulos/informatica/capitulo06}
+\input{capitulos/informatica/capitulo07}
 
 % -------------------------------------------------------------------
 % BACKMATTER

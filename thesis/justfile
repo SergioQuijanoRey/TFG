@@ -14,11 +14,17 @@ default:
 
 # Compiles the latex document
 compile:
-    # We run pdflatex this way so references work well
-    pdflatex "{{texfile}}"
-    bibtex "{{trim_end_match(texfile, '.tex')}}"
-    pdflatex "{{texfile}}"
-    pdflatex "{{texfile}}"
+    #!/usr/bin/env nu
+    try {
+        # We run pdflatex this way so references work well
+        pdflatex "{{texfile}}"
+        bibtex "{{trim_end_match(texfile, '.tex')}}"
+        pdflatex "{{texfile}}"
+        pdflatex "{{texfile}}"
+        notify-send "📃" "Latex compiled!"
+    } catch {
+        notify-send -u critical "📃" "Latex failed to compile!"
+    }
 
 # Compiles the project from zero
 clean_compile:
