@@ -56,20 +56,17 @@ En esta situación podemos calcular es lo que se conoce como \textbf{\textit{Ran
 
 Al final, sumamos los éxitos y dividimos por el tamaño de la base de datos, obteniendo el \textit{Rank@k accuracy}.
 
-\begin{observacion}
+No confudir este valor de $k$, que marca cuántas imágenes consultamos en cada \textit{query}, con el valor de $K$ que usamos en el \textit{P-K sampling}. No tienen nada que ver un parámetro con el otro.
+\todo{Estos párrafos creo que están muy fragmentados}
 
-    No confudir este valor de $k$, que marca cuántas imágenes consultamos en cada \textit{query}, con el valor de $K$ que usamos en el \textit{P-K sampling}. No tienen nada que ver un parámetro con el otro.
 
-\end{observacion}
+Hemos descrito el proceso usual de cómputo de esta métrica. Sin embargo, nosotros introducimos otra variante, a la que llamaremos \textbf{\textit{Local Rank@k accuracy}}. En esta variante, iteramos los datos en \textit{P-K batches}. Y con esto, las \textit{queries} las realizamos contra el \textit{P-K batch} y no contra toda la base de datos.
+\todo{Estos párrafos creo que están muy fragmentados}
 
-\begin{observacion}
+Esta variante la introducimos al intentar solucionar el mal comportamiento de los modelos durante el entrenamiento.
+\todo{Estos párrafos creo que están muy fragmentados}
 
-    Hemos descrito el proceso usual de cómputo de esta métrica. Sin embargo, nosotros introducimos otra variante, a la que llamaremos \textbf{\textit{Local Rank@k accuracy}}. En esta variante, iteramos los datos en \textit{P-K batches}. Y con esto, las \textit{queries} las realizamos contra el \textit{P-K batch} y no contra toda la base de datos.
-
-    Esta variante la introducimos al intentar solucionar el mal comportamiento de los modelos durante el entrenamiento.
-
-\end{observacion}
-
+\todo{En esta sección tenemos 10 párrafos. Redactar párrafos más extensos}
 
 \section{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
 
