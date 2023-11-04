@@ -1,8 +1,40 @@
-% !TeX root = ../../libro.tex
-% !TeX encoding = utf8
-
 \chapter{Introducción} \label{ich:introduccion}
 
+En la parte informática del presente trabajo buscamos resolver una \textbf{tarea de reconocimiento facial, con la particularidad de tratar la invarianza a cambios en la edad}, por sus siglas en inglés, \textit{AIFR}.
+
+El \textbf{reconocimiento facial} es un conjunto de \textbf{técnicas biométricas} que tratan de reconocer, buscar o comprobar  la identidad de un individuo a partir de información sobre su cara \cite{informatica:definicion_face_recognition}. Normalmente esta información viene en forma de imágenes de la cara (fotografías, vídeo o imagen en tiempo real), pero existen técnicas para trabajar con información tomada de otro tipo de sensores (detectores de profundidad, sensores de calor, ...) Estas técnicas tienen muchas áreas de aplicación, por mencionar algunas: videovigilancia, identificación de supuestos criminales, control de acceso a instalaciones, ... \cite{informatica:deep_fr_survey}. Además, obtener sistemas que realicen esta tarea es muy interesante por lo fácil que resulta desplegarlos en soluciones reales. Por ejemplo, colocando puestos de control que con una cámara controlen el acceso a un aeropuerto.
+
+Además de las dificultades usuales en el campo de la visión por computador (cambios en la iluminación, cambios en la posición relativa dentro de la imagen, cambios en las características de la cámara, ...) estas técnicas trabajan con \textbf{problemas específicos}, como cambios en la orientación de la cara, cambios en la expresión facial, distractores faciales (cambios en el corte de pelo, uso de gafas o gorros, uso de maquillaje), ...
+
+El \textbf{reconocimiento facial invariante a la edad o \textit{AIFR}} introduce como reto principal reconocer a una persona independientemente de las modificaciones que haya experimentado su rostro debido al paso del tiempo.
+
+Esto supone todavía \textbf{más dificultades específicas}, principalmente introducidas por cómo el \textbf{envejecimiento} afecta las características faciales \cite{informatica:aifr_survey}. En la \imgref{img:ejemplo_dificultad_aifr} quedan de manifiesto estas dificultades, en las que posteriormente profundizaremos.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_dificultad_aifr}
+    \caption{Ejemplo de datos con los que trabajamos en una tarea de \textit{AIFR}. Deja de manifiesto las dificultades específicas a las que nos enfrentamos. Principalmente cambios en las características de la cámara y los cambios faciales introducidos por el envejecimiento. Imagen extraída de \cite{informatica:aifr_survey}}
+    \label{img:ejemplo_dificultad_aifr}
+\end{figure}
+
+Estas técnicas pueden emplearse en la búsqueda de personas desaparecidas, identificación de supuestos criminales en casos en los que haya pasado mucho tiempo desde los sucesos investigados o que hayan cometido delitos en distintos momentos de su vida, verificación de documentos de identidad como pasaportes... \cite{informatica:aifr_survey}
+
+Para resolver las dificultades que este problema plantea las técnicas de \textit{deep learning} han surgido como el enfoque más prometedor. Otros enfoques clásicos han sido superados por técnicas de \textit{deep learning}, tanto en el área de reconocimiento facial \cite{informatica:deep_fr_survey} como en el área de \textit{AIFR} \cite{informatica:aifr_survey}. Algunas características de las redes profundas que las las hace interesantes para resolver este problema son:
+
+\begin{itemize}
+    \item Representación jerárquica de las \textit{features}: estos modelos son capaces de reconocer características de alto nivel sobre los rostros. Por tanto parece que serán capaces de realizar mejores razonamientos sobre estos tipos de datos
+    \item La extracción de características faciales se aprende a partir de los datos. No dependemos de un experto que diseñe los métodos para extraer estas características
+    \item Gracias al uso de grandes conjuntos de datos podemos aprender modelos mucho más expresivos que con otros métodos, como por ejemplo, comparación de características faciales diseñadas a mano (\textit{SURF} sobre características tipo \textit{SHIFT} \cite{informatica:libro_surf})
+\end{itemize}
+
+Aunque todavía no hemos introducido los fundamentos técnicos sobre los que se basa nuestro trabajo, cabe destacar que una parte fundamental de este trabajo es explorar cierta modificación técnica en una de las piezas de nuestra solución.
+
+\section{Descripción del problema}
+
+\section{Anterior introducción, borrar}
+\todo{Borrar esta sección!}
+
+% TODO -- borrar esto
 Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. Dentro de este problema, nos centraremos en resolver una tarea de \textbf{retrieval}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \cite{informatica:principal}. Esta técnica introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Esto evita tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples. Estudiaremos esta técnica detalladamente en \customref{isec:batching}.
 
 Esta situación plantea una serie de \textbf{problemas}:
@@ -300,4 +332,3 @@ En cuanto a la planificación económica, tenemos en cuenta los siguientes aspec
 \end{itemize}
 
 Todo esto supone un \textbf{coste total} de unos 30.440€.
-
