@@ -28,55 +28,15 @@ Para resolver las dificultades que este problema plantea las técnicas de \texti
 \end{itemize}
 
 Aunque todavía no hemos introducido los fundamentos técnicos sobre los que se basa nuestro trabajo, cabe destacar que una parte fundamental de este trabajo es explorar cierta modificación técnica en una de las piezas de nuestra solución.
+\todo{Introducir una referencia a la seccion en la que desarrollamos la variante técnica}
 
-\section{Descripción del problema}
-
-\section{Anterior introducción, borrar}
-\todo{Borrar esta sección!}
-
-% TODO -- borrar esto
-Las \textbf{ideas principales} de este trabajo son dos. En primer lugar, resolver un problema de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \entrecomillado{AIFR}. Dentro de este problema, nos centraremos en resolver una tarea de \textbf{retrieval}. En segundo lugar, introducir una nueva técnica de aprendizaje automático, que busca \textbf{solucionar los principales problemas que plantea el uso de la función de pérdida \entrecomillado{triplet loss}} \cite{informatica:principal}. Esta técnica introduce una forma de generar los \textit{batches} de triples de forma \textit{online}. Esto evita tener un paso separado en el ciclo de entrenamiento, dedicado únicamente a volver a generar de forma \textit{offline} nuevos \textit{batches} de triples. Y de paso, se consigue normalizar la dificultad que suponen estos conjuntos de triples. Estudiaremos esta técnica detalladamente en \customref{isec:batching}.
-
-Esta situación plantea una serie de \textbf{problemas}:
-
-\begin{itemize}
-    \item La nueva técnica que busca mejorar el uso de \textit{Triplet Loss} se plantea en un \textbf{ambiente completamente distinto} al de \textit{AIFR}, en concreto, en el ámbito de re-identificación de personas \cite{informatica:principal}
-        \begin{itemize}
-            \item En el problema de re-identificación de personas se trabaja normalmente con imágenes de cuerpo completo y con diferencias temporales entre imágenes muy acotadas. La tarea es seguir identificando con la misma identidad a una persona que ha desaparecido momentáneamente de la escena.
-            \item Mientras que los problemas principales en \textit{AIFR} son otros (y se detallarán en \customref{ich:descrp_problema}). Buscamos asignar la misma identidad a imágenes faciales de una persona, tomadas en momentos muy distintos de su vida.
-            \item Por tanto, no disponemos de literatura en la que se expongan resultados obtenidos de aplicar estas técnicas a nuestro ámbito de trabajo
-        \end{itemize}
-    \item Como veremos en \customref{ich:estado_arte}, no hay trabajos previos que hayan aplicado \textit{triplet loss} (y mucho menos la variación que introducimos) para resolver un problema de \textit{AIFR}. Por tanto, el acceso a literatura es todavía más restringido
-    \item Esta técnica cambia fundamentalmente la forma de generar \textit{batches} de datos. Y por tanto, modifica en esencia muchas partes primarias del proceso de aprendizaje. Por ejemplo, el ciclo de entrenamiento, el cálculo de métricas durante el entrenamiento, el acceso a los datos... Es por este motivo que hemos tenido que realizar \textbf{implementaciones personalizadas de casi todos estos elementos}, sin poder hacer uso de la mayoría de implementaciones que ofrecen las librerías de aprendizaje automático. Esto supone que deberemos dedicar \textbf{mucho más tiempo del esperado a la implementación}, teniendo en cuenta que hay que prestar \textbf{especial atención a la optimización y validación} mediante \textit{tests} de estos nuevos módulos. Esto se plasma en \customref{ich:implementacion}
-    \item Como comentaremos en \customref{ich:conclusiones}, este trabajo \textbf{no ha dado buenos resultados en la práctica}, comparado con otras técnicas más establecidas en el ámbito del \textit{AIFR}. Sin literatura que aplique nuestras nuevas técnicas en nuestro ámbito, como veremos en \customref{isec:interesareaestudio}, tenemos que \textbf{basarnos únicamente en todo el trabajo realizado para estudiar el por qué} de este mal comportamiento.
-\end{itemize}
-
-Aunque entraremos en detalle en \customref{isec:github_buenas_practicas}, todo el desarrollo del código y de la presente memoria se ha relaizado en un repositorio abierto de \textit{Github} \cite{informatica:repogithub}. Aquí se pueden consultar todos los \textit{commits}, \textit{pull requests}, \textit{issues}, \textit{feature branches} y la integración continua con \textit{Github Actions}.
-
-La siguiente imagen ayuda a entender la diferencia entre el problema de re-identificación (ambiente en el que se introduce la mejora de \textit{triplet loss} que vamos a explorar) y el problema de \textit{AIFR}:
-
-\begin{figure}[H]
-    \centering
-    \ajustarsubcaptions
-    \begin{subfigure}{0.4\textwidth}
-        \includegraphics[width=0.9\textwidth]{informatica/ejemplo_reid}
-        \caption{Ejemplo de un problema de re-identificación. Imágenes del \textit{dataset} \textit{LuPerson}. Imagen extraída de \cite{informatica:luperson}}
-    \end{subfigure}%
-    \begin{subfigure}{0.6\textwidth}
-        \includegraphics[width=0.9\textwidth]{informatica/cacd_example}
-        \caption{Ejemplo de un problema de \textit{AIFR}. Imágenes del \textit{dataset} \textit{CACD}. Imagen extraída de \cite{informatica:paper_cacd}}
-    \end{subfigure}
-
-    \caption{En el ejemplo de re-identificación podemos observar pares de imágenes, de cuerpo completo, de una persona en dos instantes de tiempo muy cercanos (misma ropa, prácticamente el mismo fondo). Además, en ese ejemplo el \textit{dataset} borra información sobre el rostro de las personas. En el ejemplo de \textit{AIFR}, podemos ver varias imágenes de una persona en distintos momentos de su vida, con años de diferencia. Nos centramos en la información de la cara de las personas. La variabilidad se centra en cambios en los rasgos faciales por el paso de los años, no se usa la misma ropa, ...}
-\end{figure}
+A pesar de que detallaremos ciertos conceptos técnicos en \sectionref{isec:github_buenas_practicas} es relevante señalar ahora que todo el desarrollo del código y la creación de esta memoria se ha llevado a cabo en un repositorio público alojado en \textbf{\textit{GitHub}} \cite{informatica:repogithub}. En este repositorio, se encuentran disponibles los registros de todos los cambios o \textit{commits}, introducción de cambios a la rama principal usando \textit{pull requests}, documentación de problemas y nuevas funcinalidades a través de \textit{issues}, ramas de desarrollo usando \textit{feature branches} y la integración continua a través de \textit{GitHub Actions}.
 
 \section{Descripción del problema} \label{ich:descrp_problema}
 
-Como ya se ha comentado, trabajaremos un problema de \textbf{reconocimiento facial invariante a la edad} (\textit{AIFR}, de sus singlas en inglés \entrecomillado{Age-Invariant Face Recognition}), introduciendo una \textbf{variación sobre la función de pérdida \textit{Triplet Loss}} para poder generar triples de forma \textit{online}. En esta sección nos centraremos en presentar el problema \textit{AIFR}, mientra que la nueva técnica de cómputo de la función de pérdida será estudiada en profundidad en \customref{isec:triplet_loss}.
+Como ya se ha comentado, buscamos resolver un problema de \textbf{reconocimiento facial invariante a la edad} (\textit{AIFR}, de sus singlas en inglés \entrecomillado{Age-Invariant Face Recognition}). Recordemos que el reconocimiento facial es una rama de la biometría que se centra en identificar individuos a partir de su rostro y que ha demostrado su utilidad en diversas aplicaciones, como la videovigilancia, la identificación de posibles criminales y el control de acceso a instalaciones. Por otro lado, el reconocimiento facial invariante a la edad o \textit{AIFR} representa un desafío adicional al lidiar con los cambios que el envejecimiento provoca en las características faciales. Este enfoque. En esta sección nos centraremos en estudiar las dificultades asociadas al \textit{AIFR}.
 
-El \textbf{problema de reconocimiento facial invariante a la edad} es el siguiente: dada una imagen de una persona, debemos ser capaces de discriminar entre imágenes de otras personas (negativas) e imágenes de la persona dada en primera instancia (positivas). Todo esto teniendo en cuenta diferencias significativas en la edad de las personas que aparecen, tanto en imágenes negativas como positivas.
-
-Este problema se divide en las siguientes \textbf{subtareas}:
+En general, una tarea de reconocimiento facial abarca distintas \textbf{tareas específicas}:
 
 \begin{itemize}
     \item \textbf{\textit{Retrieval}} o búsqueda: dada una imagen de una persona objetivo y una base de datos de imágenes, devolver un número específico de imágenes tomadas de la base de datos de la persona objetivo
@@ -100,25 +60,32 @@ Este problema se divide en las siguientes \textbf{subtareas}:
 
 \end{itemize}
 
-En consecuencia, nuestra tarea es la de realizar \textit{retrieval} de imágenes faciales invariante a cambios en la edad. En adelante, salvo que induzca a confusión, nos referiremos a esta tarea simplemente como \textit{AIFR}, sin especificar que estamos realizando concretamente \textit{retrieval} y no alguna de las otras subtareas que acabamos de especificar.
+Como resultado, realmente nuestra tarea consiste en realizar \textit{retrieval} de imágenes faciales invariante a cambios en la edad. En adelante, salvo que induzca a confusión, nos referiremos a esta tarea implemente como \textit{AIFR}, sin especificar que estamos realizando concretamente \textit{retrieval} y no alguna de las otras tareas específicas que acabamos de especificar.
 
-La siguiente imagen explica visualmente la tarea de verificación:
+La \imgref{img:ejemplo_verificacion} explica visualmente la tarea de verificación, mientras que la \imgref{img:ejemplo_retrieval} explica la tarea de \textit{retrieval}:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{informatica/ejemplos_tareas/verification}
+    \includegraphics[width=0.5\textwidth]{informatica/ejemplos_tareas/verification}
     \caption{Ejemplo gráfico de la tarea de verificación. Dado un par de imágenes, decidimos si se corresponden a la misma identidad o si son dos personas distintas. Imágenes extraídas de \cite{informatica:cacd_dataset}, diagrama generado con \url{draw.io}}
+    \label{img:ejemplo_verificacion}
 \end{figure}
-
-Y la siguiente imagen explica visualmente la tarea de \textit{retrieval}:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{informatica/ejemplos_tareas/retrieval}
+    \includegraphics[width=0.7\textwidth]{informatica/ejemplos_tareas/retrieval}
     \caption{Ejemplo gráfico de la tarea de \textit{retrieval}. Dada una imagen objetivo o \textit{query}, y una base de datos de imágenes candidatas, devolvemos las mejores $K = 2$ imágenes. Imágenes extraídas de \cite{informatica:cacd_dataset}, diagrama generado con \url{draw.io}}
+    \label{img:ejemplo_retrieval}
 \end{figure}
 
-Además de los problemas comunes de la visión por computador, este problema tiene las siguientes \textbf{dificultades específicas} \cite{informatica:challenges_retrieval}:
+Algunos problemas comunes en la visión por computador que son especialmente pertinentes en nuestra tarea son:
+
+\begin{enumerate}
+    \item \textbf{Distractores}: nuestro modelo se debe centrar en estudiar las caras que aparezcan en la imagen, ignorando otros elementos, como los que puedan aparecer en el fondo
+    \item \textbf{Eficiencia}: a la hora de que nuestro modelo reciba una \textit{query}, desconocemos el tamaño de la base de datos sobre la que tenemos que operar. Por tanto, nuestro modelo deberá ser eficiente para poder trabajar con grandes bases de datos sin que el tiempo de respuesta se vea gravemente afectado
+\end{enumerate}
+
+Por otro lado, nos enfrentamos a las siguientes \textbf{dificultades específicas} \cite{informatica:challenges_retrieval}:
 
 \begin{itemize}
     \item \textbf{Invarianzas}: en nuestro problema esto es especialmente relevante. Al trabajar con imágenes tomadas en instantes de tiempo muy variados, las características de la imagen pueden variar considerablemente.
@@ -126,8 +93,6 @@ Además de los problemas comunes de la visión por computador, este problema tie
             \item Pensemos, por ejemplo, en fotografías antiguas que fueron tomadas en blanco y negro, en contraste con fotografías más actuales en color
             \item O cambios considerables en características de la cámara con la que se toman las fotografías
         \end{itemize}
-    \item \textbf{Distractores}: nuestro modelo se debe centrar en estudiar las caras que aparezcan en la imagen, ignorando otros elementos, como los que puedan aparecer en el fondo
-    \item \textbf{Eficiencia}: a la hora de que nuestro modelo reciba una \textit{query}, desconocemos el tamaño de la base de datos sobre la que tenemos que operar. Por tanto, nuestro modelo deberá ser eficiente para poder trabajar con grandes bases de datos sin que el tiempo de respuesta se vea gravemente afectado
     \item Problemas asociados al \textbf{envejecimiento}: cómo varía la cara con el paso de los años es un proceso muy complejo. Algunos de los factores que afectan a este envejecimiento \cite{informatica:tecnica_sintesis_aifr} son:
         \begin{itemize}
             \item Factores intrínsecos como la genética o la etnia
@@ -137,10 +102,14 @@ Además de los problemas comunes de la visión por computador, este problema tie
 
 \item Tenemos que trabajar con \textbf{identidades que nunca hemos visto} en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, ocurre algo parecido. Por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo. Sin embargo la diferencia radica en que en nuestro problema el modelo debe saber identificar identidades, mientras que en el modelo de clasificación este debe saber identificar categorías
 
-\item Nuestro modelo debe identificar como similares (véase \customref{isec:embeddings}) imágenes de la misma persona, aunque sea en momentos muy distintos. Y debe identificar como no similares imágenes de personas distintas. Es muy fácil que ocurra que dos imágenes de la misma persona tomadas con muchos años de diferencia parezcan más distintas que dos imágenes de dos personas distintas pero de la misma edad. Por ejemplo, esto se puede ver en \customref{img:messi_distintos_otro_adulto}
-
+\item Nuestro modelo debe identificar como similares imágenes de la misma persona, aunque sea en momentos muy distintos. Y debe identificar como no similares imágenes de personas distintas. Es muy fácil que ocurra que dos imágenes de la misma persona tomadas con muchos años de diferencia parezcan más distintas que dos imágenes de dos personas distintas pero de la misma edad. Por ejemplo, esto se puede ver en la \imgref{img:messi_distintos_otro_adulto}
+    \begin{itemize}
+        \item El concepto de similitud con el que codificamos la identidad de los sujetos lo especificamos en \customref{isec:embeddings})
+    \end{itemize}
 \item Aunque desarrollemos esto más tarde en \customref{isec:base_datos_usada}, los \textbf{\textit{datasets} de \textit{AIFR} son escasos y presentan problemas} \cite{informatica:tecnica_sintesis_aifr}. Algunas de estas bases de datos son muy pequeñas. Otras, son de un tamaño más grande, pero presentan mucha menos variabilidad en los rangos de edad. Y por supuesto, muchas de estas bases de datos presentan problemas de representatividad (etnia, sexo).
 \end{itemize}
+
+Las imágenes presentadas en \imgref{img:messi_cuatro_edades} son un buen ejemplo de los problemas específicos que acabamos de comentar. Por ejemplo, la imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeno}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador como cambios en la pose, iluminación, \ldots Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho
 
 \begin{figure}[H]
 \centering
@@ -172,12 +141,9 @@ Además de los problemas comunes de la visión por computador, este problema tie
     \label{img:messi_cuatro_edades}
 
 \end{figure}
+\todo{Conseguir que las cuatro imágenes tengan el mismo tamaño y misma relación de aspecto}
 
-Las imágenes presentadas en \customref{img:messi_cuatro_edades} son un buen ejemplo de los problemas específicos que acabamos de comentar. Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho. La imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeno}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador, como por ejemplo, cambios en la pose, iluminación, \ldots
-
-Veámos otro ejemplo:
-
-\begin{figure}[H]
+\begin{figure}[hbtp]
 \centering
     \begin{subfigure}{0.5\textwidth}
         \centering
@@ -200,13 +166,8 @@ Veámos otro ejemplo:
 \label{img:messi_distintos_otro_adulto}
 \end{figure}
 
-En este ejemplo vemos un problema que hemos comentado previamente: tenemos más parecido entre dos personas distintas pero de la misma edad, que entre la misma persona pero a distintas edades. En este caso el parecido es extraordinario, pero es razonable que nuestro modelo tenga dificultades en asignar mayor parecido a imágenes de la misma persona en su adultez y niñez, que a imágenes de dos personas distintas, ambas con barba y mismo corte de pelo, por poner un ejemplo.
+Ya hora estudiemos el ejemplo presentado en \imgref{img:messi_distintos_otro_adulto}. En este ejemplo vemos un problema que hemos comentado previamente: tenemos más parecido entre dos personas distintas pero de la misma edad, que entre la misma persona pero a distintas edades. En este caso el parecido es extraordinario, pero es razonable que nuestro modelo tenga dificultades en asignar mayor parecido a imágenes de la misma persona en su adultez y niñez, que a imágenes de dos personas distintas, ambas con barba y mismo corte de pelo, por poner un ejemplo.
 
-Aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding} (véase \customref{isec:embeddings}).
-
-Gracias a que nuestro modelo aprende un \textit{embedding} semántico, podríamos haber resuelto también alguno de los otros problemas que ya hemos mencionado, por ejemplo, el de verificación. Sin embargo, para acotar el alcance de este trabajo, hemos decidido centrarnos en \textit{retrieval}.
-
-Además, por cómo hemos diseñado el código (véase \customref{isubs:impl_retr_adapter}), la adaptación del modelo a una nueva tarea es inmediata, y en teoría, si el modelo inicial es competente, el modelo adaptado también debería serlo.
 
 Y para finalizar, introducimos los \textbf{dos enfoques principales usados para resolver problemas de \textit{AIFR}}, que estudiaremos en profundidad en \customref{ich:estado_arte}:
 
@@ -214,7 +175,6 @@ Y para finalizar, introducimos los \textbf{dos enfoques principales usados para 
     \item El primer enfoque es aplicar modelos generativos adversarios (\textit{GAN}). Por ejemplo, el \textit{Age Invariant Model} o \textit{AIM} propuesto en \cite{informatica:tecnica_sintesis_aifr}.
     \item El segundo enfoque es directamente trabajar sobre una base de datos que presente la suficiente variabilidad en la edad de los individuos, y desarrollar un modelo que realice nuestra tarea. Este enfoque casi siempre pasa por computar un \textit{embedding}. Este será el enfoque que sigamos.
 \end{enumerate}
-\todo{\cite{informatica:paper_cacd} habla en la página 3 de \url{http://www.sirius.umiacs.io/papers/chen14tmm.pdf} de las aproximaciones al problema!}
 
 \section{Motivación}
 
@@ -244,6 +204,16 @@ Por ejemplo, en 2021 se pusieron en marcha en España máquinas \textit{ABC Syst
 \end{figure}
 
 Todo esto justifica el interés en disponer de un modelo que resuelva la tarea que hemos propuesto.
+
+
+\section{Variaciones técnicas}
+\todo{He movido este texto de sitio}
+
+Aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding} (véase \customref{isec:embeddings}).
+
+Gracias a que nuestro modelo aprende un \textit{embedding} semántico, podríamos haber resuelto también alguno de los otros problemas que ya hemos mencionado, por ejemplo, el de verificación. Sin embargo, para acotar el alcance de este trabajo, hemos decidido centrarnos en \textit{retrieval}.
+
+Además, por cómo hemos diseñado el código (véase \customref{isubs:impl_retr_adapter}), la adaptación del modelo a una nueva tarea es inmediata, y en teoría, si el modelo inicial es competente, el modelo adaptado también debería serlo.
 
 \section{Descripción de los objetivos}
 
@@ -332,3 +302,5 @@ En cuanto a la planificación económica, tenemos en cuenta los siguientes aspec
 \end{itemize}
 
 Todo esto supone un \textbf{coste total} de unos 30.440€.
+
+\todo{Introducir una sección que explique las secciones del documento?}
