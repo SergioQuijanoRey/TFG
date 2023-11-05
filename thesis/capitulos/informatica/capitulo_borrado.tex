@@ -1,4 +1,6 @@
-\section{Anterior introducción, borrar}
+\chapter{TODO -- borrar}
+
+\section{Introduccion}
 \todo{Borrar esta sección!}
 
 % TODO -- borrar esto
@@ -36,4 +38,12 @@ La siguiente imagen ayuda a entender la diferencia entre el problema de re-ident
 
     \caption{En el ejemplo de re-identificación podemos observar pares de imágenes, de cuerpo completo, de una persona en dos instantes de tiempo muy cercanos (misma ropa, prácticamente el mismo fondo). Además, en ese ejemplo el \textit{dataset} borra información sobre el rostro de las personas. En el ejemplo de \textit{AIFR}, podemos ver varias imágenes de una persona en distintos momentos de su vida, con años de diferencia. Nos centramos en la información de la cara de las personas. La variabilidad se centra en cambios en los rasgos faciales por el paso de los años, no se usa la misma ropa, ...}
 \end{figure}
+
+\section{Introduccion - Descripción de los objetivos}
+
+Aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding} (véase \customref{isec:embeddings}).
+
+Gracias a que nuestro modelo aprende un \textit{embedding} semántico, podríamos haber resuelto también alguno de los otros problemas que ya hemos mencionado, por ejemplo, el de verificación. Sin embargo, para acotar el alcance de este trabajo, hemos decidido centrarnos en \textit{retrieval}.
+
+Además, por cómo hemos diseñado el código (véase \customref{isubs:impl_retr_adapter}), la adaptación del modelo a una nueva tarea es inmediata, y en teoría, si el modelo inicial es competente, el modelo adaptado también debería serlo.
 

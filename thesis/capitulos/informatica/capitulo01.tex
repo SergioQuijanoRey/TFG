@@ -178,7 +178,7 @@ Y para finalizar, introducimos los \textbf{dos enfoques principales usados para 
 
 \section{Motivación}
 
-El ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la \textbf{informática forense}. La informática forense se puede definir como \entrecomillado{la disciplina de las ciencias forenses que, considerando las tareas propias asociadas a la evidencia, procura descubrir e interpretar la información en los medios informáticos para establecer los hechos y formular las hipótesis relacionadas con el caso} \cite{informatica:libro_informatica_forense} o como \entrecomillado{la disciplina científica y especializada que, entendiendo los elementos propios de las tecnologías de los equipos de computación, ofrece un análisis de la información residente en dichos equipos} \cite{informatica:libro_informatica_forense}.
+El ámbito de aplicación de un modelo capaz de reconocer caras independientemente de cambios de edad es amplio, destacando el ámbito de la \textbf{informática forense}. La informática forense se puede definir como \entrecomillado{la disciplina de las ciencias forenses que, considerando las tareas propias asociadas a la evidencia, procura descubrir e interpretar la información en los medios informáticos para establecer los hechos y formular las hipótesis relacionadas con el caso} o como \entrecomillado{la disciplina científica y especializada que, entendiendo los elementos propios de las tecnologías de los equipos de computación, ofrece un análisis de la información residente en dichos equipos} \cite{informatica:libro_informatica_forense}.
 
 Algunos ejemplos de aplicación son:
 
@@ -202,40 +202,31 @@ Por ejemplo, en 2021 se pusieron en marcha en España máquinas \textit{ABC Syst
 
     \caption{Máquinas \textit{ABC System} para realizar el control de pasaportes en aeropuertos de forma automática. Entre otras tareas, verifican que la fotografía del pasaporte se corresponda con una imagen tomada por la cámara de la máquina. Imágenes extraídas de \cite{informatica:articulo_abc_system}}
 \end{figure}
+\todo{Arreglar la relación de aspecto de estas imágenes}
 
 Todo esto justifica el interés en disponer de un modelo que resuelva la tarea que hemos propuesto.
 
-
-\section{Variaciones técnicas}
-\todo{He movido este texto de sitio}
-
-Aunque más tarde desarrollemos en profundidad el uso de \textit{triplet loss} (\customref{isec:triplet_loss}), conviene hacer unos pequeños apuntes sobre esta técnica. Para empezar, el uso de esta función de pérdida ya nos indica que, de una forma u otra, nuestra solución al problema va a fundamentarse en el cómputo de un \textit{embedding} (véase \customref{isec:embeddings}).
-
-Gracias a que nuestro modelo aprende un \textit{embedding} semántico, podríamos haber resuelto también alguno de los otros problemas que ya hemos mencionado, por ejemplo, el de verificación. Sin embargo, para acotar el alcance de este trabajo, hemos decidido centrarnos en \textit{retrieval}.
-
-Además, por cómo hemos diseñado el código (véase \customref{isubs:impl_retr_adapter}), la adaptación del modelo a una nueva tarea es inmediata, y en teoría, si el modelo inicial es competente, el modelo adaptado también debería serlo.
-
 \section{Descripción de los objetivos}
 
-Por todo lo que acabamos de comentar, los objetivos del presente trabajo son los siguientes:
+Los objetivos del presente trabajo son los siguientes:
 
 \begin{enumerate}
-    \item Realizar una revisión del estado del arte en el ámbito del \textit{AIFR} (véase \customref{ich:estado_arte})
-    \item Implementar todos los módulos necesarios para poder aplicar técnicas \textit{online} de cómputo del \textit{triplet loss} (véase \customref{ich:implementacion})
-    \item Realizar un estudio de los \textit{datasets} disponibles (véase \customref{isec:base_datos_usada})
-    \item Llevar a cabo el proceso de aprendizaje de un modelo profundo que resuelva la tarea de \textit{AIFR} (véase \customref{ich:Experimentación})
-    \item Comparar los resultados obtenidos por dicho modelo con otros trabajos del mismo ámbito
+    \item Realizar una \textbf{revisión del estado del arte} en el ámbito del \textit{AIFR} (véase \sectionref{ich:estado_arte})
+    \item Realizar un \textbf{estudio de los \textit{datasets}} disponibles (véase \sectionref{isec:base_datos_usada})
+    \item \textbf{Implementar todos los módulos necesarios} para poder aplicar las técnicas a estudiar, a partir del uso de patrones de diseño para acabar con una arquitectura limpia y cómoda de trabajar (véase \sectionref{ich:implementacion})
+    \item Llevar a cabo el proceso de \textbf{aprendizaje de un modelo profundo} que resuelva la tarea de \textit{AIFR} (véase \sectionref{ich:Experimentación})
+    \item \textbf{Estudiar los resultados obtenidos} por dicho modelo, comparándolos con los resultados obtenidos en otros trabajos del mismo ámbito
 \end{enumerate}
 
 \section{Planificación} \label{isec:planificacion}
 
-Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para las técnicas que queremos explorar. Esto supone que \textbf{deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código}. Por tanto, decidimos realizar un \textbf{desarrollo en varias etapas}, iterando sobre distintas bases de datos. Empezamos trabajando con \textit{datasets} de menor complejidad (estructura de los datos, facilidad de trabajo con ellos, tamaño) e interés, llegando al final a trabajar con los \textit{datasets} más complejos y relevantes para nuestro estudio. Como veremos en \customref{isec:optimizacion_codigo}, esto permite en un inicio desarrollar rápidamente una amplia base de código sin preocuparnos de realizar optimizaciones prematuras y poco relevantes. Solo se realiza un proceso de optimización cuando encontramos problemas reales con los tiempos de cómputo.
+Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para las técnicas que queremos explorar. Esto supone que \textbf{deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código}. Por tanto, decidimos realizar un \textbf{desarrollo en varias etapas}, iterando sobre distintas bases de datos. Empezamos trabajando con \textit{datasets} de menor complejidad (estructura de los datos, facilidad de trabajo con ellos, tamaño) e interés, llegando al final a trabajar con los \textit{datasets} más complejos y relevantes para nuestro estudio. Como veremos en \sectionref{isec:optimizacion_codigo}, esto permite en un inicio desarrollar rápidamente una amplia base de código sin preocuparnos de realizar optimizaciones prematuras y poco relevantes. Solo se realiza un proceso de optimización cuando encontramos problemas reales con los tiempos de cómputo.
 
 Una vez analizados y resuelto los puntos débiles en temas de rendimiento pasamos a tratar con las bases de datos que realmente nos interesan. Así, en este punto, tenemos prácticamente toda la base de código desarrollada, pudiendo centrarnos únicamente en la experimentación.
 
-Las bases de datos sobre las que iteramos se describen con detalle en \customref{isec:base_datos_usada}.
+Las bases de datos sobre las que iteramos se describen en detalle en \sectionref{isec:base_datos_usada}.
 
-Además, como veremos en \customref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestro enfoque para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos.
+Además, como veremos en \sectionref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestro enfoque para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos.
 
 Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura sobre el tema, desconocemos los posibles problemas que pueden resultar de aplicar esta técnica. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones. En cada una de las iteraciones podemos aplicar el modelo en cascada. Este modelo encaja perfectamente con nuestro enfoque, en el que buscamos iterar sobre distintas bases de datos. El funcionamiento de este modelo se explica mejor en la siguiente imagen:
 
@@ -248,11 +239,11 @@ Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico
 Para cada base de datos sobre la que trabajamos, consideramos las siguientes fases del modelo en cascada para esa iteración:
 
 \begin{itemize}
-    \item Análisis: realizamos un análisis exploratorio de la base de datos con la que trabajamos en esta iteración (véase \customref{isec:base_datos_usada}). Estudiamos las técnicas que queremos aplicar y nos marcamos una serie de objetivos para esta iteración
-    \item Diseño: en base al estudio realizado sobre el \textit{dataset} y las técnicas que queremos aplicar, definimos qué módulos de código debemos de introducir, qué interfaces deben cumplir para interactuar con otros módulos, las propiedades que queremos verificar en los \textit{tests}, distintos \textit{pipelines} que seguir en la experimentación...
-    \item Implementación: desarrollamos el código necesario para cumplir con el diseño realizado previamente. En esta fase también incluimos el desarrollo de \textit{tests} para realizar las validaciones
-    \item Optimización: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados, y llevamos a cabo dichos cambios. Esto se explica en detalle en \customref{isec:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes
-    \item Experimentación: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase \customref{isec:pipeline}), analizamos los resultados obtenidos, buscamos anomalías en el proceso o en los resultados, ... Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos
+    \item \textbf{Análisis}: realizamos un análisis exploratorio de la base de datos con la que trabajamos en esta iteración (véase \sectionref{isec:base_datos_usada}). Estudiamos las técnicas que queremos aplicar y nos marcamos una serie de objetivos para esta iteración
+    \item \textbf{Diseño}: en base al estudio realizado sobre el \textit{dataset} y las técnicas que queremos aplicar, definimos qué módulos de código debemos de introducir, qué interfaces deben cumplir para interactuar con otros módulos, las propiedades que queremos verificar en los \textit{tests}, distintos \textit{pipelines} que seguir en la experimentación...
+    \item \textbf{Implementación}: desarrollamos el código necesario para cumplir con el diseño realizado previamente. En esta fase también incluimos el desarrollo de \textit{tests} para realizar las validaciones
+    \item \textbf{Optimización}: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados, y llevamos a cabo dichos cambios. Esto se explica en detalle en \sectionref{isec:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes
+    \item \textbf{Experimentación}: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase \sectionref{isec:pipeline}), analizamos los resultados obtenidos, buscamos anomalías en el proceso o en los resultados, ... Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos
 \end{itemize}
 
 Para organizar todas las tareas de cada iteración, que nacen en las fases de análisis, diseño e implementación, usamos la \textbf{metodología \textit{Kanban}} \cite{informatica:kanban_paper}. En dicha metodología se usa un tablero, en el que tarjetas que representan tareas a realizar se colocan sobre columnas que representan distintos estados. Usamos cuatro estados:
@@ -264,7 +255,7 @@ Para organizar todas las tareas de cada iteración, que nacen en las fases de an
     \item \textit{Done} o tareas que ya se han completado
 \end{itemize}
 
-Esto permite tener una visualización rápida del estado de la iteración. Como comentaremos detalladamente en \customref{isec:github_buenas_practicas}, usaremos la utilidad de proyectos que ofrece \textit{Github} para tener acceso a un tablero \textit{kanban}. En la siguiente imagen se muestra un ejemplo del estado de este tablero:
+Esto permite tener una visualización rápida del estado de la iteración. Como comentaremos detalladamente en \sectionref{isec:github_buenas_practicas}, usaremos la utilidad de proyectos que ofrece \textit{Github} para tener acceso a un tablero \textit{kanban}. En la siguiente imagen se muestra un ejemplo del estado de este tablero:
 
 \begin{figure}[H]
     \centering
@@ -279,7 +270,7 @@ Teniendo todo esto en cuenta, inicialmente planificamos el proyecto tal y como d
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_ideal}
-    \caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto. El color azul corresponde al \textit{dataset} \textit{MNIST}. El color morado corresponde al \textit{dataset} \textit{LFW}. El color naranja corresponde a los \textit{datasets} \textit{FG-Net} y \textit{CACD} en conjunto}
+    \caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto. El color azul corresponde al \textit{dataset} \textit{MNIST}. El color morado corresponde al \textit{dataset} \textit{LFW}. El color naranja corresponde a los \textit{datasets} \textit{FG-Net} y \textit{CACD} en conjunto. Estas bases de datos se describen en detalle en \sectionref{isec:base_datos_usada}}
 \end{figure}
 
 Sin embargo, por los problemas enfrentados durante el desarrollo, y por inexactitudes en la planificación, acabamos distribuyendo el tiempo dedicado al trabajo tal y como se muestra en el siguiente diagrama de Gannt:
@@ -291,16 +282,16 @@ Sin embargo, por los problemas enfrentados durante el desarrollo, y por inexacti
     \label{img:gannt_real}
 \end{figure}
 
-En el repositorio abierto de \textit{Github} \cite{informatica:repogithub} donde hemos desarrollado el proyecto, podemos verificar los tiempos que aparecen en \customref{img:gannt_real}.
+En el repositorio abierto de \textit{Github} \cite{informatica:repogithub} donde hemos desarrollado el proyecto, podemos verificar los tiempos que aparecen en \imgref{img:gannt_real} \footnote{Recordamos que explicamos en detalle el uso de \textit{Git} en \sectionref{isec:github_buenas_practicas}}.
 
 En cuanto a la planificación económica, tenemos en cuenta los siguientes aspectos:
 
 \begin{itemize}
     \item El salario aproximado de un investigador en Ciencia de Datos y Aprendizaje Automático es de 35 €/h. Teniendo en cuenta que hemos dedicado al menos 720 horas de trabajo, esto supone un coste de 25.200€
     \item El valor del ordenador que hemos usado para trabajar: 600€
-    \item El valor de los servidores \textit{nGPU} donde se han lanzado los procesos (véase \customref{isec:entorno_ejecucion}). Se estima un coste de unos 145€ semanales. Teniendo en cuenta que hemos tenido acceso desde Marzo de 2023, y usamos estos servidores hasta Octubre de 2023, esto supone un coste de 4.640€
+    \item El valor de los servidores \textit{nGPU} donde se han lanzado los procesos (véase \imgref{isec:entorno_ejecucion}). Se estima un coste de unos 145€ semanales. Teniendo en cuenta que hemos tenido acceso desde Marzo de 2023, y usamos estos servidores hasta Octubre de 2023, esto supone un coste de 4.640€
 \end{itemize}
 
 Todo esto supone un \textbf{coste total} de unos 30.440€.
 
-\todo{Introducir una sección que explique las secciones del documento?}
+\section{Estructura del trabajo}
