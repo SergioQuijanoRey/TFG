@@ -1,6 +1,74 @@
 \chapter{Fundamentos teóricos} \label{ich:fundamentos_teoricos}
 
-En esta sección introduciremos algunos \textbf{conceptos teóricos} sobre los que se basará nuestro trabajo.
+En esta sección introduciremos los \textbf{conceptos teóricos} sobre los que se basará la solución al problema que presentamos en este trabajo. Hablaremos de:
+
+\begin{itemize}
+    \item Conceptos básicos sobre el aprendizaje automático: qué es, enfoque supervisado y no supervisado, visión por computador, aprendizaje por la máxima pendiente, función de pérdida, aprendizaje profundo y redes convolucionales
+    \item Codificación de la identidad: \textit{embedding} semántico como herramienta para codificar la identidad de forma independiente a la edad y uso de \textit{triplet loss} como función de pérdidad para aprender el \textit{embedding}
+    \item Mejoras técnicas objeto de estudio: introduciremos las mejoras técnicas respecto a la función de pérdida \textit{triplet loss}. \textbf{Estas mejoras son parte central del estudio realizado en este trabajo}. Presentaremos el enfoque \textit{online} de \textit{triplet loss}, la técnica \textit{P-K sampling} para generar \textit{batches} de datos y cómo la elección de los triples definen distintos variaciones en la función de pérdida. Estudiaremos también ciertas mejoras en la función de distancia usada en el \textit{embedding}
+\end{itemize}
+
+\section{Aprendizaje automático}
+
+El aprendizaje automático es una rama de la Inteligencia Artificial. La \textbf{inteligencia artificial} es a su vez una rama de las ciencias de la computación, dedicada al desarrollo de sistemas que resuelvan ciertas tareas de forma inteligente, en base a cierto criterio para especificar qué entendemos por inteligencia \cite{informatica:libro_europa_IA}. Esta disciplina es muy amplia y comprende muchas áreas de conocimiento, por ejemplo: sistemas expertos, sistemas basados en reglas, sistemas de planificación, visión por computador, robótica, aprendizaje automático...
+
+El \textbf{aprendizaje automático} logra resolver las tareas propuestas de forma inteligente a partir de algoritmos y modelos capaces de aprender el comportamiento deseado a partir de un conjunto de datos. Previa a la aparición de estas técnicas y modelos, un experto humano era el que diseñaba e implementaba la solución al problema. En el aprendizaje automático, dados un modelo y un algoritmo de aprendizaje, la solución se aprende a partir de los datos \cite{informatica:libro_europa_IA}.
+
+Este enfoque es muy interesante en ciertos problemas en los que no sabemos cómo diseñar una solución pero disponemos de un gran conjunto de datos de ejemplo. Por ejemplo, consideremos el problema de localizar caras en una imagen. Es realmente complicado diseñar manualmente un algoritmo que resuelva esta tarea, pero es relativamente sencillo generar un conjunto de datos para que un algoritmo de aprendizaje automático genere un modelo que haya aprendido a resolver esta tarea.
+
+Otra característica interesante del \textit{machine learning} es que tiene la capacidad de mejorar su rendimiento mejorando la calidad y cantidad de datos de entrenamiento \cite{informatica:paper_que_es_ml}.
+
+\subsection{Aprendizaje supervisado y no supervisado}
+
+Podemos realizar una clasificación de los algoritmos de aprendizaje automático en base a la forma de los datos con los que el modelo aprende el comportamiento deseado, que puede ser representado como
+
+\begin{equation}
+    f(x) = y
+\end{equation}
+
+donde $x$ es el dato de entrada, $y$ es la salida deseada y $f$ es el cómputo que realiza nuestro modelo. Consideremos el ejemplo de calcular la edad de una persona a partir de una fotografía de su rostro. Entonces $x$ sería una imagen facial, $y$ la edad de la persona que aparece en la imagen y $f$ el cómputo que realiza el modelo entrenado.
+
+Con esto en cuenta, hablamos de \textbf{aprendizaje supervisado} cuando los datos de entrenamiento están etiquetados, es decir, vienen dados como tuplas (dato de entrada, valor objetivo) o $(x, y)$. Siguiendo el ejemplo anterior, tendríamos un conjunto de datos en los que cada imagen viene acompañada con la edad de la persona que aparece en la imagen.
+
+Por otro lado, hablamos de \textbf{aprendizaje no supervisado} cuando los datos de entrenamiento vienen sin etiquetar, es decir, para un valor de entrada $x$ no conocemos cuál es el valor de salida $y$ esperado. En algunos casos, disponemos de otra información asociada a los datos de entrada, a partir de la cual podemos aprender el comportamiento deseado. En otros casos ni siquiera disponemos de esa información adicional.
+
+Nuestra \textbf{solución propuesta forma parte del aprendizaje no supervisado}. Como comentaremos en \sectionref{isec:base_datos_usada}, trabajamos con conjuntos de imágenes en las que únicamente conocemos la identidad del individuo que aparece en la imagen. Estamos cerca de tener un conjunto de datos propiamente etiquetado, pero faltaría que los datos de entrenamiento fueran dados en la forma asociada a una tarea de \textit{retrieval}, es decir (imagen de entrada, lista con los $n$ mejores resultados para esa imagen).
+
+\subsection{Visión por computador}
+
+La \textbf{visión por computador} es una disciplina que busca generar modelos que puedan comprender, interpretar y utilizar información visual para resolver ciertos problemas. Esto involucra ciertas tareas, como pueden ser la adquisición de imágenes digitales, procesado de imágenes, detección de características... \cite{informatica:cv_modern_approach}
+% TODO -- seguir por aqui
+% TODO -- mencionar que interesca muchas areas de informatica, como ML optiometria CS ...
+
+\subsection{Aprendizaje por la máxima pendiente}
+
+\subsection{Deep Learning}
+
+\subsection{Redes convolucionales}
+
+\section{Codificación de la identidad}
+
+Buscamos que la sdljasdlñajsdjlasdjl
+
+\subsection{\textit{Embedding} semántico}
+
+\subsection{\textit{Triplet Loss} como función de pérdida para aprender el \textit{embedding}}
+
+\section{Mejoras técnicas objeto de estudio}
+
+\subsection{Enfoque online de \textit{Triplet Loss}}
+
+\subsection{Generación online de \textit{batches} usando \textit{P-K sampling}}
+
+\subsection{Selección de triples y variaciones en la función de pérdida}
+
+\subsection{Función de distancia}
+
+
+
+
+
+
 
 \section{\textit{Embeddings}} \label{isec:embeddings}
 
