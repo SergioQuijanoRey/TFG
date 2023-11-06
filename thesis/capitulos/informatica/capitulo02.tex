@@ -34,17 +34,81 @@ Por otro lado, hablamos de \textbf{aprendizaje no supervisado} cuando los datos 
 
 Nuestra \textbf{solución propuesta forma parte del aprendizaje no supervisado}. Como comentaremos en \sectionref{isec:base_datos_usada}, trabajamos con conjuntos de imágenes en las que únicamente conocemos la identidad del individuo que aparece en la imagen. Estamos cerca de tener un conjunto de datos propiamente etiquetado, pero faltaría que los datos de entrenamiento fueran dados en la forma asociada a una tarea de \textit{retrieval}, es decir (imagen de entrada, lista con los $n$ mejores resultados para esa imagen).
 
-\subsection{Visión por computador}
+\subsection{Tarea de aprendizaje, aprendizaje por la máxima pendiente}
 
-La \textbf{visión por computador} es una disciplina que busca generar modelos que puedan comprender, interpretar y utilizar información visual para resolver ciertos problemas. Esto involucra ciertas tareas, como pueden ser la adquisición de imágenes digitales, procesado de imágenes, detección de características... \cite{informatica:cv_modern_approach}
-% TODO -- seguir por aqui
-% TODO -- mencionar que interesca muchas areas de informatica, como ML optiometria CS ...
+Buscamos modelar cierto comportamiento que viene representado por
 
-\subsection{Aprendizaje por la máxima pendiente}
+\begin{equation}
+    f(x) = y, \; \forall x \in \mathcal{X}
+\end{equation}
+
+donde $x$ es el dato de entrada que vive en el espacio $\mathcal{X}$, $y$ es el valor de salida para esa entrada, y $f$ es nuestra \textbf{función objetivo}. Notar que \textbf{no conocemos $f$}, pues conocer dicha función supone que ya conocemos la solución al problema. Para resolver dicho problema, disponemos de una familia paramétrica de funciones
+
+\begin{equation}
+    \Gamma := \conjunto{f_{\theta}: \; \theta \in \Theta \subseteq \R^N }
+\end{equation}
+
+Queremos obtener, a partir de unos datos de entrenamiento $\Omega$, la función de $\Gamma$ que más se parezca a la función objetivo $f$ (desconocida). Para ello necesitamos especificar cómo vamos a medir la similitud de nuestra solución a la función objetivo, y cuál es el algoritmo que optimiza dicha noción de similitud.
+
+La primera pieza será la \textbf{función de pérdida}. Esta función toma la función candidata $f_{\theta}$, los datos de entrenamiento $\Omega$, y devuelve un valor del error cometido. Por tanto, la solución ideal tendrá un error cero, lo que indicará que dicha solución está a distancia cero de la función objetivo. Denotaremos a dicha función como $\mathcal{L}(f_\theta, \Omega)$.
+
+En caso de que dicha función sea diferenciable respecto a $\theta$, podemos aplicar el \textbf{algoritmo de descenso por la máxima pendiente} o descenso del gradiente. Dicho algoritmo busca minimizar el error de la siguiente forma:
+
+\begin{enumerate}
+    \item Toma un valor inicial de $\theta_0 \in \Theta$ en base a algún criterio. Por ejemplo, toma dicho valor inicial aleatoriamente
+    \item Actualiza el valor de los parámetros tal que
+        \begin{equation}
+            \theta_{i + 1} \leftarrow \theta_i - \eta \nabla \mathcal{L}(f_\theta, \Omega)
+        \end{equation}
+
+        donde $\eta$ es un factor de escalado al que se le conoce como \textbf{tasa de aprendizaje} o \textbf{\textit{learning rate}}.
+    \item Se repite el paso anterior hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error, hasta que no mejoremos la función de error en cierto número de iteraciones...
+\end{enumerate}
+
+La elección del \textit{learning rate} es fundamental a la hora de obtener una buena solución. El descenso del gradiente es un método que se fundamenta en el cómputo del gradiente, y por tanto es de carácter eminentemente local. Un valor muy pequeño de $\eta$ provocará que el proceso quede atascado en mínimos locales rápidamente y que el aprendizaje sea muy lento. Un valor muy alto provocará que los cambios en los parámetros sean demasiado bruscos, y no tengamos la granularidad suficiente para explotar los óptimos (aunque sean locales). Todo esto queda explicado en la siguiente figura:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/valores_learning_rate}
+    \caption{Ejemplo gráfico del comportamiento del entrenamiento dependiendo del valor del \textit{learning rate} $\eta$. Imagen extraída de \cite{informatica:libro_clase_aprendizaje_automatico}}
+\end{figure}
+
+\subsection{Descenso del gradiente estocástico}
+
+En el algoritmo del descenso del gradiente hemos actualizado los parámetros de nuestro modelo en base al gradiente de $\mathcal{L}(f_{\theta}, \Omega)$. Esto significa que en una actualización de los parámetros usamos todos los datos de entrenamiento para computar el gradiente, lo que supone algunos problemas:
+
+\begin{itemize}
+    \item El más evidente, puede ser computacionalmente muy costoso. El tiempo de cómputo puede llegar a ser inviable. Por otro lado, estamos trabajando con conjuntos de datos tan grandes que puede que nuestro \textit{hardware} no pueda realizar cómputos de forma eficiente sin saturar la memoria
+    \item Al usar todos los datos de entrenamiento para calcular la actualización de los parámetros, podemos estar realizando cambios muy bruscos (porque acumulamos los errores sobre todos los ejemplos de entrenamiento) y poco sutiles (los cambios sutiles que proponen ciertos ejemplos concretos se ven difuminados por el resto de ejemplos)
+\end{itemize}
+
+Es por esto que se propone el uso del \textbf{descenso del gradiente estocástico}. Dividimos el conjunto de entrenamiento $\Omega$ en subconjuntos $\Omega_i$, $i \in \deltaset{n}$. A estos subconjuntos los llamaremos \textbf{\textit{batches}}. Es claro entonces que
+
+\begin{equation}
+    \Omega = \union_{i = 1}^n \Omega_i
+\end{equation}
+
+Con esto, cambiamos ligeramente nuestro algoritmo de aprendizaje, que ahora consistirá en:
+
+\begin{enumerate}
+    \item Tomar un valor inicial de $\theta_0 \in \Theta$ en base a algún criterio. Por ejemplo, tomar dicho valor inicial aleatoriamente
+    \item Inicializar $\theta_{k + 1} \leftarrow \theta_k$
+    \item Para cada $i \in \deltaset{n}$, actualizar el valor de los parámetros usando solo información de un \textit{batch}, tal que
+        \begin{equation}
+            \theta_{k + 1} \leftarrow \theta_{k + 1} - \eta \nabla \mathcal{L}(f_\theta, \Omega_i)
+        \end{equation}
+    \item Repetir desde el segundo paso hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error, hasta que no mejoremos la función de error en cierto número de iteraciones...
+\end{enumerate}
 
 \subsection{Deep Learning}
 
 \subsection{Redes convolucionales}
+
+\section{Visión por computador}
+
+La \textbf{visión por computador} es una disciplina que busca resolver problemas en base a comprender, interpretar y utilizar información visual. Esto involucra ciertas tareas, como pueden ser la adquisición de imágenes digitales, procesado de imágenes, detección de características... \cite{informatica:cv_modern_approach}. Esta disciplina se fundamenta sobre muchas otras áreas del conocimiento. Entre ellas, la inteligencia artificial y el aprendizaje automático, la radiometría, ingeniería eléctrica, procesado de imágenes, robótica, realidad aumentada, ciencias cognitivas...
+
+Es claro que nuestra solución forma parte del área de visión por computador. Buscamos comprender información en forma de imágenes (imágenes de rostros) para resolver una tarea (identificar personas independientemente de los cambios asociados al paso del tiempo). Y es aún más claro que esta solución está en la intersección de la visión por computador y el aprendizaje automático, pues usamos técnicas de \textit{machine learning} para construir un modelo que comprenda la información de las imágenes para resolver la tarea.
 
 \section{Codificación de la identidad}
 
