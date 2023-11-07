@@ -65,12 +65,13 @@ En caso de que dicha función sea diferenciable respecto a $\theta$, podemos apl
     \item Se repite el paso anterior hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error, hasta que no mejoremos la función de error en cierto número de iteraciones...
 \end{enumerate}
 
-La elección del \textit{learning rate} es fundamental a la hora de obtener una buena solución. El descenso del gradiente es un método que se fundamenta en el cómputo del gradiente, y por tanto es de carácter eminentemente local. Un valor muy pequeño de $\eta$ provocará que el proceso quede atascado en mínimos locales rápidamente y que el aprendizaje sea muy lento. Un valor muy alto provocará que los cambios en los parámetros sean demasiado bruscos, y no tengamos la granularidad suficiente para explotar los óptimos (aunque sean locales). Todo esto queda explicado en la siguiente figura:
+La elección del \textit{learning rate} es fundamental a la hora de obtener una buena solución. El descenso del gradiente es un método que se fundamenta en el cómputo del gradiente, y por tanto es de carácter eminentemente local. Un valor muy pequeño de $\eta$ provocará que el proceso quede atascado en mínimos locales rápidamente y que el aprendizaje sea muy lento. Un valor muy alto provocará que los cambios en los parámetros sean demasiado bruscos, y no tengamos la granularidad suficiente para explotar los óptimos (aunque sean locales). Todo esto queda explicado en la \imgref{img:valores_learning_rate}.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{informatica/valores_learning_rate}
     \caption{Ejemplo gráfico del comportamiento del entrenamiento dependiendo del valor del \textit{learning rate} $\eta$. Imagen extraída de \cite{informatica:libro_clase_aprendizaje_automatico}}
+    \label{img:valores_learning_rate}
 \end{figure}
 
 \subsection{Descenso del gradiente estocástico}
@@ -102,7 +103,28 @@ Con esto, cambiamos ligeramente nuestro algoritmo de aprendizaje, que ahora cons
 
 \subsection{Deep Learning}
 
+El \textit{deep learning} o \textbf{aprendizaje profundo} es una rama del aprendizaje automático caracterizado por el uso de cierto tipo de modelos, los conocidos como \textbf{redes neuronales profundas} \cite{informatica:paper_deep_learning_def} \cite{informatica:paper_deep_learning_def_second}.
+
+Las \textbf{redes neuronales} son modelos que usan unidades más pequeñas llamadas \textbf{neuronas}. Con el paso de los años han aparecido distintos tipos de redes neuronales.
+
+Un primer tipo de red neuronal es el \textbf{perceptrón multicapa} o \textit{MLP}. En esta red la entrada se transforma pasando a través de distintas capa compuestas de varias neuronas. Las salidas de una capa se usan como entrada de la siguiente capa. Cada neurona realiza una suma ponderada de las salidas previas, y se aplica una \textbf{función de activación} al valor de dicha suma. La siguiente figura muestra el funcionamiento de una neurona \textit{MLP}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/neurona_mlp}
+    \caption{Ejemplo de cómputo de una neurona en una red neuronal \textit{MLP}. Imagen extraída de \cite{informatica:paper_deep_learning_def}}
+\end{figure}
+
+Las \textbf{redes neuronales profundas} se caracterizan por tener múltiples capas ocultas. Esto es, múltiples capas entre la capa de entrada, que introduce los datos a la red, y la capa de salida, de la que tomamos las predicciones de la red. Este enfoque permite la extracción y representación de características o \textit{features} de manera jerárquica, lo que es especialmente útil para tareas de procesamiento de información, como reconocimiento de imágenes, procesamiento de lenguaje natural, traducción automática, procesamiento de voz, ...
+
+El aprendizaje profundo implica que debemos utilizar conjuntos de datos mucho más grandes y que los tiempos de entrenamiento son mucho mayores. Sin embargo, podemos utilizar de forma efectiva dichos conjuntos de datos de gran tamaño, porque estos modelos son más expresivos.
+
+El entrenamiento de estos modelos se realiza con algoritmos basados en el gradiente, como los que hemos introducido o algunas variantes más avanzadas. Actualizar los parámetros del modelo a partir de la información del gradiente de forma directa es computacionalmente muy costoso e ineficiente. El uso del algoritmo de propagación hacia atrás del gradiente o \textbf{\textit{backpropagation}} permite que la optimización de estos modelos con un número tan elevado de parámetros sea factible \cite{informatica:libro_backprop}. La idea clave es actualizar los pesos de las capas más profundas a partir del cálculo del gradiente. Para calcular el gradiente de una capa anterior (menos profunda) usamos el gradiente de la capa posterior (más profunda), y guardamos este cálculo para la siguiente capa anterior. De esta forma aliviamos notablemente la carga computacional.
+
 \subsection{Redes convolucionales}
+% TODO -- seguir por aqui
+
+Las redes convolucionales son un tipo de red neuronal, especialmente útiles para trabajar con datos visuales por las propiedades que vamos a comentar.
 
 \section{Visión por computador}
 
