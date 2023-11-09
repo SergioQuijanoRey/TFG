@@ -105,13 +105,11 @@ Con esto, cambiamos ligeramente nuestro algoritmo de aprendizaje, que ahora cons
 
 El \textit{deep learning} o \textbf{aprendizaje profundo} es una rama del aprendizaje automático caracterizado por el uso de cierto tipo de modelos, los conocidos como \textbf{redes neuronales profundas} \cite{informatica:paper_deep_learning_def} \cite{informatica:paper_deep_learning_def_second}.
 
-Las \textbf{redes neuronales} son modelos que usan unidades más pequeñas llamadas \textbf{neuronas}. Con el paso de los años han aparecido distintos tipos de redes neuronales.
-
-Un primer tipo de red neuronal es el \textbf{perceptrón multicapa} o \textit{MLP}. En esta red la entrada se transforma pasando a través de distintas capa compuestas de varias neuronas. Las salidas de una capa se usan como entrada de la siguiente capa. Cada neurona realiza una suma ponderada de las salidas previas, y se aplica una \textbf{función de activación} al valor de dicha suma. La siguiente figura muestra el funcionamiento de una neurona \textit{MLP}:
+Las \textbf{redes neuronales} son modelos que usan unidades más pequeñas llamadas \textbf{neuronas}. Con el paso de los años han aparecido distintos tipos de redes neuronales, en base al tipo de neurona usada. Un primer tipo de red neuronal es el \textbf{perceptrón multicapa} o \textit{MLP}. En esta red la entrada se transforma pasando a través de distintas capa compuestas de varias neuronas que realizan una suma ponderada de las salidas previas, y se aplica una \textbf{función de activación} al valor de dicha suma. La siguiente figura muestra el funcionamiento de una neurona \textit{MLP}:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.\textwidth]{informatica/neurona_mlp}
+    \includegraphics[width=0.4\textwidth]{informatica/neurona_mlp}
     \caption{Ejemplo de cómputo de una neurona en una red neuronal \textit{MLP}. Imagen extraída de \cite{informatica:paper_deep_learning_def}}
 \end{figure}
 
@@ -119,29 +117,29 @@ Las \textbf{redes neuronales profundas} se caracterizan por tener múltiples cap
 
 El aprendizaje profundo implica que debemos utilizar conjuntos de datos mucho más grandes y que los tiempos de entrenamiento son mucho mayores. Sin embargo, podemos utilizar de forma efectiva dichos conjuntos de datos de gran tamaño, porque estos modelos son más expresivos.
 
-El entrenamiento de estos modelos se realiza con algoritmos basados en el gradiente, como los que hemos introducido o algunas variantes más avanzadas. Actualizar los parámetros del modelo a partir de la información del gradiente de forma directa es computacionalmente muy costoso e ineficiente. El uso del algoritmo de propagación hacia atrás del gradiente o \textbf{\textit{backpropagation}} permite que la optimización de estos modelos con un número tan elevado de parámetros sea factible \cite{informatica:libro_backprop}. La idea clave es actualizar los pesos de las capas más profundas a partir del cálculo del gradiente de forma iterativa, usando la \textbf{regla de la cadena} de las derivadas. Para calcular el gradiente de una capa anterior (menos profunda) usamos el gradiente de la capa posterior (más profunda), y guardamos este cálculo para la siguiente capa anterior. De esta forma aliviamos notablemente la carga computacional.
+El entrenamiento de estos modelos se realiza con algoritmos basados en el gradiente, como los que hemos introducido o algunas variantes más avanzadas. Actualizar los parámetros del modelo a partir de la información del gradiente de forma directa es computacionalmente muy costoso e ineficiente. El uso del algoritmo de propagación hacia atrás del gradiente o \textbf{\textit{backpropagation}} permite que la optimización de estos modelos con un número tan elevado de parámetros sea factible \cite{informatica:libro_backprop}. La idea clave es actualizar los pesos de las capas más profundas a partir del cálculo del gradiente de forma iterativa, usando la \textbf{regla de la cadena}. Para calcular el gradiente de una capa anterior (menos profunda) usamos el gradiente de la capa posterior (más profunda), y guardamos este cálculo para la siguiente capa anterior. De esta forma aliviamos notablemente la carga computacional.
 
 \subsection{Redes convolucionales}
 
-Las \textbf{redes convolucionales} son un tipo de red neuronal especialmente útiles para trabajar con imágenes. A estas redes se les conoce también como \textit{CNN}, por sus siglas del inglés \textit{Convolutional Neural Networks}. Algunas tareas para las que podemos aplicar estas redes son clasificación de imágenes, detección de objetos, ... \cite{informatica:paper_definicion_cnn} La capacidad de estas redes para aprender representaciones jerárquicas las ha convertido en una de las herramientas más usadas en el ámbito del aprendizaje automático.
+Las \textbf{redes convolucionales} son un tipo de red neuronal especialmente útiles para trabajar con imágenes. A estas redes se les conoce también como \textit{CNN}, por sus siglas del inglés \textit{Convolutional Neural Networks}. Algunas tareas para las que podemos aplicar estas redes son clasificación de imágenes o detección de objetos \cite{informatica:paper_definicion_cnn}. La capacidad de estas redes para aprender representaciones jerárquicas las ha convertido en una de las herramientas más usadas en el ámbito del aprendizaje automático.
 
 Estas redes están formadas por los siguientes tipos de capas:
 
 \begin{enumerate}
     \item \textbf{Capas convolucionales}: principal característica de las redes convolucionales. Estas capas están especialmente pensadas para explotar la estructura inherente de las imágenes con las que trabajamos
-    \item Capas de \textit{pooling}
+    \item Capas de \textit{pooling}: resumen la información para reducir el número de parámetros a optimizar
     \item Capas totalmente conectadas: capas que toman un vector de entrada y aplican una capa tipo \textit{MLP} \sectionref{isubs:deep_learning_teoria}
 \end{enumerate}
 
+Desarrollamos en más detalles estas componentes.
+
 \subsubsection{Capa Convolucional}
 
-La capa convolucional es la herramienta que caracteriza este tipo de redes. Esta capa aplica filtros o \textit{kernels} a los datos con los que trabaja. A partir de estos filtros extraemos información de los datos de entrada.
-
-Estos filtros ya se usaban antes de que el \textit{deep learning} se hiciese popular. Sin embargo, dichos filtros eran diseñados manualmente por un experto. En el enfoque del aprendizaje automático, estos filtros se aprenden a partir de los datos de entrenamiento.
+La capa convolucional es la herramienta que caracteriza este tipo de redes. Esta capa aplica filtros o \textit{kernels} a los datos con los que trabaja, a partir de los cuales extraemos información de dichos datos de entrada. Estos filtros ya se usaban antes de que el \textit{deep learning} se hiciese popular. Sin embargo, dichos filtros eran diseñados manualmente por un experto. En el enfoque del aprendizaje automático los coeficientes de los filtros se aprenden a partir de los datos de entrenamiento.
 
 Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con las que trabajamos. Esta estructura vienen dada por la propiedad de que píxeles cercanos de una imagen (es decir, un vecindario de píxeles) están relacionados entre ellos. La posición de un píxel y su vecindario tienen información inherente. Esto queda más claro considerando que si tomamos una imagen y permutamos aleatoriamente sus píxeles, la imagen pierde todo su valor, como muestra la \imgref{img:desordenar_pixeles}.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \ajustarsubcaptions
     \begin{subfigure}[t]{0.45\textwidth}
@@ -158,7 +156,7 @@ Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con 
     \label{img:desordenar_pixeles}
 \end{figure}
 
-Para aplicar una red \textit{MLP} a imágenes, podemos vectorizar la imagen de entrada (por ejemplo, tomando las columnas de la imagen y concatenando dichas columnas en un único vector). Esto es claramente ineficiente, porque en cada capa combinamos toda la información de toda la imagen. Para extraer características de la imagen no es útil tomar vecindarios no muy distantes entre sí, por lo que hemos comentado. Y aquí es donde las capas convolucionales son más eficientes.
+Podemos aplicar una red \textit{MLP} a imágenes, vectorizando previamente la imagen de entrada (por ejemplo, tomando las columnas de la imagen y concatenando dichas columnas en un único vector). Esto es claramente ineficiente, porque en cada capa combinamos toda la información de toda la imagen. Para extraer características de la imagen no es útil tomar vecindarios distantes entre sí. Y aquí es donde las capas convolucionales son más eficientes.
 
 Las capas convolucionales se basan en el operador matemático de \textbf{convolución}. Dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
 
@@ -172,13 +170,13 @@ Podemos trabajar con una versión discretizada de la convolución, de la siguien
     (f * g)(x) := \sum_{t \in \N} f(t) g(x - t)
 \end{equation}
 
-Y a la hora de trabajar con imágenes, que podemos representar como matrices, podemos realizar una convolución entre funciones de dos variables:
+Y a la hora de trabajar con imágenes, que podemos representar como matrices, podemos realizar una convolución discreta entre funciones de dos variables:
 
 \begin{equation}
     (f * g)(x, y) := \sum_{s \in \N} \sum_{t \in \N} f(s, t) g(x - s, y - t)
 \end{equation}
 
-Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique esta forma de aplicar filtros a imágenes. Una \textbf{capa convolucional} vendrá dada por los siguientes hiperparámetros:
+Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique filtros a imágenes de esta forma. Una \textbf{capa convolucional} vendrá dada por los siguientes hiperparámetros:
 
 \begin{itemize}
     \item Dimensiones del filtro: podemos aplicar un filtro de tamaño $1 \times 1$, en el que en cada paso sólo nos fijamos en un píxel de la imagen. O de tamaño $3 \times 3$, en el que en cada paso nos fijamos en 9 píxeles de la imagen. O cualquier tamaño, que normalmente se toma impar
@@ -196,7 +194,7 @@ El funcionamiento de este operador se muestra en el siguiente diagrama:
 \end{figure}
 \todo{Solucionar imagen de mala calidad}
 
-Podemos mencionar algunas características muy interesantes de esta operación:
+Algunas características muy interesantes de esta operación son:
 
 \begin{itemize}
     \item \textbf{Compartición de coeficientes}: los coeficientes del operador son independientes de la posición en la que nos encontremos. Si nuestro filtro detecta un patrón, dicha detección debe ser independiente de la posición en la que se encuentre dicho patrón
@@ -226,9 +224,7 @@ Esta capa ayuda a que la red sea más ligera, pues al reducir la dimensionalidad
 
 \subsubsection{Capa totalmente conectada}
 
-Este tipo de capa consiste en simplemente en aplicar ciertas capas de tipo \textit{MLP}. Como ya hemos visto en \sectionref{isubs:deep_learning_teoria}, ya hemos visto que necesitamos trabajar con datos en formato vectorial. Una posible solución es transformar los datos a un vector, operación que se conoce comúnmente como \textit{flatten}.
-
-Estas capas se suelen poner al final de la red, para realizar la predicción final. Toman las características jerárquicas que las convoluciones extraen y las combinan para resolver la tarea planteada.
+Este tipo de capa consiste en simplemente en aplicar capas de tipo \textit{MLP}. Como ya hemos visto en \sectionref{isubs:deep_learning_teoria}, necesitamos trabajar con datos en formato vectorial. Una posible solución es transformar los datos a un vector, operación que se conoce comúnmente como \textit{flatten}. Estas capas se suelen poner al final de la red, para realizar la predicción final. Toman las características jerárquicas que las convoluciones extraen y las combinan para resolver la tarea planteada.
 
 Cabe destacar que podemos obtener las predicciones finales de la red sin estas capas, simplemente usando capas convolucionales y \textit{pooling}.
 
