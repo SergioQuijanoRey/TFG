@@ -232,37 +232,21 @@ Cabe destacar que podemos obtener las predicciones finales de la red sin estas c
 
 La \textbf{visión por computador} es una disciplina que busca resolver problemas en base a comprender, interpretar y utilizar información visual. Esto involucra ciertas tareas, como pueden ser la adquisición de imágenes digitales, procesado de imágenes, detección de características... \cite{informatica:cv_modern_approach}. Esta disciplina se fundamenta sobre muchas otras áreas del conocimiento. Entre ellas, la inteligencia artificial y el aprendizaje automático, la radiometría, ingeniería eléctrica, procesado de imágenes, robótica, realidad aumentada, ciencias cognitivas...
 
-Es claro que nuestra solución forma parte del área de visión por computador. Buscamos comprender información en forma de imágenes (imágenes de rostros) para resolver una tarea (identificar personas independientemente de los cambios asociados al paso del tiempo). Y es aún más claro que esta solución está en la intersección de la visión por computador y el aprendizaje automático, pues usamos técnicas de \textit{machine learning} para construir un modelo que comprenda la información de las imágenes para resolver la tarea.
+Es claro que nuestra solución forma parte del área de visión por computador. Buscamos comprender información en forma de imágenes (imágenes de rostros) para resolver una tarea (identificar personas independientemente de los cambios asociados al paso del tiempo). Y es aún más claro que esta solución está en la intersección de la visión por computador y el aprendizaje automático, pues usamos técnicas de \textit{machine learning} (principalmente, redes convolucionales) para construir un modelo que comprenda la información de las imágenes para resolver la tarea.
 
 \section{Codificación de la identidad}
 
-Buscamos que la sdljasdlñajsdjlasdjl
+Para resolver la tarea, buscamos aprender un modelo que codifique la identidad de las personas que aparecen en imágenes de forma independiente a la edad de dichas personas. Para ello, nuestro modelo deberá aprender un \textit{embedding}, que será la herramienta principal para llevar a cabo la codificación.
 
-\subsection{\textit{Embedding} semántico}
+Por consiguiente, en esta sección definiremos qué es un \textit{embedding} semántico, qué función de pérdida podemos utilizar para que nuestro modelo aprenda dicho \textit{embedding} y cómo se ha aplicado de forma clásica dicha función de pérdida
 
-\subsection{\textit{Triplet Loss} como función de pérdida para aprender el \textit{embedding}}
+\subsection{\textit{Embedding} semántico} \label{isec:embeddings}
 
-\section{Mejoras técnicas objeto de estudio}
+Pasamos a definir qué es un \textit{embedding} semántico y por qué será la herramienta fundamental para codificar la identidad de los individuos.
 
-\subsection{Enfoque online de \textit{Triplet Loss}}
+Un \textbf{\textit{embedding}} no es más que un mapeo desde un cierto espacio $X$ de datos de entrada (en nuestro caso, podemos considerar $X$ como el espacio de imágenes en las que aparecen caras, que a su vez puede verse como cierto $\R^M$) a un espacio vectorial $\R^N$. En algunos casos, la dimensión del espacio de llegada $N$ es menor que la dimensión del espacio $X$.
 
-\subsection{Generación online de \textit{batches} usando \textit{P-K sampling}}
-
-\subsection{Selección de triples y variaciones en la función de pérdida}
-
-\subsection{Función de distancia}
-
-
-
-
-
-
-
-\section{\textit{Embeddings}} \label{isec:embeddings}
-
-Nuestro trabajo busca desarrollar un modelo que aprenda un \textit{embedding}. Un \textit{embedding} no es más que un mapeo desde un cierto espacio $X$ de datos de entrada (en nuestro caso, podemos considerar $X$ como el espacio de imágenes en las que aparecen caras, que a su vez puede verse como cierto $\R^M$) a un espacio vectorial $\R^N$. En la mayoría de casos, la dimensión del espacio de llegada $N$ es menor que la dimensión del espacio $X$.
-
-Más formalmente, buscamos aprender una función
+Por consiguiente, buscamos que nuestro modelo aprenda una función
 
 \begin{equation}
 \begin{split}
@@ -271,9 +255,9 @@ Más formalmente, buscamos aprender una función
 \end{split}
 \end{equation}
 
-que tomamos de una familia paramétrica de funciones $\{f_{\theta}: \theta \in \Theta \}$. En el caso de nuestro problema, podemos pensar en la familia de modelos profundos convolucionales. Así, $\theta$ estaría compuesto por todos los coeficientes que determinan dicho modelo convolucional. Por lo tanto, podríamos pensar en $\Theta \subseteq \R^M$ donde $M$ es el número de coeficientes del modelo.
+que tomamos de una familia paramétrica de funciones $\{f_{\theta}: \theta \in \Theta \}$. En nuestro problema consideramos la familia de redes convolucionales profundas. Así, $\theta$ estaría compuesto por todos los coeficientes que determinan dicho modelo convolucional, por lo que podemos considerar $\Theta \subseteq \R^M$ donde $M$ es el número de coeficientes del modelo.
 
-El criterio para escoger una función u otra de mapeo es que este deberá ser \textbf{semántico}. En el espacio de llegada $\R^N$ tenemos una métrica:
+El criterio para escoger una función u otra de mapeo es que este deberá ser \textbf{semántico}. En el espacio de llegada $\R^N$ tenemos una función de distancia:
 
 \begin{equation}
 \begin{split}
@@ -282,14 +266,14 @@ El criterio para escoger una función u otra de mapeo es que este deberá ser \t
 \end{split}
 \end{equation}
 
-Por ejemplo, la métrica euclídea. Queremos que \textbf{datos semánticamente relacionados en $X$ sean mapeados a vectores en $\R^N$ cercanos} por la métrica que fijemos. Del mismo modo, datos semánticamente distintos deberán ser mapeados a vectores distantes.
+Por ejemplo, la distancia euclídea. Queremos que \textbf{datos semánticamente relacionados en $X$ sean mapeados a vectores en $\R^N$ cercanos} por la distancia que fijemos. Del mismo modo, datos semánticamente distintos deberán ser mapeados a vectores distantes. En nuestro problema la \textbf{semántica viene dada por la identidad} de cada persona. Es decir, dos imágenes están relacionadas semánticamente cuando corresponden a la misma persona (\textbf{independientemente de la edad} con la que aparezcan).
 
-Además, será deseable que $f_{\theta}$ sea una función continua. En casi cualquier ámbito podemos considerar $X = \R^M$ para algún valor de $M$, como ya hemos comentado para el caso de las imágenes. Siguiendo con este ejemplo, un ligero cambio en un \textit{píxel} de la imagen no debería producir un vector muy distanciado del original. En muchas ocasiones, al estar buscando que el \textit{embedding} sea semántico, esta restricción inducirá en menor o mayor medida dicha continuidad.
+Veamos ahora algunos ejemplos en los que podemos solucionar cierto problemas a través del uso de \textit{embeddings}.
 
 \begin{ejemplo}
     Consideremos que queremos computar un \textit{embedding} para representar palabras.
 
-    Este problema es \textbf{especialmente relevante} en el ámbito del lenguaje natural. Esto es así porque, si queremos trabajar con texto usando modelos de aprendizaje automático, deberemos primero convertir dicho texto a una representación numérica \cite{informatica:word_embeddings_survey}. Usar, por ejemplo, el código binario que codifica dicho texto no parece muy buena idea, porque este mapeo no es semántico ni continuo.
+    Este problema es \textbf{especialmente relevante} en el ámbito del lenguaje natural. Esto es así porque, si queremos trabajar con texto usando modelos de aprendizaje automático, deberemos primero convertir dicho texto a una representación numérica \cite{informatica:word_embeddings_survey}. Usar, por ejemplo, el código binario que codifica dicho texto no parece muy buena idea, porque este mapeo no es semántico, y pequeños cambios en una palabra provocan grandes cambios en la representación (podemos pensar que el mapeo es discontinuo, aunque no hayamos definido correctamente qué significa esto).
 
     En este caso, queremos que palabras con una semántica parecida se transformen a vectores cercanos. Por ejemplo, la distancia entre los \textit{embeddings} de las palabras \entrecomillado{ciudad}, \entrecomillado{pueblo} debería ser mucho menor que la distancia entre los \textit{embeddings} de las palabras \entrecomillado{papel}, \entrecomillado{odio}. Esta idea se puede visualizar en la siguiente representación:
 
@@ -307,7 +291,7 @@ Además, será deseable que $f_{\theta}$ sea una función continua. En casi cual
 \end{ejemplo}
 
 \begin{ejemplo}
-    Veamos ahora un ejemplo mucho más cercano con el problema que queremos resolver. Por ejemplo, el problema de re-identificación (ambiente en el que se proponen las nuevas técnicas de cómputo del \textit{triplet loss} \cite{informatica:principal}).
+    Veamos ahora un ejemplo mucho más cercano con el problema que queremos resolver. Por ejemplo, el problema de re-identificación (ambiente en el que se proponen ciertas técnicas novedosas que estudiaremos más adelante).
 
     En este caso, queremos que las imágenes de una persona en una escena, se transformen a vectores cercanos, como muestra la siguiente representación:
 
@@ -324,15 +308,13 @@ Además, será deseable que $f_{\theta}$ sea una función continua. En casi cual
 
     Y para finalizar, consideremos nuestra tarea en concreto. Buscamos que las imágenes de la misma persona, aunque hayan pasado los años, se transformen en vectores cercanos. Y al contrario, que imágenes de dos personas distintas estén lo más lejos posible.
 
-    Esto es especialmente complicado, como ya hemos comentando en \customref{ich:descrp_problema}, porque por ejemplo, nuestro modelo debe ver como más cercanos imágenes de un niño y un adulto con barba (ambos siendo la misma persona) que dos imágenes de dos adultos con barba (siendo distintas personas). Este problema en concreto lo hemos mostrado en \customref{img:messi_distintos_otro_adulto}
-
+    Esto es especialmente complicado, como ya hemos comentando en \sectionref{ich:descrp_problema}, porque por ejemplo, nuestro modelo debe ver como más cercanos imágenes de un niño y un adulto con barba (ambos siendo la misma persona) que dos imágenes de dos adultos con barba (siendo distintas personas). Este problema en concreto lo hemos mostrado en la \imgref{img:messi_distintos_otro_adulto}
 \end{ejemplo}
 
-\section{\textit{Triplet Loss}} \label{isec:triplet_loss}
 
-Nuestro objetivo es ahora justificar el uso de \textit{triplet loss} como una función de pérdida que permita a nuestro modelo aprender un \textit{embedding} semántico.
+\subsection{\textit{Triplet Loss} como función de pérdida para aprender el \textit{embedding}} \label{isec:triplet_loss}
 
-Recordemos que estamos trabajando con funciones de la forma:
+Ya sabemos que para resolver nuestro problema queremos que un modelo convolucional profundo aprenda un \textit{embedding} semántico que codifique la identidad de las personas independientemente de cambios en la edad. Lo que nos falta es una función de pérdida que optimice los parámetros de nuestro modelo. Justificaremos ahora el uso de \textit{triplet loss} como función de pérdida. Recordemos que estamos trabajando con funciones de la forma:
 
 \begin{equation}
 \begin{split}
@@ -341,7 +323,7 @@ Recordemos que estamos trabajando con funciones de la forma:
 \end{split}
 \end{equation}
 
-y con una métrica:
+y con una función de distancia:
 
 \begin{equation}
 \begin{split}
@@ -350,9 +332,7 @@ y con una métrica:
 \end{split}
 \end{equation}
 
-Para ser más concisos, usaremos la notación $D_{i, j} := D(f_{\theta}(x_i), f_{\theta}(x_j))$.
-
-Como su nombre indica, \textit{triplet loss} trabajará sobre triples. Esto es:
+Para ser más concisos, usaremos la notación $D_{i, j} := D(f_{\theta}(x_i), f_{\theta}(x_j))$. Como su nombre indica, \textit{triplet loss} trabajará sobre triples. Esto es:
 
 \begin{enumerate}
     \item Una imagen de un individuo concreto, a la que llamaremos \textbf{\textit{anchor}} o ancla
@@ -388,8 +368,8 @@ Buscamos que el término de la izquierda sea lo más negativo posible, por lo bu
 
 \begin{equation} \label{ieq:triplet_loss_single_entry}
 \begin{split}
-    \mathcal{L}_{tri}(\theta; A, P, N) & := max \{D_{A, P} - D_{A, N} + \alpha, 0 \} = \ldots \\
-    \ldots &= ReLU(D_{A, P} - D_{A, N} + \alpha)
+    \mathcal{L}_{tri}(\theta; A, P, N) & := max \{D_{A, P} - D_{A, N} + \alpha, 0 \} \\
+    &= ReLU(D_{A, P} - D_{A, N} + \alpha)
 \end{split}
 \end{equation}
 
@@ -401,23 +381,19 @@ Minimizando esta función de pérdida, lo que haremos será atraer elementos de 
     \caption{Ejemplo gráfico del proceso de aprendizaje deseado con \textit{triplet loss}. Imagen creada a partir de datos de \cite{informatica:cacd_dataset} en base a \cite{informatica:facenet}}
 \end{figure}
 
-Sin embargo, en \eqref{ieq:triplet_loss_single_entry} trabajamos con una sola entrada de tres datos. A diferencia de un \textit{dataset} con datos etiquetados clásico, de la forma \lstinline{(entrada, valor de etiqueta)}, tenemos datos de la forma \lstinline{(imagen, identificador de individuo, edad)}. Esto supone un \textbf{problema} a resolver: cómo generamos \textit{batches} con triples de la forma \lstinline{(ancla, positivo, negativo)} para poder aplicar \eqref{ieq:triplet_loss_single_entry}. Introducimos algunas soluciones propuestas a este problema en \customref{isec:batching}
+Notar que en \eqref{ieq:triplet_loss_single_entry} trabajamos con una sola entrada de tres datos en forma de imagen. A diferencia de un \textit{dataset} con datos etiquetados clásico, de la forma \lstinline{(entrada, valor de etiqueta)}, tenemos datos de la forma \lstinline{(imagen, identificador de individuo, edad)}. Esto supone un \textbf{problema} a resolver: cómo generamos \textit{batches} con triples de la forma \lstinline{(ancla, positivo, negativo)} para poder aplicar \eqref{ieq:triplet_loss_single_entry}. Explicaremos cómo solucionar esto en \sectionref{isubs:enfoque_offline_minado_triples}
 
-Por otro lado, este enfoque plantea algunas \textbf{ventajas}. La principal es que, a diferencia de otros enfoques basados en usar funciones de pérdida auxiliares (y que suelen fuerzan que la red solo pueda funcionar comparando pares de imágenes), el cómputo del \textit{embedding} es directo usando esta función de pérdida (\textit{end to end learning}). Optimizamos directamente la propiedad semántica del \textit{embedding} que deseamos obtener. Una vez entrenado el modelo es directo adaptar el modelo a tareas de \textit{clustering}, \textit{retrieval}, verificación, \ldots \cite{informatica:principal}. En \customref{isubs:impl_retr_adapter}, mostramos cómo podemos realizar una de estas adaptaciones.
+Pero ahora veamos las \textbf{ventajas} que plantea este enfoque. La principal es que, a diferencia de otros enfoques basados en usar funciones de pérdida auxiliares (y que suelen forzar que la red solo pueda funcionar comparando pares de imágenes), el cómputo del \textit{embedding} es directo usando esta función de pérdida (\textit{end to end learning}). Optimizamos directamente la propiedad semántica del \textit{embedding} que deseamos obtener. Una vez entrenado el modelo es directo adaptar el modelo a tareas de \textit{clustering}, \textit{retrieval}, verificación, \ldots \cite{informatica:principal}. En \customref{isubs:impl_retr_adapter} mostramos lo sencillo que es realizar esta adaptación.
 
-\section{Generación de \textit{batches}} \label{isec:batching}
+\subsubsection{Minado de triples \textit{offline}} \label{isubs:enfoque_offline_minado_triples}
 
 Como ya hemos comentado, la tarea que debemos resolver ahora es la de generación de \textit{batches} adecuados para poder emplear \eqref{ieq:triplet_loss_single_entry} como función de pérdida a minimizar.
 
 Por tanto, dado un conjunto de datos de la forma \lstinline{(imagen, identificador, edad)}, debemos obtener un conjunto de datos de la forma \lstinline{(img. ancla, img. positivo, img. negativo)}. Este último conjunto de datos puede ser una lista de triples o un conjunto de \textit{batches}. Como buscamos trabajar con \textit{batches}, en el caso de tener una lista de triples, podemos simplemente muestrear aleatoriamente y sin remplazo de dicha lista, repitiendo el muestreo tras cada época completada.
 
-\subsection{Enfoque \textit{offline}} \label{isubs:enfoque_offline_minado_triples}
+El \textbf{minado de triples \textit{offile}} es el enfoque clásico que se ha venido usando previo a \cite{informatica:facenet}, trabajo que introduce un enfoque \textit{online} que luego otros trabajos como \cite{informatica:principal} han ido mejorando. Para entender este minado veamos el ciclo de aprendizaje, que se divide en \textbf{varios pasos}.
 
-Este es el enfoque clásico que se ha venido usando previo a \cite{informatica:facenet}, trabajo que introduce un enfoque \textit{online} que luego otros trabajos como \cite{informatica:principal} han ido mejorando.
-
-En este enfoque, el ciclo de aprendizaje se divide en \textbf{varios pasos}.
-
-En primer lugar, se realiza un \textbf{minado \textit{offline}} de los triples. Es decir, se obtiene una primera lista o conjunto de \textit{batches} de la forma \lstinline{(img. ancla, img.positivo, img.negativo)}. Una forma de hacer esto sería, por ejemplo, generar los triples de forma aleatoria, generar todos los posibles triples, $\ldots\dspace$ Aunque estas ideas no suelen funcionar en la práctica. Otra forma más efectiva es seleccionar los triples en base a algún estudio estadístico. O usar la red que vamos a optimizar para identificar aquellos triples en los que tiene más dificultad.
+En primer lugar, se realiza el minado \textit{offline} de los triples. Es decir, se obtiene una primera lista o conjunto de \textit{batches} de la forma \lstinline{(img. ancla, img.positivo, img.negativo)}. Una forma de hacer esto sería, por ejemplo, generar los triples de forma aleatoria, generar todos los posibles triples, $\ldots\dspace$ Aunque estas ideas no suelen funcionar en la práctica. Otra forma más efectiva es seleccionar los triples en base a algún estudio estadístico. O usar la red que vamos a optimizar para identificar aquellos triples en los que tiene más dificultad.
 
 En segundo lugar, realizamos el aprendizaje sobre dicho conjunto de triples. En algunos casos, realizamos el entrenamiento completo sobre dicho conjunto inicial. En otros casos, principalmente cuando usamos la red para el minado de triples, pasadas algunas épocas de entrenamiento volvemos a generar otra vez la lista de triples. Así, triples que antes la red no identificaba propiamente, ahora sí que los identifica (\entrecomillado{network snapshots}, \cite{informatica:facenet}) y podemos buscar triples más interesantes.
 
@@ -427,18 +403,15 @@ Una vez computado una lista de triples $(a, p, n) \in \Omega$, la función de p�
     \mathcal{L}_{tri}^{offline}(\theta; \Omega) := \frac{1}{\#\Omega} \sum_{(a, p, n) \in \Omega} \mathcal{L}_{tri}(\theta; a, p, n)
 \end{equation}
 
-\begin{observacion}
-
 En la literatura sobre aprendizaje automático normalmente se ignora el término $\frac{1}{\#\Omega}$ y se supone que siempre estamos dividiendo por el número de sumandos, con lo que nuestra función de error suele escribirse como:
 
 \begin{equation}
     \mathcal{L}_{tri}^{offline}(\theta; \Omega) := \sum_{(a, p, n) \in \Omega} \mathcal{L}_{tri}(\theta; a, p, n)
 \end{equation}
 
+\subsubsection{Problemas del minado \textit{offline}}
 
-\end{observacion}
-
-Este enfoque supone una serie de \textbf{problemas}:
+El minado de triples \textit{offline} supone una serie de \textbf{problemas}:
 
 \begin{itemize}
     \item Estamos dividiendo el proceso de aprendizaje en dos etapas, la de minado de triples y la de aprendizaje sobre estos triples. Esto añade complejidad a nuestra \textit{pipeline} (véase \customref{isec:pipeline})
@@ -447,12 +420,22 @@ Este enfoque supone una serie de \textbf{problemas}:
             \item Además, generalmente los modelos aprenden rápidamente a distinguir la mayoría de ejemplos en los que las diferencias son relativamente evidentes. Por tanto, en pocas iteraciones la mayoría de triples generados de forma \textit{offline} son demasiado sencillos, lo que agrava mucho el problema que hemos comentado
         \end{itemize}
     \item Sería conveniente disponer de alguna forma de ajustar la complejidad de los triples presentados. Podemos confiar en que al ir re-generando la lista de triples, la complejidad vaya aumentando. Pero el algoritmo de minado debería tener alguna forma de controlar el énfasis que se hace en la búsqueda de combinaciones difíciles, lo que añade aún más complejidad al sistema
-    \item El minado supone realizar un proceso de búsqueda, que es \textbf{muy lento} (evaluar de alguna forma todos los posibles triples supondría al menos $O(n^3)$). Lo ideal sería disponer de algún método que se basará en muestrear aleatoriamente de nuestra lista de elementos de la forma \lstinline{(imagen, identidad, edad)} (proceso que es muy rápido) y generar triples interesantes sobre dicho muestreo. Esto motiva la técnica introducida en \customref{isubs:triples_online}
+    \item El minado supone realizar un proceso de búsqueda, que es \textbf{muy lento} (evaluar de alguna forma todos los posibles triples supondría al menos $O(n^3)$). Lo ideal sería disponer de algún método que se basará en muestrear aleatoriamente de nuestra lista de elementos de la forma \lstinline{(imagen, identidad, edad)} (proceso que es muy rápido) y generar triples interesantes sobre dicho muestreo. Esto motiva la técnica introducida en \sectionref{isubs:triples_online}
 \end{itemize}
 
-\subsection{Enfoque \textit{online}} \label{isubs:triples_online}
+\section{Mejoras técnicas objeto de estudio}
 
-La idea común será la de implementar el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio sobre los datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Repetimos este proceso hasta agotar todos las entradas de nuestro \textit{dataset}, completando así una época de entrenamiento.
+Hemos introducido todos los conceptos teóricos suficientes para plantear una solución basada en aprendizaje automático para nuestro problema. Sin embargo, una \textbf{parte fundamental de este trabajo consiste en explorar algunas mejoras técnicas} introducidas en \cite{informatica:principal}. Dichas mejoras se resumen en:
+
+\begin{itemize}
+    \item Introducir una técnica para minar de forma \textit{online} los triples, basada en el muestreo \textit{PK-Sampling}
+    \item A partir del nuevo muestreo podemos definir dos variaciones sobre la función de pérdida
+    \item Exploramos el uso de una nueva función de distancia
+\end{itemize}
+
+\subsection{Enfoque online de \textit{Triplet Loss}} \label{isubs:triples_online}
+
+Buscamos modificar el minado de triples \textit{offline} para solucionar alguno de sus problemas que hemos comentado. Para ello implementaremos el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio sobre nuestros datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Repetimos este proceso hasta agotar todos las entradas de nuestro \textit{dataset}, completando así una época de entrenamiento.
 
 Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales del proceso (muestreo y selección de triples):
 
@@ -467,9 +450,9 @@ Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber
 
 Desarrollada esta visión de forma general, veamos cómo se implementa cada una de las partes, siguiendo las técnicas introducidas en \cite{informatica:principal}.
 
-\subsection{Muestreo de los datos con \textit{P-K sampling}} \label{isubs:muestreo_datos_pk_sampling_teoria}
+\subsection{Generación online de \textit{batches} usando \textit{P-K sampling}} \label{isubs:muestreo_datos_pk_sampling_teoria}
 
-La \textbf{idea principal del muestreo} es lo que definiremos como \textbf{\textit{P-K sampling}}. Como ya hemos comentado en \customref{isubs:triples_online}, nuestra tarea ahora es generar un \textit{batch} de elementos de la forma \lstinline{(imagen, identidad, edad)}. En una segunda etapa (véase \customref{isubs:seleccion_de_triples}), otro algoritmo decide cómo generar triples a partir de estos datos.
+La \textbf{idea principal del muestreo} es lo que definiremos como \textbf{\textit{P-K sampling}}. Como ya hemos comentado en \sectionref{isubs:triples_online}, nuestra tarea ahora es generar un \textit{batch} de elementos de la forma \lstinline{(imagen, identidad, edad)}. En una segunda etapa (véase \sectionref{isubs:seleccion_de_triples}), otro algoritmo decide cómo generar triples a partir de estos datos.
 
 El algoritmo de muestreo \textit{P-K sampling} es muy sencillo. En cada muestreo, seleccionamos aleatoriamente $P$ identidades de individuos (o clases, en un ambiente más general en el que no necesariamente estemos trabajando con imágenes de personas). Por cada una de las identidades, seleccionamos aleatoriamente $K$ imágenes asociadas a esa identidad. Por tanto, obtenemos una lista de $P \cdot K$ imágenes, a la que llamaremos \textbf{\textit{P-K batch}}. Para poder obtener triples interesantes en la siguiente etapa, parece que lo deseable es que ambos muestreos aleatorios sean sin repetición.
 
@@ -481,17 +464,13 @@ El hecho de tener $K$ imágenes por cada uno de los individuos seleccionados es 
     \caption{Ejemplo gráfico del proceso de \textit{P-K sampling}. Imagen extraída de \cite{informatica:paper_image_pk_sampling}}
 \end{figure}
 
-Queda aquí claro el \textbf{problema principal} que introduce esta técnica: si queremos muestrear $K$ imágenes de cada individuo sin repetición, cada individuo debe tener asociadas al menos $K$ imágenes. Así que a la hora de trabajar con un \textit{dataset}, siempre deberíamos comprobar la distribución del número de imágenes por individuo, como haremos en \customref{isec:base_datos_usada}.
+Queda aquí claro el \textbf{problema principal} que introduce esta técnica: si queremos muestrear $K$ imágenes de cada individuo sin repetición, cada individuo debe tener asociadas al menos $K$ imágenes. Así que a la hora de trabajar con un \textit{dataset}, siempre deberíamos comprobar la distribución del número de imágenes por individuo, como haremos en \sectionref{isec:base_datos_usada}.
 
-\subsection{Selección de triples y funciones de pérdida} \label{isubs:seleccion_de_triples}
+\subsection{Selección de triples y variaciones en la función de pérdida} \label{isubs:seleccion_de_triples}
 
 Una vez que tenemos un \textit{batch} de $P \cdot K$ elementos, deberemos generar una lista de triples en base a este \textit{batch}. Una vez se especifica cómo se seleccionan los triples, usando \eqref{ieq:triplet_loss_single_entry}, inducimos de forma natural y directa una cierta función de pérdida que actúa sobre estos \textit{P-K batches}.
 
-\begin{observacion}[Notación para los \textit{P-K batches}] \label{iobs:notacion_pk_formulas}
-
-    Vamos a trabajar con $P \cdot K$ elementos, cada uno correspondiendo a una clase en concreto. Por tanto, indexaremos los elementos de la forma $x_k^p$ donde $p$ marca el identificador del individuo, y $k$ marca a cuál de las $K$ imágenes del individuo $p$ nos estamos refiriendo
-
-\end{observacion}
+Introducimos una notación que nos va a ser útil. Trabajamos $P \cdot K$ elementos, cada uno correspondiendo a una clase en concreto. Por tanto, indexaremos los elementos de la forma $x_k^p$ donde $p$ marca el identificador del individuo, y $k$ marca a cuál de las $K$ imágenes del individuo $p$ nos estamos refiriendo
 
 \subsubsection{\textit{Batch Hard}} \label{isubsubs:batch_hard}
 
@@ -508,13 +487,13 @@ Esto introduce la siguiente función de pérdida, a la que llamaremos \textbf{\t
 
 donde $[x]_+ := max \{0, x\} = ReLU(x)$ y $\hat{\Omega}$ se refiere a un \textit{P-K batch}. No olvidemos que no estamos escribiendo la división por el número de sumandos, $P \cdot K$.
 
-Estamos generando \textbf{triples moderados}, porque estamos buscando los triples más difíciles, pero dentro de un \textit{batch} relativamente pequeño comparado a el total del conjunto de datos. Con esto estamos ajustando la dificultad de los triples cómodamente, resolviendo el problema que comentábamos en \customref{isubs:enfoque_offline_minado_triples}. Aumentando el valor de $\{P, K\}$ aumentamos el tamaño del espacio de búsqueda, y por tanto podremos encontrar triples mucho más difíciles. Sin embargo, hay que tener siempre en cuenta el coste en tiempo de cómputo.
+Estamos generando \textbf{triples moderados}, porque estamos buscando los triples más difíciles, pero dentro de un \textit{batch} relativamente pequeño comparado a el total del conjunto de datos. Con esto estamos ajustando la dificultad de los triples cómodamente, resolviendo el problema que comentábamos en \sectionref{isubs:enfoque_offline_minado_triples}. Aumentando el valor de $\{P, K\}$ aumentamos el tamaño del espacio de búsqueda, y por tanto podremos encontrar triples mucho más difíciles. Sin embargo, hay que tener siempre en cuenta el coste en tiempo de cómputo.
 
 Queda claro que, gracias al proceso de \textit{P-K sampling}, ahora es factible realizar una búsqueda de triples interesantes en profundidad, basándonos en el estado más actualizado de la red para calcular la dificultad de los triples. Esta búsqueda extensiva no habría sido posible si la planteásemos sobre todo el conjunto de datos.
 
 \subsubsection{\textit{Batch All}} \label{isubsubs:batch_all}
 
-Motivados por lo que acabamos de comentar en \customref{isubsubs:batch_hard}, podemos plantearnos usar todos los posibles triples dentro de un \textit{P-K batch} como un enfoque que ahora cobra más sentido (ya hemos comentado en \customref{isubs:enfoque_offline_minado_triples} que realizar esto sobre todo el conjunto de datos no parece una buena idea).
+Motivados por lo que acabamos de comentar en \sectionref{isubsubs:batch_hard}, podemos plantearnos usar todos los posibles triples dentro de un \textit{P-K batch} como un enfoque que ahora cobra más sentido (ya hemos comentado en \sectionref{isubs:enfoque_offline_minado_triples} que realizar esto sobre todo el conjunto de datos no parece una buena idea).
 
 Realizar esto introduce la función de pérdida que llamaremos \textbf{\textit{Batch All}}:
 
@@ -533,7 +512,7 @@ Está claro que, por el número de sumandos, esta aproximación es viable gracia
     P \cdot K \cdot (K - 1) \cdot (P - 1) \cdot K = P^2 - P + K^3 - K^2 \approx P^2 + K^3
 \end{equation}
 
-Esta aproximación sería completamente inviable sobre un número muy elevado de elementos. Pensemos, por ejemplo, en las 163446 imágenes de \textit{CACD} (véase \customref{isec:dataset_cacd}).
+Esta aproximación sería completamente inviable sobre un número muy elevado de elementos. Pensemos, por ejemplo, en las 163446 imágenes de \textit{CACD} (conjunto de datos que estudiamos en \sectionref{isec:dataset_cacd}).
 
 \subsubsection{Mejoras introducidas a partir de la experimentación} \label{isubsubs:mejoras_sumandos_no_nulos}
 
@@ -560,17 +539,16 @@ El desarrollo que hemos realizado justifica las siguientes \textbf{ventajas} de 
 A pesar de esto, a raíz de trabajar con estas nuevas técnicas, identificamos los siguientes \textbf{inconvenientes}:
 
 \begin{itemize}
-    \item Introducimos dos hiperparámetros, $\{P, K\}$ que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \customref{isec:hptuning_kfold_cross_validation} e implementamos en \customref{isec:hp_tuning}
+    \item Introducimos dos hiperparámetros, $\{P, K\}$ que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \sectionref{isec:hptuning_kfold_cross_validation} e implementamos en \sectionref{isec:hp_tuning}
     \item Tenemos que tener mucho cuidado con usar valores elevados de $\{P, K\}$ por dos motivos. El primero, y como ya hemos comentado, valores altos implicarán que los tiempos de cómputo para la generación de triples crecerán rápidamente. El segundo es que el tamaño de los \textit{batches} crecerán considerablemente, llegando a colapsar la memoria disponible de la \textit{GPU}
     \item Hemos comprobado en la práctica que es realmente fácil colapsar la memoria \textit{GPU}, usando modelos profundos como \textit{ResNet50} con valores de $P \cdot K = 100$. Esto supone que, aunque no estuviéramos limitados por el tiempo de cómputo, el colapso de la memoria limita el conjunto de valores $\{P, K\}$ con los que podemos experimentar
-    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo. Por este motivo hemos estudiado esta distribución en \customref{isec:base_datos_usada}. Se pueden explorar técnicas como el aumentado de datos para alcanzar el número de imágenes por individuo deseado, pero solo serán efectivas si dicha distribución es buena para empezar (véase \customref{isec:aumentado_datos})
-    \item Tanto por el formato de los datos con los que hemos trabajado, como por el cambio fundamental realizado en el \textit{sampling} de los datos, hemos tenido que realizar un \textbf{esfuerzo considerable de implementación}, al no poder basarnos en la mayor parte de los casos en código implementado por alguna biblioteca de aprendizaje automático. Esto se ve reflejado en \customref{ich:implementacion}
+    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo. Por este motivo hemos estudiado esta distribución en \sectionref{isec:base_datos_usada}. Se pueden explorar técnicas como el aumentado de datos para alcanzar el número de imágenes por individuo deseado, pero solo serán efectivas si dicha distribución es buena para empezar (véase \sectionref{isec:aumentado_datos})
+    \item Tanto por el formato de los datos con los que hemos trabajado, como por el cambio fundamental realizado en el \textit{sampling} de los datos, hemos tenido que realizar un \textbf{esfuerzo considerable de implementación}, al no poder basarnos en la mayor parte de los casos en código implementado por alguna biblioteca de aprendizaje automático. Esto se ve reflejado en \sectionref{ich:implementacion}
 \end{itemize}
 
-\section{Función de distancia}
+\subsection{Variaciones en la función de distancia}
 
 En todos los conceptos que hemos ido introduciendo la función de distancia
-
 
 \begin{equation}
     D: X \times X \to [0, \infty)
@@ -588,21 +566,17 @@ Sin embargo, motivados por \cite{informatica:principal}, decidimos usar la dista
         D(x_i, x_j) := ||f_{\theta}(x_i) - f_{\theta}(x_j)||_2
 \end{equation}
 
-\section{Márgenes suaves} \label{isec:margenes_suaves}
+\subsection{Márgenes suaves} \label{isec:margenes_suaves}
 
-En \customref{isec:triplet_loss} hemos justificado por qué es necesario introducir un término $\alpha$ para controlar el margen y evitar que nuestro modelo aprenda a colapsar todas las entradas al vector $\vec{0}$. Con esto llegamos a la ecuación \eqref{ieq:triplet_loss_single_entry}.
+En \sectionref{isec:triplet_loss} hemos justificado por qué es necesario introducir un término $\alpha$ para controlar el margen y evitar que nuestro modelo aprenda a colapsar todas las entradas al vector $\vec{0}$. Con esto llegamos a la ecuación \eqref{ieq:triplet_loss_single_entry}.
 
-En dicha función de pérdida, el propósito de $x \mapsto \max\{0, x + \alpha\}$ (conocida comúnmente como \textit{hinge function} \cite{informatica:principal}) es no corregir ejemplos que, en vista del margen $\alpha$ establecido, ya son correctos. Pero puede ser que estemos interesados en afinar aún más ejemplos que, para dicho valor del margen, sean correctos. Con esto conseguiríamos seguir acercando imágenes del mismo individuo lo máximo posible \cite{informatica:principal}.
-
-Es por esto que se propone en \cite{informatica:principal} usar la función \textbf{\textit{softplus}}:
+En dicha función de pérdida, el propósito de $x \mapsto \max\{0, x + \alpha\}$ (conocida comúnmente como \textit{hinge function}) es no corregir ejemplos que, en vista del margen $\alpha$ establecido, ya son correctos. Pero puede ser que estemos interesados en afinar aún más ejemplos que, para dicho valor del margen, sean correctos. Con esto conseguiríamos seguir acercando imágenes del mismo individuo lo máximo posible \cite{informatica:principal}. Es por esto que se propone en usar la función \textbf{\textit{softplus}}:
 
 \begin{equation}
     x \mapsto ln(1 + exp(x))
 \end{equation}
 
-Dicha función puede verse como una versión suavizada de la función \textit{hinge}. Decae exponencialmente, por lo que ejemplos correctos se penalizarán exponencialmente menos cuanto más cercanos estén, pero contrasta con la función \textit{hinge} en que no presenta un salto o corte fuerte. Por tanto, se suele decir que estamos usando un \textbf{margen suave}.
-
-Además, una ventaja de esta función es que \textbf{desechamos el hiperparámetro $\alpha$}, el cual ya no tenemos que fijar a través de algún método (como podría ser el \textit{hyperparameter tuning}).
+Dicha función puede verse como una versión suavizada de la función \textit{hinge}. Decae exponencialmente, por lo que ejemplos correctos se penalizarán exponencialmente menos cuanto más cercanos estén, pero contrasta con la función \textit{hinge} en que no presenta un salto o corte fuerte. Por tanto, se suele decir que estamos usando un \textbf{margen suave}. Además, una ventaja de esta función es que \textbf{desechamos el hiperparámetro $\alpha$}, el cual ya no tenemos que fijar a través de algún método (como podría ser el \textit{hyperparameter tuning}).
 
 \begin{figure}[H]
 \centering
@@ -628,5 +602,5 @@ Además, una ventaja de esta función es que \textbf{desechamos el hiperparámet
     \label{img:graficas_margenes}
 \end{figure}
 
-Las gráficas mostradas en \customref{img:graficas_margenes} nos sirven para visualizar de forma sencilla todo lo que hemos comentado. La función \textit{softplus} actúa como una \textit{hinge} suavizada. El hecho de que se parezcan tanto cuando hacemos que el margen de \textit{hinge} sea cero nos hace pensar que \textit{softplus} va a actuar como una \textit{hinge} en la que no hay margen, y por lo tanto, acercará elementos de la misma clase todo lo que pueda.
+Las gráficas mostradas en \imgref{img:graficas_margenes} nos sirven para visualizar de forma sencilla todo lo que hemos comentado. La función \textit{softplus} actúa como una \textit{hinge} suavizada. El hecho de que se parezcan tanto cuando hacemos que el margen de \textit{hinge} sea cero nos hace pensar que \textit{softplus} va a actuar como una \textit{hinge} en la que no hay margen, y por lo tanto, acercará elementos de la misma clase todo lo que pueda.
 
