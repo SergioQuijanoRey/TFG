@@ -1,10 +1,11 @@
 \chapter{Materiales y métodos} \label{ich:materiales_metodos}
+\todo{Seleccionar calidad de las imágenes sacadas de \textit{matplotlib}}
 
 \section{Descripción de las bases de datos usadas} \label{isec:base_datos_usada}
 
-Como ya hemos comentado en \customref{isec:planificacion}, teniendo en cuenta que íbamos a tener que realizar un gran número de implementaciones, decidimos iterar sobre varias bases de datos.
+Como ya hemos comentado en \sectionref{isec:planificacion}, teniendo en cuenta que íbamos a tener que realizar un gran número de implementaciones, decidimos iterar sobre varias bases de datos.
 
-Sabemos además que las bases de datos con las que trabajemos deberán cumplir ciertas características para ser útiles. Por ejemplo, en \customref{isubsubs:observaciones_conclusiones_pksampling}, hemos justificado la necesidad de realizar un estudio sobre la distribución del número de imágenes por individuo.
+Sabemos además que las bases de datos con las que trabajemos deberán cumplir ciertas características para ser útiles. Por ejemplo, en \sectionref{isubsubs:observaciones_conclusiones_pksampling}, hemos justificado la necesidad de realizar un estudio sobre la distribución del número de imágenes por individuo.
 
 Por tanto, en esta sección introduciremos las bases de datos usadas durante el proyecto y estudiaremos ciertas características sobre ellas.
 
@@ -39,7 +40,7 @@ En este caso damos un salto de calidad en cuanto a lo adecuada que es la base de
 
 \begin{itemize}
     \item Estamos trabajando con imágenes faciales en vez de con imágenes de dígitos manuscritos
-    \item El tamaño del \textit{dataset} ha aumentado considerablemente. Como veremos más adelante, en \customref{isec:optimizacion_codigo}, esto ya hace que tengamos que plantearnos optimizaciones de nuestros módulos de código
+    \item El tamaño del \textit{dataset} ha aumentado considerablemente. Como veremos más adelante, en \sectionref{isec:optimizacion_codigo}, esto ya hace que tengamos que plantearnos optimizaciones de nuestros módulos de código
     \item La tarea de \textit{retrieval} ya tiene sentido (esto no ocurría al trabajar con dígitos manuscritos)
 \end{itemize}
 
@@ -48,7 +49,7 @@ Tenemos una serie de \textbf{problemas con esta base de datos}, que motiva el us
 \begin{itemize}
     \item En primer lugar, y como se indica en \cite{informatica:lfw_dataset}, esta base de datos está pensada para resolver una tarea de verificación. Aunque nos centremos en computar un \textit{embedding} (tarea que deberíamos poder resolver sin problemas), la propia institución ya nos está advirtiendo sobre lo inadecuada de la base de datos para intentar resolver una tarea de \textit{retrieval}
     \item Hay grupos que no están propiamente representados. Por ejemplo, apenas hay niños o personas por encima de los 80 años. Las mujeres y ciertos grupos étnicos están infrarrepresentados. En nuestro caso, es \textbf{especialmente grave la infrarrepresentación de ciertos grupos de edad}
-    \item En \customref{ich:fundamentos_teoricos} hemos visto que para computar \textit{P-K batches} es fundamental que cada individuo tenga el máximo número de fotografías asociadas. De nada nos sirve, por ejemplo, tener una base de datos enorme pero con solo una fotografía por persona. En este sentido, y como indica \cite{informatica:lfw_dataset}, solo 1680 individuos tienen dos fotografías o más. Esto hace que tomar valores altos en el \textit{P-K sampling} sea imposible, y que por ello, tengamos que recurrir al aumentado de datos. Como comentaremos en \customref{isec:aumentado_datos}, esto será un reto importante de cara a mantener un rendimiento aceptable
+    \item En \sectionref{ich:fundamentos_teoricos} hemos visto que para computar \textit{P-K batches} es fundamental que cada individuo tenga el máximo número de fotografías asociadas. De nada nos sirve, por ejemplo, tener una base de datos enorme pero con solo una fotografía por persona. En este sentido, y como indica \cite{informatica:lfw_dataset}, solo 1680 individuos tienen dos fotografías o más. Esto hace que tomar valores altos en el \textit{P-K sampling} sea imposible, y que por ello, tengamos que recurrir al aumentado de datos. Como comentaremos en \sectionref{isec:aumentado_datos}, esto será un reto importante de cara a mantener un rendimiento aceptable
     \item Este \textit{dataset} no introduce ninguna forma de trabajar la invarianza a cambios de edad, por lo que, en última instancia, no es adecuado para nuestros propósitos
 \end{itemize}
 
@@ -62,7 +63,7 @@ Acabamos de comentar la importancia de la distribución del número de imágenes
     \caption{Distribución del número de imágenes por cada individuo. En el eje horizontal, tenemos el número de imágenes por cada individuo. En vertical, la cantidad de individuos que tienen un cierto número de imágenes}
 \end{figure}
 
-Podemos ver que la mayoría de individuos solo tienen una imagen o dos. Teniendo en cuenta que casi siempre trabajamos usando al menos tres imágenes por clase, queda clara la necesidad de usar aumento de datos, que introduciremos en \customref{isec:aumentado_datos}.
+Podemos ver que la mayoría de individuos solo tienen una imagen o dos. Teniendo en cuenta que casi siempre trabajamos usando al menos tres imágenes por clase, queda clara la necesidad de usar aumento de datos, que introduciremos en \sectionref{isec:aumentado_datos}.
 
 Veamos cómo queda esta distribución tras forzar que cada individuo tenga al menos un número asociado de imágenes, usando aumentado de datos:
 
@@ -89,13 +90,13 @@ Veamos cómo queda esta distribución tras forzar que cada individuo tenga al me
     \label{img:distribuciones_forzar_data_augmentation}
 \end{figure}
 
-Las distribuciones que se muestran en \customref{img:distribuciones_forzar_data_augmentation} muestran una propiedad clara: haciendo aumento de datos, la mayoría de individuos basan la variedad de sus imágenes en el aumento de datos. Además, esto ocurre por muy bajo que sea el número de imágenes por individuo que queramos obtener, como muestran las tres distribuciones prácticamente idénticas. Esto indica que seguramente los resultados obtenidos no sean demasiado buenos, puesto que la mayoría de imágenes de un individuo serán una o dos \entrecomillado{repetidas} (aunque apliquemos transformaciones propias del aumento de datos). Los posibles problemas que esto supone se agravan aún más al estar usando \textit{triplet loss} (véase \customref{isec:triplet_loss}).
+Las distribuciones que se muestran en la \imgref{img:distribuciones_forzar_data_augmentation} muestran una propiedad clara: haciendo aumento de datos, la mayoría de individuos basan la variedad de sus imágenes en el aumento de datos. Además, esto ocurre por muy bajo que sea el número de imágenes por individuo que queramos obtener, como muestran las tres distribuciones prácticamente idénticas. Esto indica que seguramente los resultados obtenidos no vayan a ser demasiado buenos, puesto que la mayoría de imágenes de un individuo serán una o dos \entrecomillado{repetidas} (aunque apliquemos transformaciones propias del aumento de datos). Los posibles problemas que esto supone se agravan aún más al estar usando \textit{triplet loss} (véase \sectionref{isec:triplet_loss}).
 
 Además, en este \textit{dataset} no tenemos información sobre las edades de los individuos en cada una de sus imágenes, así que no podemos hacer un estudio en más profundidad en este aspecto.
 
 \subsection{\textit{FG-Net}} \label{isec:fgnet}
 
-La \textbf{tercera base de datos} con la que trabajamos es \textit{FG-Net dataset}. La fuente original de este conjunto de datos ya no está operativa, y ahora estos datos se ofrecen en \cite{informatica:fgnet_dataset}. Este conjunto de datos se compone de 1.002 imágenes de 82 individuos distintos. Es el \textit{dataset} más popular sobre \textit{AIFR} \cite{informatica:best_fgnet_model}.
+La \textbf{tercera base de datos} con la que trabajamos es \textit{FG-Net dataset}. La fuente original de este conjunto de datos ya no está operativa, y ahora estos datos se ofrecen en \cite{informatica:fgnet_dataset}. Este conjunto de datos se compone de 1.002 imágenes de 82 individuos distintos. Es el \textbf{\textit{dataset} más popular sobre \textit{AIFR}} \cite{informatica:best_fgnet_model}.
 
 \begin{figure}[H]
     \centering
@@ -103,7 +104,7 @@ La \textbf{tercera base de datos} con la que trabajamos es \textit{FG-Net datase
     \caption{Muestra de ejemplo del \textit{dataset} \textit{FG-Net}. Imagen extraída de \cite{informatica:fg_net_papers_with_code}}
 \end{figure}
 
-Este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}. Por tanto, y como indicamos en \customref{isec:datasets_customs}, realizamos una implementación de \lstinline{torch.utils.data.Dataset} propia, para poder trabajar con estos datos.
+Este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}. Por tanto, y como indicamos posteriormente en \sectionref{isec:datasets_customs}, realizamos una implementación de \lstinline{torch.utils.data.Dataset} propia, para poder trabajar con estos datos.
 
 Dicho conjunto de datos se compone de:
 
@@ -119,8 +120,8 @@ Y de nuevo, este \textit{dataset} presenta un salto de calidad respecto al anter
 
 \begin{itemize}
     \item Trabajamos con un conjunto de datos cuya dificultad principal es la de la varianza en la edad. Esto se alinea por completo con el problema que queremos resolver
-    \item El número de imágenes por individuo es mucho mejor que en \textit{LFW}, como muestran \customref{img:fgnet_images_per_class} y \customref{table:fgnet_images_per_class}
-    \item Tenemos información sobre la distribución de la edad de nuestros individuos, que estudiamos en \customref{isubsubs:fgnet_dist_edades} y en \customref{isubsubs:fgnet_rango_edades}
+    \item El número de imágenes por individuo es mucho mejor que en \textit{LFW}, como muestran la \imgref{img:fgnet_images_per_class} y la \tableref{table:fgnet_images_per_class}
+    \item Tenemos información sobre la distribución de la edad de nuestros individuos, que estudiamos en \sectionref{isubsubs:fgnet_dist_edades} y en \sectionref{isubsubs:fgnet_rango_edades}
 \end{itemize}
 
 \subsubsection{Distribución del número de imágenes por individuo}
@@ -193,7 +194,7 @@ Que complementamos con las siguientes estadísticas
     \label{table:fgnet_estadisticas_edad}
 \end{table}
 
-El histograma \customref{img:fgnet_histograma_edad} nos muestra una distribución asímetrica, con una mayor concentración de individuos en edades bajas. Esto puede ser un problema a la hora de que un modelo entrenado sobre estos datos generalice adecuadamente. Por ejemplo, en el caso de que trabajemos con personas de una edad más adulta. En el histograma se observa un pico de frecuencia entorno a los 20 años. La moda nos indica que dicho pico se produce, en efecto, en los 18 años. Parece ser que dicha edad es un momento especial en el que se registran más fotografías de lo usual.
+El histograma dado en \imgref{img:fgnet_histograma_edad} nos muestra una distribución asimétrica, con una mayor concentración de individuos en edades bajas. Esto puede ser un problema a la hora de que un modelo entrenado sobre estos datos generalice adecuadamente. Por ejemplo, en el caso de que trabajemos con personas de una edad más adulta. En el histograma se observa un pico de frecuencia entorno a los 20 años. La moda nos indica que dicho pico se produce, en efecto, en los 18 años. Parece ser que dicha edad es un momento especial en el que se registran más fotografías de lo usual.
 
 El rango de edades es muy amplio, yendo desde los 0 años (en \textit{LFW} ya comentábamos el problema que suponía no tener imágenes de niños) hasta los 69 años.
 
@@ -248,7 +249,7 @@ En base a estos datos, podemos observar:
 \begin{itemize}
     \item El rango mínimo de edad es de 11 años. Esto es, dado cualquier individuo del conjunto de datos, tenemos aseguradas imágenes que difieren en al menos 11 años. El máximo rango es de 55 años. Esto supone una gran riqueza en los datos, y a la vez, una gran dificultad a la hora de trabajar la invarianza a los cambios de edad
     \item De media tenemos un rango de aproximadamente 27 años. Y la mayoría de nuestros datos se encuentran dentro de unas diferencias de edad de entre 18 y 37 años (aproximadamente). De nuevo, esto marca la calidad en cuanto a rangos de edad se refiere
-    \item En \customref{img:fgnet_rangos_individuales} podemos ver claramente que la mayoría de individuos tienen imágenes en rangos de edad que podemos considerar bajos (por debajo de 10 años)
+    \item En \imgref{img:fgnet_rangos_individuales} podemos ver claramente que la mayoría de individuos tienen imágenes en rangos de edad que podemos considerar bajos (por debajo de 10 años)
 \end{itemize}
 
 \subsubsection{Inconvenientes} \label{isubsubs:fgnet_inconvenientes}
@@ -266,11 +267,11 @@ Todo lo comentado previamente muestra los siguientes \textbf{inconvenientes}:
         \end{itemize}
 \end{enumerate}
 
-Es por tanto que, siguiendo el procedimiento propuesto en \cite{informatica:best_fgnet_model}, usaremos este \textit{dataset} para validar el modelo entrenado sobre un conjunto de datos mucho mayor, en este caso, \customref{isec:dataset_cacd}.
+Es por tanto que, siguiendo el procedimiento propuesto en \cite{informatica:best_fgnet_model}, usaremos este \textit{dataset} para validar el modelo entrenado sobre un conjunto de datos mucho mayor, en este caso, \sectionref{isec:dataset_cacd}.
 
 \subsection{\textit{CACD}} \label{isec:dataset_cacd}
 
-La \textbf{cuarta y última base de datos} con la que trabajamos es \entrecomillado{Cross-Age Celebrity Dataset} o \textit{CACD}. Como su propio nombre sugiere, se trata de una base de datos de celebridades en distintos momentos de su vida. Podemos acceder a estos datos en \cite{informatica:cacd_dataset}. El proceso de construcción de este conjunto de datos se especifica en \cite{informatica:paper_cacd}. En el momento de la publicación era el \textit{dataset} sobre \textit{AIFR} más grande.
+La \textbf{cuarta y última base de datos} con la que trabajamos es \entrecomillado{Cross-Age Celebrity Dataset} o \textit{CACD}. Como su propio nombre indica, se trata de una base de datos de celebridades en distintos momentos de su vida. Podemos acceder a estos datos en \cite{informatica:cacd_dataset}. El proceso de construcción de este conjunto de datos se especifica en \cite{informatica:paper_cacd}. En el momento de la publicación era el \textit{dataset} sobre \textit{AIFR} más grande.
 
 Este \textit{dataset} se compone de 163.446 imágenes de 2.000 celebridades en edades que van desde los 16 hasta los 62 años \cite{informatica:paper_cacd}. Dichas imágenes fueron recolectadas de internet realizando búsquedas de ciertos individuos entre los años 2004 y 2013. Sabiendo la fecha de nacimiento de la celebridad, y el año de búsqueda, se computa la edad de dicha celebridad en cada imagen.
 
@@ -281,7 +282,7 @@ Este \textit{dataset} se compone de 163.446 imágenes de 2.000 celebridades en e
     \label{img:cacd_imagenes_ejemplo}
 \end{figure}
 
-De nuevo, este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}, por lo que realizamos otra implementación de \lstinline{torch.utils.data.Dataset}, como desarrollamos en \customref{isec:datasets_customs}. El conjunto de datos se compone de:
+De nuevo, este conjunto de datos no se ofrece en ninguna librería conocida de \textit{machine learning}, por lo que realizamos otra implementación de \lstinline{torch.utils.data.Dataset}, como desarrollamos más adelante en \sectionref{isec:datasets_customs}. El conjunto de datos se compone de:
 
 \begin{itemize}
     \item Las imágenes de las celebridades
@@ -294,10 +295,10 @@ De nuevo, trabajamos únicamente con el conjunto de datos de imágenes, sin anot
 \begin{itemize}
     \item En primer lugar, tenemos varianza en la edad de los individuos, que es fundamental para resolver nuestro problema
     \item El tamaño del conjunto de datos ahora es elevado, con lo que podemos plantearnos el aprendizaje de un modelo lo suficientemente potente
-    \item El número de imágenes por individuo es excelente, aún mejor que en \textit{FG-Net}, como mostraremos en \customref{isubsubs:cacd_images_per_indv}
+    \item El número de imágenes por individuo es excelente, aún mejor que en \textit{FG-Net}, como mostraremos en \sectionref{isubsubs:cacd_images_per_indv}
 \end{itemize}
 
-Además, como hemos comentado en \customref{isubsubs:fgnet_inconvenientes}, usaremos este \textit{dataset} en conjunto con \textit{FG-Net}. Sobre este conjunto de datos se realizará principalmente el entrenamiento, usando \textit{FG-Net} únicamente para validar el modelo obtenido.
+Además, como hemos comentado en \sectionref{isubsubs:fgnet_inconvenientes}, usaremos este \textit{dataset} en conjunto con \textit{FG-Net}. Sobre este conjunto de datos se realizará principalmente el entrenamiento, usando \textit{FG-Net} únicamente para validar el modelo obtenido.
 
 \subsubsection{Distribución del número de imágenes por individuo} \label{isubsubs:cacd_images_per_indv}
 
@@ -332,7 +333,7 @@ De nuevo, complementamos con las siguientes estadísticas de la distribución:
 \caption{Datos estadísticos sobre la distribución del número de imágenes por individuo}
 \end{table}
 
-Podemos ver en \customref{img:cacd_distr_images_per_class}, que el número de imágenes por cada individuo parece seguir una distribución normal. Sin embargo, no nos interesa comprobar dicha hipótesis, pues es un hecho del que no vamos a aprovecharnos. Como mínimo, cada celebridad tiene 22 imágenes asociadas. Esto supone todavía una mejora respecto a \textit{FG-Net}. Llegamos a tener 139 imágenes por individuo como máximo. La mayoría de individuos tienen entre 68 y 95 imágenes asociadas. Por tanto, a la hora de establecer los valores del \textit{P-K sampling}, podemos tomar valores relativamente altos de $K$ (véase \customref{ich:fundamentos_teoricos}).
+Podemos ver en la \imgref{img:cacd_distr_images_per_class}, que el número de imágenes por cada individuo parece seguir una distribución normal. Sin embargo, no nos interesa comprobar dicha hipótesis, pues es un hecho del que no vamos a aprovecharnos. Como mínimo, cada celebridad tiene 22 imágenes asociadas. Esto supone todavía una mejora respecto a \textit{FG-Net}. Llegamos a tener 139 imágenes por individuo como máximo. La mayoría de individuos tienen entre 68 y 95 imágenes asociadas. Por tanto, a la hora de establecer los valores del \textit{P-K sampling}, podemos tomar valores relativamente altos de $K$ (véase \sectionref{ich:fundamentos_teoricos}).
 
 \subsubsection{Distribución de edad de los individuos}
 
@@ -364,7 +365,7 @@ Complementamos con las siguientes estadísticas:
 \caption{Algunas estadísticas sobre la distribución de la edad en nuestro conjunto de datos}
 \end{table}
 
-Esta vez tenemos una distribución más simétrica de las edades, con una media de aproximadamente 38 años. Las edad mínima es de 14 años, muy alejada de los 0 años de \textit{FG-Net} (\customref{table:fgnet_estadisticas_edad}). Esto puede suponer algunos problemas a la hora de entrenar un modelo en \textit{CACD} y que generalice correctamente en \textit{FG-Net}. No entraremos en comparaciones más profundas, pues esto lo haremos en \customref{isec:comparaciones_datasets}.
+Esta vez tenemos una distribución más simétrica de las edades, con una media de aproximadamente 38 años. La edad mínima es de 14 años, muy alejada de los 0 años de \textit{FG-Net} (\tableref{table:fgnet_estadisticas_edad}). Esto puede suponer algunos problemas a la hora de entrenar un modelo en \textit{CACD} y que generalice correctamente en \textit{FG-Net}. No entraremos en comparaciones más profundas, pues esto lo haremos en \sectionref{isec:comparaciones_datasets}.
 
 \subsubsection{Distribución del rango de edad por individuo}
 
@@ -376,7 +377,7 @@ Veamos ahora los \textbf{rangos de edad} de cada uno de los individuos del conju
     \caption{Rangos de edad para todos los individuos. Los individuos están ordenados en primera instancia por su edad más baja, y en segunda instancia, por su edad más alta.}
 \end{figure}
 
-Esta gráfica ahora no es tan clara como cuando la presentábamos para \textit{FG-Net} en \customref{img:fgnet_rangos_distribucion}, así que procedemos a hacer algunas observaciones. En primer lugar, como se han recolectado los datos buscando imágenes correspondientes al periodo 2004-2013, el rango de edad siempre va a ser de 9 años. Esto lo vamos a comprobar posteriormente. Por esto mismo, y por el ordenamiento en base a la edad más baja de cada individuo, estamos visualizando la distribución de las edades. Es decir, fijándonos en el punto más bajo de cada línea, estamos viendo a aquellos individuos que en 2004 tenían cierta edad. Así que se pueden visualizar, de una forma poco conveniente, los grupos de edad presentes en nuestra base de datos.
+Esta gráfica ahora no es tan clara como cuando la presentábamos para \textit{FG-Net} en la \imgref{img:fgnet_rangos_distribucion}, así que procedemos a hacer algunas observaciones. En primer lugar, como se han recolectado los datos buscando imágenes correspondientes al periodo 2004-2013, el rango de edad siempre va a ser de 9 años. Esto lo vamos a comprobar posteriormente. Por esto mismo, y por el ordenamiento en base a la edad más baja de cada individuo, estamos visualizando la distribución de las edades. Es decir, fijándonos en el punto más bajo de cada línea, estamos viendo a aquellos individuos que en 2004 tenían cierta edad. Así que se pueden visualizar, de una forma poco conveniente, los grupos de edad presentes en nuestra base de datos.
 
 Confirmemos esto viendo las estadísticas sobre la distribución de los rangos de edad:
 
@@ -410,14 +411,14 @@ Por tanto, es totalmente innecesario mostrar el histograma de los rangos de edad
 Todo esto plantea los siguientes \textbf{inconvenientes}:
 
 \begin{itemize}
-    \item En primer lugar, los rangos de edad son muy pequeños y nada variables. Por ejemplo, en \customref{img:cacd_imagenes_ejemplo} podemos observar algunos casos en los que hay poca variabilidad por el paso de los años. Además, nuestro modelo siempre va a trabajar con diferencias de como mucho 9 años. No sabemos cómo puede comportarse cuando trabajemos con otros rangos de edad
-    \item En segundo lugar, y como comentaremos detalladamente en \customref{isec:comparaciones_datasets}, el conjunto de entrenamiento y de validación son muy distintos. Por ejemplo, no tenemos imágenes de personas por debajo de 14 años en \textit{CACD}, mientras que en \textit{FG-Net} hemos visto que tenemos imágenes desde cero años.
+    \item En primer lugar, los rangos de edad son muy pequeños y nada variables. Por ejemplo, en \imgref{img:cacd_imagenes_ejemplo} podemos observar algunos casos en los que hay poca variabilidad por el paso de los años. Además, nuestro modelo siempre va a trabajar con diferencias de como mucho 9 años. No sabemos cómo puede comportarse cuando trabajemos con otros rangos de edad
+    \item En segundo lugar, y como comentaremos detalladamente en \sectionref{isec:comparaciones_datasets}, el conjunto de entrenamiento y de validación son muy distintos. Por ejemplo, no tenemos imágenes de personas por debajo de 14 años en \textit{CACD}, mientras que en \textit{FG-Net} hemos visto que tenemos imágenes desde cero años.
     \item Por tanto, es realmente complicado que el modelo generalice. Sin embargo, de ser así, estaremos bastante seguros de haber construido un modelo robusto
 \end{itemize}
 
 \subsection{Comparación de los \textit{datasets} \textit{FG-Net} y \textit{CACD}} \label{isec:comparaciones_datasets}
 
-Como hemos comentado, tanto en \customref{isec:fgnet} como en \customref{isec:dataset_cacd}, usaremos el primer \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos. Repasaremos los apartados de estudio realizados en los dos últimos \textit{datasets}, comparando los resultados de ambos.
+Como hemos comentado, tanto en \sectionref{isec:fgnet} como en \sectionref{isec:dataset_cacd}, usaremos el primer \textit{dataset} para entrenar nuestro modelo, y el segundo para validar los resultados obtenidos. Por tanto, es relevante realizar una comparación de ciertas propiedades de ambos conjuntos de datos. Repasaremos los apartados de estudio realizados en los dos últimos \textit{datasets}, comparando los resultados de ambos.
 
 
 \subsubsection{Distribución del número de imágenes por individuo}
@@ -464,7 +465,7 @@ Podemos ver que:
 \begin{itemize}
     \item El número de imágenes por individuo es ampliamente superior en \textit{CACD} que en \textit{FG-Net}. Un claro indicador de esto es que el valor máximo en \textit{FG-Net} está por debajo del mínimo en \textit{CACD}. Este hecho puede ayudar a solventar algunos de los problemas sobre la diferencia en la distribución de la edad que plantea \textit{FG-Net}
     \item La desviación típica es mucho menor en \textit{FG-Net}. Por lo tanto, respecto al número de imágenes por individuo, quizás \textit{CACD} suponga algo más de dificultad, aunque esto no nos parece un factor realmente relevante
-    \item A la hora de entrenar, vamos a poder usar valores mucho más altos de $K$ en \textit{CACD} (véase \customref{isubs:muestreo_datos_pk_sampling_teoria}). Y este valor, en validación, se puede reducir (o directamente ignorar) para actuar sobre \textit{FG-Net}
+    \item A la hora de entrenar, vamos a poder usar valores mucho más altos de $K$ en \textit{CACD} (véase \sectionref{isubs:muestreo_datos_pk_sampling_teoria}). Y este valor, en validación, se puede reducir (o directamente ignorar) para actuar sobre \textit{FG-Net}
     \item La distribución en \textit{CACD} parece seguir una distribución normal, mientras que en \textit{FG-Net}, a priori, no se ve de forma tan clara. Aunque como ya hemos comentado previamente, no estamos interesados en comprobar estas hipótesis
 \end{itemize}
 
@@ -508,9 +509,9 @@ Podemos ver que:
 A partir de estos datos, podemos ver que:
 
 \begin{itemize}
-    \item Las formas de las dos distribuciones de datos, tal y como se aprecia en \customref{img:conjunta_fgnet_cacd_edades}, son completamente distintas. Por un lado, en \textit{FG-Net} tenemos una distribución muy asimétrica, acumulando la mayor parte de la densidad en edades bajas, entre 0 y 20 años. En \textit{CACD}, tenemos una distribución más o menos simétrica
+    \item Las formas de las dos distribuciones de datos, tal y como se aprecia en \imgref{img:conjunta_fgnet_cacd_edades}, son completamente distintas. Por un lado, en \textit{FG-Net} tenemos una distribución muy asimétrica, acumulando la mayor parte de la densidad en edades bajas, entre 0 y 20 años. En \textit{CACD}, tenemos una distribución más o menos simétrica
     \item El dominio en \textit{FG-Net} es mucho más amplio, con una edad mínima 14 años menor, y una edad máxima 7 años mayor
-    \item Por tanto, era razonable pensar que íbamos a tener una población mucho más adulta en \textit{CACD}, como muestran tanto los histogramas como el valor de la media y moda en \customref{table:conjunta_fgnet_cacd_estadisticas_edad}
+    \item Por tanto, era razonable pensar que íbamos a tener una población mucho más adulta en \textit{CACD}, como muestran tanto los histogramas como el valor de la media y moda en \tableref{table:conjunta_fgnet_cacd_estadisticas_edad}
     \item La concentración en edades bajas en \textit{FG-Net} puede presentar un \textbf{serio problema} a la hora de que un modelo entrenado sobre \textit{CACD} funcione correctamente
 \end{itemize}
 
@@ -557,10 +558,10 @@ A partir de estos datos, podemos ver que:
 A partir de esto, podemos ver que:
 
 \begin{itemize}
-    \item Como muestran tanto \customref{img:conjunta_fgnet_rangos_edades_individuales} como \customref{table:conjunta_fgnet_estadisticas_rangos_edad}, \textit{FG-Net} presenta una variabilidad en los rangos de edad que es prácticamente inexistente en \textit{CACD} (en la que salvo 15 individuos, el rango de edad siempre es de 9 años)
+    \item Como muestran tanto la \imgref{img:conjunta_fgnet_rangos_edades_individuales} como la \tableref{table:conjunta_fgnet_estadisticas_rangos_edad}, \textit{FG-Net} presenta una variabilidad en los rangos de edad que es prácticamente inexistente en \textit{CACD} (en la que salvo 15 individuos, el rango de edad siempre es de 9 años)
     \item Este problema se ve agravado cuando nos damos cuenta que la mayoría de individuos en \textit{FG-Net} tienen un rango de edad entre 18 y casi 38 años, que contrasta con el rango de 9 años constante en \textit{CACD}. Si el rango en \textit{CACD} fuese constante pero superior, al menos la falta de variabilidad podría no notarse tanto
-    \item Para \textit{FG-Net} tenía sentido mostrar el histograma de la distribución de rangos, en \customref{img:fgnet_rangos_distribucion}. Sin embargo, en \textit{CACD}, como no teníamos variabilidad, no mostramos dicho histograma
-    \item Así que las dificultades que veíamos en \customref{isubsubs:conjunta_fgnet_cacd_edades} se ven agravadas al estudiar la distribución de los rangos de edad
+    \item Para \textit{FG-Net} tenía sentido mostrar el histograma de la distribución de rangos, en \imgref{img:fgnet_rangos_distribucion}. Sin embargo, en \textit{CACD}, como no teníamos variabilidad, no mostramos dicho histograma
+    \item Así que las dificultades que veíamos en \sectionref{isubsubs:conjunta_fgnet_cacd_edades} se ven agravadas al estudiar la distribución de los rangos de edad
 \end{itemize}
 
 \section{Entorno de ejecución} \label{isec:entorno_ejecucion}
@@ -620,10 +621,11 @@ Como \textbf{sistema operativo}, hemos usado:
 \end{itemize}
 
 \section{Técnicas empleadas}
+% TODO -- seguir por aquí
 
 \subsection{Hyperparameter Tuning usando K-Fold Cross Validation} \label{isec:hptuning_kfold_cross_validation}
 
-Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de \textbf{fijar una serie de hiperparámetros} que afectan de forma esencial a la calidad de dicho modelo. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase \customref{isubs:muestreo_datos_pk_sampling_teoria}), el número de épocas de entrenamiento, ... Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos.
+Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de \textbf{fijar una serie de hiperparámetros} que afectan de forma esencial a la calidad de dicho modelo. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase \sectionref{isubs:muestreo_datos_pk_sampling_teoria}), el número de épocas de entrenamiento, ... Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos.
 
 Una técnica de \textbf{\textit{hyperparameter tuning}} estará formada por dos componentes:
 
@@ -632,7 +634,7 @@ Una técnica de \textbf{\textit{hyperparameter tuning}} estará formada por dos 
     \item Una segunda componente que tome los resultados de la primera componente, y genere nuevas configuraciones de hiperparámetros a explorar. Es decir, un algoritmo de búsqueda
 \end{itemize}
 
-Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search}, \textit{Random Search}, Optimización Bayesiana, algoritmos evolutivos basados en poblaciones, ... \cite{informatica:review_algoritmos_hp} En \customref{isec:hp_tuning} veremos que la librería \lstinline{optuna} se encarga de implementar esta búsqueda por nosotros.
+Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search}, \textit{Random Search}, Optimización Bayesiana, algoritmos evolutivos basados en poblaciones, ... \cite{informatica:review_algoritmos_hp} En \sectionref{isec:hp_tuning} veremos que la librería \lstinline{optuna} se encarga de implementar esta búsqueda por nosotros.
 
 Para la primera componente tenemos también varias alternativas. Una alternativa sería la de usar el subconjunto de entrenamiento para probar las configuraciones candidatas de hiperparámetros, y evaluar sobre el conjunto de \textit{test}. \textbf{Esta alternativa es completamente errónea}, pues estamos realizando \textit{data snooping}: incluimos datos de \textit{test} en el proceso de creación del modelo.
 
@@ -670,11 +672,11 @@ Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta t�
     \item Sin embargo, valores altos de $K$ suponen tiempos de cómputo grandes: entrenamos $K$ veces, y sobre un porcentaje grande del \textit{dataset} de entrenamiento: $\frac{K - 1}{K}$
 \end{itemize}
 
-Describimos cómo implementamos esta técnica en \customref{isec:hp_tuning}.
+Describimos cómo implementamos esta técnica en \sectionref{isec:hp_tuning}.
 
 \subsection{Normalización} \label{isubs:normalizacion_teoria}
 
-En \customref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \customref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
+En \sectionref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \sectionref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
 
 \begin{equation} \label{ieq:normalizacion}
     \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}
@@ -688,13 +690,13 @@ Además del interés que pueda tener estudiar el comportamiento de los modelos a
     \caption{Histórico de \textit{WANDB} que muestra un entrenamiento inestable que acaba por fallar. En las gráficas, los círculos indican entradas con el valor \lstinline{NaN}}
 \end{figure}
 
-En \customref{isubs:normalization_impl} estudiaremos la implementación de esta técnica en detalle.
+En \sectionref{isubs:normalization_impl} estudiaremos la implementación de esta técnica en detalle.
 
 \subsection{Localización de cuellos de botella en el código para realizar optimizaciones} \label{isubs:localizacion_partes_criticas}
 
-Como hemos comentado en \customref{isec:planificacion} y \customref{isec:base_datos_usada}, hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con estos problemas, identificamos qué partes del código son las responsables. Llamamos \textbf{cuellos de botella} o \textit{bottlenecks} a estas partes de código responsables de tiempos de ejecución elevados
+Como hemos comentado en \sectionref{isec:planificacion} y \sectionref{isec:base_datos_usada}, hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con estos problemas, identificamos qué partes del código son las responsables. Llamamos \textbf{cuellos de botella} o \textit{bottlenecks} a estas partes de código responsables de tiempos de ejecución elevados
 
-Realizaremos un \textit{profile} para identificar los cuellos de botella (véase \customref{isec:optimizacion_codigo}). Una vez identificamos \textit{bottlenecks}, sabemos en qué partes concretas debemos concentrar nuestros esfuerzos. De esta forma desarrollamos una amplia base de código inicial de forma rápida, sin aplicar optimizaciones prematuras. Y las optimizaciones que realizamos son óptimas, pues estamos localizando el código responsable de los tiempos de cómputo.
+Realizaremos un \textit{profile} para identificar los cuellos de botella (véase \sectionref{isec:optimizacion_codigo}). Una vez identificamos \textit{bottlenecks}, sabemos en qué partes concretas debemos concentrar nuestros esfuerzos. De esta forma desarrollamos una amplia base de código inicial de forma rápida, sin aplicar optimizaciones prematuras. Y las optimizaciones que realizamos son óptimas, pues estamos localizando el código responsable de los tiempos de cómputo.
 
 El enfoque que acabamos de describir se fundamenta en la \textbf{ley de Amdahl} \cite{informatica:amdahl_original} \cite{informatica:amdahl_moderno}. Aunque esta ley se centra en medir mejoras de tiempo al introducir paralelismo, es fácilmente aplicable a nuestro ámbito: cambios en las implementaciones para acelerar los tiempos de cómputo. Si optimizamos una fracción de cómputo $f$ obteniendo una mejora en tiempo de cómputo de $S$ para esa fracción, la mejora global (mejora que obtenemos sobre toda la base de código) viene dada por:
 
@@ -708,4 +710,4 @@ Además, suponiendo que optimicemos infinitamente la fracción de cómputo, hast
     S_{max} := \lim_{S \to \infty}\frac{1}{(1 - f) + \frac{f}{S}} = \frac{1}{1 - f}
 \end{equation}
 
-Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el enfoque que empleamos en \customref{isec:optimizacion_codigo}.
+Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el enfoque que empleamos en \sectionref{isec:optimizacion_codigo}.
