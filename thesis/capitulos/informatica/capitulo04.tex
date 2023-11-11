@@ -621,9 +621,12 @@ Como \textbf{sistema operativo}, hemos usado:
 \end{itemize}
 
 \section{Técnicas empleadas}
-% TODO -- seguir por aquí
 
-\subsection{Hyperparameter Tuning usando K-Fold Cross Validation} \label{isec:hptuning_kfold_cross_validation}
+A continuación, presentamos diversas técnicas que hemos empleado en nuestro trabajo. Estas técnicas abarcan aspectos muy diversos: en \sectionref{isec:hptuning_kfold_cross_validation} introducimos una técnica que forma parte del diseño experimental, en \sectionref{isubs:normalizacion_teoria} presentamos una técnica que forma parte del diseño de la solución y finalmente, en \sectionref{isubs:localizacion_partes_criticas} describimos una técnica fundamental para optimizar nuestra base de código.
+
+Aunque pertenezcan a ambientes muy diferentes, incluimos estas técnicas aquí, ya que resultarán fundamentales si el lector decide explorar el capítulo \sectionref{ich:implementacion}, en cuyo caso será crucial comprender estos métodos dado que en dicha sección estudiamos detalladamente su implementación.
+
+\subsection{Hyperparameter Tuning} \label{isec:hptuning_kfold_cross_validation}
 
 Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de \textbf{fijar una serie de hiperparámetros} que afectan de forma esencial a la calidad de dicho modelo. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase \sectionref{isubs:muestreo_datos_pk_sampling_teoria}), el número de épocas de entrenamiento, ... Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos.
 
@@ -645,23 +648,27 @@ Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, val
     \item Los resultados pueden depender mucho de la selección del subconjunto de validación, y por tanto, no ser robustos
 \end{itemize}
 
-Por tanto, buscamos una técnica que nos permita seleccionar los mejores hiperparámetros, usando todo el subconjunto de entrenamiento tanto para entrenar como para evaluar. Esta técnica se conoce como \textbf{\textit{K-Fold Cross Validation}} \cite{informatica:kfold_cross_val_paper}.
+Sin embargo, en nuestro caso concreto en el que disponemos de conjuntos de datos de gran tamaño, tienen algunas ventajas:
 
-Esta técnica consiste en dividir el conjunto de entrenamiento en $K$ \textit{folds} o subconjuntos. Repetimos $K$ veces el siguiente proceso:
+\begin{itemize}
+    \item Suponen procesos más ligeros y rápidos que métodos más avanzados (como el que introducimos a continuación). Esto es muy relevante si tenemos en cuenta que el entrenamiento de un modelo profundo es lento y, en ocasiones, puede saturar los recursos \textit{hardware} que tenemos disponibles
+    \item El gran tamaño de los conjuntos de datos reduce en parte los posibles problemas de robustez que hemos comentado. Y por tanto, técnicas más avanzadas que resuelven este problema de robustez, pero introducen ciertas contraprestaciones, pueden no tener ahora tanto sentido
+\end{itemize}
+
+Teniendo en cuenta este compromiso, buscamos una técnica que nos permita seleccionar los mejores hiperparámetros, usando todo el subconjunto de entrenamiento tanto para entrenar como para evaluar. Esta técnica se conoce como \textbf{\textit{K-Fold Cross Validation}} \cite{informatica:kfold_cross_val_paper} y consiste en dividir el conjunto de entrenamiento en $K$ \textit{folds} o subconjuntos. Repetimos $K$ veces el siguiente proceso:
 
 \begin{itemize}
     \item Seleccionamos $K-1$ \textit{folds} sobre los que entrenamos el modelo
     \item Sobre el \textit{fold} restante que todavía no usamos, calculamos la métrica a optimizar con el modelo que acabamos de entrenar
 \end{itemize}
 
-Obtenemos así $K$ valores de la métrica que podemos promediar. De esta forma hemos usado el conjunto de entrenamiento completamente, tanto para entrenar con configuraciones candidatas como para evaluar los modelos entrenados.
+Obtenemos así $K$ valores de la métrica que podemos promediar. De esta forma hemos usado el conjunto de entrenamiento completamente, tanto para entrenar con configuraciones candidatas como para evaluar los modelos entrenados. Visualizamos esta técnica en la \imgref{img:visualizacion_kfold_cv}.
 
-Podemos visualizar esta técnica en la siguiente imagen:
-
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{informatica/kfold_cross_val_img_example}
     \caption{Ejemplo gráfico del uso de \textit{K-Fold Cross Validation}, con un valor de $K = 5$. Cada fila representa una iteración del proceso. Las partes azules representan los 4 \textit{folds} elegidos en esa iteración para entrenar. La parte blanca representa el \textit{fold} que usamos para calcular la métrica a optimizar. Imagen extraída de \cite{informatica:kfold_cross_val_img_web}}
+    \label{img:visualizacion_kfold_cv}
 \end{figure}
 
 Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta técnica:
