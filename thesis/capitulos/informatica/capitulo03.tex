@@ -54,23 +54,31 @@ Así que, cuando veamos en \sectionref{ich:conclusiones} que no obtenemos buenos
 \section{Mejores modelos de \textit{retrieval} para el \textit{dataset} \textit{FG-Net}}
 
 En esta sección vamos a introducir qué técnicas y tendencias han sido las que mayor éxito han tenido en el ámbito del \textit{AIFR} trabajando sobre el \textit{dataset} de \textit{FG-Net}. Realizaremos algunos apuntes sobre los trabajos que mejores modelos han producido, pero nos centraremos en las tendencias generales.
-
 Como ya hemos visto en \sectionref{isec:interesareaestudio}, ninguno de estos trabajos usará \textit{triplet loss}. Por lo tanto, será complicado justificar las diferencias entre nuestros resultados y los del estado del arte.
 
 Este estudio se fundamenta en los tres mejores trabajos hasta la fecha, en cuanto a que obtienen los mejores resultados sobre \textit{FG-Net}:
 
 \begin{itemize}
-    \item \entrecomillado{When Age-Invariant Face Recognition Meets Face Age Synthesis: A Multi-Task Learning Framework} \cite{informatica:best_fgnet_model} que propone el modelo \textit{MTLFace}
-    \item \entrecomillado{Decorrelated Adversarial Learning for Age-Invariant Face Recognition} \cite{informatica:dal} que propone el algoritmo de aprendizaje \textit{DAL}
-    \item \entrecomillado{Look Across Elapse: Disentangled Representation Learning and Photorealistic Cross-Age Face Synthesis for Age-Invariant Face Recognition} \cite{informatica:aim} que propone el modelo \textit{Age Invariant Model} o \textit{AIM}.
+    \item \entrecomillado{When Age-Invariant Face Recognition Meets Face Age Synthesis: A Multi-Task Learning Framework} \cite{informatica:best_fgnet_model} que propone el modelo \textit{MTLFace}. Dicho modelo se construye en dos pasos, que consisten en:
+        \begin{enumerate}
+            \item Aprender dos \textit{features} incorreladas: edad e identidad. Para ello se usa una arquitectura basa en modelos de atención
+            \item A partir de esto, se optimiza una función multiobjetivo, para resolver dos tareas:
+                    \begin{itemize}
+                        \item Estimar la edad de una persona a partir de una imagen suya
+                        \item Reconocimiento facial, es decir, determinar si en dos imágenes aparece o no la misma persona
+                    \end{itemize}
+            En dicho proceso se usa una red generativa adversaria, o \textit{GAN}.
+        \end{enumerate}
+    \item \entrecomillado{Decorrelated Adversarial Learning for Age-Invariant Face Recognition} \cite{informatica:dal} que propone el algoritmo de aprendizaje \textit{DAL}. En la misma línea que el trabajo anterior, se aprenden dos características incorreladas, una para la edad y otra para la identidad. Optimizamos la incorrelación entre edad e identidad a partir de un enfoque adversario
+    \item \entrecomillado{Look Across Elapse: Disentangled Representation Learning and Photorealistic Cross-Age Face Synthesis for Age-Invariant Face Recognition} \cite{informatica:aim} que propone el modelo \textit{Age Invariant Model} o \textit{AIM}. De nuevo, se extraen dos características incorreladas a partir de un enfoque adversario. Del modelo \textit{GAN} se consigue extraer un generador de imágenes hiperrealista
 \end{itemize}
 
 En estos tres trabajos, podemos ver los siguientes puntos en común:
 
 \begin{itemize}
     \item Los tres trabajos buscan aprender dos \textit{features} incorreladas. Una \textit{feature} se corresponderá a la identidad asociada a la imagen, y la otra se corresponderá a la edad de la persona que aparece en la imagen
-    \item Los tres trabajos usan redes generativas adversarias, conocidas comúnmente como \textit{GANs}. En los tres trabajos la idea de la componente generativa es la misma. Dada una edad objetivo y una imagen de ejemplo de un individuo, generar una imagen del mismo individuo con la edad objetivo. Como siempre, la tarea del discriminador es diferenciar entre imágenes reales e imágenes sintéticas creadas por la componente generativa
-    \item Todos los trabajos proponen la creación de un nuevo \textit{dataset} de grandes dimensiones sobre el que realizar el entrenamiento. Esto deja claro que \textit{FG-Net} no es suficiente para entrenar un modelo lo suficientemente potente. Lo que justifica nuestro enfoque de usar otro \textit{dataset} mucho más grande para entrenar y emplear \textit{FG-Net} exclusivamente para validar el modelo obtenido
+    \item Los tres trabajos usan redes generativas adversarias, conocidas comúnmente como \textit{GANs}, con el mismo objetivo. Dada una edad objetivo y una imagen de ejemplo de un individuo, generar una imagen del mismo individuo con la edad objetivo. Como siempre, la tarea del discriminador es diferenciar entre imágenes reales e imágenes sintéticas creadas por la componente generativa
+    \item Todos los trabajos proponen la creación de un nuevo \textit{dataset} de grandes dimensiones sobre el que realizar el entrenamiento. Esto deja claro que \textit{FG-Net} no es suficiente para entrenar un modelo lo suficientemente potente. Lo que \textbf{justifica nuestro enfoque de usar otro \textit{dataset}} mucho más grande para entrenar y emplear \textit{FG-Net} exclusivamente para validar el modelo obtenido
 \end{itemize}
 
 Estas similitudes tan grandes marcan una fuerte tendencia de trabajo en este área de estudio. Algunas diferencias entre los trabajos son:
@@ -105,22 +113,23 @@ La siguiente imagen muestra cómo \textit{DAL} busca aprender dos \textit{featur
     \caption{Ejemplo de cómo \textit{DAL} descompone la información en dos \textit{features}: una de edad y otra de identidad. Estas imágenes muestran como, fijada la componente de identidad, podemos variar la componente de edad. Imagen extraída de \cite{informatica:dal}}
 \end{figure}
 
-Mostramos ahora, de forma resumida, una comparativa de los resultados obtenidos por los trabajos que acabamos de estudiar:
+Mostramos ahora, de forma resumida, una comparativa de los resultados obtenidos por los trabajos que acabamos de estudiar. Usamos la métrica \textit{Rank@1} \footnotemark para comparar estos resultados:
+\footnotetext{Si el lector no está familiarizado con la métrica \textit{Rank@k}, en \sectionref{isubs:rank_at_k} definimos qué es esta métrica}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|}
+\begin{tabular}{|l|l|l|l|l|}
     \hline
-    Modelo & \textit{Rank@1} \\
+    Modelo & Dos \textit{features} incorreladas & Uso de \textit{GAN} & Modelo subyacente & \textit{Rank@1} \\
     \hline
 
-    \textbf{\textit{MTLFace}} & \textbf{94.78} \\
-    \textit{DAL} & 94.5 \\
-    \textit{AIM} & 93.20 \\
+    \textbf{\textit{MTLFace}} & Sí & Sí & Modelo basado en atención & \textbf{94.78} \\
+    \textit{DAL} & Sí & Sí & \textit{CNN} & 94.5 \\
+    \textit{AIM} & Sí & Sí & \textit{CNN} & 93.20 \\
     \hline
 
 \end{tabular}
-\caption{Resultados de los principales modelos estudiados del estado del arte sobre el \textit{dataset} \textit{FG-Net}}
+\caption{Resultados \textit{Rank@1} de los principales modelos estudiados del estado del arte sobre el \textit{dataset} \textit{FG-Net}}
 \end{table}
 
 Y ahora, usando la comparativa que aparece en \cite{informatica:best_fgnet_model}, mostramos los resultados de otros modelos, cuyos trabajos no hemos estudiado en detalle:
@@ -140,7 +149,7 @@ Y ahora, usando la comparativa que aparece en \cite{informatica:best_fgnet_model
     \textbf{MTLFace} & \textbf{94.78} \\
     \hline
 \end{tabular}
-\caption{Resultados de algunos modelos sobre el \textit{dataset} \textit{FG-Net}. Datos extraídos de \cite{informatica:best_fgnet_model}}
+\caption{Resultados \textit{Rank@1} de algunos modelos sobre el \textit{dataset} \textit{FG-Net}. Datos extraídos de \cite{informatica:best_fgnet_model}}
 \end{table}
 
 En base a todo esto extraemos las siguientes \textbf{conclusiones}:
@@ -148,5 +157,5 @@ En base a todo esto extraemos las siguientes \textbf{conclusiones}:
 \begin{itemize}
     \item \textbf{No existen trabajos previos que empleen \textit{triplet loss} para resolver una tarea de \textit{AIFR}}. Por lo tanto, no podremos contrastar los resultados obtenidos con modelos que operen de una forma parecida
     \item \textbf{Los mejores modelos sobre \textit{FG-Net} emplean técnicas mucho más avanzadas} que las presentadas en este trabajo. El aprendizaje de dos \textbf{\textit{features} incorreladas}, una para la edad y otra para la identidad, en base a \textbf{redes generativas adversarias}, es el punto común principal
-    \item Por lo tanto, \textbf{parece que nuestra propuesta no va a ser lo suficientemente potente} como para obtener los resultados aquí mostrados. Sin embargo, sería realmente interesante lograr resultados ligeramente competentes, pues obtendríamos un modelo mucho más ligero a partir de un entrenamiento mucho más fácil de realizar, tanto por los recursos como por las técnicas empleadas
+    \item Por lo tanto, \textbf{parece que nuestra propuesta no va a ser lo suficientemente potente} como para obtener los resultados aquí mostrados. Para afirmar esto deberíamos realizar un estudio experimental en profundidad, que queda fuera del alcance de este trabajo. A pesar de esta sospecha, sería realmente interesante lograr resultados ligeramente competentes, pues obtendríamos un modelo mucho más ligero a partir de un entrenamiento mucho más fácil de realizar, tanto por los recursos como por las técnicas empleadas
 \end{itemize}
