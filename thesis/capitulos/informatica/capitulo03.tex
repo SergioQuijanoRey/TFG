@@ -7,56 +7,55 @@ Posteriormente en \sectionref{isec:base_datos_usada} estudiaremos las bases de d
 En este sentido, no es de interés estudiar los resultados de modelos sobre \textit{CACD}, porque estamos usando dicho conjunto para entrenar, no para evaluar el rendimiento del modelo. Además, la mayoría de trabajos que estudiaremos más adelante siguen nuestro enfoque, usando un \textit{dataset} de tamaño considerable para entrenar y evaluando sobre \textit{FG-Net}. Es decir, su \textit{dataset} de entrenamiento no tiene por qué ser \textit{CACD}. Con esto queda claro que lo que realmente nos interesa son los resultados sobre \textit{FG-Net}.
 
 \section{Interés del área de estudio} \label{isec:interesareaestudio}
-% TODO -- seguir por aqui ahora que he modificado algo los diagramas
 
-Empecemos viendo el interés de este área de estudio. Para ello podemos realizar una búsqueda en \textit{SCOPUS}, buscando trabajos sobre \textit{AIFR}, filtrando el área de estudio al de las ciencias de la computación. Esto produce los siguientes \textit{keywords}:
+Empecemos viendo el interés de este área de estudio. Para ello podemos realizar una búsqueda en \textit{SCOPUS}, buscando trabajos sobre \textit{AIFR}, filtrando el área de estudio al de las ciencias de la computación. Para realizar dicha búsqueda usamos las siguientes palabras clave o \textit{keywords}:
 
-\begin{lstlisting}[caption=\textit{Keywords usados para la búsqueda en \textit{SCOPUS}. Búsqueda realizada el 17 de Septiembre de 2023}, label=code:scopus_search, captionpos=b]
+\begin{lstlisting}[caption=\textit{Keywords usadas para la búsqueda en \textit{SCOPUS}. Búsqueda realizada el 17 de Septiembre de 2023}, label=code:scopus_search, captionpos=b]
     TITLE-ABS-KEY ( age  AND invariant  AND face  AND recognition )  AND  ( LIMIT-TO ( SUBJAREA ,  "COMP" ) )
 \end{lstlisting}
 
-Con dichos \textit{keywords} obtenemos la siguiente gráfica:
+Con dichas \textit{keywords} obtenemos la siguiente gráfica:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{informatica/scopus_search_histogram}
-    \caption{Resultados de la búsqueda en \textit{SCOPUS} usando los \textit{keywords} del \coderef{code:scopus_search}}
+    \caption{Resultados de la búsqueda en \textit{SCOPUS} usando las \textit{keywords} del \coderef{code:scopus_search}}
 \end{figure}
 
 Vemos que, a partir de 2012 este área de estudio gana bastante popularidad. Coincide este momento con la aparición de \textit{AlexNet}, que da paso a la popularidad de las redes convolucionales profundas en el campo de la visión por computador. Sin tener en cuenta el último año (pues, en el momento de la consulta, sigue en curso y está lejos de acabar), no vemos que la tendencia siga al alza, pudiendo llegar a pensar que la popularidad de este campo se está estancando. Aunque habría que tener en cuenta condiciones externas, como la pandemia de \textit{COVID}, que podrían explicar la bajada notable en los años 2020 y 2021.
 
-Veamos también la popularidad de la técnica \textit{triplet loss}, pues estamos proponiendo una mejora sobre esta. Los \textit{keywords} usados fueron:
+Veamos también la popularidad de la técnica \textit{triplet loss}, pues estamos proponiendo algunas variaciones sobre esta técnica. Las \textit{keywords} usadas fueron:
 
-\begin{lstlisting}[caption=\textit{Keywords usados para la búsqueda en \textit{SCOPUS} para consultar la popularidad del \textit{triplet loss}. Búsqueda realizada el 17 de Septiembre de 2023}, label=code:scopus_search_tripletloss, captionpos=b]
+\begin{lstlisting}[caption=\textit{Keywords usadas para la búsqueda en \textit{SCOPUS} para consultar la popularidad del \textit{triplet loss}. Búsqueda realizada el 17 de Septiembre de 2023}, label=code:scopus_search_tripletloss, captionpos=b]
     TITLE-ABS-KEY ( triplet  AND loss )
     AND  ( LIMIT-TO ( SUBJAREA ,  "COMP" ) )
 \end{lstlisting}
 
-La búsqueda con estos \textit{keywords} produce la siguiente gráfica:
+La búsqueda con estas \textit{keywords} produce la siguiente gráfica:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{informatica/scopus_search_tripletloss}
-    \caption{Resultados de la búsqueda en \textit{SCOPUS} usando los \textit{keywords} del  \coderef{code:scopus_search_tripletloss}}
+    \caption{Resultados de la búsqueda en \textit{SCOPUS} usando las \textit{keywords} del \coderef{code:scopus_search_tripletloss}. El descenso en el número de publicaciones en el último año puede ser debido a que no hemos finalizado el año o a que tenemos una tendencia a la baja}
 \end{figure}
 
-Vemos que entre 2017 y 2018 esta técnica da un grandísimo salto en popularidad. Sin embargo, en los dos últimos años la popularidad ha caído en picado, y aunque todavía no haya pasado el tiempo suficiente para observar el progreso de dicha tendencia, la caída en el último año es demasiado grande, y pensamos que la tendencia va a seguir a la baja.
+Vemos que entre 2017 y 2018 esta técnica da un grandísimo salto en popularidad. Sin embargo, en el último año la popularidad ha caído drásticamente. Aunque todavía no haya pasado el tiempo suficiente para observar el progreso de la tendencia, la caída en el último año es tan grande que pensamos que dicha tendencia va a seguir a la baja.
 
-Por otro lado, estamos usando nuevas técnicas para computar \textit{triplet loss}. Dichas técnicas fueron introducidas en \cite{informatica:principal}. En dicho trabajo se intenta resolver una tarea de re-identificación, que difiere de nuestra tarea de \textit{retrieval} para reconocimiento facial invariante a la edad. Por lo tanto, buscamos trabajos que hayan aplicado \textit{triplet loss} en el campo del \textit{AIFR}. Aplicamos la siguiente búsqueda:
+Por otro lado, estamos usando nuevas técnicas para computar \textit{triplet loss}. Dichas técnicas fueron introducidas en \cite{informatica:principal}. \textbf{En dicho trabajo se intenta resolver una tarea de re-identificación, que difiere de nuestra tarea de \textit{retrieval} para reconocimiento facial invariante a la edad}. Por lo tanto, buscamos trabajos que hayan aplicado \textit{triplet loss} en el campo del \textit{AIFR}. Aplicamos la siguiente búsqueda:
 
 \begin{lstlisting}[caption=Keywords usandos para la búsqueda de trabajos que combinen \textit{AIFR} y \textit{triplet loss} en \textit{SCOPUS}, label=code:scopus_search_especifico, captionpos=b]
     TITLE-ABS-KEY ( age AND invariant AND face AND recognition, AND triplet AND loss )  AND  ( LIMIT-TO ( SUBJAREA ,  "COMP" ) )
 \end{lstlisting}
 
-La búsqueda determinada por \customref{code:scopus_search_especifico} no produce ningún resultado. \textbf{No hay publicado ningún trabajo que aplique \textit{triplet loss} al campo del \textit{AIFR}}. Y esto, sin considerar que nuestro trabajo introduce nuevas técnicas que mejoran el uso del \textit{triplet loss} clásico, desarrollado en \customref{isec:triplet_loss}.
+La búsqueda determinada por \coderef{code:scopus_search_especifico} no produce ningún resultado. \textbf{SCOPUS no tiene constancia de ningún trabajo que aplique \textit{triplet loss} al campo del \textit{AIFR}}. Y esto, sin considerar que nuestro trabajo introduce nuevas técnicas que mejoran el uso del \textit{triplet loss} clásico, desarrollado en \sectionref{isec:triplet_loss}.
 
-Así que, cuando veamos en \customref{ich:conclusiones} que no obtenemos buenos resultados, tendremos que \textbf{justificar el por qué basándonos únicamente en el trabajo presente}, puesto que \textbf{ningún trabajo ha intentado resolver una tarea de \textit{AIFR} usando \textit{triplet loss}}.
+Así que, cuando veamos en \sectionref{ich:conclusiones} que no obtenemos buenos resultados, tendremos que \textbf{justificar el por qué basándonos únicamente en el trabajo presente}, puesto que \textbf{ningún trabajo ha intentado resolver una tarea de \textit{AIFR} usando \textit{triplet loss}}.
 
 \section{Mejores modelos de \textit{retrieval} para el \textit{dataset} \textit{FG-Net}}
 
 En esta sección vamos a introducir qué técnicas y tendencias han sido las que mayor éxito han tenido en el ámbito del \textit{AIFR} trabajando sobre el \textit{dataset} de \textit{FG-Net}. Realizaremos algunos apuntes sobre los trabajos que mejores modelos han producido, pero nos centraremos en las tendencias generales.
 
-Como ya hemos visto en \customref{isec:interesareaestudio}, ninguno de estos trabajos usará \textit{triplet loss}. Por lo tanto, será complicado justificar las diferencias entre nuestros resultados y los del estado del arte.
+Como ya hemos visto en \sectionref{isec:interesareaestudio}, ninguno de estos trabajos usará \textit{triplet loss}. Por lo tanto, será complicado justificar las diferencias entre nuestros resultados y los del estado del arte.
 
 Este estudio se fundamenta en los tres mejores trabajos hasta la fecha, en cuanto a que obtienen los mejores resultados sobre \textit{FG-Net}:
 
