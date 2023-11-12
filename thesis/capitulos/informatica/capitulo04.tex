@@ -1,5 +1,4 @@
 \chapter{Materiales y métodos} \label{ich:materiales_metodos}
-\todo{Seleccionar calidad de las imágenes sacadas de \textit{matplotlib}}
 
 \section{Descripción de las bases de datos usadas} \label{isec:base_datos_usada}
 
@@ -67,22 +66,22 @@ Podemos ver que la mayoría de individuos solo tienen una imagen o dos. Teniendo
 
 Veamos cómo queda esta distribución tras forzar que cada individuo tenga al menos un número asociado de imágenes, usando aumentado de datos:
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
     \begin{subfigure}{0.5\textwidth}
         \centering
-        \includegraphics[width=.7\linewidth]{informatica/lfw_forzar_3}
+        \includegraphics[width=.9\linewidth]{informatica/lfw_forzar_3}
         \caption{Forzando 3 imágenes por individuo }
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=.7\linewidth]{informatica/lfw_forzar_5}
+        \includegraphics[width=.9\linewidth]{informatica/lfw_forzar_5}
         \caption{Forzando 5 imágenes por individuo}
     \end{subfigure}
 
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=.7\linewidth]{informatica/lfw_forzar_10}
+        \includegraphics[width=.9\linewidth]{informatica/lfw_forzar_10}
         \caption{Forzando 10 imágenes por individuo }
     \end{subfigure}
 
@@ -211,18 +210,16 @@ Estudiamos ahora el \textbf{rango de edad por individuo}. Para calcular este, co
     \label{img:fgnet_rangos_individuales}
 \end{figure}
 
-De esta forma es complicado sacar información de los datos. Así que mostremos la distribución de los rangos de edad:
+De esta forma es complicado sacar información de los datos. Así que mostremos la distribución de los rangos de edad en la \imgref{img:fgnet_rangos_distribucion}. Dicha distribución se complementa con los estadísticos de la \tableref{table:fgnet_rangos_estadisticas}:
 
-\begin{figure}[H]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{informatica/fgnet_distribucion_rangos_edad}
     \caption{Distribución del rango de edad. En el eje horizontal tenemos los rangos de edad. En el eje vertical, la cantidad de individuos que presentan dicho rango de edad en sus imágenes}
     \label{img:fgnet_rangos_distribucion}
 \end{figure}
 
-Esta distribución se complementa con los siguientes datos estadísticos:
-
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{|l|l|}
     \hline
@@ -306,7 +303,7 @@ Veamos la \textbf{distribución del número de imágenes por cada individuo}:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{informatica/cacd_images_per_class}
+    \includegraphics[width=0.7\textwidth]{informatica/cacd_images_per_class}
     \caption{Distribución del número de imágenes por cada individuo}
     \label{img:cacd_distr_images_per_class}
 \end{figure}
@@ -341,7 +338,7 @@ Veamos ahora la \textbf{distribución de edad de los individuos}:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{informatica/cacd_distribucion_edades}
+    \includegraphics[width=0.7\textwidth]{informatica/cacd_distribucion_edades}
     \caption{Histograma de la variable edad en nuestro \textit{dataset}}
 \end{figure}
 
@@ -427,15 +424,16 @@ Como hemos comentado, tanto en \sectionref{isec:fgnet} como en \sectionref{isec:
 \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/fgnet_images_per_class}
+        \includegraphics[width=0.95\linewidth]{informatica/fgnet_images_per_class}
         \caption{\textit{FG-Net}}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/cacd_images_per_class}
+        \includegraphics[width=0.95\linewidth]{informatica/cacd_images_per_class}
         \caption{\textit{CACD}}
     \end{subfigure}
 \caption{Distribución del número de imágenes por individuo en los \textit{datsets} \textit{FG-Net} y \textit{CACD} }
+    \label{img:comparativa_imagenes_por_individuo}
 \end{figure}
 
 
@@ -458,9 +456,10 @@ Como hemos comentado, tanto en \sectionref{isec:fgnet} como en \sectionref{isec:
 
 \end{tabular}
 \caption{Datos estadísticos sobre la distribución del número de imágenes por individuo, en los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
+    \label{table:comparativa_imagenes_por_individuo}
 \end{table}
 
-Podemos ver que:
+En base a los datos mostrados en \imgref{img:comparativa_imagenes_por_individuo} y \tableref{table:comparativa_imagenes_por_individuo}, podemos ver que:
 
 \begin{itemize}
     \item El número de imágenes por individuo es ampliamente superior en \textit{CACD} que en \textit{FG-Net}. Un claro indicador de esto es que el valor máximo en \textit{FG-Net} está por debajo del mínimo en \textit{CACD}. Este hecho puede ayudar a solventar algunos de los problemas sobre la diferencia en la distribución de la edad que plantea \textit{FG-Net}
@@ -475,12 +474,12 @@ Podemos ver que:
 \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/fgnet_distribucion_edades}
+        \includegraphics[width=0.95\linewidth]{informatica/fgnet_distribucion_edades}
         \caption{\textit{FG-Net}}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/cacd_distribucion_edades}
+        \includegraphics[width=0.95\linewidth]{informatica/cacd_distribucion_edades}
         \caption{\textit{CACD}}
     \end{subfigure}
     \caption{Distribuciones de las edades en los \textit{datasets} \textit{FG-Net} y \textit{CACD}}
@@ -518,19 +517,20 @@ A partir de estos datos, podemos ver que:
 \subsubsection{Distribución del rango de edad por individuo}
 
 \begin{figure}[H]
-\centering
-    \begin{subfigure}{.5\textwidth}
+    \centering
+    \begin{subfigure}[t]{0.55\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/fgnet_rangos_edad_individuales}
+        \includegraphics[width=0.95\linewidth]{informatica/fgnet_rangos_edad_individuales}
         \caption{\textit{FG-Net}}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.4\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{informatica/cacd_rangos_individuales}
+        \includegraphics[width=0.95\linewidth]{informatica/cacd_rangos_individuales}
         \caption{\textit{CACD}}
     \end{subfigure}
-\caption{Rangos de edad para todos los individuos, en los \textit{datasets} \textit{FG-Net} y \textit{CACD}. Los individuos están ordenados en primera instancia por su edad más baja, y en segunda instancia, por su edad más alta.}
-\label{img:conjunta_fgnet_rangos_edades_individuales}
+
+    \caption{Rangos de edad para todos los individuos, en los \textit{datasets} \textit{FG-Net} y \textit{CACD}. Los individuos están ordenados en primera instancia por su edad más baja, y en segunda instancia, por su edad más alta.}
+    \label{img:conjunta_fgnet_rangos_edades_individuales}
 \end{figure}
 
 \begin{table}[H]

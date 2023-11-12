@@ -4,7 +4,7 @@
 
 Como se comenta en el \entrecomillado{Apéndice D} de \cite{informatica:principal}, el proceso de entrenamiento presenta una particularidad: la función de pérdida rápidamente decae hasta un cierto valor en el que prácticamente se mantiene constante durante todo el entrenamiento. Sin embargo, otras métricas relevantes deberían mejorar durante el paso de las épocas de entrenamiento. Por tanto, \textbf{no es suficiente que observemos únicamente el valor de la función de pérdida}, sino que tenemos que seguir muy de cerca el valor de otras métricas relevantes durante el entrenamiento.
 
-En esta sección introduciremos algunas de las métricas más relevantes. En toda esta sección, supondremos que estamos trabajando con $N$ individuos, cada individuo $i$ tendrá $N_i$ imágenes asociadas. Usaremos la misma notación que la introducida en \customref{iobs:notacion_pk_formulas}. El elemento $x_k^p$ indicará que estamos trabajando con la imagen $k$ de la clase $p$. Solo que esta vez, estamos considerando todo el conjunto de datos.
+En esta sección introduciremos algunas de las métricas más relevantes. En toda esta sección, supondremos que estamos trabajando con $N$ individuos, cada individuo $i$ tendrá $N_i$ imágenes asociadas. Usaremos la misma notación que la introducida en \sectionref{iobs:notacion_pk_formulas}. El elemento $x_k^p$ indicará que estamos trabajando con la imagen $k$ de la clase $p$. Solo que esta vez, estamos considerando todo el conjunto de datos.
 
 
 \subsection{Distancias intracluster e intercluster} \label{isubs:teoria_distancia_intra_inter_cluster}
@@ -37,11 +37,11 @@ Por lo tanto, lo que buscamos ver es que las distancias intraclúster se minimic
 
 \subsection{Normas de los \textit{embeddings}} \label{isubs:normas_embeddings}
 
-Como ya hemos comentado en \customref{isec:triplet_loss}, un problema que puede ocurrir es que nuestro modelo decida colapsar cualquier entrada al vector $\vec{0}$. Esto justifica el uso de un margen. Pero en \customref{isec:margenes_suaves} hemos introducido una función para computar los márgenes de forma suave, sin especificar el valor $\alpha$. Esta nueva variante podría dar lugar al colapso del modelo. Por tanto, vamos a observar durante el entrenamiento la norma euclídea de todas las salidas de nuestro modelo durante el entrenamiento. Esto es interesante sobre todo cuando no usamos la normalización de la salida, introducida en \customref{isubs:normalization_impl}.
+Como ya hemos comentado en \sectionref{isec:triplet_loss}, un problema que puede ocurrir es que nuestro modelo decida colapsar cualquier entrada al vector $\vec{0}$. Esto justifica el uso de un margen. Pero en \sectionref{isec:margenes_suaves} hemos introducido una función para computar los márgenes de forma suave, sin especificar el valor $\alpha$. Esta nueva variante podría dar lugar al colapso del modelo. Por tanto, vamos a observar durante el entrenamiento la norma euclídea de todas las salidas de nuestro modelo durante el entrenamiento. Esto es interesante sobre todo cuando no usamos la normalización de la salida, introducida en \sectionref{isubs:normalization_impl}.
 
 \subsection{Sumandos activos}
 
-En \customref{isubsubs:mejoras_sumandos_no_nulos} ya hemos desarrollado la noción de sumandos nulos y sumandos activos. Los sumandos nulos pueden llegar a ser nocivos para el aprendizaje de la red. Si demasiados triples no aportan valor a la función de pérdida, o bien no estamos aprovechando los ciclos de entrenamiento (en el caso de que estemos usando $\mathcal{L}_{BH \neq 0}, \mathcal{L}_{BA \neq 0}$) o bien  la red puede que no aprenda de los sumandos activos (en el caso de que estemos usando $\mathcal{L}_{BH}, \mathcal{L}_{BA}$). Por tanto, vamos a registrar el porcentaje de sumandos activos en la función de pérdida, en cada \textit{P-K batch}.
+En \sectionref{isubsubs:mejoras_sumandos_no_nulos} ya hemos desarrollado la noción de sumandos nulos y sumandos activos. Los sumandos nulos pueden llegar a ser nocivos para el aprendizaje de la red. Si demasiados triples no aportan valor a la función de pérdida, o bien no estamos aprovechando los ciclos de entrenamiento (en el caso de que estemos usando $\mathcal{L}_{BH \neq 0}, \mathcal{L}_{BA \neq 0}$) o bien  la red puede que no aprenda de los sumandos activos (en el caso de que estemos usando $\mathcal{L}_{BH}, \mathcal{L}_{BA}$). Por tanto, vamos a registrar el porcentaje de sumandos activos en la función de pérdida, en cada \textit{P-K batch}.
 
 \subsection{\textit{Rank@k accuracy}} \label{isubs:rank_at_k}
 
@@ -70,7 +70,7 @@ Esta variante la introducimos al intentar solucionar el mal comportamiento de lo
 
 \section{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
 
-En \customref{isec:hptuning_kfold_cross_validation} describimos detalladamente el proceso para la selección de hiperparámetros. En \customref{isec:hp_tuning} describimos cómo implementamos este proceso.
+En \sectionref{isec:hptuning_kfold_cross_validation} describimos detalladamente el proceso para la selección de hiperparámetros. En \sectionref{isec:hp_tuning} describimos cómo implementamos este proceso.
 
 La siguiente tabla muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar:
 
@@ -134,7 +134,7 @@ Los hiperparámetros elegidos tras realizar el proceso de \textit{hyperparameter
 
 \section{Descripción del modelo empleado}
 
-Como hemos visto en \customref{table:hp_escogidos}, hemos decidido usar el modelo . Este modelo se compone de .
+Como hemos visto en \tableref{table:hp_escogidos}, hemos decidido usar el modelo . Este modelo se compone de .
 \todo{Completar una vez consiga hacer funcionar el \textit{hp tuning}}
 
 \section{Proceso de entrenamiento}
