@@ -857,11 +857,11 @@ def slow_objective(trial):
 
         # Model that we have chosen
         if net_election == "FGLightModel":
-            net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+            net = FGLigthModel(embedding_dimension)
         elif net_election == "CACDResNet18":
-            net = CACDResnet18(GLOBALS['EMBEDDING_DIMENSION'])
+            net = CACDResnet18(embedding_dimension)
         elif net_election == "CACDResNet50":
-            net = CACDResnet50(GLOBALS['EMBEDDING_DIMENSION'])
+            net = CACDResnet50(embedding_dimension)
         else:
             err_msg = "Parameter `net_election` has not a valid value \n"
             err_msg += f"{net_election=}"
@@ -1021,11 +1021,11 @@ def fast_objective(trial):
 
         # Model that we have chosen
         if net_election == "FGLightModel":
-            net = FGLigthModel(GLOBALS['EMBEDDING_DIMENSION'])
+            net = FGLigthModel(embedding_dimension)
         elif net_election == "CACDResNet18":
-            net = CACDResnet18(GLOBALS['EMBEDDING_DIMENSION'])
+            net = CACDResnet18(embedding_dimension)
         elif net_election == "CACDResNet50":
-            net = CACDResnet50(GLOBALS['EMBEDDING_DIMENSION'])
+            net = CACDResnet50(embedding_dimension)
         else:
             err_msg = "Parameter `net_election` has not a valid value \n"
             err_msg += f"{net_election=}"
