@@ -77,8 +77,8 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 
 # Parameters of P-K sampling
-GLOBALS['P'] = 8    # Number of classes used in each minibatch
-GLOBALS['K'] = 8    # Number of images sampled for each selected class
+GLOBALS['P'] = 34    # Number of classes used in each minibatch
+GLOBALS['K'] = 2     # Number of images sampled for each selected class
 
 # Batch size for online training
 # We can use `P * K` as batch size. Thus, minibatches will be
@@ -126,7 +126,7 @@ GLOBALS['HYPERPARAMETER_TUNING_TRIES'] = 300
 
 # Wether to use the validation set in the hp tuning process or to use k-fold
 # cross validation (which is more robust but way slower)
-GLOBALS['FAST_HP_TUNING'] = True
+GLOBALS['FAST_HP_TUNING'] = False
 
 # Number of folds used in k-fold Cross Validation
 GLOBALS['NUMBER_OF_FOLDS'] = 3
@@ -272,6 +272,7 @@ import seaborn as sns
 import time
 import copy
 import cProfile
+import enum
 from collections import Counter
 from datetime import datetime
 from pprint import pprint
@@ -719,15 +720,24 @@ def loss_function(net: torch.nn.Module, validation_fold: DataLoader) -> float:
         fast_implementation = False,
     )
 
-def slow_objective(trial):
+class TuningStrat(enum.Enum):
+    HOLDOUT = "Hold Out"
+    KFOLD = "K-Fold Cross Validation"
+
+def objective(trial, implementation: TuningStrat):
     """
     Optuna function that is going to be used in the optimization process
 
-    It is based in k-fold cross validation
+    Depending on `implementation`, it computes the metric score to optimize in the following way:
 
+    - TuningStrat.HOLDOUT: uses holdout method (training - validation). That is
+                           to say, trains on training dataset, computes the
+                           metric on the validation set
+    - TuningStrat.KFOLD: uses k-fold cross validation for computing the metric
     """
 
     # Parameters that we are exploring
+    # This is shared among underlying implementations
     p = trial.suggest_int("P", 2, 10)
     k = trial.suggest_int("K", 2, 10)
     net_election = trial.suggest_categorical(
@@ -782,7 +792,19 @@ def slow_objective(trial):
             transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
             transforms.RandomAutocontrast(),
         ])
+    )
 
+    # Put some dataloaders
+    # TODO -- esto en la implementacion original se hace en el `loader_generator`
+    train_loader = torch.utils.data.DataLoader(
+        dataset = train_dataset,
+        batch_size = p * k,
+        sampler = CustomSampler(
+            p,
+            k,
+            train_dataset,
+            avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
+        ),
     )
 
     # And with p, k values we can define the way we use the laoder generator
@@ -852,169 +874,6 @@ def slow_objective(trial):
 
         return loader
 
-    # Wrap the network in a lambda function so we can use it in `custom_cross_validation`
-    def network_creator():
-
-        # Model that we have chosen
-        if net_election == "FGLightModel":
-            net = FGLigthModel(embedding_dimension)
-        elif net_election == "CACDResNet18":
-            net = CACDResnet18(embedding_dimension)
-        elif net_election == "CACDResNet50":
-            net = CACDResnet50(embedding_dimension)
-        else:
-            err_msg = "Parameter `net_election` has not a valid value \n"
-            err_msg += f"{net_election=}"
-            raise Exception(err_msg)
-
-        # Wether or not use normalization
-        if normalization_election is True:
-            net = NormalizedNet(net)
-
-        net.set_permute(False)
-        return net
-
-    # The function that takes a training fold loader and a network, and returns
-    # a trained net. This is a parameter for our `custom_cross_validation`
-    def network_trainer(fold_dataloader: DataLoader, net: torch.nn.Module) -> torch.nn.Module:
-
-        parameters = dict()
-        parameters["epochs"] = GLOBALS['HYPERPARAMETER_TUNING_EPOCHS']
-        parameters["lr"] = learning_rate
-        parameters["criterion"] = BatchHardTripletLoss(
-            margin,
-            use_softplus = softplus,
-            use_gt_than_zero_mean = True
-        )
-
-        # Wether or not use norm penalization
-        if use_norm_penalty:
-            parameters["criterion"] = AddSmallEmbeddingPenalization(
-                base_loss = parameters["criterion"],
-                penalty_factor = norm_penalty,
-            )
-
-        _ = train_model_online(
-            net = net,
-            path = os.path.join(GLOBALS['BASE_PATH'], "tmp_hp_tuning"),
-            parameters = parameters,
-            train_loader = fold_dataloader,
-            validation_loader = None,
-            name = "Hyperparameter Tuning Network",
-            logger = SilentLogger(),
-            snapshot_iterations = None,
-            gradient_clipping = gradient_clipping,
-            fail_fast = True,
-        )
-
-        return net
-
-
-    # Now we have defined everything for `custom_cross_validation`. So we can
-    # run k-fold cross validation for this configuration of parameters
-    # For some combinations of parameters, this can fail
-    try:
-        losses = hptuning.custom_cross_validation(
-            train_dataset = train_dataset_augmented,
-            k = GLOBALS['NUMBER_OF_FOLDS'],
-            random_seed = GLOBALS['RANDOM_SEED'],
-            network_creator = network_creator,
-            network_trainer = network_trainer,
-            loader_generator = loader_generator,
-            loss_function = loss_function,
-        )
-        print(f"Array of losses: {losses=}")
-        print(f"Obtained loss (cross validation mean) is {losses.mean()=}")
-
-    except Exception as e:
-
-        # Show that cross validation failed for this combination
-        msg = "Could not run succesfully k-fold cross validation for this combination of parameters\n"
-        msg = msg + f"Error was: {e}\n"
-        print(msg)
-        file_logger.warn(msg)
-
-        # Return None so optuna knows this trial failed
-        return None
-
-    # If everything went alright, return the mean of the loss
-    return losses.mean()
-
-def fast_objective(trial):
-    """
-    Optuna function that is going to be used in the optimization process
-
-    It is based on evaluating in the validation subset
-    """
-
-    # Parameters that we are exploring
-    p = trial.suggest_int("P", 2, 10)
-    k = trial.suggest_int("K", 2, 10)
-    net_election = trial.suggest_categorical(
-        "Network",
-        ["CACDResNet18", "CACDResNet50", "FGLightModel"]
-    )
-    normalization_election = trial.suggest_categorical(
-        "UseNormalization", [True, False]
-    )
-    embedding_dimension = trial.suggest_int("Embedding Dimension", 1, 10)
-    learning_rate = trial.suggest_float("Learning rate", 0, 0.001)
-    softplus = trial.suggest_categorical("Use Softplus", [True, False])
-    use_norm_penalty = trial.suggest_categorical("Use norm penalty", [True, False])
-
-    use_gradient_clipping = trial.suggest_categorical(
-        "UseGradientClipping", [True, False]
-    )
-
-    norm_penalty = None
-    if use_norm_penalty is True:
-        norm_penalty = trial.suggest_float("Norm penalty factor", 0.0001, 2.0)
-
-    margin = None
-    if softplus is False:
-        margin = trial.suggest_float("Margin", 0.001, 1.0)
-
-    gradient_clipping = None
-    if use_gradient_clipping is True:
-        gradient_clipping = trial.suggest_float("Gradient Clipping Value", 0.00001, 10.0)
-
-    # Log that we are going to do k-fold cross validation and the values of the
-    # parameters. k-fold cross validation can be really slow, so this logs are
-    # useful for babysitting the process
-    print("")
-    print(f"🔎 Starting cross validation for trial {trial.number}")
-    print(f"🔎 Parameters for this trial are:\n{trial.params}")
-    print("")
-
-    # With all parameters set, we can create all the necessary elements for
-    # running k-fold cross validation with this configuration
-
-    # With P, K values, we can generate the augmented dataset
-    train_dataset_augmented = LazyAugmentatedDataset(
-        base_dataset = train_dataset,
-        min_number_of_images = k,
-
-        # Remember that the trasformation has to be random type
-        # Otherwise, we could end with a lot of repeated images
-        # Again, we want to end with the normalized shape
-        transform = transforms.Compose([
-            transforms.RandomResizedCrop(size=GLOBALS['IMAGE_SHAPE'], antialias = True),
-            transforms.RandomRotation(degrees=GLOBALS['ROTATE_AUGM_DEGREES']),
-            transforms.RandomAutocontrast(),
-        ])
-    )
-
-    # Put some dataloaders
-    train_loader = torch.utils.data.DataLoader(
-        dataset = train_dataset,
-        batch_size = p * k,
-        sampler = CustomSampler(
-            p,
-            k,
-            train_dataset,
-            avoid_failing = GLOBALS['AVOID_CUSTOM_SAMPLER_FAIL'],
-        ),
-    )
 
     # Wrap the network in a lambda function so we can use it in `custom_cross_validation`
     def network_creator():
@@ -1073,19 +932,60 @@ def fast_objective(trial):
 
         return net
 
-    # Train the model, might fail
-    net = network_creator()
-    try:
-        net = network_trainer(train_loader, net)
-    except Exception as e:
-        print(f"Error training the network, reason was: {e}")
+    # Train and evaluate the model to obtain a loss metric
+    # This is where the two implementations differ considerably
+    if implementation is TuningStrat.HOLDOUT:
+        # Train the model, might fail
+        net = network_creator()
+        try:
+            net = network_trainer(train_loader, net)
+        except Exception as e:
+            print(f"Error training the network, reason was: {e}")
 
-        # Let optuna know that this set of parameters produced a failure in the
-        # training process
-        return None
+            # Let optuna know that this set of parameters produced a failure in the
+            # training process
+            return None
 
-    # Evaluate the model
-    loss = loss_function(net, validation_loader_augmented)
+        # Evaluate the model
+        loss = loss_function(net, validation_loader_augmented)
+
+    if implementation is TuningStrat.KFOLD:
+
+        # Now we have defined everything for `custom_cross_validation`. So we can
+        # run k-fold cross validation for this configuration of parameters
+        # For some combinations of parameters, this can fail
+        try:
+            losses = hptuning.custom_cross_validation(
+                train_dataset = train_dataset_augmented,
+                k = GLOBALS['NUMBER_OF_FOLDS'],
+                random_seed = GLOBALS['RANDOM_SEED'],
+                network_creator = network_creator,
+                network_trainer = network_trainer,
+                loader_generator = loader_generator,
+                loss_function = loss_function,
+            )
+            print(f"Array of losses: {losses=}")
+            print(f"Obtained loss (cross validation mean) is {losses.mean()=}")
+
+        except Exception as e:
+
+            # Show that cross validation failed for this combination
+            msg = "Could not run succesfully k-fold cross validation for this combination of parameters\n"
+            msg = msg + f"Error was: {e}\n"
+            print(msg)
+            file_logger.warn(msg)
+
+            # Return None so optuna knows this trial failed
+            return None
+
+        # If everything went alright, return the mean of the loss
+        loss = losses.mean()
+
+    else:
+        # This should never happen, but add a check in case we modify the enum
+        # so we don't forget to modify this *"match"* statement
+        raise Exception(f"Got invalid implementation enum\n{implementation=}")
+
     return loss
 
 # Launch the hp tuning process
@@ -1093,7 +993,11 @@ if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
 
     print("🔎 Started hyperparameter tuning")
 
-    objective = fast_objective if GLOBALS['FAST_HP_TUNING'] is True else slow_objective
+    # We want to chose the `objective` implementation to use. But optuna only
+    # accepts functions with the shape `objective(trial)` so get a partial
+    # function with the parameter `implementation chosen`
+    impl = TuningStrat.HOLDOUT if GLOBALS['FAST_HP_TUNING'] is True else TuningStrat.KFOLD
+    partial_objective = lambda trial: objective(trial, implementation = impl)
 
     study = optuna.create_study(
         direction = "maximize",
@@ -1101,7 +1005,7 @@ if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
         storage = GLOBALS['OPTUNA_DATABASE'],
         load_if_exists = True
     )
-    study.optimize(objective, n_trials = GLOBALS['HYPERPARAMETER_TUNING_TRIES'])
+    study.optimize(partial_objective, n_trials = GLOBALS['HYPERPARAMETER_TUNING_TRIES'])
 
     print("🔎 Hyperparameter tuning ended")
     print("")
