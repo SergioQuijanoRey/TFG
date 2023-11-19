@@ -567,7 +567,7 @@ def rank_accuracy(
     data_loader: torch.utils.data.DataLoader,
     network: torch.nn.Module,
     max_examples: int,
-    fast_implementation: Optional[bool],
+    fast_implementation: Optional[bool] = None,
 ) -> float:
     """"
     Computes the rank-k accuracy metric. Thus, this only can be used when the
