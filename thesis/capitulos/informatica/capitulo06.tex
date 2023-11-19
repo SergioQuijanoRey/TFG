@@ -115,22 +115,22 @@ La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que expl
     \hline
     \textbf{Hiperparámetro}                           & \textbf{Valor escogido} \\
     \hline
-    P                                                 & 8                     \\
-    K                                                 & 2                     \\
-    Arquitectura de la red                            & \textit{CACDResNet18} \\
-    Uso de normalización                              & No                    \\
-    Dimensión del \textit{embedding}                  & 9                     \\
-    \textit{Learning Rate}                            & $5,157 \cdot 10^{-4}$ \\
-    Uso de \textit{Softplus}                          & No                    \\
-    Penalización en la norma de las salidas           & No                    \\
-    Factor de penalización en la norma de las salidas & -                     \\
-    Uso de \textit{Gradient Clipping}                 & No                    \\
-    Valor máximo del \textit{Gradient Clipping}       & $[0.00001, 10.0]$     \\
-    $\alpha$                                          & 0.840                 \\
+    P                                                 & 8                       \\
+    K                                                 & 2                       \\
+    Arquitectura de la red                            & \textit{CACDResNet18}   \\
+    Uso de normalización                              & No                      \\
+    Dimensión del \textit{embedding}                  & 9                       \\
+    \textit{Learning Rate}                            & $5,157 \cdot 10^{-4}$   \\
+    Uso de \textit{Softplus}                          & No                      \\
+    Penalización en la norma de las salidas           & No                      \\
+    Factor de penalización en la norma de las salidas & -                       \\
+    Uso de \textit{Gradient Clipping}                 & No                      \\
+    Valor máximo del \textit{Gradient Clipping}       & -                       \\
+    $\alpha$                                          & 0.840                   \\
 
     \hline
 \end{tabular}
-\caption{Valores de los hiperparámetros elegidos a partir del proceso de \textit{hyperparameter tuning}. Con estos parámetros obtenemos un valor de \textbf{\textit{Rank@1} de 0.0945}}
+\caption{Valores de los hiperparámetros elegidos a partir del proceso de \textit{hyperparameter tuning}. Con estos parámetros obtenemos un valor de \textbf{\textit{Rank@1} de 0.0945}. Los hiperparámetros con un valor \entrecomillado{-} son valores de técnicas que hemos elegido no usar}
 \label{table:hp_escogidos}
 \end{table}
 
@@ -147,10 +147,47 @@ En base a estos resultados, entrenaremos un modelo sobre todo el conjunto \texti
 
 \section{Descripción del modelo empleado} \label{isec:explicacion_modelo}
 
-Como hemos visto en \tableref{table:hp_escogidos}, hemos decidido usar el modelo \textit{CACDResnet18}. Este modelo se compone de .
-\todo{Completar una vez consiga hacer funcionar el \textit{hp tuning}}
+Como hemos visto en \tableref{table:hp_escogidos}, hemos decidido usar el modelo \textit{CACDResnet18}, que es una adaptación del modelo \textit{ResNet18} para:
+
+\begin{enumerate}
+    \item Trabajar con el conjunto de datos \textit{CACD}, en vez de con el conjunto de datos \textit{ImageNet}
+    \item Producir un \textit{embedding}, de dimensión 9 en base a \tableref{table:hp_escogidos}, en vez de resolver una tarea de clasificación con 1000 clases de salida
+\end{enumerate}
+
+Para realizar esta adaptación, simplemente cambiamos la última capa de \textit{ResNet18} que pasa de ser una capa densa con 1000 valores de salida a ser una capa densa con 9 valores de salida.
+
+Usamos la red pre-entrenada del paquete \lstinline{torchvision} \cite{informatica:resnet18_torchvision}. Realizamos un ajuste fino de todas las capas de la red, es decir, no congelamos ninguno de los parámetros del modelo.
+
+% TODO -- seguir por aqui
+% TODO -- hacer una descripcion de la arquitectura
+
 
 \section{Entrenamiento del modelo} \label{isec:entrenamiento_mejor_modelo}
+
+Entrenamos el modelo usando los hiperparámetros indicados en \tableref{table:hp_escogidos}. Además, especificamos los siguientes hiperparámetros:
+
+\begin{itemize}
+    \item Función de pérdida
+    \item Épocas de entrenamiento
+    \item Técnica de Aumentado de Datos: \textit{lazy}
+\end{itemize}
+
+El proceso de entrenamiento puede estudiarse a partir de las métricas que se muestran en \imgref{img:metricas_entrenamiento}.
+
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}{0.45\textwidth}
+%         \includegraphics[width=1.0\textwidth]{}
+%         \caption{}
+%     \end{subfigure}
+%     \begin{subfigure}{0.45\textwidth}
+%         \includegraphics[width=1.0\textwidth]{}
+%         \caption{}
+%     \end{subfigure}
+
+%     \caption{}
+%     \label{img:metricas_entrenamiento}
+% \end{figure}
 
 Mostrar gráficas de \textit{WANDB} sobre cómo avanza el entrenamiento del modelo
 
