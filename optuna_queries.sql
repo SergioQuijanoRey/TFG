@@ -9,6 +9,9 @@ SELECT * FROM trial_values;
 -- return all trials (useful for debuggin)
 SELECT * FROM trials;
 
+-- Get all the trials that run succesfully
+SELECT * FROM trials WHERE state != "FAIL" AND state != "RUNNING";
+
 -- Get the info of the best trial value (trial value is the float that we are
 -- optimizing)
 SELECT *  FROM trial_values WHERE value == (SELECT MAX(value) FROM trial_values);
@@ -19,4 +22,3 @@ FROM trial_params
 WHERE trial_id == (
     SELECT trial_id  FROM trial_values WHERE value == (SELECT MAX(value) FROM trial_values)
 );
-
