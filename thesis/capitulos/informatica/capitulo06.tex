@@ -72,9 +72,9 @@ Al final, sumamos los éxitos y dividimos por el tamaño de la base de datos, ob
 Hemos descrito el proceso usual de cómputo de esta métrica. Sin embargo, nosotros introducimos otra variante, a la que llamaremos \textbf{\textit{Local Rank@k accuracy}}. En esta variante, iteramos los datos en \textit{P-K batches}. Y con esto, las \textit{queries} las realizamos contra el \textit{P-K batch} y no contra toda la base de datos.
 
 \section{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
-% TODO -- seguir por aqui
 
-En \sectionref{isec:hptuning_kfold_cross_validation} describimos detalladamente el proceso para la selección de hiperparámetros. En \sectionref{isec:hp_tuning} describimos cómo implementamos este proceso.
+En \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. En resumen, utilizamos la técnica \textit{K-Fold Cross Validation} para guiar la búsqueda de los mejores hiperparámetros.
+\todo{Cambiar esto porque es mentira. Estoy usando hold-out por la carga de \textit{KFOLD Cross Validation}}.
 
 La siguiente tabla muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar:
 
@@ -101,7 +101,7 @@ La siguiente tabla muestra los hiperparámetros que exploramos y el rango de val
     \hline
 
 \end{tabular}
-\caption{Hiperparámetros a explorar y el rango de valores que pueden tomar. Los hiperparámetro marcados con (*) dependen de que hayamos elegido usar o no esa característica. Por ejemplo, en caso de usar \textit{Softplus} no debemos establecer valor del margen. Los valores de penalización y \textit{gradient clipping} solo se usan si decidimos usar estas técnicas}
+\caption{Hiperparámetros a explorar y el rango de valores que pueden tomar. Los hiperparámetro marcados con (*) dependen del valor de otros hiperparámetros.En el caso de usar \textit{Softplus} no debemos establecer el valor del margen. Los valores de penalización y \textit{gradient clipping} solo se usan si decidimos usar estas técnicas, respectivamente}
 \end{table}
 
 

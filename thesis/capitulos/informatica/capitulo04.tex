@@ -641,7 +641,7 @@ Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search
 
 Para la primera componente tenemos también varias alternativas. Una alternativa sería la de usar el subconjunto de entrenamiento para probar las configuraciones candidatas de hiperparámetros, y evaluar sobre el conjunto de \textit{test}. \textbf{Esta alternativa es completamente errónea}, pues estamos realizando \textit{data snooping}: incluimos datos de \textit{test} en el proceso de creación del modelo.
 
-Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, validación y \textit{test}). El conjunto de validación se genera partiendo el conjunto de entrenamiento. Entrenamos usando las configuraciones candidatas y evaluamos sobre el conjunto de validación. Este enfoque sí que es correcto pues no estamos usando el conjunto de \textit{test} en ningún momento, pero tiene algunos inconvenientes:
+Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, validación y \textit{test}). El conjunto de validación se genera partiendo el conjunto de entrenamiento. Entrenamos usando las configuraciones candidatas y evaluamos sobre el conjunto de validación. A esta técnica se le conoce como \textbf{\textit{holdout}}. Este enfoque sí que es correcto pues no estamos usando el conjunto de \textit{test} en ningún momento, pero tiene algunos inconvenientes:
 
 \begin{itemize}
     \item Estamos perdiendo una parte considerable del conjunto de entrenamiento para generar el conjunto de validación
@@ -679,7 +679,7 @@ Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta t�
     \item Sin embargo, valores altos de $K$ suponen tiempos de cómputo grandes: entrenamos $K$ veces, y sobre un porcentaje grande del \textit{dataset} de entrenamiento: $\frac{K - 1}{K}$
 \end{itemize}
 
-Describimos cómo implementamos esta técnica en \sectionref{isec:hp_tuning}.
+Describimos cómo implementamos estas dos técnicas (\textit{holdout} y \textit{K-fold Cross validation}) en \sectionref{isec:hp_tuning}.
 
 \subsection{Normalización} \label{isubs:normalizacion_teoria}
 

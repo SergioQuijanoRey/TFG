@@ -227,9 +227,20 @@ net = NormalizedNet(net)
 
 \subsection{\textit{Hyperparameter Tuning}} \label{isec:hp_tuning}
 
-Como hemos comentado en \sectionref{isec:hptuning_kfold_cross_validation}, usaremos la técnica de \textit{K-Fold Cross Validation} para buscar buenos valores de hiperparámetros. Para facilitar este proceso, desarrollamos un módulo \lstinline{src.lib.hyperparameter_tuning}.
+Como hemos comentado en \sectionref{isec:hptuning_kfold_cross_validation}, usaremos dos técnicas para realizar el \textit{hyperparameter tuning}: \textit{holdout} y \textit{K-Fold Cross Validation}. Usaremos un código común para los dos enfoques, basado en la librería \textit{optuna}. En función de cuál de los dos enfoques usemos, entrenaremos y evaluaremos de una forma u otra, pero todo el código asociado a la propuesta de nuevas configuraciones e instanciación de las distintas piezas necesarias para llevar a cabo el proceso es el mismo.
 
-En este módulo definimos la función \lstinline{custom_cross_validation}, cuyo objetivo es implementar la primera componente que mencionamos en \sectionref{isec:hptuning_kfold_cross_validation}. Por lo tanto, debe generar una métrica a optimizar a partir de una configuración de hiperparámetros dada. La función acepta los siguientes parámetros:
+Cada \textit{script} que usemos para entrenar y validar definirá una sección de ajuste de hiperparámetros (como comentamos en \sectionref{isec:pipeline}). Usaremos el \textit{framework} \lstinline{optuna} para realizar una búsqueda en el espacio de hiperparámetros \cite{informatica:optuna_web}. Este \textit{framework} implementa toda la lógica necesaria para proponer valores de hiperparámetros, y en base a los resultados obtenidos gracias a la técnica escogida, proponer nuevos hiperparámetros. Además, usa \lstinline{SQLite} para almacenar los resultados e introducir paralelismo, lo que permite que lancemos varios procesos en los servidores \textit{nGPU}, disminuyendo los tiempos de búsqueda. Como ya hemos comentado, el fichero \lstinline{optuna_queries.sql} contiene las consultas \textit{SQL} para poder acceder a la base de datos donde se almacenan los resultados de la búsqueda.
+
+En la sección de ajuste de hiperparámetros, deberemos configurar \lstinline{optuna} para realizar la búsqueda:
+
+\begin{itemize}
+    \item Indicamos qué hiperparámetros queremos explorar, el rango de valores que pueden tomar y sus distribuciones
+    \item Configuramos el proceso que produce el valor numérico a optimizar. En nuestro caso, en función de los hiperparámetros elegidos por \lstinline{optuna}, construimos un modelo u otro, adaptamos la red adecuadamente (por ejemplo, añadiendo o no normalización) y usamos la técnica escogida (\textit{holdout} o \textit{K-Fold Cross validation}) para entrenar y obtener la métrica de error a minimizar.
+\end{itemize}
+
+A la hora de aplicar \textit{holdout}, el proceso es muy sencillo. Simplemente separamos el conjunto de entrenamiento en entrenamiento y validación, aprendemos un modelo sobre el conjunto de entrenamiento y evaluamos sobre el conjunto de validación.
+
+Aplicar \textit{K-Fold Cross Validation} no es tan directo, por lo que desarrollamos un módulo \lstinline{src.lib.hyperparameter_tuning}, donde implementamos la función \lstinline{custom_cross_validation}. Dicha función debe generar una métrica a optimizar a partir de una configuración de hiperparámetros dada. La función acepta los siguientes parámetros:
 
 \begin{itemize}
     \item \lstinline{train_dataset}, \textit{dataset} de entrenamiento, sobre el que construiremos los \textit{folds}
@@ -238,21 +249,10 @@ En este módulo definimos la función \lstinline{custom_cross_validation}, cuyo 
     \item \lstinline{network_creator}, función que devuelve una red inicializada aleatoriamente con la arquitectura que queramos trabajar
     \item \lstinline{network_trainer}, función que toma un \textit{dataloader} y una red neuronal, y ejecuta el entrenamiento devolviendo la red entrenada
     \item \lstinline{loader_generator}, función que toma un \textit{dataset} que representa uno de los dos bloques (el \textit{fold} de validación o los $k-1$ \textit{folds} de entrenamiento), el tipo de bloque (entrenamiento o validación) y genera un \lstinline{torch.utils.dada.Dataloader} adecuado para poder lanzar el proceso de entrenamiento y el cálculo de la función a optimizar
-    \item \lstinline{loss_function}, función que queremos optimizar usando \textit{hyperparameter tuning}
+    \item \lstinline{loss_function}, función que produce la métrica de error a minimizar
 \end{itemize}
 
-Estamos aplicando el patrón estrategia \cite{informatica:design_patterns} \cite{informatica:strategy_pattern_web}. Pero en vez de estar usando el enfoque clásico en un ambiente de programación orientada a objetos, estamos usando un enfoque funcional. Gracias a esto, podemos usar esta función configurando muy fácilmente qué redes neuronales queremos usar, cómo queremos entrenar la red, cómo queremos trabajar con los datos, ... Y como comentamos a continuación, todo esto de forma dinámica en base a los hiperparámetros propuestos por el \textit{framework} usado (\lstinline{optuna}).
-
-Usando esta función, cada \textit{script} que usemos para entrenar y validar definirá una sección de ajuste de hiperparámetros (como comentamos en \sectionref{isec:pipeline}). Usaremos el \textit{framework} \lstinline{optuna} para realizar una búsqueda en el espacio de hiperparámetros \cite{informatica:optuna_web}. Este \textit{framework} implementa toda la lógica necesaria para proponer valores de hiperparámetros, y en base a los resultados obtenidos gracias a \lstinline{custom_cross_validation}, proponer nuevos hiperparámetros. Además, usa \lstinline{SQLite} para almacenar los resultados e introducir paralelismo, lo que permite que lancemos varios procesos en los servidores \textit{nGPU}, disminuyendo los tiempos de búsqueda. Como ya hemos comentado, el fichero \lstinline{optuna_queries.sql} contiene las consultas \textit{SQL} para poder acceder a la base de datos donde se almacenan los resultados de la búsqueda.
-
-En la sección de ajuste de hiperparámetros, deberemos configurar \lstinline{optuna} para realizar la búsqueda:
-
-\begin{itemize}
-    \item Indicamos qué hiperparámetros queremos explorar, el rango de valores que pueden tomar y sus distribuciones
-    \item Configuramos el proceso que produce el valor numérico a optimizar. En nuestro caso, en función de los hiperparámetros elegidos por \lstinline{optuna}, construimos un modelo u otro, adaptamos la red adecuadamente (por ejemplo, añadiendo o no normalización) y lanzamos la función \lstinline{custom_cross_validation} que en definitiva produce la métrica a optimizar
-\end{itemize}
-
-En \sectionref{isec:experimentacion_hp_tuning} usaremos este módulo para realizar la selección de hiperparámetros.
+Estamos aplicando el patrón estrategia \cite{informatica:design_patterns} \cite{informatica:strategy_pattern_web}. Pero en vez de estar usando el enfoque clásico en un ambiente de programación orientada a objetos, estamos usando un enfoque funcional. Gracias a esto, podemos usar esta función configurando muy fácilmente qué redes neuronales queremos usar, cómo queremos entrenar la red, cómo queremos trabajar con los datos, ... Y por ende, es muy cómodo trabajar con los hiperparámetros sugeridos por \lstinline{optuna}.
 
 \subsection{Adaptador para realizar \textit{retrieval}} \label{isubs:impl_retr_adapter}
 
