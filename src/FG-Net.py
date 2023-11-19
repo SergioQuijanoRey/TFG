@@ -126,7 +126,7 @@ GLOBALS['HYPERPARAMETER_TUNING_TRIES'] = 300
 
 # Wether to use the validation set in the hp tuning process or to use k-fold
 # cross validation (which is more robust but way slower)
-GLOBALS['FAST_HP_TUNING'] = False
+GLOBALS['FAST_HP_TUNING'] = True
 
 # Number of folds used in k-fold Cross Validation
 GLOBALS['NUMBER_OF_FOLDS'] = 3
@@ -949,7 +949,7 @@ def objective(trial, implementation: TuningStrat):
         # Evaluate the model
         loss = loss_function(net, validation_loader_augmented)
 
-    if implementation is TuningStrat.KFOLD:
+    elif implementation is TuningStrat.KFOLD:
 
         # Now we have defined everything for `custom_cross_validation`. So we can
         # run k-fold cross validation for this configuration of parameters
@@ -991,13 +991,15 @@ def objective(trial, implementation: TuningStrat):
 # Launch the hp tuning process
 if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
 
-    print("🔎 Started hyperparameter tuning")
-
     # We want to chose the `objective` implementation to use. But optuna only
     # accepts functions with the shape `objective(trial)` so get a partial
     # function with the parameter `implementation chosen`
-    impl = TuningStrat.HOLDOUT if GLOBALS['FAST_HP_TUNING'] is True else TuningStrat.KFOLD
-    partial_objective = lambda trial: objective(trial, implementation = impl)
+    strat = TuningStrat.HOLDOUT if GLOBALS['FAST_HP_TUNING'] is True else TuningStrat.KFOLD
+    partial_objective = lambda trial: objective(trial, implementation = strat)
+
+
+    print(f"🔎 Started hyperparameter tuning with {strat=}")
+    print("")
 
     study = optuna.create_study(
         direction = "maximize",
