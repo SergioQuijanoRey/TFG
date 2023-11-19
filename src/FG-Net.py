@@ -77,7 +77,7 @@ GLOBALS['OPTUNA_DATABASE'] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna
 
 
 # Parameters of P-K sampling
-GLOBALS['P'] = 34    # Number of classes used in each minibatch
+GLOBALS['P'] = 8     # Number of classes used in each minibatch
 GLOBALS['K'] = 2     # Number of images sampled for each selected class
 
 # Batch size for online training
@@ -90,11 +90,11 @@ GLOBALS['K'] = 2     # Number of images sampled for each selected class
 # clear reason to do this
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
-# Epochs for hard triplets, online training
-GLOBALS['TRAINING_EPOCHS'] = 1
+# Training epochs
+GLOBALS['TRAINING_EPOCHS'] = 20
 
 # Learning rate for hard triplets, online training
-GLOBALS['ONLINE_LEARNING_RATE'] = 10**(-6)
+GLOBALS['ONLINE_LEARNING_RATE'] = 5.157 * 10**(-4)
 
 # How many single elements we want to see before logging
 # It has to be a multiple of P * K, otherwise `should_log` would return always
@@ -103,7 +103,7 @@ GLOBALS['ONLINE_LEARNING_RATE'] = 10**(-6)
 # `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
 # minibatches
 #  GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 500
-GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 10_000
+GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 1_000
 
 # Which percentage of the training and validation set we want to use for the logging
 GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE'] = 0.005
@@ -129,13 +129,13 @@ GLOBALS['HYPERPARAMETER_TUNING_TRIES'] = 300
 GLOBALS['FAST_HP_TUNING'] = True
 
 # Number of folds used in k-fold Cross Validation
-GLOBALS['NUMBER_OF_FOLDS'] = 3
+GLOBALS['NUMBER_OF_FOLDS'] = 2
 
 # Margin used in the loss function
-GLOBALS['MARGIN'] = 0.5
+GLOBALS['MARGIN'] = 0.840
 
 # Dim of the embedding calculated by the network
-GLOBALS['EMBEDDING_DIMENSION'] = 5
+GLOBALS['EMBEDDING_DIMENSION'] = 9
 
 # Number of neighbours considered in K-NN
 # K-NN used for transforming embedding task to classification task
@@ -146,7 +146,7 @@ GLOBALS['NUMBER_NEIGHBOURS'] = 4
 GLOBALS['BATCH_TRIPLET_LOSS_FUNCTION'] = "hard"
 
 # Whether or not use softplus loss function instead of vanilla triplet loss
-GLOBALS['USE_SOFTPLUS_LOSS'] = True
+GLOBALS['USE_SOFTPLUS_LOSS'] = False
 
 # Count all sumamnds in the mean loss or only those summands greater than zero
 GLOBALS['USE_GT_ZERO_MEAN_LOSS'] = True
@@ -166,12 +166,12 @@ GLOBALS['PENALTY_FACTOR'] = 0.6
 
 # If we want to wrap our model into a normalizer
 # That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
-GLOBALS['NORMALIZED_MODEL_OUTPUT'] = True
+GLOBALS['NORMALIZED_MODEL_OUTPUT'] = False
 
 # If its None, we do not perform gradient clipping
 # If its a Float value, we perform gradient clipping, using that value as a
 # parameter for the max norm
-GLOBALS['GRADIENT_CLIPPING'] = 100
+GLOBALS['GRADIENT_CLIPPING'] = None
 
 # Number of candidates that we are going to consider in the retrieval task,
 # used in the Rank@K accuracy metric
@@ -192,7 +192,7 @@ GLOBALS['ROTATE_AUGM_DEGREES'] = (0, 20)
 # - This way we can skip some heavy computations when not needed
 
 # Skip hyper parameter tuning for online training
-GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = False
+GLOBALS['SKIP_HYPERPARAMTER_TUNING'] = True
 
 # Skip training and use a cached model
 # Useful for testing the embedding -> classifier transformation
@@ -987,6 +987,7 @@ def objective(trial, implementation: TuningStrat):
         raise Exception(f"Got invalid implementation enum\n{implementation=}")
 
     return loss
+
 
 # Launch the hp tuning process
 if GLOBALS['SKIP_HYPERPARAMTER_TUNING'] is False:
