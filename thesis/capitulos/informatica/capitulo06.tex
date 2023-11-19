@@ -73,21 +73,24 @@ Hemos descrito el proceso usual de cómputo de esta métrica. Sin embargo, nosot
 
 \section{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
 
-En \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. En resumen, utilizamos la técnica \textit{K-Fold Cross Validation} para guiar la búsqueda de los mejores hiperparámetros.
-\todo{Cambiar esto porque es mentira. Estoy usando hold-out por la carga de \textit{KFOLD Cross Validation}}.
+En \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. Describimos ahora cómo utilizamos este proceso, las decisiones tomadas durante dicho proceso y qué información obtenemos.
+
+En los \textit{datasets} \textit{MNIST} y \textit{LFW} usamos \textit{K-Fold Hyperparameter Tuning}. En estos \textit{datasets} de tamaño más manejable las ventajas que ofrece esta técnica supera ampliamente a los inconvenientes. Sin embargo, en los \textit{datasets} que nos interesan (\textit{CACD} para entrenar, \textit{FG-Net} para validar) esta situación se invierte, por lo que usamos \textit{Holdout}. Como hemos comentado en \sectionref{isec:hptuning_kfold_cross_validation}, trabajar con \textit{datasets} de gran tamaño hace que el proceso de \textit{K-Fold Cross Validation} sea demasiado lento. Además, el problema de robustez de \textit{holdout}, que \textit{K-Fold Cross Validation} trata de solucionar, se reduce drásticamente.
+
+Es más, cuando intentamos usar \textit{K-fold Cross Validation} para realizar la búsqueda de hiperparámetros nos encontramos con que gran parte de los intentos o \textit{trials} fallan al consumir toda la memoria disponible. Esto supone dos problemas: descartamos configuraciones de hiperparámetros que podrían ser buenas y que el tiempo de búsqueda aumenta aun más. Esto hace que aplicar esta técnica sobre \textit{CACD} sea inviable.
 
 La siguiente tabla muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar:
 
 \begin{table}[H]
 \centering
-    \begin{tabular}{|l|l|}
+    \begin{tabular}{|l|p{5cm}|}
     \hline
     \textbf{Hiperparámetros} & \textbf{Rango de valores} \\
     \hline
 
     P & $[2, 10]$ \\
     K & $[2, 10]$ \\
-    Arquitectura de la red & \textit{CACDResNet18}, \textit{CACDResNet50}, \textit{FGLightModel} \\
+    Arquitectura de la red & \textit{CACDResNet18}, \textit{CACDResNet50} \textit{FGLightModel} \\
     Uso de normalización & Sí, No \\
     Dimensión del \textit{embedding} & $\deltaset{10}$ \\
     \textit{Learning Rate} & $[0, 0.001]$ \\
@@ -101,45 +104,49 @@ La siguiente tabla muestra los hiperparámetros que exploramos y el rango de val
     \hline
 
 \end{tabular}
-\caption{Hiperparámetros a explorar y el rango de valores que pueden tomar. Los hiperparámetro marcados con (*) dependen del valor de otros hiperparámetros.En el caso de usar \textit{Softplus} no debemos establecer el valor del margen. Los valores de penalización y \textit{gradient clipping} solo se usan si decidimos usar estas técnicas, respectivamente}
+\caption{Hiperparámetros a explorar y el rango de valores que pueden tomar. Los hiperparámetro marcados con (*) dependen del valor de otros hiperparámetros.En el caso de usar \textit{Softplus} no debemos establecer el valor del margen. Los valores de penalización y \textit{gradient clipping} solo se usan si decidimos usar estas técnicas, respectivamente. Usamos el enfoque \textit{Holdout} en la búsqueda de los hiperparámetros}
 \end{table}
 
-
-Los hiperparámetros elegidos tras realizar el proceso de \textit{hyperparameter tuning} se muestran en la siguiente tabla:
+Lanzamos esta búsqueda de hiperparámetros como hemos especificado, maximizando el valor de \textit{Rank@k accuracy} \footnotemark. Los resultados de la búsqueda pueden consultarse en la base de datos \textit{SQLITE} \lstinline{hp_tuning_optuna.db}. Si el lector quiere realizar consultas sobre esta base de datos, el fichero \lstinline{optuna_queries.sql} contiene las órdenes \textit{SQL} que más hemos usado para vigilar el proceso de búsqueda. La siguiente tabla muestra los mejores hiperparámetros encontrados:
+\footnotetext{Si el lector no está familiarizado con esta métrica, la hemos definido en \sectionref{isubs:rank_at_k}}
 
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
     \hline
-    \textbf{Hiperparámetro} & \textbf{Valor escogido} \\
+    \textbf{Hiperparámetro}                           & \textbf{Valor escogido} \\
     \hline
-
-    P & $[2, 10]$ \\
-    K & $[2, 10]$ \\
-    Arquitectura de la red & \textit{CACDResNet18}, \textit{CACDResNet50}, \textit{FGLightModel} \\
-    Uso de normalización & Sí, No \\
-    Dimensión del \textit{embedding} & $\deltaset{10}$ \\
-    \textit{Learning Rate} & $[0, 0.001]$ \\
-    Uso de \textit{Softplus} & Sí, No \\
-    Penalización en la norma de las salidas & Sí, No \\
-    Factor de penalización en la norma de las salidas & $[0.0001, 2.0]$ \\
-    Uso de \textit{Gradient Clipping} & Sí, No \\
-    Valor máximo del \textit{Gradient Clipping} & $[0.00001, 10.0]$ \\
-    $\alpha$ & $[0.001, 1.0]$ \\
+    P                                                 & 8                     \\
+    K                                                 & 2                     \\
+    Arquitectura de la red                            & \textit{CACDResNet18} \\
+    Uso de normalización                              & No                    \\
+    Dimensión del \textit{embedding}                  & 9                     \\
+    \textit{Learning Rate}                            & $5,157 \cdot 10^{-4}$ \\
+    Uso de \textit{Softplus}                          & No                    \\
+    Penalización en la norma de las salidas           & No                    \\
+    Factor de penalización en la norma de las salidas & -                     \\
+    Uso de \textit{Gradient Clipping}                 & No                    \\
+    Valor máximo del \textit{Gradient Clipping}       & $[0.00001, 10.0]$     \\
+    $\alpha$                                          & 0.840                 \\
 
     \hline
-
-
 \end{tabular}
-\caption{Valores de los hiperparámetros elegidos a partir del proceso de \textit{hyperparameter tuning}}
+\caption{Valores de los hiperparámetros elegidos a partir del proceso de \textit{hyperparameter tuning}. Con estos parámetros obtenemos un valor de \textit{Rank@1} de \textbf{0.0945}}
 \label{table:hp_escogidos}
 \end{table}
-\todo{Escribir el verdadero valor escogido una vez haga funcionar hp tuning}
+
+En \tableref{table:hp_escogidos} podemos ver que la métrica \textit{Rank@1 Accuracy} es realmente mala, no llega al $0.1$. Por otro lado, de 100 pruebas de hiperparámetros, solo 11 consiguen terminar su ejecución de forma normal. La mayoría de los fallos son por explosión de gradientes y no por otros problemas, como era el caso de colapsar la memoria al usar \textit{K-Fold Cross Validation}. Esto ya indica dos aspectos de las técnicas empleadas:
+
+\begin{enumerate}
+    \item Producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte
+    \item Por el uso de las nuevas técnicas, el entrenamiento del modelo es muy frágil y es realmente complicado encontrar configuraciones de hiperparámetros que logren producir un modelo sin errores en el proceso
+\end{enumerate}
+
+\section{Descripción del modelo empleado} \label{isec:explicacion_modelo}
 
 Como hemos visto en \tableref{table:hp_escogidos}, hemos decidido usar el modelo . Este modelo se compone de .
 \todo{Completar una vez consiga hacer funcionar el \textit{hp tuning}}
 
-\section{Descripción del modelo empleado} \label{isec:explicacion_modelo}
 
 \section{Entrenamiento del modelo} \label{isec:entrenamiento_mejor_modelo}
 
