@@ -91,7 +91,7 @@ GLOBALS['K'] = 2     # Number of images sampled for each selected class
 GLOBALS['ONLINE_BATCH_SIZE'] = GLOBALS['P'] * GLOBALS['K']
 
 # Training epochs
-GLOBALS['TRAINING_EPOCHS'] = 20
+GLOBALS["TRAINING_EPOCHS"] = 1
 
 # Learning rate for hard triplets, online training
 GLOBALS['ONLINE_LEARNING_RATE'] = 5.157 * 10**(-4)
