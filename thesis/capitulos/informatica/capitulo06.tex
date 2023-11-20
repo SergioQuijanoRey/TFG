@@ -154,11 +154,9 @@ Como hemos visto en \tableref{table:hp_escogidos}, hemos decidido usar el modelo
     \item Producir un \textit{embedding}, de dimensión 9 en base a \tableref{table:hp_escogidos}, en vez de resolver una tarea de clasificación con 1000 clases de salida
 \end{enumerate}
 
-Para realizar esta adaptación, simplemente cambiamos la última capa de \textit{ResNet18} que pasa de ser una capa densa con 1000 valores de salida a ser una capa densa con 9 valores de salida.
+Para realizar esta adaptación, simplemente cambiamos la última capa de \textit{ResNet18} que pasa de ser una capa densa con 1000 valores de salida a ser una capa densa con 9 valores de salida. Además, usamos la red pre-entrenada del paquete \lstinline{torchvision} \cite{informatica:resnet18_torchvision}. Realizamos un ajuste fino de todas las capas de la red, es decir, no congelamos ninguno de los parámetros del modelo.
 
-Usamos la red pre-entrenada del paquete \lstinline{torchvision} \cite{informatica:resnet18_torchvision}. Realizamos un ajuste fino de todas las capas de la red, es decir, no congelamos ninguno de los parámetros del modelo.
-
-Esta arquitectura fue introducida en el trabajo \cite{informatica:resnet_original_paper}. La idea principal consiste en trabajar con bloques residuales y \textit{skip connectios} con el objetivo de que el gradiente fluya mejor y así poder trabajar con un gran número de capas (gran profundidad). De ahí su nombre, \textit{RESiudal NETwork}.
+La arquitectura original fue introducida en \cite{informatica:resnet_original_paper}. La idea principal consiste en trabajar con bloques residuales y \textit{skip connectios} con el objetivo de que el gradiente fluya mejor y así poder trabajar con un gran número de capas (gran profundidad). De ahí su nombre, \textit{RESiudal NETwork}.
 
 \begin{itemize}
     \item Un \textbf{bloque residual} se compone de dos capas convolucionales. Entre las dos capas convolucionales aplicamos una no-linealidad (\textit{ReLU}, en la arquitectura original). Además sumamos la entrada original a la salida. Tras esto, se aplica otra no-linealidad. Es decir, dado una entrada $X$, computamos $\mathcal{F}(X) + X$. Por tanto, la red no aprende drectamente la salida buscada, sino la diferencia entre la entrada y dicha salida. Todo esto queda reflejado en la \imgref{img:ejemplo_bloque_resnet}.
