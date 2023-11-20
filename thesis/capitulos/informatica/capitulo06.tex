@@ -158,8 +158,28 @@ Para realizar esta adaptación, simplemente cambiamos la última capa de \textit
 
 Usamos la red pre-entrenada del paquete \lstinline{torchvision} \cite{informatica:resnet18_torchvision}. Realizamos un ajuste fino de todas las capas de la red, es decir, no congelamos ninguno de los parámetros del modelo.
 
-% TODO -- seguir por aqui
-% TODO -- hacer una descripcion de la arquitectura
+Esta arquitectura fue introducida en el trabajo \cite{informatica:resnet_original_paper}. La idea principal consiste en trabajar con bloques residuales y \textit{skip connectios} con el objetivo de que el gradiente fluya mejor y así poder trabajar con un gran número de capas (gran profundidad). De ahí su nombre, \textit{RESiudal NETwork}.
+
+\begin{itemize}
+    \item Un \textbf{bloque residual} se compone de dos capas convolucionales. Entre las dos capas convolucionales aplicamos una no-linealidad (\textit{ReLU}, en la arquitectura original). Además sumamos la entrada original a la salida. Tras esto, se aplica otra no-linealidad. Es decir, dado una entrada $X$, computamos $\mathcal{F}(X) + X$. Por tanto, la red no aprende drectamente la salida buscada, sino la diferencia entre la entrada y dicha salida. Todo esto queda reflejado en la \imgref{img:ejemplo_bloque_resnet}.
+    \item Las \textbf{\textit{skip connections}} pasan la información directamente de una capa a otra, saltándose uno o más bloques residuales. Esto permite que no haya tanto desvanecimiento del gradiente, lo que permite usar más bloques residuales (aumentando drásticamente la profundidad).
+\end{itemize}
+
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=0.6\textwidth]{informatica/bloque_resnet}
+    \caption{Ejemplo de bloque residual. Imagen extraída de \cite{informatica:resnet_original_paper}}
+    \label{img:ejemplo_bloque_resnet}
+\end{figure}
+
+En base a estos elementos, la arquitectura de nuestro modelo \textit{ResNet18} se describe gráficamente en la \imgref{img:arquitectura_resnet_18}. Notar que estamos modificando la última capa \textit{fully connected}.
+
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=1.0\textwidth]{informatica/resnet18_arch}
+    \caption{Diagrama de la arquitectura \textit{ResNet18}. Las líneas continuas por encima de los bloques indican la conexión entre el inicio y final de un bloque residual. Las líneas discontinuas por encima de los bloques indican las \textit{skip connections}. Imagen extraída de \cite{informatica:resnet18_arch_web}}
+    \label{img:arquitectura_resnet_18}
+\end{figure}
 
 
 \section{Entrenamiento del modelo} \label{isec:entrenamiento_mejor_modelo}
