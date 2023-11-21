@@ -172,47 +172,138 @@ La arquitectura original fue introducida en \cite{informatica:resnet_original_pa
 
 En base a estos elementos, la arquitectura de nuestro modelo \textit{ResNet18} se describe gráficamente en la \imgref{img:arquitectura_resnet_18}. Notar que estamos modificando la última capa \textit{fully connected}.
 
-\begin{figure}[hbt]
+\begin{figure}[!hbt]
     \centering
     \includegraphics[width=1.0\textwidth]{informatica/resnet18_arch}
     \caption{Diagrama de la arquitectura \textit{ResNet18}. Las líneas continuas por encima de los bloques indican la conexión entre el inicio y final de un bloque residual. Las líneas discontinuas por encima de los bloques indican las \textit{skip connections}. Imagen extraída de \cite{informatica:resnet18_arch_web}}
     \label{img:arquitectura_resnet_18}
 \end{figure}
 
-
 \section{Entrenamiento del modelo} \label{isec:entrenamiento_mejor_modelo}
 
 Entrenamos el modelo usando los hiperparámetros indicados en \tableref{table:hp_escogidos}. Además, especificamos los siguientes hiperparámetros:
 
 \begin{itemize}
-    \item Función de pérdida
-    \item Épocas de entrenamiento
-    \item Técnica de Aumentado de Datos: \textit{lazy}
+    \item Función de pérdida: \textit{batch hard} con sumandos activos, es decir, $\mathcal{L}_{BH \neq 0}$
+    \item Épocas de entrenamiento: una única época de entrenamiento. El conjunto de entrenamiento \textit{CACD} es lo suficientemente grande como para entrenar en una sola época. Tomamos esta decisión en base a experimentos previos y a los propios resultados de este entrenamiento.
+    \item Técnica de Aumentado de Datos: \textit{lazy}. Esta variante permite que no saturemos la memoria disponible
+    \item Usamos el 80\% del \textit{dataset} \textit{CACD} para entrenar, y el 20\% restante como conjunto de validación
 \end{itemize}
 
-El proceso de entrenamiento puede estudiarse a partir de las métricas que se muestran en \imgref{img:metricas_entrenamiento}.
+El proceso de entrenamiento puede estudiarse a partir de las métricas que se muestran en \imgref{img:metricas_entrenamiento}. Al finalizar el entrenamiento, evaluamos distintas métricas sobre el conjunto \textit{FG-Net}. Estos resultados se muestran en la \tableref{table:resultados_sobre_fg_net}.
 
-% \begin{figure}[H]
-%     \centering
-%     \begin{subfigure}{0.45\textwidth}
-%         \includegraphics[width=1.0\textwidth]{}
-%         \caption{}
-%     \end{subfigure}
-%     \begin{subfigure}{0.45\textwidth}
-%         \includegraphics[width=1.0\textwidth]{}
-%         \caption{}
-%     \end{subfigure}
+\begin{figure}[!hbtp]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/running_loss}
+        \caption{Error de entrenamiento tipo \entrecomillado{running}}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/manual_loss}
+        \caption{Error de entrenamiento}
+    \end{subfigure}
 
-%     \caption{}
-%     \label{img:metricas_entrenamiento}
-% \end{figure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/rank@1}
+        \caption{\textit{Rank@1 Accuracy}}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/rank@5}
+        \caption{\textit{Rank@5 Accuracy}}
+    \end{subfigure}
 
-Mostrar gráficas de \textit{WANDB} sobre cómo avanza el entrenamiento del modelo
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/local_rank@1}
+        \caption{\textit{Rank@1 Accuracy}}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/local_rank@5}
+        \caption{\textit{Local Rank@5 Accuracy}}
+    \end{subfigure}
+
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intracluster_distance}
+        \caption{Distanca \textit{intracluster} media}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intercluster_distance}
+        \caption{Distancia \textit{intercluster} media}
+    \end{subfigure}
+
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/embedding_norms}
+        \caption{Norma de los \textit{embeddings}}
+    \end{subfigure}
+
+    \caption{Valores de las métricas observadas durante el proceso de entrenamiento}
+    \label{img:metricas_entrenamiento}
+\end{figure}
+
+\begin{table}[!hbtp]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    Métrica & Conjunto & Valor \\
+    \hline
+
+    \textit{Rank@1 Accuracy} & Entrenamiento & 0.07185 \\
+    \textit{Rank@1 Accuracy} & Test & 0.01000 \\
+    \textit{Rank@5 Accuracy} & Entrenamiento & 0.15244 \\
+    \textit{Rank@5 Accuracy} & Test & 0.00100 \\
+    \textit{Silhouette} & Entrenamiento & -0.41858 \\
+    \textit{Silhouette} & Test & -0.32984 \\
+
+    \hline
+
+\end{tabular}
+\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de evaluación}
+    \label{table:resultados_sobre_fg_net}
+\end{table}
+
+En \imgref{img:metricas_entrenamiento} podemos ver que:
+
+\begin{itemize}
+    \item Como habíamos previsto, la función de pérdida cae rápidamente mientras que el resto de métricas varían su valor. Por tanto, la red está aprendiendo cierto comportamiento (que claramente no es el deseado) aunque la función de pérdida no varíe. Esto ocurre tanto en la función de pérdida \textit{running} como en la función de pérdida computada a mano sobre los datos
+    \item Tanto el \textit{Rank@1} como \textit{Rank@5 Accuracy} aumentan satisfactoriamente, aunque sus valores son realmente bajos. Además, tenemos mejores valores en validación que en entrenamiento, lo que supone un comportamiento inusual que puede indicar que la red no está aprendiendo adecuadamente
+    \item La variante local de \textit{Rank@1} y \textit{Rank@5} obtienen resultados notablemente mejores, lo que era de esperar por la naturaleza de esta variante
+    \item Como esperábamos, la distancia intracluster desciende con el paso del tiempo. Sin embargo, la distancia intercluster desciende, en vez de ascender. Acompañado del descenso de las normas de los \textit{embeddings}, podemos pensar que estamos en la primera fase del entrenamiento que hemos comentado: agrupamos todos los datos en un cierto centro de gravedad. Pero no estamos logrando pasar a la siguiente fase, en la que se forma los clústers gracias a que los elementos atraviesan el centro de gravedad para juntarse con el resto de elementos de su clúster
+\end{itemize}
+
+Los resultados obtenidos en \tableref{table:resultados_sobre_fg_net} muestran que:
+
+\begin{itemize}
+    \item Los resultados en el conjunto de entrenamiento son realmente malos. Los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} son pésimos, y están muy lejos de los valores que hemos mostrado que alcanzan modelos estado del arte. Aunque no logremos ser competitivos con el estado del arte, podríamos haber obtenido un modelo aplicable en la práctica, competente y ligero. Pero este no es el caso, en este estado el modelo no es aplicable en ningún escenario
+    \item En base a estos malos resultados, y como era de esperar, los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} sobre \textit{FG-Net} son pésimos
+    \item Los valores de \textit{Silhouette} son muy malos también. Un valor negativo implica que el \textit{embedding} aprendido es de una calidad pésima
+\end{itemize}
 
 \section{Comparativas variando las técnicas empleadas} \label{isec:experimentacion_variar_tecnicas}
+\todo{Desarrollar esta sección}
 
-\section{Conclusiones extraídas de la experimetnación} \label{isec:conclusiones_experimentacion}
+\section{Conclusiones extraídas de la experimentación} \label{isec:conclusiones_experimentacion}
 
-Mostrar los valores de rank@k, local rank@k, ...
+En base a \imgref{img:metricas_entrenamiento} y \tableref{table:resultados_sobre_fg_net} queda claro que el entrenamiento de este modelo, a partir de las técnicas que hemos ido desarrollando a lo largo del trabajo, no han producido un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una comparativa entre algunos modelos del estado del arte y nuestro modelo:
 
-Comparar con el estado del arte
+\begin{table}[!hbtp]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    Modelo                    & \textit{Rank@1 Accuracy} en \textit{FG-Net} \\
+    \hline
+
+    \textbf{\textit{MTLFace}} & \textbf{94.78}                              \\
+    \textit{DAL}              & 94.5                                        \\
+    \textit{AIM}              & 93.20                                       \\
+    Nuestro modelo            & 0.07185                                     \\
+    \hline
+
+\end{tabular}
+\caption{Resultados \textit{Rank@1 Accuracy} de distintos modelos del estado del arte y el modelo que hemos entrenado en este trabajo}
+\label{table:estado_del_arte_y_mi_modelo}
+\end{table}
+
+Claramente, nuestro modelo está muy lejos de ser competitivo con los modelos del estado del arte. Es más, está lejos de ser aplicable en ningún escenario práctico. Podríamos haber obtenido un modelo que, aunque no fuera competitivo con el estado del arte, tuviese un rendimiento decente. En cuyo caso tendríamos un modelo aplicable mucho más ligero que los modelos del estado del arte. Pero estamos muy lejos de encontrarnos en esa situación.
+
+% TODO -- seguir por aqui
+
+El rendimiento ha sido tan malo que durante mucho tiempo hemos pensado que existía un error en nuestra extensa base de código. Esto ha motivado la implementación de una amplia gama de \textit{tests} para descartar esta opción, como hemos desarrollado en \sectionref{}.
