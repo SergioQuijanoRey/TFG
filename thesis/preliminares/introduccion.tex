@@ -5,17 +5,43 @@
 % Introducción
 %*******************************************************
 
-% TODO -- lo tengo que escribir, porque es una parte obligatoria
-
 % \manualmark
+
 % \markboth{\textsc{Introducción}}{\textsc{Introducción}}
 
-\chapter{Introducción}
+\chapter{Resumen}
 
-\todo{Escribirlo cuando la parte de informática se estabilice algo}
+% 1. Objetivos
+% 1. Papers principales con los que trabajamos
+% 1. Objetivos alcanzados y objetivos no alcanzados
+% 1. Estado del arte
 
-De acuerdo con la comisión de grado, el TFG debe incluir una introducción en la que se describan claramente los objetivos previstos inicialmente en la propuesta de TFG, indicando si han sido o no alcanzados, los antecedentes importantes para el desarrollo, los resultados obtenidos, en su caso y las principales fuentes consultadas.
+\textbf{Palabras clave}: Análisis Tensorial, Descomposición Tensorial \textit{CP}, Descomposición Tensorial \textit{HT}, Aprendizaje Automático, Aprendizaje Profundo, Visión por Computador, Redes Convolucionales, Reconocimiento Facial Invariante a la Edad, \textit{Triplet Loss}
 
-Ver archivo \texttt{preliminares/introduccion.tex}
+El presente Trabajo de Fin de Grado tiene dos \textbf{objetivos principales}. El primero de ellos consiste en realizar una modelización de las redes neuronales convolucionales, profundas y no profundas, y estudiar la propiedad conocida comúnmente como \textit{depth efficiency}. El segundo objetivo consiste en resolver una tarea de reconocimiento facial invariante a cambios en la edad. Además, estudiaremos ciertas variantes sobre la función de pérdida \textit{Triplet Loss}, buscando resolver algunos problemas asociados al uso de esta técnica. Dichas variantes suponen un gran esfuerzo de implementación, por lo tanto, buscamos aplicar patrones de diseño para que la arquitectura resultante sea fácil de modificar y extender.
+
+El uso de técnicas de aprendizaje automático basado en redes neuronales profundas ha crecido enormemente en los últimos años. Su buen rendimiento en ciertas tareas específicas ha sido demostrado de forma contundente. Sin embargo, este buen rendimiento \textbf{se justifica únicamente sobre la evidencia experimental}. No se realizado un estudio profundo y fructífero sobre los motivos teóricos que respaldan los resultados experimentales. Los trabajos que realizan un estudio para respaldar la línea experimental suelen trabajar con modelizaciones matemáticas alejadas de los modelos comunes del \textit{deep learning}, y los resultados suelen tratar sobre casos concretos en los que las redes profundas son claramente superiores a las redes no profundas o \textit{shallow}. La publicación con la que trabajamos principalmente es \cite{matematicas:principal}.
+
+Nuestro trabajo en esta línea es novedoso por dos motivos principales: la \textbf{modelización matemáticas de las redes neuronales es muy cercana a la realidad}, y el resultado sobre \textbf{\textit{depth efficiency} da información concreta sobre la cantidad de escenarios} en los que ocurre esta \textit{depth efficiency}.
+
+Expresaremos las funciones de puntuación que la red busca aprender en base a un tensor de coeficientes sobre una base de funciones linealmente independientes y totales. A partir de aquí, la modelización se basa en dos conocidas descomposiciones tensoriales, la descomposición \textit{CANDECOMP/PARAFAC} o \textit{CP} y la descomposición jerárquica \textit{Tucker} o \textit{HT}. Estas \textbf{modelizaciones tienen en cuenta las propiedades fundamentales de las redes convolucionales}: localidad de la convolución, compartición de coeficientes y operadores de \textit{pooling}.
+
+Demostraremos \textbf{dos resultados centrales}. El primero nos muestra que, en el sentido de la medida de Lebesgue, casi todos los modelos no profundos necesitan un número exponencial de parámetros para implementar un modelo profundo. El segundo resultado añade que, de hecho, casi todos los modelos profundos no pueden ni siquiera ser aproximados por un modelo no profundo con menos de un número exponencial de parámetros.
+
+En esta línea, \textbf{los objetivos de este estudio han sido alcanzados}. Hemos presentado una modelización matemática muy cercana a la realidad, y hemos demostrado dos resultados que nos dan información exacta sobre en qué escenarios son superiores las redes profundas frente a las redes no profundas, y cómo de frecuente sucede esto.
+
+Por otro lado, hemos \textbf{intentado resolver una tarea de reconocimiento facial invariante a la edad, o \textit{AIFR}}. Esta tarea resulta muy interesante en el ambiente de la \textbf{informática forense}, por todas las aplicaciones prácticas que tiene obtener un modelo capaz de identificar a un individuo en distintas imágenes independientemente de la edad con la que aparezca en dichas imágenes. Buscamos aplicar las técnicas introducidas en la publicación \cite{informatica:principal} en la tarea de \textit{AIFR}, enfoque que según nuestro conocimiento nunca se había aplicado a esta tarea.
+
+Dicha tarea presenta una complejidad elevada. Además de los retos que supone una tarea de visión por computador usual, debemos añadir todos los \textbf{retos asociados a cómo el envejecimiento afecta las características faciales} con las que trabajamos.
+
+Para resolver el problema planteado, realizamos un estudio del estado del arte, que nos indica las principales líneas de trabajo que más éxito han tenido. Estos trabajos utilizan principalmente redes generativas adversarias para descomponer los datos de entrada en dos características incorreladas: edad e identidad. Algunos trabajos utilizando modelos basados en atención para aprender a resolver esta tarea. Este enfoque usa técnicas y modelos avanzados, que quedan fuera del alcance del presente trabajo.
+
+Realizamos un estudio de los conjuntos de datos disponibles. Estos son escasos y en ocasiones de una calidad pobre. Estudiamos el tamaño de los conjuntos de datos, las distribuciones del número de imágenes por individuo (fundamental para aplicar nuestras técnicas), la distribución de edad de los individuos y la distribución del rango de edad de los individuos. En base a este estudio tomamos una decisión informada de qué conjuntos usar y qué protocolo experimental aplicar. Siguiendo la línea más común en el estado del arte, entrenamos sobre un conjunto de datos grande, \textit{CACD}, y validamos sobre el conjunto \textit{FG-Net}, que presenta un gran reto por su gran variedad en edades y rangos.
+
+Desarrollamos una amplia base de código para poder aplicar las técnicas estudiadas. Realizamos una optimización de la base de código guíada por los datos tomados durante varios \textit{profiles}, debido a necesidades de rendimiento. Por los malos resultados obtenidos, aplicamos una amplia \textit{suite} de \textit{tests} para validar que los malos resultados no estén provocados por fallos en la implementación.
+
+Realizamos una \textbf{experimentación y estudio de los resultados}. Eston son pésimos, muy lejos de ser competitivos con el estado del arte y, todavía peor, muy lejanos de ser aplicables en un escenario práctico. El estado del arte obtiene valores para \textit{Rank@1 Accuracy} superiores al 90\%. Nuestro modelo no llega al 0.1\%. Además, al no existir literatura concreta sobre el uso de estas técnicas sobre un problema de \textit{AIFR}, debemos justificar los pésimos resultados en base al presente trabajo.
+
+Por lo tanto, \textbf{se ha cumplido el objetivo de desarrollar una base de código bien diseñada}, con la que sea cómodo trabajar y experimentar. Sin embargo, los \textbf{resultados experimentales son muy malos y quedan muy lejos de los objetivos propuestos} inicialmente.
 
 \endinput
