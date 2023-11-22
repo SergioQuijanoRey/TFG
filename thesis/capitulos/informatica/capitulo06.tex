@@ -156,7 +156,7 @@ Como hemos visto en \tableref{table:hp_escogidos}, hemos decidido usar el modelo
 
 Para realizar esta adaptación, simplemente cambiamos la última capa de \textit{ResNet18} que pasa de ser una capa densa con 1000 valores de salida a ser una capa densa con 9 valores de salida. Además, usamos la red pre-entrenada del paquete \lstinline{torchvision} \cite{informatica:resnet18_torchvision}. Realizamos un ajuste fino de todas las capas de la red, es decir, no congelamos ninguno de los parámetros del modelo.
 
-La arquitectura original fue introducida en \cite{informatica:resnet_original_paper}. La idea principal consiste en trabajar con bloques residuales y \textit{skip connectios} con el objetivo de que el gradiente fluya mejor y así poder trabajar con un gran número de capas (gran profundidad). De ahí su nombre, \textit{RESiudal NETwork}.
+La arquitectura original fue introducida en \cite{informatica:resnet_original_paper}. La idea principal consiste en trabajar con bloques residuales y \textit{skip connections} con el objetivo de que el gradiente fluya mejor y así poder emplear un gran número de capas, es decir, aumentar drásticamente la profundidad. De ahí su nombre, \textit{RESiudal NETwork}. A continuación describimos estas dos componentes principales del modelo:
 
 \begin{itemize}
     \item Un \textbf{bloque residual} se compone de dos capas convolucionales. Entre las dos capas convolucionales aplicamos una no-linealidad (\textit{ReLU}, en la arquitectura original). Además sumamos la entrada original a la salida. Tras esto, se aplica otra no-linealidad. Es decir, dado una entrada $X$, computamos $\mathcal{F}(X) + X$. Por tanto, la red no aprende drectamente la salida buscada, sino la diferencia entre la entrada y dicha salida. Todo esto queda reflejado en la \imgref{img:ejemplo_bloque_resnet}.
@@ -170,7 +170,7 @@ La arquitectura original fue introducida en \cite{informatica:resnet_original_pa
     \label{img:ejemplo_bloque_resnet}
 \end{figure}
 
-En base a estos elementos, la arquitectura de nuestro modelo \textit{ResNet18} se describe gráficamente en la \imgref{img:arquitectura_resnet_18}. Notar que estamos modificando la última capa \textit{fully connected}.
+En base a estos elementos, la arquitectura de nuestro modelo \textit{ResNet18} se describe gráficamente en la \imgref{img:arquitectura_resnet_18}. Notar que estamos modificando la última capa \textit{fully connected}, pasando de 1000 valores de salida a solo 9 (la dimensión de nuestro \textit{embedding}).
 
 \begin{figure}[!hbt]
     \centering
@@ -184,9 +184,9 @@ En base a estos elementos, la arquitectura de nuestro modelo \textit{ResNet18} s
 Entrenamos el modelo usando los hiperparámetros indicados en \tableref{table:hp_escogidos}. Además, especificamos los siguientes hiperparámetros:
 
 \begin{itemize}
-    \item Función de pérdida: \textit{batch hard} con sumandos activos, es decir, $\mathcal{L}_{BH \neq 0}$
+    \item Función de pérdida: \textit{batch hard} con sumandos activos, es decir, $\mathcal{L}_{BH \neq 0}$. Elegimos esta función en base a la experimentación realizada sobre los \textit{datasets} previos a \textit{CACD} y \textit{FG-Net}
     \item Épocas de entrenamiento: una única época de entrenamiento. El conjunto de entrenamiento \textit{CACD} es lo suficientemente grande como para entrenar en una sola época. Tomamos esta decisión en base a experimentos previos y a los propios resultados de este entrenamiento.
-    \item Técnica de Aumentado de Datos: \textit{lazy}. Esta variante permite que no saturemos la memoria disponible
+    \item Técnica de Aumentado de Datos: \textit{lazy}. Esta variante permite que no saturemos la memoria disponible. De otra forma, en algunos experimentos obtenemos errores al ocurrir dicha saturación de la memoria. De otra forma, en algunos experimentos obtenemos errores al ocurrir dicha saturación de la memoria
     \item Usamos el 80\% del \textit{dataset} \textit{CACD} para entrenar, y el 20\% restante como conjunto de validación
 \end{itemize}
 
@@ -256,7 +256,7 @@ El proceso de entrenamiento puede estudiarse a partir de las métricas que se mu
     \hline
 
 \end{tabular}
-\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de evaluación}
+\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de \textit{test}}
     \label{table:resultados_sobre_fg_net}
 \end{table}
 
@@ -266,7 +266,7 @@ En \imgref{img:metricas_entrenamiento} podemos ver que:
     \item Como habíamos previsto, la función de pérdida cae rápidamente mientras que el resto de métricas varían su valor. Por tanto, la red está aprendiendo cierto comportamiento (que claramente no es el deseado) aunque la función de pérdida no varíe. Esto ocurre tanto en la función de pérdida \textit{running} como en la función de pérdida computada a mano sobre los datos
     \item Tanto el \textit{Rank@1} como \textit{Rank@5 Accuracy} aumentan satisfactoriamente, aunque sus valores son realmente bajos. Además, tenemos mejores valores en validación que en entrenamiento, lo que supone un comportamiento inusual que puede indicar que la red no está aprendiendo adecuadamente
     \item La variante local de \textit{Rank@1} y \textit{Rank@5} obtienen resultados notablemente mejores, lo que era de esperar por la naturaleza de esta variante
-    \item Como esperábamos, la distancia intracluster desciende con el paso del tiempo. Sin embargo, la distancia intercluster desciende, en vez de ascender. Acompañado del descenso de las normas de los \textit{embeddings}, podemos pensar que estamos en la primera fase del entrenamiento que hemos comentado: agrupamos todos los datos en un cierto centro de gravedad. Pero no estamos logrando pasar a la siguiente fase, en la que se forma los clústers gracias a que los elementos atraviesan el centro de gravedad para juntarse con el resto de elementos de su clúster
+    \item Como esperábamos, la distancia intracluster desciende con el paso del tiempo. Sin embargo, la distancia intercluster desciende, en vez de ascender. Acompañado del descenso de las normas de los \textit{embeddings}, podemos pensar que estamos en la primera fase del entrenamiento que hemos comentado: agrupamos todos los datos en un cierto centro de gravedad. Pero no estamos logrando pasar a la siguiente fase, en la que se forma los clústers gracias a que los elementos atraviesen el centro de gravedad para juntarse con el resto de elementos de su clúster
 \end{itemize}
 
 Los resultados obtenidos en \tableref{table:resultados_sobre_fg_net} muestran que:
@@ -282,7 +282,7 @@ Los resultados obtenidos en \tableref{table:resultados_sobre_fg_net} muestran qu
 
 \section{Conclusiones extraídas de la experimentación} \label{isec:conclusiones_experimentacion}
 
-En base a \imgref{img:metricas_entrenamiento} y \tableref{table:resultados_sobre_fg_net} queda claro que el entrenamiento de este modelo, a partir de las técnicas que hemos ido desarrollando a lo largo del trabajo, no han producido un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una comparativa entre algunos modelos del estado del arte y nuestro modelo:
+En base a \imgref{img:metricas_entrenamiento} y \tableref{table:resultados_sobre_fg_net} queda claro que el entrenamiento de este modelo, a partir de las técnicas que hemos ido desarrollando en este trabajo, no han producido un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una \textbf{comparativa entre algunos modelos del estado del arte y nuestro modelo}:
 
 \begin{table}[!hbtp]
 \centering
@@ -302,8 +302,8 @@ En base a \imgref{img:metricas_entrenamiento} y \tableref{table:resultados_sobre
 \label{table:estado_del_arte_y_mi_modelo}
 \end{table}
 
-Claramente, nuestro modelo está muy lejos de ser competitivo con los modelos del estado del arte. Es más, está lejos de ser aplicable en ningún escenario práctico. Podríamos haber obtenido un modelo que, aunque no fuera competitivo con el estado del arte, tuviese un rendimiento decente. En cuyo caso tendríamos un modelo aplicable mucho más ligero que los modelos del estado del arte. Pero estamos muy lejos de encontrarnos en esa situación.
+Claramente, \textbf{nuestro modelo está muy lejos de ser competitivo con los modelos del estado del arte}. Es más, está \textbf{lejos de ser aplicable en ningún escenario práctico}. Podríamos haber obtenido un modelo que, aunque no fuera competitivo con el estado del arte, tuviese un rendimiento decente. En cuyo caso tendríamos un modelo aplicable mucho más ligero que los modelos del estado del arte. Pero estamos muy lejos de encontrarnos en esa situación.
 
-% TODO -- seguir por aqui
+El rendimiento ha sido tan malo que hemos pensado que existía un error en nuestra extensa base de código. Esto ha motivado la implementación de una amplia gama de \textit{tests} para descartar esta opción, como hemos desarrollado en \sectionref{isec:test_suite}. Gracias a esta amplia \textit{suite} de \textit{tests} descartamos, con cierto grado de confianza, que los malos resultados se deban a un error de implementación.
 
-El rendimiento ha sido tan malo que durante mucho tiempo hemos pensado que existía un error en nuestra extensa base de código. Esto ha motivado la implementación de una amplia gama de \textit{tests} para descartar esta opción, como hemos desarrollado en \sectionref{}.
+Los resultados son tan malos que \textbf{no consideramos que merezca la pena realizar modificaciones a las técnicas empleadas}, basadas en \textit{triplet loss}, para buscar mejoras futuras de rendimiento. En base a estos resultados, el enfoque más adecuado sería explorar técnicas radicalmente diferentes, como las propuestas por los distintos modelos del estado del arte que hemos estudiado en \sectionref{isec:mejores_modelos_estado_arte}.
