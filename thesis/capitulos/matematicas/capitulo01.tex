@@ -1,22 +1,24 @@
 \chapter{Introducción}\label{ch:introduccion}
 
-El objetivo de este trabajo, desde la perspectiva de las matemáticas, es \textbf{analizar las redes neuronales profundas, basadas en convoluciones, y explicar por qué en ciertos escenarios estas funcionan mejor que las redes neuronales no profundas}, conocidas en la literatura como redes neuronales \entrecomillado{shallow}.
+El objetivo de este trabajo, desde la perspectiva de las matemáticas, es \textbf{analizar las redes neuronales profundas, basadas en convoluciones, y explicar por qué en ciertos escenarios éstas funcionan mejor que las redes neuronales no profundas}, conocidas en la literatura como redes neuronales \entrecomillado{shallow}.
 
-En este escenario ocurre que para replicar redes profundas con un número polinomial de coeficientes, necesitamos que las redes \textit{shallow} tengan un número de coeficientes superior al polinomial (en nuestro modelo \textit{shallow}, el número de coeficientes será exponencial). En este escenario hablamos de \textbf{eficiencia en profundidad} o \textbf{\entrecomillado{depth efficiency}}.
+En este escenario ocurre que para replicar redes profundas con un número polinomial de coeficientes, necesitamos que las redes \textit{shallow} tengan un número de coeficientes superior al polinomial (en nuestro modelo \textit{shallow}, el número de coeficientes será exponencial). En este caso hablamos de \textbf{eficiencia en profundidad} o \textbf{\entrecomillado{depth efficiency}}.
 \todo{Poner aquí una referencia a otra parte del paper sobre esto de tamaño exponencial}
 
 El \textit{depth efficiency} es muy conocido en la práctica, pero pocos son los trabajos que han tratado de justificar matemáticamente por qué ocurre este fenómeno. Además, \textbf{en la mayoría de trabajos de este tipo, no se han tenido en cuenta propiedades fundamentales de las redes profundas ni de las redes convolucionales} \cite{matematicas:paper_depth_malo_01} \cite{matematicas:paper_depth_malo_02} \cite{matematicas:paper_depth_malo_03}. Por otro lado, suelen ser trabajos en los que \textbf{se muestran ejemplos concretos} de funciones implementables (de forma eficiente) con redes profundas pero no con redes \textit{shallow}, sin dar \textbf{ningún tipo de información sobre con qué frecuencia ocurre esto}. En base a esto, las \textbf{principales fortalezas de este trabajo respecto a otros} es que consideramos:
+\todo{Comentarios de JMeri: este tipo de afirmaciones pueden llevar a preguntas del tribunal. Preparar bien las posibles respuestas}
+\todo{Quizás yo añadir comentarios sobre esta afirmación para que se responda automáticamente al leer esto}
 \todo{Aquí he copiado una frase de la introducción del trabajo, que quizás debería referenciar propiamente}
 
 \begin{itemize}
-    \item La diferencia jerárquica entre ambos tipos de redes
-    \item Propiedades fundamentales de las redes convolucionales. Esto es:
-        \begin{itemize}
-            \item Compartición de los coeficientes en las convoluciones
-            \item Localidad de la operación de convolución
-            \item Uso de la operación de \textit{pooling}
-        \end{itemize}
-    \item Un estudio de lo frecuente que es tener funciones que sean implementables (de forma eficiente) por redes profundas, pero no por redes \textit{shallow}
+	\item La diferencia jerárquica entre ambos tipos de redes.
+	\item Propiedades fundamentales de las redes convolucionales. Esto es:
+	      \begin{itemize}
+		      \item Compartición de los coeficientes en las convoluciones.
+		      \item Localidad de la operación de convolución.
+		      \item Uso de la operación de \textit{pooling}.
+	      \end{itemize}
+	\item Un estudio de lo frecuente que es tener funciones que sean implementables (de forma eficiente) por redes profundas, pero no por redes \textit{shallow}.
 \end{itemize}
 \todo{Desarrollar más qué significan estas propiedades. En la introducción del paper se explica esto más o menos}
 
@@ -25,27 +27,27 @@ El \textit{depth efficiency} es muy conocido en la práctica, pero pocos son los
 Los principales \textbf{objetivos} del presente trabajo son:
 
 \begin{enumerate}
-    \item Modelar matemáticamente la tarea de aprendizaje. Para esto, modelaremos los datos de entrada, la tarea a resolver y el espacio de hipótesis en el que buscaremos la mejor solución
-    \item Modelar los dos tipos de redes neuronales (profundas y no profundas) a través de dos tipos de descomposiciones tensoriales:
-        \begin{enumerate}
-            \item Descomposición \textit{CP}, que equivale al uso de redes \textit{shallow}
-            \item Descomposición \textit{HT}, que equivale al uso de redes profundas
-        \end{enumerate}
-    \item Demostrar dos resultados centrales que pondrán de manifiesto la superioridad de las redes profundas, en lo que se conoce como \textit{depth efficiency}, a través de las ya mencionadas descomposiciones tensoriales
-        \begin{itemize}
-            \item El teorema principal, \customref{teorema:teorema_principal_especificacion}, que dice que si tenemos un modelo profundo con un número polinomial de coeficientes, el modelo \textit{shallow} necesitará al menos un número exponencial de coeficientes para poder implementar el mismo modelo. Esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo
-            \item El corolario principal, \customref{lema:lema_previo_corolario}, indica que no es que un modelo \textit{shallow} no pueda realizar el modelo profundo con menos de un número exponencial de parámetros, sino que no es capaz ni de aproximar al modelo profundo con menos de un número exponencial de parámetros. De nuevo, esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo
-        \end{itemize}
+	\item Modelar matemáticamente la tarea de aprendizaje. Para esto, modelaremos los datos de entrada, la tarea a resolver y el espacio de hipótesis en el que buscaremos la mejor solución.
+	\item Modelar los dos tipos de redes neuronales (profundas y no profundas) a través de dos tipos de descomposiciones tensoriales:
+	      \begin{enumerate}
+		      \item Descomposición \textit{CP}, que equivale al uso de redes \textit{shallow}  y que desarrollamos en \sectionref{subs:descomposcion_cp}.
+		      \item Descomposición \textit{HT}, que equivale al uso de redes profundas y que introducimos en \sectionref{subs:descomposicion_ht}.
+	      \end{enumerate}
+	\item Demostrar dos resultados centrales que pondrán de manifiesto la superioridad de las redes profundas, en lo que se conoce como \textit{depth efficiency}, a través de las ya mencionadas descomposiciones tensoriales.
+	      \begin{itemize}
+		      \item El teorema principal, \customref{teorema:teorema_principal_especificacion}, que dice que si tenemos un modelo profundo con un número polinomial de coeficientes, el modelo \textit{shallow} necesitará al menos un número exponencial de coeficientes para poder implementar el mismo modelo. Esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo.
+		      \item El corolario principal, \customref{lema:lema_previo_corolario}, indica que no es que un modelo \textit{shallow} no pueda realizar el modelo profundo con menos de un número exponencial de parámetros, sino que no es capaz ni de aproximar al modelo profundo con menos de un número exponencial de parámetros. De nuevo, esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo.
+	      \end{itemize}
 \end{enumerate}
 
 Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas de las herramientas que usaremos serán:
 
 \begin{itemize}
-    \item Teoría básica sobre tensores
-    \item Descomposiciones tensoriales \textit{CP} y \textit{HT}
-    \item Matrización de tensores
-    \item Teoría de la medida
-    \item Álgebra de matrices básica
+	\item Teoría básica sobre tensores.
+	\item Descomposiciones tensoriales \textit{CP} y \textit{HT}.
+	\item Matrización de tensores.
+	\item Teoría de la medida.
+	\item Álgebra de matrices básica.
 \end{itemize}
 
 \section{Estructura del trabajo}
@@ -53,8 +55,8 @@ Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas
 Estructuraremos el trabajo de la siguiente manera:
 
 \begin{itemize}
-    \item En \customref{ch:matematicas_fundamentales} introduciremos las herramientas básicas sobre las que fundamentaremos nuestro trabajo. En concreto, introduciremos el concepto de producto tensorial
-    \item En \customref{ch:tarea_aprendizaje} indicaremos cómo modelizamos la tarea de aprendizaje. Modelizaremos un espacio de hipótesis general, para lo cual justificaremos la elección de ciertas funciones de puntuación, que serán clave en el desarrollo del trabajo, y la elección de ciertas funciones de representación. En \customref{sec:repr_funciones_puntuacion} daremos un primer paso común en la modelización de ambas arquitecturas de aprendizaje automático
-    \item En \customref{ch:modelizacion} desarrollaremos las dos modelizaciones (\textit{shallow} y profunda) a partir de dos descomposiciones tensoriales (\textit{CP} y \textit{HT}, respectivamente). Veremos en ambos casos cómo las modelizaciones realizadas se corresponden con arquitecturas usadas en la práctica del aprendizaje automático. Compararemos el número de parámetros que definen cada modelo, pues será fundamental en nuestros resultados teóricos
-    \item En \customref{chapter:teoremas_y_demostraciones} introduciremos los dos resultados principales, veremos y demostraremos algunos resultados previos necesarios para las demostraciones, y probaremos el teorema y corolario principal
+	\item En \customref{ch:matematicas_fundamentales} introduciremos las herramientas básicas sobre las que fundamentaremos nuestro trabajo. En concreto, introduciremos el concepto de producto tensorial.
+	\item En \customref{ch:tarea_aprendizaje} indicaremos cómo modelizamos la tarea de aprendizaje. Modelizaremos un espacio de hipótesis general, para lo cual justificaremos la elección de ciertas funciones de puntuación, que serán clave en el desarrollo del trabajo, y la elección de ciertas funciones de representación. En \customref{sec:repr_funciones_puntuacion} daremos un primer paso común en la modelización de ambas arquitecturas de aprendizaje automático.
+	\item En \customref{ch:modelizacion} desarrollaremos las dos modelizaciones (\textit{shallow} y \textit{deep}) a partir de dos descomposiciones tensoriales (\textit{CP} y \textit{HT}, respectivamente). Veremos en ambos casos cómo las modelizaciones realizadas se corresponden con arquitecturas usadas en la práctica del aprendizaje automático. Compararemos el número de parámetros que definen cada modelo, pues será fundamental en nuestros resultados teóricos.
+	\item En \customref{chapter:teoremas_y_demostraciones} introduciremos los dos resultados principales, veremos y demostraremos algunos resultados previos necesarios para las demostraciones, y probaremos el teorema y corolario principal.
 \end{itemize}
