@@ -43,27 +43,27 @@ Por tanto, nuestro \textbf{espacio de hipótesis} es el conjunto de funciones $\
 
 \section{Espacio de hipótesis general}
 
-Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ que conformarán el espacio de hipótesis sobre el que trabajaremos. Si el lector no está interesado en esta justificación, en \customref{sec:repr_funciones_puntuacion} mostramos cuál es esta elección.
-
-Usaremos bastantes hechos básicos sobre análisis funcional, que hemos introducidos en \customref{sec:preliminares_funcional}.
+Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ que conformarán el espacio de hipótesis sobre el que trabajaremos. En la \sectionref{sec:repr_funciones_puntuacion} mostramos cuál es la elección final basada en el desarrollo previo. Usaremos ciertos hechos básicos sobre análisis funcional que hemos introducido en la \sectionref{sec:preliminares_funcional}.
 
 \subsection{Planteamiento para construir el espacio de hipótesis} \label{sec:justificacion_func_repr}
 
-Recordemos que, como ya hemos introducido en \customref{seq:planteamiento_problema}, nuestros datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$, y que tomamos la etiqueta $y \in \mathcal{Y}$ cuya función de puntuación $h_y: \mathcal{X} \to \R$ sea máxima.
+Recordemos que, como ya hemos introducido en la \sectionref{seq:planteamiento_problema}, nuestros datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$. Para cada entrada $X \in \mathcal{X}$ tomamos como salida la etiqueta $\hat{y} \in \mathcal{Y}$ que maximice su función de puntuación asociada, es decir:
+
+\begin{equation}
+	\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)
+\end{equation}
 
 Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ donde elegir nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
 
-En \customref{subs:caracterizaciones_familias_funciones} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas. Es más, en este caso el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total y, por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$.
+En \customref{subs:caracterizaciones_familias_funciones} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas. Es más, en este caso el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total y, por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$. A las funciones $\conjunto{f_d: \R^s \to \R: d \in \N}$ las llamaremos \textbf{funciones de representación}.
 
-En resumen, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in L^2((R^s)^N$, podemos aproximar dicha función de puntuación arbitrariamente bien ($\epsilon$-aproximación dada en \customref{prop:conjuntos_totales_epsilon_aproximacion}) con combinaciones lineales finitas.
-
-A las funciones $\conjunto{f_d: \R^s \to \R: d \in \N}$ las llamaremos \textbf{funciones de representación}.
+En resumen, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in L^2((R^s)^N$, podemos aproximar dicha función de puntuación arbitrariamente bien ($\epsilon$-aproximación dada en la \propref{prop:conjuntos_totales_epsilon_aproximacion}) con combinaciones lineales finitas.
 
 \subsection{Implementación del planteamiento}
 
-Reflejamos este planteamiento de forma que sea más manejable en la búsqueda de un modelo matemático. Queremos expresar de forma cómoda y manejable la aproximación por combinaciones lineales finitas a partir de $\conjunto{f_d: \; d \in \N}$ que \customref{prop:conjuntos_totales_epsilon_aproximacion} nos da.
+Reflejamos este planteamiento de forma que sea más manejable en la búsqueda de un modelo matemático. Queremos expresar de forma cómoda y manejable la aproximación por combinaciones lineales finitas a partir de las funciones de puntuación $\conjunto{f_d: \; d \in \N}$.
 
-Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita numerable (podemos considerar que tenemos $N$ sucesiones). El papel de estos tensores formales será el de almacenar los coeficientes de la combinación lineal finita dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion}. Como esa combinación lineal es finita, nuestro tensor formal tendrá todas las entradas nulas, salvo un conjunto finito. Necesitamos usar tensores formales porque tenemos que elegir qué funciones usamos de un conjunto numerable. Y con esto llegamos a:
+Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, tensores con $N$ modos, cada modo con una dimensión infinita numerable (podemos considerar que tenemos $N$ sucesiones). El papel de estos tensores formales será el de almacenar los coeficientes de la combinación lineal finita dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion}. Como esa combinación lineal es finita, nuestro tensor formal tendrá todas las entradas nulas, salvo un conjunto finito. Necesitamos usar tensores formales porque tenemos que elegir qué funciones usamos de un conjunto numerable. Y con esto llegamos a:
 
 \begin{equation} \label{eq:hipotesis_en_general}
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} A^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i})
@@ -78,6 +78,8 @@ Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{
 Por tanto, \eqref{eq:hipotesis_en_general} \textbf{define un modelo universal}, puesto que cualquier función de representación $h_y$ puede ser aproximada arbitrariamente bien con combinaciones lineales en nuestro conjunto de funciones total.
 
 \subsection{Elección de la familia de funciones de representación}
+
+% TODO -- seguir por aqui
 
 Como hemos justificado, tenemos que escoger una familia paramétrica de funciones de representación que sea numerable y además total, es decir:
 
