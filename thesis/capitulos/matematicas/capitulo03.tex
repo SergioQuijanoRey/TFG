@@ -2,31 +2,44 @@
 
 \section{Planteamiento del problema} \label{seq:planteamiento_problema}
 
-La tarea de aprendizaje que consideramos es la de \textbf{clasificación de imágenes}. El uso de redes convolucionales profundas supuso un gran avance a la hora de resolver esta tarea, enfoque que introduje \textit{AlexNet} en 2012 \cite{matematicas:alexnet_original_paper}. A partir de estos modelos se han construido otros más potentes, como por ejemplo, modelos de atención basados en el módulo \entrecomillado{transformer}.
+La tarea de aprendizaje que consideramos es la de \textbf{clasificación de imágenes}. El uso de redes convolucionales profundas ha supuesto un gran avance a la hora de resolver esta tarea. Nos centraremos en modelar redes convolucionales (profundas y no profundas) para clasificar imágenes.
 
-Por lo tanto, nos centraremos en modelar redes convolucionales (profundas y no profundas) para clasificar imágenes.
+Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \} = \deltaset{Y}$. Con esto, podemos ver que los datos de entrada viven en el espacio
 
-Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \} = \deltaset{Y}$.
+\begin{equation}
+	\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N
+\end{equation}
 
-Con esto, podemos ver que los datos de entrada viven en el espacio
+Esta representación de los datos de entrada es natural en muchos escenarios. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen (parche o \textit{patch}). Por la estructura local de las imágenes, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Puede ocurrir que existan \textit{pixels} que aparezcan en más de un parche. Las imágenes contienen información en los colores que contiene cada píxel, pero también en la posición de los píxeles. Por ejemplo, si permutamos aleatoriamente las posiciones de los píxeles de una imagen, como hacemos en \imgref{img:desordenar_pixeles_repetida_mates}, esta imagen pierde completamente el sentido. A esto nos referimos cuando hablamos de estructura local de la imagen. Una forma natural de generar estos parches a partir de las imágenes consiste en tomar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
 
-$$\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N$$
-
-Esta representación de los datos de entrada es natural en muchos escenarios. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen (parche o \textit{patch}, \cite{matematicas:principal}). Idealmente, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Puede ocurrir que existan \textit{pixels} que aparezcan en más de un parche.
-
-Una forma natural de generar estos parches a partir de las imágenes consiste en tomar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
-
-Por ejemplo, el trabajo que presenta el conocido modelo  de deep learning \textit{VIT} propone una arquitectura basada en el módulo \entrecomillado{transformer} a la que que se le pasa parches de la imagen para poder explotar el mecanismo de atención: \entrecomillado{we split an image into patches and provide the sequence of linear embeddings of these patches as an input to a Transformer} \cite{matematicas:vit}.
+\begin{figure}[!hbtp]
+	\centering
+	\ajustarsubcaptions
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.9\linewidth]{informatica/ejemploperm_normal}
+		\caption{Imagen original}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.9\linewidth]{informatica/ejemploperm_permutada}
+		\caption{Imagen original tras aplicar una permutación aleatoria de las posiciones de los píxeles}
+	\end{subfigure}
+	\caption{Tenemos que considerar la estructura local de la imagen. La posición de los píxeles y su vecindario contiene una información fundamental de la que no podemos prescindir. Por tanto, los parches deben contener vecindarios de píxeles, aunque tengamos distintas estrategias para escoger estos vecindarios.}
+	\label{img:desordenar_pixeles_repetida_mates}
+\end{figure}
 
 Para decidir la etiqueta de un elemento, consideramos $Y$ \textbf{funciones de puntuación}:
 
-$$\{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y} \}$$
+\begin{equation}
+	\conjunto{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y}}.
+\end{equation}
 
 Con esto, dado un elemento $X \in \mathcal{X}$, lo clasificaremos buscando la etiqueta cuya función de puntuación sea máxima, es decir:
 
 $$\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
 
-Por tanto, nuestro \textbf{espacio de hipótesis} $\Gamma$ es el conjunto de funciones $\mathcal{X} \to \R$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subseteq \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
+Por tanto, nuestro \textbf{espacio de hipótesis} es el conjunto de funciones $\Gamma := \conjunto{f: \mathcal{X} \to \R}$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subseteq \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
 
 \section{Espacio de hipótesis general}
 
