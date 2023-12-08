@@ -53,12 +53,12 @@ Reflejamos este planteamiento de forma que sea más manejable en la búsqueda de
 Para ello, consideraremos tensores formales $\mathcal{A}^y \in \espaciotensores{N}{\N}$. Esto es, un tensores con $N$ modos, cada modo con una dimensión infinita numerable (podemos considerar que tenemos $N$ sucesiones). El papel de estos tensores formales será el de almacenar los coeficientes de la combinación lineal finita dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion}. Como esa combinación lineal es finita, nuestro tensor formal tendrá todas las entradas nulas, salvo un conjunto finito. Necesitamos usar tensores formales porque tenemos que elegir qué funciones usamos de un conjunto numerable. Y con esto llegamos a:
 
 \begin{equation} \label{eq:hipotesis_en_general}
-    h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} A^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i})
+	h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} A^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i})
 \end{equation}
 
 \begin{observacion}
 
-    La idea de cercanía que denota $\approx$ viene perfectamente dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion}. Además, y como ya hemos comentado, el número de entradas no nulas del tensor dependerá del valor de $\varepsilon$. Pero esta ecuación no da problemas porque la relación entre estos dos elementos viene implícita.
+	La idea de cercanía que denota $\approx$ viene perfectamente dada por \eqref{eq:conjuntos_totales_epsilon_aproximacion}. Además, y como ya hemos comentado, el número de entradas no nulas del tensor dependerá del valor de $\varepsilon$. Pero esta ecuación no da problemas porque la relación entre estos dos elementos viene implícita.
 
 \end{observacion}
 
@@ -69,28 +69,28 @@ Por tanto, \eqref{eq:hipotesis_en_general} \textbf{define un modelo universal}, 
 Como hemos justificado, tenemos que escoger una familia paramétrica de funciones de representación que sea numerable y además total, es decir:
 
 \begin{equation}
-    \mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta, \; \# \Theta = \# \N }
+	\mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta, \; \# \Theta = \# \N }
 \end{equation}
 
 Las opciones más usadas en la práctica del aprendizaje automático son:
 
 \begin{enumerate}
-    \item Wavelets
-    \item Funciones de base radial (RBF), en concreto, la Gaussiana con matriz de covarianzas diagonal:
+	\item Wavelets
+	\item Funciones de base radial (RBF), en concreto, la Gaussiana con matriz de covarianzas diagonal:
 
-        \begin{equation}
-            f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
-        \end{equation}
+	      \begin{equation}
+		      f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
+	      \end{equation}
 
-        donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
+	      donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
 
-    \item Neuronas:
+	\item Neuronas:
 
-        \begin{equation}
-            f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
-        \end{equation}
+	      \begin{equation}
+		      f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
+	      \end{equation}
 
-        donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$ y $\sigma$ la función de activación de la neurona, por ejemplo una \textit{sigmoide} o una \textit{ReLU}
+	      donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$ y $\sigma$ la función de activación de la neurona, por ejemplo una \textit{sigmoide} o una \textit{ReLU}
 
 
 \end{enumerate}
@@ -102,23 +102,23 @@ De hecho, en \cite{matematicas:principal} se prueba que para las Gaussianas y ne
 Usando este hecho, tomaremos $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2(\R^s)$ total en la ecuación \eqref{eq:hipotesis_en_general}. Con ello, ahora es suficiente tomar $\mathcal{A}^y \in \espaciotensores{N}{M}$, llegando a:
 
 \begin{equation}
-    h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+	h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
 \end{equation}
 
 \begin{observacion}
 
-    Nada nos impide tomar la familia de funciones $\{f_{\theta_d}: d \in \deltaset{M}\}$ de forma que sea también linealmente independiente. Como comentamos en \customref{sec:preliminares_funcional}, la familia de funciones producto punto a punto inducida,
+	Nada nos impide tomar la familia de funciones $\{f_{\theta_d}: d \in \deltaset{M}\}$ de forma que sea también linealmente independiente. Como comentamos en \customref{sec:preliminares_funcional}, la familia de funciones producto punto a punto inducida,
 
-    \begin{equation}
-        \{ (\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N \}
-    \end{equation}
+	\begin{equation}
+		\{ (\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N \}
+	\end{equation}
 
-    será también linealmente independiente, y se comportará como si fuera una \entrecomillado{base} del espacio $L^2((R^s)^N)$. Y por tanto, una función de puntuación $h_y$ \textbf{determina unívocamente un tensor de coeficientes} $\mathcal{A}^y$
+	será también linealmente independiente, y se comportará como si fuera una \entrecomillado{base} del espacio $L^2((R^s)^N)$. Y por tanto, una función de puntuación $h_y$ \textbf{determina unívocamente un tensor de coeficientes} $\mathcal{A}^y$
 
 \end{observacion}
 
 \begin{observacion}
-    Usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$
+	Usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$
 \end{observacion}
 
 \subsection{Representación de las funciones de puntuación} \label{sec:repr_funciones_puntuacion}
@@ -126,7 +126,7 @@ Usando este hecho, tomaremos $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2
 Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 
 \begin{equation} \label{eq:puntuacion_general}
-    h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+	h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
 \end{equation}
 
 Explicamos ahora algunos detalles sobre esta ecuación, que será central en nuestro trabajo.
@@ -138,9 +138,9 @@ $$\mathcal{F} = \{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta \}$$
 Algunas funciones de representación usuales en la práctica son:
 
 \begin{itemize}
-    \item \textit{Wavelets}
-    \item Funciones de base radial (\textit{RBF}), normalmente la Gaussiana
-    \item Neuronas
+	\item \textit{Wavelets}
+	\item Funciones de base radial (\textit{RBF}), normalmente la Gaussiana
+	\item Neuronas
 \end{itemize}
 
 El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumatoria en \eqref{eq:puntuacion_general}, es claro que tiene orden $N$ y dimensión $M$ en cada modo. Es decir, $\mathcal{A} \in \espaciotensores{N}{M}$.
@@ -148,18 +148,18 @@ El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumat
 Por lo tanto, la tarea de aprendizaje consistirá en optimizar los valores de los parámetros $\theta_1, \ldots, \theta_M$ y los valores de los tensores de coeficientes $\mathcal{A}^1, \ldots, \mathcal{A}^Y$.
 
 \begin{observacion}
-    Por lo comentado previamente, estamos trabajando con un conjunto de funciones de representación $\conjunto{f_d: \; d \in \deltaset{M}}$ total y linealmente independiente. Por tanto, el conjunto de funciones producto punto a punto también será total y linealmente independiente (\customref{prop:conservacion_totalidad_indp_lineal_func_prod}):
+	Por lo comentado previamente, estamos trabajando con un conjunto de funciones de representación $\conjunto{f_d: \; d \in \deltaset{M}}$ total y linealmente independiente. Por tanto, el conjunto de funciones producto punto a punto también será total y linealmente independiente (\customref{prop:conservacion_totalidad_indp_lineal_func_prod}):
 
-    \begin{equation}
-        \conjunto{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\nv{x_i}): \dspace d_i \in \deltaset{M} \dspace \forall i \in \deltaset{N} }
-    \end{equation}
+	\begin{equation}
+		\conjunto{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^{N} f_{\theta_{d_i}} (\nv{x_i}): \dspace d_i \in \deltaset{M} \dspace \forall i \in \deltaset{N} }
+	\end{equation}
 
 
-    Sabemos entonces que esta familia de funciones actuará como una \entrecomillado{base} del espacio $L^2((\R^s)^N)$. Y por lo tanto podemos pensar que el tensor $\mathcal{A}^y$ nos da los coeficientes de la función de puntuación $h_y$ en dicha \entrecomillado{base}.
+	Sabemos entonces que esta familia de funciones actuará como una \entrecomillado{base} del espacio $L^2((\R^s)^N)$. Y por lo tanto podemos pensar que el tensor $\mathcal{A}^y$ nos da los coeficientes de la función de puntuación $h_y$ en dicha \entrecomillado{base}.
 \end{observacion}
 
 \begin{observacion}
-    Como $\mathcal{A} \in \espaciotensores{N}{M}$, tenemos que optimizar el valor de $M^N$ valores reales a través del proceso de aprendizaje. Esto supone un reto, que \textbf{motiva el uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje del tensor de coeficientes sea más factible.
+	Como $\mathcal{A} \in \espaciotensores{N}{M}$, tenemos que optimizar el valor de $M^N$ valores reales a través del proceso de aprendizaje. Esto supone un reto, que \textbf{motiva el uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje del tensor de coeficientes sea más factible.
 \end{observacion}
 
 \subsection{Capa de representación} \label{subs:capa_de_representacion}
@@ -179,9 +179,9 @@ Y como ya hemos comentado, estamos usando las mismas funciones de representació
 El siguiente diagrama muestra gráficamente cómo actúa la capa de representación, calculando los $N \cdot M$ coeficientes reales que componen dicha capa:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{matematicas/computo_capa_representacion}
-    \caption{Ejemplo gráfico sobre cómo actúa la capa de representación. A partir de $N$ parches en $\R^s$, acabamos con $N \cdot M$ coeficientes reales}
+	\centering
+	\includegraphics[width=0.8\textwidth]{matematicas/computo_capa_representacion}
+	\caption{Ejemplo gráfico sobre cómo actúa la capa de representación. A partir de $N$ parches en $\R^s$, acabamos con $N \cdot M$ coeficientes reales}
 \end{figure}
 
 
@@ -192,22 +192,22 @@ Supongamos que trabajamos con $N = 3, M = 2$. En este caso, una imagen de entrad
 El primer paso es computar la capa de representación, que son los $N \cdot M$ coeficientes reales dados por:
 
 \begin{equation}
-\begin{split}
-    f_1(\nv{x_1}), f_1(\nv{x_2}), f_1(\nv{x_3}) \\
-    f_2(\nv{x_1}), f_2(\nv{x_2}), f_2(\nv{x_3})
-\end{split}
+	\begin{split}
+		f_1(\nv{x_1}), f_1(\nv{x_2}), f_1(\nv{x_3}) \\
+		f_2(\nv{x_1}), f_2(\nv{x_2}), f_2(\nv{x_3})
+	\end{split}
 \end{equation}
 
 Y con esto ya podemos expresar nuestra función de puntuación:
 
 \begin{equation}
-\begin{split}
-    h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, d_2, d_3 = 1}^{2} \mathcal{A}^y_{d_1 d_2 d_3} \prod_{i = 1}^3 f_{d_i}(\nv{x_i}) = \ldots \\
-    \ldots &= A_{111} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_1(\nv{x_2}) + \\
-           &+ A_{112} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_2(\nv{x_2}) + \ldots \\
-           \ldots &+ A_{321} \; f_3(\nv{x_1}) \; f_2(\nv{x_2}) \; f_1(\nv{x_2}) + \ldots \\
-           \ldots &+ A_{333} \; f_3(\nv{x_1}) \; f_3(\nv{x_2}) \; f_3(\nv{x_3})
-\end{split}
+	\begin{split}
+		h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, d_2, d_3 = 1}^{2} \mathcal{A}^y_{d_1 d_2 d_3} \prod_{i = 1}^3 f_{d_i}(\nv{x_i}) = \ldots \\
+		\ldots &= A_{111} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_1(\nv{x_2}) + \\
+		&+ A_{112} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_2(\nv{x_2}) + \ldots \\
+		\ldots &+ A_{321} \; f_3(\nv{x_1}) \; f_2(\nv{x_2}) \; f_1(\nv{x_2}) + \ldots \\
+		\ldots &+ A_{333} \; f_3(\nv{x_1}) \; f_3(\nv{x_2}) \; f_3(\nv{x_3})
+	\end{split}
 \end{equation}
 
 Queda claro que el tensor $\mathcal{A}^y$ contiene los coeficientes que realizan una combinación lineal sobre todos los posibles productos de nuestros $N \cdot M$ valores reales de la capa de representación
@@ -221,7 +221,7 @@ Las imágenes de entrada se dividen en parches. Esto es, una imagen viene dada p
 Al disponer de $M$ funciones de representación, cada vector $\nv{x_i}$ acabará siendo \textbf{representado} por un descriptor de longitud $M$, es decir:
 
 \begin{equation}
-    \nv{x_i} \to (f_1(\nv{x_i}), \ldots, f_M(\nv{x_i})) \in \R^M
+	\nv{x_i} \to (f_1(\nv{x_i}), \ldots, f_M(\nv{x_i})) \in \R^M
 \end{equation}
 
 Para resolver la tarea de clasificación, buscamos aprender $Y$ funciones de puntuación $h_y$. Para ello, tomamos los $N \cdot M$ coeficientes resultado de tomar $N$ descriptores de longitud $M$. La función de puntuación $h_y$ es el resultado de combinar linealmente los $M^N$ posibles productos de los $N \cdot M$ coeficientes. La combinación lineal se describe con los coeficientes de $\mathcal{A}^y \in \espaciotensores{N}{M}$. Todo esto quedó claro en \customref{ejemplo:funcion_puntuacion}.
