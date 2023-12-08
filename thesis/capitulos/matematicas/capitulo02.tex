@@ -433,7 +433,7 @@ Además, usaremos el siguiente hecho, que es consecuencia directa del \textbf{Te
 
 \begin{observacion}
 
-    Sea $\mathbb{V}$ un espacio vectorial de Hilbert y sea $\mathbb{B}$ una base ortonormal de $\mathbb{V}$. Entonces, convergencia en norma implica convergencia en los coeficientes de dicha base
+	Sea $\mathbb{V}$ un espacio vectorial de Hilbert y sea $\mathbb{B}$ una base ortonormal de $\mathbb{V}$. Entonces, convergencia en norma implica convergencia en los coeficientes de dicha base
 
 \end{observacion}
 
@@ -446,7 +446,7 @@ Además, usaremos el siguiente hecho, que es consecuencia directa del \textbf{Te
 Introducimos ahora dos caracterizaciones fundamentales sobre familias de funciones, que serán de gran importancia a la hora de desarrollar nuestros resultados:
 
 \begin{definicion}[Subconjuntos de funciones totales]
-	Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$
+	Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$.
 \end{definicion}
 
 La principal ventaja de trabajar con un subconjunto de funciones de este tipo viene dada por la siguiente proposición:
@@ -457,7 +457,7 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 	\begin{equation} \label{eq:conjuntos_totales_epsilon_aproximacion}
 		\begin{split}
 			\forall \varepsilon > 0 \dspace \exists f_1, \ldots, f_n \in \mathcal{F} \dspace \exists c_1, \ldots c_n \in \R:\\
-			\int | (\sum_{i = 1}^n c_i \cdot f_i) - g| < \varepsilon \\
+			\int | (\sum_{i = 1}^n c_i \; f_i) - g| < \varepsilon \\
 		\end{split}
 	\end{equation}
 
@@ -473,18 +473,27 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 
 \end{definicion}
 
-\begin{proposicion}[Existencia de \entrecomillado{bases} numerables en espacios de funciones]
-	Todo espacio $L^2(\R^N)$ admite un subconjunto numerable que sea linealmente independiente y total. Estos conjuntos actuarán de forma similar a una base vectorial
+\begin{proposicion}[Existencia de \entrecomillado{bases} en espacios de funciones]
+	Para cada $N \in \N$ se tiene que $L^2(\R^N)$ admite un subconjunto numerable que sea linealmente independiente y total.
 \end{proposicion}
-\todo{Qué relación tiene esto con el hecho de que sabemos que todo espacio de Hilbert admite una base ortonormal. Hay estamos usando <fi, fi'> = 0 en vez de la indp. lineal pero claramente están relacionados}
+
+\begin{observacion}
+	Estos conjuntos actuarán de forma similar a una base vectorial
+\end{observacion}
+
+\begin{observacion}
+
+	Este resultado es, de nuevo, consecuencia del \textbf{Teorema de proyección ortogonal}. Es más, sabemos que todo espacio de \textit{Hilbert} finito-dimensional admite una base ortonormal, es decir, un subconjunto de funciones ortonormales dos a dos que es total. La ortonormalidad implica independiencia lineal, por lo que esto nos da la existencia de nuestras \entrecomillado{bases}.
+
+\end{observacion}
 
 En nuestros dos modelos, trabajaremos con la familia de funciones producto inducida. Así que vemos como se comporta esta transformación respecto a las dos caracterizaciones que acabamos de introducir:
 
 \begin{proposicion}[Conservación de la totalidad e independencia lineal en la familia de funciones producto inducida] \label{prop:conservacion_totalidad_indp_lineal_func_prod}
-	Sea $\{f_d\} \subseteq L^2(\R^s): d \in \deltaset{N} \}$ total (resp. linealmente independiente). Entonces el subconjunto:
+	Sea $\conjunto{f_d \in L^2(\R^s): d \in \deltaset{N} }$ total (resp. linealmente independiente). Entonces el subconjunto:
 
 	\begin{equation}
-		\{ (\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N \} \subseteq L^2((\R^s)^N)
+		\conjunto{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N} \subseteq L^2((\R^s)^N)
 	\end{equation}
 
 	es total (resp. linealmente independiente) \cite{matematicas:descomposicion_ht}.
@@ -496,14 +505,20 @@ En esta sección vamos a ver cómo se relaciona el producto tensorial con todos 
 
 \begin{proposicion}
 
-	Si los espacios $\mathbb{V}_1, \ldots, \mathbb{V}_N$ son espacios de Hilbert, podemos dotar de forma natural al espacio $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ de un producto escalar, siendo así $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ un espacio de Hilbert
+	Si los espacios $\mathbb{V}_1, \ldots, \mathbb{V}_N$ son espacios de Hilbert, podemos dotar de forma natural al espacio $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ de un producto escalar, siendo así $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ un espacio de Hilbert.
 
 \end{proposicion}
+
+\begin{proof}
+
+	\todo{JMeri me apunta que escriba el producto escalar inducido. No sé si en una prueba como tal o simplemente escribir dicho producto escalar}
+
+\end{proof}
 
 Y ahora veamos cómo se relaciona el producto tensorial con las dos caracterizaciones:
 
 \begin{proposicion}
-	Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(1)}_{\alpha_1}} \otimes \ldots \otimes  \nv{v^{(N)}_{\alpha_N}}  \} \subseteq \mathbb{V}_1 \otimes \ldots \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
+	Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(1)}_{\alpha_1}} \otimes \cdots \otimes  \nv{v^{(N)}_{\alpha_N}}  \} \subseteq \mathbb{V}_1 \otimes \cdots \otimes \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
 \end{proposicion}
 
 Como ya hemos comentado, será importante estudiar la familia de funciones producto inducida. El siguiente teorema da un paso en este estudio.
@@ -514,11 +529,9 @@ Como ya hemos comentado, será importante estudiar la familia de funciones produ
 	\begin{equation}
 		\begin{split}
 			\MediumOtimes^{N} L^2(\R^s) &\to L^2((\R^s)^N) \\
-			f_1(\nv{x}) \otimes \ldots \otimes f_N(\nv{x}) &\mapsto \prod_{i = 1}^N f_i(\nv{x_i})
+			f_1(\nv{x}) \otimes \cdots \otimes f_N(\nv{x}) &\mapsto \prod_{i = 1}^N f_i(\nv{x_i})
 		\end{split}
 	\end{equation}
 
 	Así, tenemos identificadas las funciones que vienen dadas como producto tensorial con funciones que vienen dadas como producto punto a punto.
 \end{teorema}
-
-
