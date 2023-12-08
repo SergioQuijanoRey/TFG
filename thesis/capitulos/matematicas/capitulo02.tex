@@ -3,7 +3,7 @@
 
 \chapter{Herramientas matemáticas fundamentales} \label{ch:matematicas_fundamentales}
 
-En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas y no aportan nada nuevo al estudio que hacemos sobre las redes neuronales, por lo que el lector puede pasar directamente a \customref{ch:tarea_aprendizaje}.
+En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas por lo que el lector experimentado puede pasar directamente al \sectionref{ch:tarea_aprendizaje}.
 
 \section{Notación}
 
@@ -36,61 +36,21 @@ Para la construcción del producto tensorial de espacios vectoriales necesitarem
     Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales reales. Se define su \textbf{producto formal} como:
 
     \begin{equation}
-        \mathbb{V} \ast \mathbb{W} := span_{\mathbb{R}} \{v \ast w / v \in \mathbb{V}, w \in \mathbb{W} \}
+        \mathbb{V} \ast \mathbb{W} := \spanset{v \ast w : \; v \in \mathbb{V}, w \in \mathbb{W}}
     \end{equation}
 
     donde $*$ es un símbolo con el que no sabemos operar. Por tanto, ahora mismo no sabemos simplificar muchas expresiones en este espacio.
-
 \end{definicion}
 
 \begin{observacion}
-
-    $span$ denota el conjunto formado por todas las combinaciones lineales finitas de los elementos del conjunto, es decir,
+    $\text{span}$ denota el conjunto formado por todas las combinaciones lineales finitas de los elementos del conjunto, es decir,
 
     \begin{equation}
-        span_{\mathbb{R}}(A) := \{ \sum_{k = 1}^n \alpha_i a_i : n \in \N, \; \alpha_i \in \R, \; a_i \in A \}
+        \spanset{A} := \{ \sum_{k = 1}^n \alpha_i a_i : \; n \in \N, \; \alpha_i \in \R, \; a_i \in A \}
     \end{equation}
-
-
 \end{observacion}
 
 Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar tomando combinaciones lineales finitas, $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial.
-
-Veamos ahora algunos ejemplos para familiarizarnos con este espacio.
-\todo{\textbf{Para Javier}: no sé si estos ejemplos son necesarios. Los he puesto porque lo tenía apuntado en mis notas cuando estaba estudiando el producto tensorial, pero ahora no le veo demasiado el valor a dejarlo aquí}
-
-\begin{ejemplo}[Producto formal sencillo] \label{ej:prod_formal}
-
-Sea $\Omega := \R^2 \ast \R^3$. Entonces tenemos que:
-
-\begin{equation}
-    \Omega = span \conjunto{
-        \begin{pmatrix}
-            a \\
-            b
-        \end{pmatrix}
-        \ast
-        \begin{pmatrix}
-            x \\
-            y \\
-            z
-        \end{pmatrix}
-        / a, b, x, y, z \in \R
-    }
-\end{equation}
-
-Un elemento de dicho espacio puede ser
-
-$$
-2 \left[ \begin{pmatrix}1 \\ 2\end{pmatrix} \ast \begin{pmatrix}3 \\ 2 \\ 1 \end{pmatrix} \right]
-- 3 \left[ \begin{pmatrix}1 \\ 0\end{pmatrix} \ast \begin{pmatrix}1 \\ 2 \\ 3 \end{pmatrix} \right]
-$$
-
-Notar que no sabemos cómo meter los escalares $2, -3$ en los elementos del producto formal.
-
-Por cómo hemos definido el producto formal de dos espacios vectoriales, tenemos que $dim(\R^2 \ast \R^3) = \infty$
-
-\end{ejemplo}
 
 \subsubsection{Producto tensorial a partir del producto formal} \label{sec:cociente_prod_formal}
 
@@ -103,22 +63,13 @@ Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que 
     \item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$
 \end{enumerate}
 
-Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$
-
-Estas igualdades representan las propiedades que queremos que se cumplan para que nuestro nuevo objeto matemático tenga un comportamiento similar al del producto entre escalares. En concreto, 1 y 2 nos dan la asociatividad, mientras que 3 y 4 nos dan la propiedad distributiva.
-
-Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir estas propiedades. Para ello definimos:
+Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$. Estas igualdades representan las propiedades que queremos que se cumplan para que nuestro nuevo objeto matemático tenga un buen comportamiento. Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir dichas propiedades. Para ello definimos:
 
 \begin{equation}
 \begin{split}
-    I &:= span\{ \\
-        & \dspace (c\nv{v}) \ast \nv{w} - c(\nv{v} \ast \nv{w}), \\
-        & \dspace \nv{v} \ast (c\nv{w}) - c(\nv{v} \ast \nv{w}), \\
-        & \dspace (\nv{v_1} + \nv{v_2}) \ast \nv{w} - (\nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}), \\
-        & \dspace \nv{v} \ast (\nv{w_1} + \nv{w_2}) - (\nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}): \\
-        & \dspace \\
-        & \dspace \nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}; \dspace \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}; \dspace c \in \R \\
-     \} &
+    I := \spanset{ &
+        (c\nv{v}) \ast \nv{w} - c(\nv{v} \ast \nv{w}), \nv{v} \ast (c\nv{w}) - c(\nv{v} \ast \nv{w}), (\nv{v_1} + \nv{v_2}) \ast \nv{w} - (\nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}), \\
+        & \nv{v} \ast (\nv{w_1} + \nv{w_2}) - (\nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}): \dspace \nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}; \dspace \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}; \dspace c \in \R }
 \end{split}
 \end{equation}
 
@@ -148,9 +99,7 @@ A partir de esta definición, son directas las siguientes propiedades:
     \end{enumerate}
 \end{proposicion}
 
-\begin{proof} $\newline \newline$
-    1.
-
+\begin{proof} Empecemos viendo la primera propiedad:
     \begin{equation}
     \begin{split}
         (c\nv{v}) \otimes \nv{w} &\eqtext{def} (c\nv{v}) \ast \nv{w} + I = \ldots \ \text{usando que} \quad \nv{a} + I = \nv{a} + \nv{i} + I, \quad \forall \nv{i} \in I \\
@@ -160,7 +109,7 @@ A partir de esta definición, son directas las siguientes propiedades:
     \end{split}
     \end{equation}
 
-    El resto de propiedades se comprueban de forma análoga, introduciendo la propiedad que queremos probar gracias a que $\nv{a} + I = \nv{a} + \nv{i}$, $\forall \nv{i} \in I$ y operando con esto
+    El resto de propiedades se comprueban de forma análoga, introduciendo la propiedad que queremos probar gracias a que $\nv{a} + I = \nv{a} + \nv{i}$, $\forall \nv{i} \in I$ y operando con esto.
 
 \end{proof}
 
@@ -186,10 +135,6 @@ Ahora, enunciamos un importante teorema que nos ayudará a entender la naturalez
 \end{teorema}
 
 \begin{observacion}
-    Al estar tomando bases vectoriales (finitas), esta proposición solo es válida en espacios vectoriales de dimensión finita.
-\end{observacion}
-
-\begin{observacion}
     Notar que podríamos haber usado este teorema como forma de definir el producto tensorial de dos espacios vectoriales. Sin embargo, limitaríamos esta construcción a espacios vectoriales que admitiesen una base.
 \end{observacion}
 
@@ -206,7 +151,7 @@ La expresión anterior motiva la siguiente definición:
 \end{definicion}
 
 \begin{proposicion}
-    Como consecuencia directa de \customref{th:base_prod_tensorial}, dados $\nv{v}, \nv{w} \in \mathbb{V}$, en general no es cierto que:
+    Como consecuencia directa del \propref{th:base_prod_tensorial}, dados $\nv{v}, \nv{w} \in \mathbb{V}$, en general no es cierto que:
 
     \begin{equation}
         \nv{v} \otimes \nv{w} \neq \nv{w} \otimes \nv{v}
