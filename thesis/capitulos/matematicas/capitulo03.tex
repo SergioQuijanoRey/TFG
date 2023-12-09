@@ -79,8 +79,6 @@ Por tanto, \eqref{eq:hipotesis_en_general} \textbf{define un modelo universal}, 
 
 \subsection{Elección de la familia de funciones de representación}
 
-% TODO -- seguir por aqui
-
 Como hemos justificado, tenemos que escoger una familia paramétrica de funciones de representación que sea numerable y además total, es decir:
 
 \begin{equation}
@@ -105,16 +103,14 @@ Las opciones más usadas en la práctica del aprendizaje automático son:
 		      f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
 	      \end{equation}
 
-	      donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$ y $\sigma$ la función de activación de la neurona, por ejemplo una \textit{sigmoide} o una \textit{ReLU}
+	      donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$ y $\sigma$ la función de activación de la neurona, por ejemplo una \textit{sigmoide} o una \textit{ReLU}.
+
+	      \todo{Comentario JMERI: se pueden poner en una sección de herramientas}
 
 
 \end{enumerate}
 
-En la práctica, las dos últimas son más populares que la primera a la hora de clasificar imágenes. En ambas, podemos tomar un subconjunto numerable que siga siendo total, basta con restringir que los coeficientes tomen valores en los racionales. En el caso de las Gaussianas, véase \cite{matematicas:gaussianas_totales}. En el caso de las neuronas, véase \cite{matematicas:neuronas_totales}.
-
-De hecho, en \cite{matematicas:principal} se prueba que para las Gaussianas y neuronas es suficiente con tomar un número finito de funciones ${f_1, \ldots, f_M}$. Es más, en el caso de estar trabajando con imágenes, proponen que basta con tomar $M$ entorno a 100.
-
-Usando este hecho, tomaremos $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2(\R^s)$ total en la ecuación \eqref{eq:hipotesis_en_general}. Con ello, ahora es suficiente tomar $\mathcal{A}^y \in \espaciotensores{N}{M}$, llegando a:
+Como veremos más adelante al especificar nuestro modelo, podemos tomar un conjunto finito de funciones de representación que sea total, es decir, podemos tomar $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2(\R^s)$ total en la ecuación \eqref{eq:hipotesis_en_general}. Con ello, ahora es suficiente tomar $\mathcal{A}^y \in \espaciotensores{N}{M}$, llegando a:
 
 \begin{equation}
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
@@ -128,12 +124,12 @@ Usando este hecho, tomaremos $\{f_{\theta_d}: d \in \deltaset{M}\} \subseteq L^2
 		\{ (\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N \}
 	\end{equation}
 
-	será también linealmente independiente, y se comportará como si fuera una \entrecomillado{base} del espacio $L^2((R^s)^N)$. Y por tanto, una función de puntuación $h_y$ \textbf{determina unívocamente un tensor de coeficientes} $\mathcal{A}^y$
+	será también linealmente independiente, por lo que será una base del espacio $L^2((R^s)^N)$. Y por tanto, una función de puntuación $h_y$ \textbf{determina unívocamente un tensor de coeficientes} $\mathcal{A}^y$.
 
 \end{observacion}
 
 \begin{observacion}
-	Usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$
+	Usamos la notación $\sum_{d_1, \ldots, d_N = 1}^{M}$ para denotar $\sum_{d_1 = 1}^{M} \sum_{d_2 = 1}^{M} \ldots \sum_{d_N = 1}^{M}$.
 \end{observacion}
 
 \subsection{Representación de las funciones de puntuación} \label{sec:repr_funciones_puntuacion}
