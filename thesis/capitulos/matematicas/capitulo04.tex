@@ -3,27 +3,25 @@
 A partir de las herramientas matemáticas que hemos introducido en \customref{ch:matematicas_fundamentales} y de la modelización de la tarea de aprendizaje realizada en \customref{ch:tarea_aprendizaje}, buscamos desarrollar una modelización matemática de las redes neuronales con las que se suele trabajar en la práctica. Para que sea una \textbf{buena modelización}, esta debería cumplir que:
 
 \begin{itemize}
-    \item Sea lo más parecida a los modelos que se usan en la práctica
-    \item Permita obtener resultados interesantes
+    \item Sea lo más parecida a los modelos que se usan en la práctica.
+    \item Permita obtener resultados interesantes.
 \end{itemize}
 
 Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
 
 \begin{itemize}
-    \item Redes neuronales no profundas, a partir de la descomposición \textit{CP}
-    \item Redes convolucionales profundas, a partir de la descomposición \textit{HT}
+    \item Redes neuronales no profundas, a partir de la descomposición \textit{CANDECOMP/PARAFAC} o descomposición \textit{CP}.
+    \item Redes convolucionales profundas, a partir de la descomposición jerárquica de \textit{Tucker} o descomposición \textit{HT} por sus siglas en inglés.
 \end{itemize}
 
 Las \textbf{modelizaciones son muy cercanas a las arquitecturas usadas en la práctica del aprendizaje automático}. Principalmente, porque tienen en cuenta las tres propiedades características de una red convolucional:
 
 \begin{enumerate}
-    \item Localidad
-    \item Compartición de parámetros, que junto a la localidad, da lugar a la convolución
-    \item \textit{Pooling}
+    \item Localidad.
+    \item Compartición de parámetros, que junto a la localidad, da lugar a la convolución.
+    \item \textit{Pooling}.
 \end{enumerate}
-\todo{Esto ya lo digo antes en la introducción. No sé si aquí sería buen momento para desarrollar lo que significa cada cosa o si es mejor quitarlo de alguna parte}
-
-Además, el modelo profundo es equivalente a las redes conocidas como \textit{SimNets} \cite{matematicas:principal}, lo que reafirma el hecho de que la modelización es muy buena.
+\todo{Desarrollar de forma más extensa qué significan estas propiedades. Antes digo que voy a explicar qué son estas propiedades. Y además, estoy repitiendo el listado, por lo que tengo que desarrollar bien estas propiedades}
 
 \section{Modelo \textit{CP}}
 
@@ -31,9 +29,7 @@ Este modelo será el resultado de aplicar la descomposición tensorial \textit{C
 
 \subsection{Descomposición CANDECOMP/PARAFAC} \label{subs:descomposcion_cp}
 
-En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/PARAFAC}. Esta es la descomposición más sencilla de las dos descomposiciones que vamos a manejar.
-
-Empecemos introduciendo la siguiente propiedad sobre los tensores puros:
+En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/PARAFAC}. Esta es la descomposición más sencilla de las dos descomposiciones que vamos a manejar. Empecemos introduciendo la siguiente propiedad sobre los tensores puros:
 
 \begin{proposicion}[Rango matricial de los tensores puros]
     Sean $\nv{v} \in \R^{N}, \nv{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
@@ -87,28 +83,28 @@ Con esto sabemos que $rank(\nv{v} \otimes \nv{w}) \leq 1$, pero podría darse el
     Estamos escribiendo la igualdad $\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T$ sin definir lo que significa la igualdad entre un tensor de orden 2 y una matriz. Sin embargo, esta igualdad es totalmente natural. Decimos que un tensor de orden dos y una matriz son iguales cuando las dimensiones de la matriz y las dos dimensiones del tensor coinciden, y cuando las entradas de ambos coinciden.
 \end{observacion}
 
-Recordemos que en \customref{def:tensor_puro} hemos definido estos tensores como \textbf{tensores puros}. La anterior proposición muestra que los tensores puros que vienen dados como producto tensorial de dos vectores tienen un rango matricial igual a uno (en caso de que no sean ambos vectores nulos).
+La anterior proposición muestra que los tensores puros que vienen dados como producto tensorial de dos vectores tienen un rango matricial igual a uno (en caso de que no sean ambos vectores nulos). Es natural plantearse generalizar esta propiedad a tensores puros que vengan dados como producto tensorial de $N$ vectores. Pero de momento no tenemos una herramienta para comparar tensores de orden $N > 2$ con matrices. Esto motiva la introducción de la descomposición tensorial \textit{CANDECOMP/PARAFAC}:
 
-Es natural plantearse generalizar esta propiedad a tensores puros que vengan dados como producto tensorial de $N$ vectores. Pero de momento no tenemos una herramienta para comparar tensores de orden $N > 2$ con matrices. Esto motiva la introducción de la descomposición tensorial \textit{CP}:
-
-\begin{proposicion}[\textbf{Descomposición \textit{CP}}]
+\begin{proposicion}[\textbf{Descomposición \textit{CANDECOMP/PARAFAC}}]
     Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros. Es decir, $\forall \mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$, $\exists Z \in \N$:
 
     \begin{equation} \label{eq:cp_decomp}
-        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \ldots \otimes \nv{v_i^{(N)}};
+        \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \cdots \otimes \nv{v_i^{(N)}};
         \qquad \nv{v_i^{(k)}} \in \R^{M_k},
         \dspace \forall i \in \deltaset{Z},
         \dspace \forall k \in \deltaset{N},
     \end{equation}
 \end{proposicion}
 
-A la descomposición anterior se le llama \textbf{descomposición \textit{CANDECOMP/PARAFAC}}, o abreviadamente, \textbf{descomposición \textit{CP}}
+\begin{observacion}[Origen del nombre de la descomposición]
+    En 1927 Hitchcock propone la idea de expresar un tensor como la suma de tensores de rango uno. En 1970 se introducen dos trabajos independientes que resuelven esta tarea. El primero, introducido por Carol y Chang, propone la descomposición canónica (\textit{CANonical DECOMPosition} o \textit{CANDECOMP}). El segundo trabajo, introducido por Harshman, propone la descomposición por factores paralelos (\textit{PARallel FACtors} o \textit{PARAFAC}). Más tarde se descubre que ambas descomposiciones son equivalentes, por lo que se adopta el nombre conjunto \cite{matematicas:cp_nombre_paper}.
+\end{observacion}
 
 \begin{observacion}
     Esta descomposición es equivalente a la siguiente descomposición:
 
     \begin{equation}
-        \mathcal{A} = \sum_{i = 1}^Z \lambda_i \cdot \nv{v_i^{(1)}} \otimes \ldots \otimes \nv{v_i^{(N)}};
+        \mathcal{A} = \sum_{i = 1}^Z \lambda_i \cdot \nv{v_i^{(1)}} \otimes \cdots \otimes \nv{v_i^{(N)}};
         \qquad \nv{v_i^{(k)}} \in \R^{M_k},
         \dspace \lambda_i \in \R,
         \dspace \forall i \in \deltaset{Z},
@@ -122,18 +118,19 @@ A la descomposición anterior se le llama \textbf{descomposición \textit{CANDEC
         \nv{w_i^{(1)}} := \lambda_i \cdot \nv{v_i^{(1)}} \in \R^{M_1}
     \end{equation}
 
-    y, usando de nuevo las propiedades del producto tensorial:
+    y usando de nuevo las propiedades del producto tensorial:
 
     \begin{equation}
-        \lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \ldots \nv{v_i^{(N)}}
+        \lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \cdots \otimes \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \cdots \otimes  \nv{v_i^{(N)}}
     \end{equation}
 \end{observacion}
 
 \begin{observacion}
-    Notar que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
+    Nótese que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
 \begin{proof} \label{proof:demostracion_cp_es_universal}
+    % TODO -- seguir por aqui
     Queremos descomponer el tensor $\mathcal{A}$ que tiene orden $N$ y dimensión $M_k$ en cada dimensión $k \in \deltaset{N}$. Por tanto, $\mathcal{A}$ tiene $M_1 \cdot M_2 \cdot \ldots \cdot M_N$ elementos. En base a esto, tomamos $Z = M_1 \cdot M_2 \cdot \ldots \cdot M_N$ y en cada sumando de la descomposición buscamos colocar un único coeficiente del tensor en su índice correspondiente.
 
     Por tanto, en cada sumando buscamos encontrar vectores cuyo producto tensorial genere un tensor, de dimensiones adecuadas, con todas las entradas nulas salvo la entrada de la que nos ocupamos en esa iteración.
