@@ -42,6 +42,7 @@ $$\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
 Por tanto, nuestro \textbf{espacio de hipótesis} es el conjunto de funciones $\Gamma := \conjunto{f: \mathcal{X} \to \R}$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subseteq \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
 
 \section{Espacio de hipótesis general}
+\todo{JMERI: leer de nuevo esta sección completa, porque es muy liosa, repito cosas, introduzco cosas donde no debería. Mirar los contenidos que he borrado}
 
 Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ que conformarán el espacio de hipótesis sobre el que trabajaremos. En la \sectionref{sec:repr_funciones_puntuacion} mostramos cuál es la elección final basada en el desarrollo previo. Usaremos ciertos hechos básicos sobre análisis funcional que hemos introducido en la \sectionref{sec:preliminares_funcional}.
 
@@ -140,19 +141,7 @@ Por todo esto, las funciones de puntuación vendrán dadas de la forma:
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
 \end{equation}
 
-Explicamos ahora algunos detalles sobre esta ecuación, que será central en nuestro trabajo.
-
-Las funciones $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ son las \textbf{funciones de representación}. Cada una de estas funciones se selecciona de una familia paramétrica
-
-$$\mathcal{F} = \{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta \}$$
-
-Algunas funciones de representación usuales en la práctica son:
-
-\begin{itemize}
-	\item \textit{Wavelets}
-	\item Funciones de base radial (\textit{RBF}), normalmente la Gaussiana
-	\item Neuronas
-\end{itemize}
+Las funciones $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ son las \textbf{funciones de representación}, que como ya hemos comentado, suelen ser \textit{Wavelets}, funciones de base radial (\textit{RBF}) o neuronas.
 
 El tensor $\mathcal{A}^y$ será el \textbf{tensor de coeficientes}. Por la sumatoria en \eqref{eq:puntuacion_general}, es claro que tiene orden $N$ y dimensión $M$ en cada modo. Es decir, $\mathcal{A} \in \espaciotensores{N}{M}$.
 
@@ -168,6 +157,7 @@ Por lo tanto, la tarea de aprendizaje consistirá en optimizar los valores de lo
 
 	Sabemos entonces que esta familia de funciones actuará como una \entrecomillado{base} del espacio $L^2((\R^s)^N)$. Y por lo tanto podemos pensar que el tensor $\mathcal{A}^y$ nos da los coeficientes de la función de puntuación $h_y$ en dicha \entrecomillado{base}.
 \end{observacion}
+\todo{Comentario de JMeri: Esto está repetido varias veces. Tengo que repasar toda la sección}
 
 \begin{observacion}
 	Como $\mathcal{A} \in \espaciotensores{N}{M}$, tenemos que optimizar el valor de $M^N$ valores reales a través del proceso de aprendizaje. Esto supone un reto, que \textbf{motiva el uso de los dos modelos}, que se basarán en descomposiciones tensoriales para que el aprendizaje del tensor de coeficientes sea más factible.
@@ -175,11 +165,7 @@ Por lo tanto, la tarea de aprendizaje consistirá en optimizar los valores de lo
 
 \subsection{Capa de representación} \label{subs:capa_de_representacion}
 
-En \eqref{eq:puntuacion_general} estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de puntuación $h_y$. Lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$.
-
-Notar además que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\nv{x_i}$ solo participan en el productorio que involucra computar $f_{\theta_{d_i}}(\mathbf{x_i})$.
-
-Por tanto, podemos considerar un paso inicial, compartido en los dos modelos que proponemos, el cómputo de los valores:
+En \eqref{eq:puntuacion_general} estamos usando las mismas funciones de representación $f_{\theta_1}, \ldots, f_{\theta_M}: \R^s \to \R$ para todas las funciones de puntuación $h_y$. Lo único que cambia entre las distintas funciones de puntuación es el tensor de coeficientes $\mathcal{A}^y$. Nótese además que en la ecuación \refeq{eq:puntuacion_general}, los vectores de entrada $\nv{x_i}$ solo participan en el producto que involucra computar $f_{\theta_{d_i}}(\nv{x_i})$. Por tanto, podemos considerar un paso inicial, que será compartido en los dos modelos que más adelante introduciremos, consistente en computar los valores:
 
 $$\{f_{\theta_d}(\nv{x_i}): \; d \in \deltaset{M},\ i \in \deltaset{N} \}$$
 
@@ -189,7 +175,7 @@ Y como ya hemos comentado, estamos usando las mismas funciones de representació
 
 El siguiente diagrama muestra gráficamente cómo actúa la capa de representación, calculando los $N \cdot M$ coeficientes reales que componen dicha capa:
 
-\begin{figure}[H]
+\begin{figure}[!hbtp]
 	\centering
 	\includegraphics[width=0.8\textwidth]{matematicas/computo_capa_representacion}
 	\caption{Ejemplo gráfico sobre cómo actúa la capa de representación. A partir de $N$ parches en $\R^s$, acabamos con $N \cdot M$ coeficientes reales}
@@ -213,28 +199,21 @@ Y con esto ya podemos expresar nuestra función de puntuación:
 
 \begin{equation}
 	\begin{split}
-		h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, d_2, d_3 = 1}^{2} \mathcal{A}^y_{d_1 d_2 d_3} \prod_{i = 1}^3 f_{d_i}(\nv{x_i}) = \ldots \\
-		\ldots &= A_{111} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_1(\nv{x_2}) + \\
-		&+ A_{112} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_2(\nv{x_2}) + \ldots \\
-		\ldots &+ A_{321} \; f_3(\nv{x_1}) \; f_2(\nv{x_2}) \; f_1(\nv{x_2}) + \ldots \\
-		\ldots &+ A_{333} \; f_3(\nv{x_1}) \; f_3(\nv{x_2}) \; f_3(\nv{x_3})
+		h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, d_2, d_3 = 1}^{2} \mathcal{A}^y_{d_1 d_2 d_3} \prod_{i = 1}^3 f_{d_i}(\nv{x_i}) = A_{111} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_1(\nv{x_2}) + A_{112} \; f_1(\nv{x_1}) \; f_1(\nv{x_2}) \; f_2(\nv{x_2}) + \\
+		\cdots &+ A_{321} \; f_3(\nv{x_1}) \; f_2(\nv{x_2}) \; f_1(\nv{x_2}) + A_{333} \; f_3(\nv{x_1}) \; f_3(\nv{x_2}) \; f_3(\nv{x_3})
 	\end{split}
 \end{equation}
 
-Queda claro que el tensor $\mathcal{A}^y$ contiene los coeficientes que realizan una combinación lineal sobre todos los posibles productos de nuestros $N \cdot M$ valores reales de la capa de representación
+Queda claro que el tensor $\mathcal{A}^y$ contiene los coeficientes que realizan una combinación lineal sobre todos los posibles productos de nuestros $N \cdot M$ valores reales de la capa de representación.
 
 \section{Resumen}
 
-En resumen, buscamos resolver una tarea de clasificación. Es decir, buscamos clasificar imágenes en una de las etiquetas $\mathcal{Y} := \{1, \ldots, Y\} = \deltaset{Y}$.
-
-Las imágenes de entrada se dividen en parches. Esto es, una imagen viene dada por $N$ vectores $x = (\nv{x_1}, \ldots, \nv{x_N}), \dspace \nv{x_i} \in \R^s \dspace \forall i \in \deltaset{N}$.
-
-Al disponer de $M$ funciones de representación, cada vector $\nv{x_i}$ acabará siendo \textbf{representado} por un descriptor de longitud $M$, es decir:
+Buscamos resolver una tarea de clasificación. Es decir, buscamos clasificar imágenes en una de las etiquetas $\mathcal{Y} := \{1, \ldots, Y\} = \deltaset{Y}$. Las imágenes de entrada se dividen en parches. Esto es, una imagen viene dada por $N$ vectores $x = (\nv{x_1}, \ldots, \nv{x_N}), \dspace \nv{x_i} \in \R^s \dspace \forall i \in \deltaset{N}$. Al disponer de $M$ funciones de representación, cada vector $\nv{x_i}$ acabará siendo \textbf{representado} por un descriptor de longitud $M$, es decir:
 
 \begin{equation}
 	\nv{x_i} \to (f_1(\nv{x_i}), \ldots, f_M(\nv{x_i})) \in \R^M
 \end{equation}
 
-Para resolver la tarea de clasificación, buscamos aprender $Y$ funciones de puntuación $h_y$. Para ello, tomamos los $N \cdot M$ coeficientes resultado de tomar $N$ descriptores de longitud $M$. La función de puntuación $h_y$ es el resultado de combinar linealmente los $M^N$ posibles productos de los $N \cdot M$ coeficientes. La combinación lineal se describe con los coeficientes de $\mathcal{A}^y \in \espaciotensores{N}{M}$. Todo esto quedó claro en \customref{ejemplo:funcion_puntuacion}.
+Para resolver la tarea de clasificación, buscamos aprender $Y$ funciones de puntuación $h_y$. Para ello, tomamos los $N \cdot M$ coeficientes resultado de tomar $N$ descriptores de longitud $M$. La función de puntuación $h_y$ es el resultado de combinar linealmente los $M^N$ posibles productos de los $N \cdot M$ coeficientes. La combinación lineal se describe con los coeficientes de $\mathcal{A}^y \in \espaciotensores{N}{M}$.
 
-Las dos arquitecturas que introducimos más adelante son el resultado de factorizar el tensor de coeficientes $\mathcal{A}^y$ con una descomposición u otra. Ambas incorporan conceptos claves en la práctica del aprendizaje automático, como la localidad, compartición de coeficientes y \textit{pooling}.
+Las dos arquitecturas que introduciremos más adelante son el resultado de factorizar el tensor de coeficientes $\mathcal{A}^y$ con distintas descomposiciones. Ambas incorporan conceptos claves en la práctica del aprendizaje automático, como la localidad, compartición de coeficientes y \textit{pooling}, que explicaremos más adelante.
