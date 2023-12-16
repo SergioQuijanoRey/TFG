@@ -239,15 +239,48 @@ Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sa
 
 \begin{proof}
 
-	Esta demostración es prácticamente la misma que la usada en \propref{proposicion:descomposicion_cp}. Ahora tenemos que $M_1 = M_2 = \ldots = M_N = M$ y nuestro conjunto de vectores es:
+	Esta demostración es prácticamente la misma que la usada en \propref{proposicion:descomposicion_cp}, pero ahora tenemos que $M_1 = M_2 = \ldots = M_N = M$. Teniendo este paralelismo en cuenta, desarrollamos la prueba. En vez de trabajar con un único índice que se mueva en $\deltaset{Z}$, será más fácil trabajar con $N$ índices que se muevan en $\deltaset{M}$, con lo que la ecuación \eqref{eq:cp_decomp_conjunta} se escribe:
 
-	\begin{equation} \label{eq:cp_decomp_asignacion_vectores}
-		\{\nv{\omega^{z, i}} \in \R^M : \; z \in \deltaset{Z}, i \in \deltaset{N} \} =
-		\{ \nv{\delta_{i_j, N}} : \; j \in \deltaset{N}, i_j \in \deltaset{M} \}
-	\end{equation}
+    \begin{equation}
+        \mathcal{A}^y = \sum_{d_1 = 1}^{M} \cdots \sum_{d_N = 1}^{M} a^y_{d_1, \ldots, d_N} \; \nv{\omega^{(1)}_{d_1, \ldots, d_N}} \otimes \cdots \otimes \nv{\omega^{(N)}_{d_1, \ldots, d_N}}
+    \end{equation}
 
-    Teniendo esto en cuenta, desarrollamos la prueba
-    % TODO -- seguir por aqui
+    Buscamos colocar un único elemento del tensor $\mathcal{A}^y$ en cada sumando de la anterior expresión. Para ello basta con que:
+
+    \begin{enumerate}
+        \item $a^y_{d_1, \ldots, d_N} = \mathcal{A}^y_{d_1, \ldots, d_N}$, lo cual es inmediato.
+        \item $\nv{\omega^{(1)}_{d_1, \ldots, d_N}} \otimes \cdots \otimes \nv{\omega^{(N)}_{d_1, \ldots, d_N}}$ genere el tensor de $\espaciotensores{N}{M}$ cuyas entradas sean todas cero salvo un uno en la posición $d_1, \ldots, d_N$. A dicho tensor lo denotaremos como $\mathcal{B}^{(d_1, \ldots, d_N)}$.
+    \end{enumerate}
+
+    Definimos ahora los vectores $\nv{\delta_{i, M}} \in \R^M$ como aquellos vectores con todas las entradas cero salvo un uno en la entrada $i$-ésima. Es decir,
+
+    \begin{equation}
+        (\nv{\delta_{i, N}})_k = \delta_{i, k} =
+        \begin{cases}
+            1 & \text{si } i = k    \\
+            0 & \text{en otro caso}
+        \end{cases}
+    \end{equation}
+
+    Con ello, es claro que:
+
+    \begin{equation}
+        \mathcal{B}_{d_1, \ldots, d_N} = \nv{\delta_{d_1, M}} \otimes \cdots \otimes \nv{\delta_{d_N, M}}
+    \end{equation}
+
+    Por tanto, es suficiente con fijar el siguiente conjunto de vectores:
+
+    \begin{equation}
+        \conjunto{\nv{\delta_{i, M}}: \; i \in \deltaset{M}}
+    \end{equation}
+
+    Y podemos expresar cualquier tensor $\mathcal{A}^y$ como:
+
+    \begin{equation}
+        \mathcal{A}^y = \sum_{d_1 = 1}^{M} \cdots \sum_{d_N = 1}^{M} a^y_{d_1, \ldots, d_N} \; \nv{\delta_{d_1, M}} \otimes \cdots \otimes \nv{\delta_{d_N, M}}
+    \end{equation}
+
+    donde $a^y_{d_1, \ldots, d_N} = \mathcal{A}^y_{d_1, \ldots, d_N}$.
 
 \end{proof}
 
