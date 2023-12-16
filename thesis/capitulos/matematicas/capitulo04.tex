@@ -85,7 +85,7 @@ En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/P
 
 La anterior proposición muestra que los tensores puros que vienen dados como producto tensorial de dos vectores tienen un rango matricial igual a uno (en caso de que no sean ambos vectores nulos). Es natural plantearse generalizar esta propiedad a tensores puros que vengan dados como producto tensorial de $N$ vectores. Pero de momento no tenemos una herramienta para comparar tensores de orden $N > 2$ con matrices. Esto motiva la introducción de la descomposición tensorial \textit{CANDECOMP/PARAFAC}:
 
-\begin{proposicion}[\textbf{Descomposición \textit{CANDECOMP/PARAFAC}}]
+\begin{proposicion}[\textbf{Descomposición \textit{CANDECOMP/PARAFAC}}] \label{proposicion:descomposicion_cp}
 	Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros. Es decir, $\forall \mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$, $\exists Z \in \N$:
 
 	\begin{equation} \label{eq:cp_decomp}
@@ -129,13 +129,10 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 	Nótese que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
-% TODO -- seguir por aqui
-\begin{proof} \label{proof:demostracion_cp_es_universal}
-	Queremos descomponer el tensor $\mathcal{A}$ que tiene orden $N$ y dimensión $M_k$ en cada dimensión $k \in \deltaset{N}$. Por tanto, $\mathcal{A}$ tiene $M_1 M_2 \ldots M_N$ elementos. En base a esto, tomamos $Z = M_1 M_2 \cdots M_N$ y en cada sumando de la descomposición buscamos colocar un único coeficiente del tensor en su índice correspondiente.
+\begin{proof}
+	Queremos descomponer el tensor $\mathcal{A}$ que tiene orden $N$ y dimensión $M_k$ en cada dimensión $k \in \deltaset{N}$. Por tanto, $\mathcal{A}$ tiene $M_1 M_2 \cdots M_N$ elementos. En base a esto, tomamos $Z = M_1 M_2 \cdots M_N$ y en cada sumando de la descomposición buscamos colocar un único coeficiente del tensor en su índice correspondiente.
 
-	Por tanto, en cada sumando buscamos encontrar vectores cuyo producto tensorial genere un tensor, de dimensiones adecuadas, con todas las entradas nulas salvo la entrada de la que nos ocupamos en esa iteración.
-
-	Para que la demostración sea más clara cambiaremos la forma de indexar la suma. En la proposición estamos usando un único índice que llega hasta $Z = M_1 \cdot \ldots \cdot M_N$. Esto es lo mismo que usar $N$ índices que lleguen hasta $M_k$, y así la sumatoria queda:
+	Por tanto, en cada sumando buscamos encontrar vectores cuyo producto tensorial genere un tensor, de dimensiones adecuadas, con todas las entradas nulas salvo la entrada de la que nos ocupamos en esa iteración. Para que la demostración sea más clara cambiaremos la forma de indexar la suma. En la proposición estamos usando un único índice que llega hasta $Z = M_1 \cdots M_N$. Esto es lo mismo que usar $N$ índices que lleguen hasta $M_k$, y así la sumatoria queda:
 
 	\begin{equation}
 		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \lambda_{i_1, \ldots, i_N} \cdot \nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \cdots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}
@@ -187,14 +184,14 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 	como buscábamos. Y con esto es trivial ver nuestra descomposición:
 
 	\begin{equation}
-		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \cdot \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}
+		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \; \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}
 	\end{equation}
 \end{proof}
 
 
 \begin{observacion}[Descomposición conjunta] \label{observacion:descomposicion_cp_conjunta}
 
-	Notar que en la demostración hemos fijado un cojunto de vectores que solo depende del tensor a descomponer en cuanto que tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots M_N}$, entonces este conjunto de vectores no depende del tensor a descomponer. Es decir, podemos usar estos vectores para descomponer cualquier tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$. Este conjunto de vectores es:
+	Obsérvese que en la demostración hemos fijado un cojunto de vectores que solo depende del tensor a descomponer en cuanto que tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots \times M_N}$, entonces este conjunto de vectores no depende del tensor a descomponer. Es decir, podemos usar estos vectores para descomponer cualquier tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$. Este conjunto de vectores es:
 
 	\begin{equation}
 		\conjunto{\delta_{k, L}: \; L \in \deltaset{M}, \; k \in \deltaset{L}}
@@ -206,20 +203,20 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 
 \begin{observacion}
 
-	En la demostración, hemos tomado $Z = M_1 \cdot \ldots \cdot M_N$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
+	En la demostración, hemos tomado $Z = M_1 \cdots M_N$ para asegurarnos de la existencia de una tal descomposición. Sin embargo, es razonable pensar que existirán combinaciones de vectores con las que podamos tomar un valor de $Z$ menor. De hecho, buscar una descomposición que minimice el valor de $Z$ es un problema de optimización complejo.
 
-	Esto motivará la siguiente definición.
+	Esto motiva la siguiente definición.
 \end{observacion}
 
 \begin{definicion}[Rango \textit{CP}]
-	Dado un tensor $\mathcal{A}$, se define su rango \textit{CP} como el mínimo valor de $Z$ para el cual la ecuación \eqref{eq:cp_decomp} se mantiene
+	Dado un tensor $\mathcal{A}$, se define su rango \textit{CP} como el mínimo valor de $Z$ para el cual la ecuación \eqref{eq:cp_decomp} se mantiene.
 
 \end{definicion}
 
-Una propiedad interesante es la siguiente:
+Para tensores de orden dos el cálculo del rango \textit{CP} es claro:
 
-\begin{proposicion}[]
-	Para un tensor de orden dos, que podemos ver como una matriz, su rango \textit{CP} coincide con el rango matricial usual
+\begin{proposicion}
+	Para un tensor de orden dos, que podemos ver como una matriz, su rango \textit{CP} coincide con el rango matricial usual.
 \end{proposicion}
 
 \subsection{Aplicando la descomposición a la función de puntuación}
@@ -227,29 +224,30 @@ Una propiedad interesante es la siguiente:
 Nuestra tarea ahora es aplicar la descomposición \textit{CP} que acabamos de introducir en \eqref{eq:puntuacion_general}, para expresar el tensor de coeficientes $\mathcal{A}^y$. Usaremos una descomposición conjunta, de la siguiente forma:
 
 \begin{equation} \label{eq:cp_decomp_conjunta}
-	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}}
+	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \; \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}}
 \end{equation}
 
-Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por \eqref{eq:cp_decomp} que $a_z^y \in \R$, y por tanto, podemos expresar $\nv{a^y} := (a_1^y, \ldots, a_Z^y) \in \R^Z$. En segundo lugar, y de nuevo, conforme a \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien refleja los índices de la fórmula.
+Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por la ecuación \eqref{eq:cp_decomp} que $a_z^y \in \R$, y por tanto, podemos escribir $\nv{a^y} := (a_1^y, \ldots, a_Z^y) \in \R^Z$. En segundo lugar, y de nuevo, conforme a la ecuación \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien refleja los índices de la fórmula. Veamos que esta descomposición conjunta es universal:
 
-Veamos que esta descomposición conjunta es universal:
-
-\begin{proposicion}
-	Tomando $Z = M^N$ en la ecuación \refeq{eq:cp_decomp_conjunta}, la descomposición es universal. Esto es, podemos fijar un conjunto de vectores $\{\nv{\omega^{z, i}} \in \R^M / z \in \deltaset{Z}, i \in \deltaset{N} \}$ de forma que cualquier tensor $\mathcal{A}^y$ de orden $N$ y dimensión $M$ en cada modo puede ser representado. Es decir:
+\begin{proposicion}[Universalidad de la descomposición \textit{CP} conjunta]
+	Tomando $Z = M^N$ en la ecuación \eqref{eq:cp_decomp_conjunta}, la descomposición es universal. Esto es, podemos fijar un conjunto de vectores $\conjunto{\nv{\omega^{z, i}} \in \R^M: \; z \in \deltaset{Z}, \; i \in \deltaset{N}}$ de forma que cualquier tensor $\mathcal{A}^y$ de orden $N$ y dimensión $M$ en cada modo puede ser representado. Es decir:
 
 	\begin{equation}
-		\forall \mathcal{A}^y \in \espaciotensores{N}{M}, \; \exists \nv{a^y} \in \R^Z: \text{la ecuación \refeq{eq:cp_decomp_conjunta} se verifica}
+		\forall \mathcal{A}^y \in \espaciotensores{N}{M}, \; \exists \nv{a^y} \in \R^Z \;\; \text{de modo que la ecuación \eqref{eq:cp_decomp_conjunta} se verifica}
 	\end{equation}
 \end{proposicion}
 
 \begin{proof}
 
-	Esta demostración es prácticamente la misma que \customref{proof:demostracion_cp_es_universal}. Ahora tenemos que $M_1 = M_2 = \ldots = M_N = M$ y nuestro conjunto de vectores es:
+	Esta demostración es prácticamente la misma que la usada en \propref{proposicion:descomposicion_cp}. Ahora tenemos que $M_1 = M_2 = \ldots = M_N = M$ y nuestro conjunto de vectores es:
 
 	\begin{equation} \label{eq:cp_decomp_asignacion_vectores}
 		\{\nv{\omega^{z, i}} \in \R^M : \; z \in \deltaset{Z}, i \in \deltaset{N} \} =
 		\{ \nv{\delta_{i_j, N}} : \; j \in \deltaset{N}, i_j \in \deltaset{M} \}
 	\end{equation}
+
+    Teniendo esto en cuenta, desarrollamos la prueba
+    % TODO -- seguir por aqui
 
 \end{proof}
 
