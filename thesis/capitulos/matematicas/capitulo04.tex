@@ -311,13 +311,11 @@ Con esto ya podemos realizar la sustitución:
 
 \begin{equation}
 	\begin{split}
-		h_y(\nv{x_1}, \ldots, \nv{x_N}) &= \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{d_1, \ldots, d_N = 1}^{M} (\sum_{z = 1}^Z a_z^y \cdot \nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{d_1, \ldots, d_N = 1}^{M} \; \sum_{z = 1}^Z a_z^y \cdot (\nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{z = 1}^Z a_z^y \sum_{d_1, \ldots, d_N = 1}^{M}  (\nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{z = 1}^Z a_z^y \sum_{d_1, \ldots, d_N = 1}^{M} \; \prod_{i = 1}^N (\nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N}  \; f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{z = 1}^Z a_z^y \; \prod_{i = 1}^N \; \sum_{d_1, \ldots, d_N = 1}^{M}  (\nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; f_{\theta_{d_i}}(\nv{x_i}) \encima{=}{\text{(*)}} \ldots \\
-		\ldots &\encima{=}{\text{(*)}} \sum_{z = 1}^Z a_z^y \; \prod_{i = 1}^N \; \sum_{d = 1}^{M} \omega_d^{z,i}  \cdot f_{\theta_{d}}(\nv{x_i})
+        &h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) = \sum_{d_1, \ldots, d_N = 1}^{M} (\sum_{z = 1}^Z a_z^y \cdot \nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) \\
+        &= \sum_{d_1, \ldots, d_N = 1}^{M} \; \sum_{z = 1}^Z a_z^y \cdot (\nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) \\
+        &= \sum_{z = 1}^Z a_z^y \sum_{d_1, \ldots, d_N = 1}^{M}  (\nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}) \\
+        &= \sum_{z = 1}^Z a_z^y \sum_{d_1, \ldots, d_N = 1}^{M} \; \prod_{i = 1}^N (\nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N}  \; f_{\theta_{d_i}}(\nv{x_i}) \\
+        &= \sum_{z = 1}^Z a_z^y \; \prod_{i = 1}^N \; \sum_{d_1, \ldots, d_N = 1}^{M}  (\nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; f_{\theta_{d_i}}(\nv{x_i}) \encima{=}{\text{(*)}} \sum_{z = 1}^Z a_z^y \; \prod_{i = 1}^N \; \sum_{d = 1}^{M} \omega_d^{z,i}  \cdot f_{\theta_{d}}(\nv{x_i})
 	\end{split}
 \end{equation}
 
@@ -325,18 +323,18 @@ Donde en (*) estamos usando que, fijado $i \in \deltaset{N}$:
 
 \begin{equation}
 	\begin{split}
-		&\sum_{d_1, \ldots, d_N = 1}^{M}  (\nv{\omega^{z, 1}} \otimes \ldots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N}  f_{\theta_{d_i}}(\nv{x_i}) = \sum_{d_1, \ldots, d_N = 1}^{M} \omega^{z, 1}_{d_1} \cdot \ldots \cdot \omega^{z, N}_{d_N} \cdot f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{d_i = 1}^M \dspace \sum_{d_1, \ldots, d_{i -1}, d_{i+1}, \ldots, d_N}^M \omega^{z, 1}_{d_1} \cdot \ldots \cdot \omega^{z, N}_{d_N} \cdot f_{\theta_{d_i}}(\nv{x_i}) = \ldots \\
-		\ldots &= \sum_{d_i = 1}^M \omega_{d_i}^{z, i} \cdot f_{d_i}(\nv{x_i}) \dspace \sum_{d_1, \ldots, d_{i -1}, d_{i+1}, \ldots, d_N}^M \omega^{z, 1}_{d_1} \cdot \ldots \cdot \omega^{z, i-1}_{d_{i-1}} \cdot \omega^{z, i+1}_{d_{i+1}} \cdot \ldots \cdot \omega^{z, N}_{d_N}= \ldots \\
-		\ldots &= \sum_{d = 1}^{M} \omega_d^{z,i}  \cdot f_{\theta_{d}}(\nv{x_i})
+		&\sum_{d_1, \ldots, d_N = 1}^{M}  (\nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}})_{d_1, \ldots, d_N} \; f_{\theta_{d_i}}(\nv{x_i}) = \sum_{d_1, \ldots, d_N = 1}^{M} \omega^{z, 1}_{d_1} \cdots \omega^{z, N}_{d_N} \; f_{\theta_{d_i}}(\nv{x_i}) \\
+		&= \sum_{d_i = 1}^M \dspace \sum_{d_1, \ldots, d_{i -1}, d_{i+1}, \ldots, d_N}^M \omega^{z, 1}_{d_1} \cdots \omega^{z, N}_{d_N} \; f_{\theta_{d_i}}(\nv{x_i}) \\
+		&= \sum_{d_i = 1}^M \omega_{d_i}^{z, i} \; f_{d_i}(\nv{x_i}) \dspace \sum_{d_1, \ldots, d_{i -1}, d_{i+1}, \ldots, d_N}^M \omega^{z, 1}_{d_1} \cdots \omega^{z, i-1}_{d_{i-1}} \; \omega^{z, i+1}_{d_{i+1}} \cdots \omega^{z, N}_{d_N} = \sum_{d = 1}^{M} \omega_d^{z,i}  \; f_{\theta_{d}}(\nv{x_i})
 	\end{split}
 \end{equation}
-\todo{\textbf{Para Javier}: estoy trabajando en probar el último paso pero no veo por donde sacarlo}
+\todo{No he probado el último paso}
+\todo{Javier: la notación despista una barbaridad (pg 64 de la corrección, consultarlo)}
 
 Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
 
 \begin{equation} \label{eq:cp_model}
-	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})
+	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \; f_{\theta_{d}}(\nv{x_i}).
 \end{equation}
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
