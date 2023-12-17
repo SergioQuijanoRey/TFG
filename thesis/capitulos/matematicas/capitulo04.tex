@@ -338,20 +338,21 @@ Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
 \end{equation}
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
+% TODO -- seguir por aqui
 
-Veamos cómo esta modelización se relaciona con una arquitectura usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en \customref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores
+Veamos cómo esta modelización se relaciona con una arquitectura usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en la \sectionref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores
 
 \begin{equation}
-	\{f_{\theta_d}(\nv{x_i}) : \; d \in \deltaset{M}, \; i \in \deltaset{N} \}
+    \conjunto{f_{\theta_d}(\nv{x_i}) : \; d \in \deltaset{M}, \; i \in \deltaset{N}}.
 \end{equation}
 
-Una vez hecho esto, en \eqref{eq:cp_model} podemos ver $\; \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $M$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
+Una vez hecho esto, en la ecuación \eqref{eq:cp_model} podemos ver $\; \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $M$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
 
 \begin{equation}
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i)
 \end{equation}
 
-Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en \customref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales.
+Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en la \sectionref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales.
 
 Escrito así, también es claro que el productorio está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps} por cada valor de $z$. Diremos que es un \textit{pooling} producto de tipo \textbf{global}, porque toma los $N$ \textit{feature maps} de una posición y nos devuelve un único escalar. Por tanto, tras hacer el \textit{pooling} de los $Z$ grupos de $M$ \textit{feature maps}, acabamos con $Z$ valores escalares.
 
