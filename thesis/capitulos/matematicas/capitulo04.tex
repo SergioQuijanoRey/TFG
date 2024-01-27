@@ -384,15 +384,14 @@ En resumen, tras computar la capa de representación, nuestro modelo tiene una c
 \end{figure}
 
 \subsection{Compartición de coeficientes} \label{subs:comparticion_parametros_cp}
-% TODO -- seguir por aqui
 
 Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
 
-La compartición de coeficientes es necesaria para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de esta.
+La compartición de coeficientes es necesaria para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de ésta.
 
 En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de los vectores $\nv{\omega^{z,i}} := (\omega^{z, i}_1, \ldots, \omega^{z, i}_M)$.
 
-Por tanto, para forzar el deseado \textit{coefficient sharing} basta con imponer en \eqref{eq:cp_decomp_conjunta}:
+Por tanto, para forzar la deseada compartición de coeficientes, basta con imponer en \eqref{eq:cp_decomp_conjunta}:
 
 \begin{equation}
 	\nv{\omega^{z, 1}} = \ldots = \nv{\omega^{z, N}} =: \nv{\omega^z}
@@ -401,12 +400,13 @@ Por tanto, para forzar el deseado \textit{coefficient sharing} basta con imponer
 Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP} simétrica, es decir:
 
 \begin{equation}
-	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \ldots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M
+	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \ldots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M.
 \end{equation}
 
-Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos.
+Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos. En la práctica usaremos compartición de coeficientes. En el modelo profundo que vamos a introducir más tarde se presenta la misma situación, debemos imponer la compartición de coeficientes que hace que el modelo pierda universalidad. Sin embargo, cuando veamos los resultados, veremos que el modelo profundo restringido es más potente que este modelo no profundo sin restringir.
 
 \subsection{Número de parámetros del modelo} \label{msubsec:parametros_modelo_cp}
+% TODO -- seguir por aqui
 
 A partir de la ecuación \eqref{eq:cp_model} vemos que para definir nuestro modelo debemos definir los siguientes parámetros:
 
