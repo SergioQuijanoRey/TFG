@@ -417,17 +417,12 @@ A partir de la ecuación \eqref{eq:cp_model} vemos que para definir nuestro mode
 Es decir, que en total nuestro modelo viene dado al especificar $N \cdot M \cdot Z + Y \cdot Z$ coeficientes reales. Usaremos este número de coeficientes para estudiar los tamaños de las redes profundas y no profundas que vamos a comparar.
 
 \section{Modelo HT} \label{sec:modelo_ht}
-% TODO -- seguir por aqui
 
-En esta sección pasamos a presentar el segundo y último modelo con el que trabajaremos. A diferencia del modelo anterior, esta vez terminaremos con una arquitectura que puede considerarse como profunda.
-
-De nuevo, la idea es introducir una descomposición tensorial que usamos en \eqref{eq:puntuacion_general} para expresar el tensor de coeficientes $\mathcal{A}^y$. Usaremos la descomposición \textit{HT}.
+En esta sección pasamos a presentar el segundo y último modelo con el que trabajaremos. A diferencia del modelo anterior, esta vez terminaremos con una arquitectura que puede considerarse como profunda. De nuevo, la idea es introducir una descomposición tensorial que usamos en \eqref{eq:puntuacion_general} para expresar el tensor de coeficientes $\mathcal{A}^y$. Usaremos la descomposición \textit{HT}.
 
 \subsection{Descomposición \textit{HT}} \label{subs:descomposicion_ht}
 
-Introducimos ahora la \textbf{descomposición jerárquica de \textit{Tucker}}, o como se la conoce por sus siglas en inglés, \textbf{descomposición \textit{HT}} \cite{matematicas:descomposicion_ht} \cite{matematicas:principal}.
-
-Descomponemos el tensor de coeficientes $\mathcal{A}^y$ recursivamente, de la siguiente forma:
+Introducimos ahora la \textbf{descomposición jerárquica de \textit{Tucker}}, o como se la conoce por sus siglas en inglés, \textbf{descomposición \textit{HT}} \cite{matematicas:descomposicion_ht} \cite{matematicas:principal}. Descomponemos el tensor de coeficientes $\mathcal{A}^y$ recursivamente, de la siguiente forma:
 
 \begin{equation} \label{eq:descomposicion_ht}
 	\begin{split}
@@ -440,13 +435,13 @@ Descomponemos el tensor de coeficientes $\mathcal{A}^y$ recursivamente, de la si
 	\end{split}
 \end{equation}
 
-Estudiemos detenidamente la ecuación \eqref{eq:descomposicion_ht}. Para facilitar el entendimiento al lector, hay que tener en cuenta que:
+Estudiemos detenidamente las ecuaciones \eqref{eq:descomposicion_ht}. Para facilitar el entendimiento al lector, hay que tener en cuenta que:
 
 \begin{itemize}
-	\item El superíndice $l$ indica en que nivel de la descomposición nos encontramos. Consideraremos que en total tenemos $L$ capas
-	\item El superíndice $j$ indica la posición en la que nos encontramos dentro del nivel $l$
-	\item El superíndice $\gamma$ indica con qué tensor de la capa $l$ y posición $j$ estamos trabajando. Es decir, dados un nivel y una posición, podemos tener más de un tensor
-	\item Los valores $r_l$, que llamaremos \textbf{rango de nivel $l$}, marcan el número de tensores que hay en cada posición $j$ de la capa $l$. Considerando que en la primera ecuación no trabajamos con tensores sino con vectores
+	\item El superíndice $l$ indica en qué nivel de la descomposición nos encontramos. Consideraremos que en total tenemos $L$ capas.
+	\item El superíndice $j$ indica la posición en la que nos encontramos dentro del nivel $l$.
+	\item El superíndice $\gamma$ indica con qué tensor de la capa $l$ y posición $j$ estamos trabajando. Es decir, dados un nivel y una posición, podemos tener más de un tensor.
+	\item Los valores $r_l$, que llamaremos \textbf{rango de nivel $l$}, marcan el número de tensores que hay en cada posición $j$ de la capa $l$. Considerando que en la primera ecuación no trabajamos con tensores sino con vectores.
 \end{itemize}
 
 Una vez introducido el significado de los índices de la descomposición, estudiemos dicha descomposición. En primer lugar, estamos construyendo el tensor de coeficientes $\mathcal{A}^y$ de forma claramente recursiva. Empezamos construyendo los tensores $\phi^{1, j, \gamma}$ a partir de unos vectores iniciales $\{\nv{\varphi^{j, \alpha}} \in \R^M: \; j \in \deltaset{N}, \alpha \in \deltaset{r_0}  \}$  y unos coeficientes reales $\{a_{\alpha}^{1, j, \gamma}: \; \alpha \in \deltaset{r_0}\}$. Los tensores del nivel $l$ se construyen en función de los tensores del nivel $l-1$.
@@ -457,9 +452,7 @@ A partir de las fórmulas es claro ver que los tensores de una capa tienen un or
 	\phi^{l, j, \gamma} = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
 \end{equation}
 
-estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$, para obtener el tensor $\phi^{l, j, \gamma}$ de orden $2^l$.
-
-Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta asunción también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
+estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$, para obtener el tensor $\phi^{l, j, \gamma}$ de orden $2^l$. Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta asunción también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
 
 Cabe destacar también que estamos considerando solo productos tensoriales de dos elementos. Además, estamos combinando únicamente tensores contiguos de cada capa.
 
@@ -494,14 +487,16 @@ Veamos ahora este mismo diagrama, pero suponiendo que $r = 2$. Por tanto, en cad
 La siguiente proposición nos muestra la relación de este modelo con el modelo \textit{CP}:
 
 \begin{proposicion}
-	La descomposición \textit{HT} es universal. Es más, extiende la descomposición \textit{CP}. Esto es, cualquier tensor que pueda expresarse como la descomposición \textit{CP} con rango \textit{CP} $Z$, admite una descomposición \textit{HT} con rangos $r_1 = r_2 = \ldots = r_{L - 1} = Z$
+	La descomposición \textit{HT} es universal. Es más, extiende la descomposición \textit{CP}. Esto es, cualquier tensor que pueda expresarse como la descomposición \textit{CP} con rango \textit{CP} $Z$, admite una descomposición \textit{HT} con rangos $r_1 = r_2 = \ldots = r_{L - 1} = Z$.
 \end{proposicion}
 
 \begin{proof}
 	\todo{En la página 8 del paper se da una indicación de cómo se hace esto}
+    \todo{JMeri me dice que escriba la demostración}
 \end{proof}
 
 \subsection{Número de parámetros del modelo} \label{msubs:parametros_modelo_ht}
+% TODO -- seguir por aquí
 
 Nuestro modelo viene dado por los siguientes parámetros:
 
