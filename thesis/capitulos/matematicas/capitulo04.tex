@@ -338,9 +338,9 @@ Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
 \end{equation}
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
-% TODO -- seguir por aqui
 
-Veamos cómo esta modelización se relaciona con una arquitectura usual de \textit{machine learning}. En primer lugar, y como ya hemos comentado en la \sectionref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores
+Veamos cómo esta modelización se relaciona con una arquitectura usual de \textit{machine learning}, usando los elementos básicos que hemos introducido en la \sectionref{sec:piezas_machine_learning_matematicas}. Para comenzar, y como ya hemos comentado en la \sectionref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores
+\todo{Tenemos que escribir esta sección de definiciones de machine learning matemáticas, porque no he definido lo que es pooling, feature maps, \ldots}
 
 \begin{equation}
     \conjunto{f_{\theta_d}(\nv{x_i}) : \; d \in \deltaset{M}, \; i \in \deltaset{N}}.
@@ -349,26 +349,20 @@ Veamos cómo esta modelización se relaciona con una arquitectura usual de \text
 Una vez hecho esto, en la ecuación \eqref{eq:cp_model} podemos ver $\; \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $M$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
 
 \begin{equation}
-	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i)
+	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i).
 \end{equation}
 
-Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en la \sectionref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales.
-
-Escrito así, también es claro que el productorio está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps} por cada valor de $z$. Diremos que es un \textit{pooling} producto de tipo \textbf{global}, porque toma los $N$ \textit{feature maps} de una posición y nos devuelve un único escalar. Por tanto, tras hacer el \textit{pooling} de los $Z$ grupos de $M$ \textit{feature maps}, acabamos con $Z$ valores escalares.
-
-De nuevo, re-escribimos la ecuación:
+Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en la \sectionref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} o mapas de activación para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales. También es claro que el producto está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps} por cada valor de $z$. De hecho, sabemos que el \textit{pooling} es de tipo \textbf{producto global}, porque toma los $N$ \textit{feature maps} de una posición y nos devuelve un único escalar. Por tanto, tras hacer el \textit{pooling} de los $Z$ grupos de $M$ \textit{feature maps}, acabamos con $Z$ valores escalares. De nuevo, re-escribimos la ecuación:
 
 \begin{equation}
-	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace ProdPooling( Conv(i) )
+	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace ProdPooling( Conv(i) ).
 \end{equation}
 
-Y con esto, vemos que la sumatoria final está combinando los $Z$ escalares producidos por la convolución seguida del \textit{pooling} de forma lineal. Esto es, una \textit{linear dense layer} sobre dichos $Z$ escalares.
+Y con esto, vemos que la sumatoria final está combinando los $Z$ escalares producidos por la convolución seguida del \textit{pooling} de forma lineal, es decir, una \textit{linear dense layer} sobre dichos $Z$ escalares.
 
-En resumen, tras computar la capa de representación, nuestro modelo tiene una capa oculta convolucional con $M$ canales, tras la que aplicamos \textit{pooling} global en cada canal, produciendo $M$ escalares que combinamos en una capa lineal densa. Y por tanto, es razonable considerar este modelo con lo que se conoce comúnmente como una \textbf{red \textit{shallow}}.
+En resumen, tras computar la capa de representación, nuestro modelo tiene una capa oculta convolucional con $M$ canales, tras la que aplicamos \textit{pooling} global en cada canal, produciendo $M$ escalares que combinamos en una capa lineal densa. Y por tanto, es razonable considerar este modelo como lo que se conoce comúnmente como una \textbf{red somera} o \textbf{red no profunda}. Podemos representar este modelo gráficamente como mostramos en la \imgref{diag:model_cp_visualizacion}.
 
-Podemos representar este modelo gráficamente como sigue:
-
-\begin{figure}[h]
+\begin{figure}[!hbtp]
 	\centering
 	\begin{tikzpicture}[
 			squarenode/.style={rectangle, draw=cyan!60, fill=cyan!5, very thick, minimum size=5mm, align=center},
@@ -382,13 +376,15 @@ Podemos representar este modelo gráficamente como sigue:
 		\draw[-stealth] (entrada.east) -- node[text width=2.0cm,midway,above,align=center]{$f_d$} (repr.west);
 		\draw[-stealth] (repr.south) -- node[text width=2.0cm,midway,right,align=center]{Convoluciones $\sum_{d = 1}^{M} \omega^{z, i}_d \cdot $} (convoluciones.north);
 		\draw[-stealth] (convoluciones.west) -- node[text width=2.0cm,midway,above,align=center]{Pooling $\prod_{i = 1}^N$} (pooling.east);
-		\draw[-stealth] (pooling.south) -- node[text width=2.0cm,midway,right,align=center]{Dense layer $\sum_{z = 1}^Z a_z^y$} (denselayer.north);
+		\draw[-stealth] (pooling.south) -- node[text width=2.0cm,midway,right,align=center]{Capa densa $\sum_{z = 1}^Z a_z^y$} (denselayer.north);
 
 	\end{tikzpicture}
 	\caption{Representación gráfica del modelo \textit{CP}}
+    \label{diag:model_cp_visualizacion}
 \end{figure}
 
 \subsection{Compartición de coeficientes} \label{subs:comparticion_parametros_cp}
+% TODO -- seguir por aqui
 
 Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
 
