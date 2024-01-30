@@ -540,39 +540,11 @@ coeficientes. Si asumimos que todos los rangos son iguales, $r := r_0 = \ldots =
 	\end{split}
 \end{equation}
 
-donde hemos usado que:
+donde hemos usado que
 
 \begin{equation}
-	\sum_{l = 1}^{L-1} \frac{1}{2^l} = \frac{2^{L-1} - 1}{2^{L-1}}
+	\sum_{l = 1}^{L-1} \frac{1}{2^l} = \frac{2^{L-1} - 1}{2^{L-1}}.
 \end{equation}
-
-Podemos comprobar esto fácilmente:
-
-\begin{proposicion}
-	\begin{equation}
-		\sum_{k = 1}^{N} \frac{1}{2^k} = \frac{2^N - 1}{2^N}; \dspace \forall N \in \N
-	\end{equation}
-\end{proposicion}
-
-% Tengo hecha esta demostracion de forma directa en la pagina 49 de mis notas
-\begin{proof}
-	Procederemos por inducción. Veamos que la ecuación se verifica para $N = 1$:
-
-	\begin{equation}
-		\sum_{k = 1}^{1} \frac{1}{2^k} = \frac{1}{2} = \frac{2^1 - 1}{2^1}
-	\end{equation}
-
-	Supuesto que la ecuación se cumple para $N$, veamos si la ecuación se cumple para $N + 1$:
-
-	\begin{equation}
-		\begin{split}
-			\sum_{k = 1}^{N+1} \frac{1}{2^k} &= \sum_{k = 1}^{N} (\frac{1}{2^k}) + \frac{1}{2^{N+1}} \encima{=}{\text{hip. ind.}} \ldots \\
-			\ldots &= \frac{2^N - 1}{2^N} + \frac{1}{2^{N+1}} = \ldots \\
-			\ldots &= \frac{2^{N+1} - 2 + 1}{2^{N+1}} = \ldots \\
-			\ldots &= \frac{2^{N+1} - 1}{2^{N+1}}
-		\end{split}
-	\end{equation}
-\end{proof}
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
 
