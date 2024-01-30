@@ -565,9 +565,7 @@ Así pues, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} 
 \subsection{Coeficientes compartidos}
 % TODO -- seguir por aqui
 
-Al igual que ocurría en el modelo \textit{CP} \customref{subs:comparticion_parametros_cp}, nuestras convoluciones $1 \times 1$ son dependientes de la localización. En la práctica, en los modelos convolucionales los coeficientes de las convoluciones son independientes de la localización, lo que se conoce como \textbf{coeficientes compartidos}.
-
-En el modelo \textit{HT} es muy fácil imponer los coeficientes compartidos, teniendo en cuenta los comentarios que hemos hecho en \customref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
+Al igual que ocurría en el modelo \textit{CP}, nuestras convoluciones $1 \times 1$ son dependientes de la localización, así que siguiendo la idea planteada en \sectionref{subs:comparticion_parametros_cp}, buscamos introducir ciertas restricciones en el modelo para imponer los coeficientes compartidos. En este modelo es muy fácil encontrar la restricción deseada, teniendo en cuenta los comentarios que hemos hecho en la \sectionref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
 
 \begin{equation}
 	\phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
@@ -576,18 +574,18 @@ En el modelo \textit{HT} es muy fácil imponer los coeficientes compartidos, ten
 En $\phi^{l, j, \gamma}$:
 
 \begin{itemize}
-	\item $l$ indica la capa en la que nos encontramos
-	\item $j$ indica la posición del tensor en la capa $l$
-	\item $\gamma$ indica con qué tensor trabajamos en la posición $j$, porque podemos tener más de un tensor en cada posición (cuando $r_l > 1$)
+	\item $l$ indica la capa en la que nos encontramos.
+	\item $j$ indica la posición del tensor en la capa $l$.
+	\item $\gamma$ indica con qué tensor trabajamos en la posición $j$, porque podemos tener más de un tensor en cada posición (cuando $r_l > 1$).
 \end{itemize}
 
 Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \ldots, a^{l, j, \gamma}_{r_{l-1}})$ no deberían depender de la posición $j$. Con esto, para imponer los coeficientes compartidos, basta con hacer:
 
 \begin{equation}
-	\nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \ldots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}
+	\nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \cdots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}
 \end{equation}
 
-Como ocurría en \customref{subs:comparticion_parametros_cp}, esta imposición provoca que nuestro modelo pierda la universalidad. Esto es, nuestro modelo no puede representar cualquier tensor, independientemente de los valores de $L$ o $r_l$. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
+Como ocurría en la \sectionref{subs:comparticion_parametros_cp}, esta imposición provoca que nuestro modelo pierda la universalidad. Esto es, nuestro modelo no puede representar cualquier tensor, independientemente de los valores de $L$ o $r_l$. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
 
 \section{Comparativa del número de coeficientes de cada modelo}
 
