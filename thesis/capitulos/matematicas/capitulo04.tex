@@ -548,17 +548,13 @@ donde hemos usado que
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
 
-El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en nuestra función de puntuación \eqref{eq:puntuacion_general}. En esta sección, describiremos este modelo producido.
+El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en nuestra función de puntuación \eqref{eq:puntuacion_general}. En esta sección, estudiaremos el modelo producido y cómo se relaciona con los modelos usuales de aprendizaje automático, en base a los elementos básicos que hemos introducido en la \sectionref{sec:piezas_machine_learning_matematicas}.
 
 Como en el modelo \textit{CP}, el primer paso consiste en computar la capa de representación, $\{f_d(\nv{x_i}): d \in \deltaset{N}, \; i \in \deltaset{M}\}$. Esto genera $N \cdot M$ números reales, que serán transformados en las $L$ capas ocultas que producen la salida \eqref{eq:descomposicion_ht}.
 
-Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{product pooling} con tamaño de ventana 2. En el modelo \textit{CP}, el \textit{product pooling} era global, colapsando las \textit{feature maps} a un único valor escalar. En este \textit{product pooling} reducimos el número de \textit{feature maps} a la mitad en cada paso.
+Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{product pooling} con tamaño de ventana 2 sin superposición.  Esto es debido al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican los ejemplos de la \imgref{img:diagrama_ht_simple} y la \imgref{img:diagrama_ht_complejo}, reduciendo el número de \textit{feature maps} a la mitad en cada paso. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{product pooling} y, por tanto, distintas profundidades. Nótese que en el modelo \textit{CP}, el \textit{product pooling} era global, colapsando las \textit{feature maps} a un único valor escalar.
 
-Por lo tanto, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} iniciales acaban siendo una única \textit{feature map}. Y con esto, acabamos con una lista de $r_{L - 1}$ coeficientes sobre los que aplicamos una última capa oculta, dada por la última ecuación de \eqref{eq:descomposicion_ht}.
-
-Nuestra red realiza \textit{product pooling} con un tamaño de ventana 2, sin \textit{overlapping} gracias al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican los ejemplos \customref{img:diagrama_ht_simple} y \customref{img:diagrama_ht_complejo}. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{product pooling} y, por tanto, distintas profundidades.
-
-En resumen, el funcionamiento de este modelo se puede observar en el siguiente diagrama:
+Así pues, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} iniciales acaban siendo una única \textit{feature map}. Y con esto, acabamos con una lista de $r_{L - 1}$ coeficientes sobre los que aplicamos una última capa oculta, dada por la última ecuación de \eqref{eq:descomposicion_ht}. En resumen, el funcionamiento de este modelo se puede observar en el siguiente diagrama:
 
 \begin{figure}[H]
 	\centering
