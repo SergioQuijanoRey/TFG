@@ -8,7 +8,7 @@ El teorema principal del trabajo es el siguiente:
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_introduccion}
 
-Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos la compartición de coeficientes en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 
 \end{teorema}
 
@@ -24,7 +24,7 @@ A partir de este teorema, obtenemos el corolario, que es el segundo resultado pr
         \conjunto{f_{\theta_d}: \; d \in \deltaset{M}}
     \end{equation}
 
-     aleatorizar los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando la compartición de coeficientes en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
+     aleatorizar los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando los coeficientes compartidos en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
 
 \end{corolario}
 
@@ -405,11 +405,11 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos su enunciado y pasamos a ver la prueba:
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
-    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos la compartición de coeficientes en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 \end{teorema}
 
 \begin{proof}
-    \textbf{Caso 1: sin compartición de coeficientes}
+    \textbf{Caso 1: sin coeficientes compartidos}
 
     Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$.
     \todo{En la página 7 del \textit{paper} dicen que por completitud, $r_L = Y$}
@@ -503,7 +503,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 
     Esto concluye la prueba para el caso no compartido
 
-    \textbf{Caso 2: Compartición de coeficientes}
+    \textbf{Caso 2: Coeficientes compartidos}
 
     Es totalmente análogo al caso 1. En la inducción, en el paso $l = 1$, usamos la versión del lema \customref{lema:primer_lema} en la que $A(\nv{x}) = B(\nv{x})$
 \end{proof}

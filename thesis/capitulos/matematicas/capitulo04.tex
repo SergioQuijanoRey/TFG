@@ -383,15 +383,15 @@ En resumen, tras computar la capa de representación, nuestro modelo tiene una c
     \label{diag:model_cp_visualizacion}
 \end{figure}
 
-\subsection{Compartición de coeficientes} \label{subs:comparticion_parametros_cp}
+\subsection{Coeficientes compartidos} \label{subs:comparticion_parametros_cp}
 
-Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
+Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{coeficientes compartidos}.
 
-La compartición de coeficientes es necesaria para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de ésta.
+Los coeficientes compartidos son necesarios para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de ésta.
 
 En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de los vectores $\nv{\omega^{z,i}} := (\omega^{z, i}_1, \ldots, \omega^{z, i}_M)$.
 
-Por tanto, para forzar la deseada compartición de coeficientes, basta con imponer en \eqref{eq:cp_decomp_conjunta}:
+Por tanto, para forzar que los coeficientes sean compartidos, basta con imponer en \eqref{eq:cp_decomp_conjunta}:
 
 \begin{equation}
 	\nv{\omega^{z, 1}} = \ldots = \nv{\omega^{z, N}} =: \nv{\omega^z}
@@ -403,7 +403,7 @@ Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP}
 	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \ldots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M.
 \end{equation}
 
-Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos. En la práctica usaremos compartición de coeficientes. En el modelo profundo que vamos a introducir más tarde se presenta la misma situación, debemos imponer la compartición de coeficientes que hace que el modelo pierda universalidad. Sin embargo, cuando veamos los resultados, veremos que el modelo profundo restringido es más potente que este modelo no profundo sin restringir.
+Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos. En la práctica usaremos coeficientes compartidos. En el modelo profundo que vamos a introducir más tarde se presenta la misma situación, debemos imponer los coeficientes compartidos, lo que hace que el modelo pierda universalidad. Sin embargo, cuando veamos los resultados, veremos que el modelo profundo restringido es más potente que este modelo no profundo sin restringir.
 
 \subsection{Número de parámetros del modelo} \label{msubsec:parametros_modelo_cp}
 
@@ -496,7 +496,6 @@ La siguiente proposición nos muestra la relación de este modelo con el modelo 
 \end{proof}
 
 \subsection{Número de parámetros del modelo} \label{msubs:parametros_modelo_ht}
-% TODO -- seguir por aquí
 
 Nuestro modelo viene dado por los siguientes parámetros:
 
@@ -563,11 +562,12 @@ Así pues, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} 
 \end{figure}
 \todo{Sustituir este modelo por un diagrama realizado por mi}
 
-\subsection{Compartición de coeficientes}
+\subsection{Coeficientes compartidos}
+% TODO -- seguir por aqui
 
-Al igual que ocurría en el modelo \textit{CP} \customref{subs:comparticion_parametros_cp}, nuestras convoluciones $1 \times 1$ son dependientes de la localización. En la práctica, en los modelos convolucionales los coeficientes de las convoluciones son independientes de la localización, lo que se conoce como \textbf{compartición de coeficientes}.
+Al igual que ocurría en el modelo \textit{CP} \customref{subs:comparticion_parametros_cp}, nuestras convoluciones $1 \times 1$ son dependientes de la localización. En la práctica, en los modelos convolucionales los coeficientes de las convoluciones son independientes de la localización, lo que se conoce como \textbf{coeficientes compartidos}.
 
-En el modelo \textit{HT} es muy fácil imponer la compartición de coeficientes, teniendo en cuenta los comentarios que hemos hecho en \customref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
+En el modelo \textit{HT} es muy fácil imponer los coeficientes compartidos, teniendo en cuenta los comentarios que hemos hecho en \customref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
 
 \begin{equation}
 	\phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
@@ -581,7 +581,7 @@ En $\phi^{l, j, \gamma}$:
 	\item $\gamma$ indica con qué tensor trabajamos en la posición $j$, porque podemos tener más de un tensor en cada posición (cuando $r_l > 1$)
 \end{itemize}
 
-Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \ldots, a^{l, j, \gamma}_{r_{l-1}})$ no deberían depender de la posición $j$. Con esto, para imponer la compartición de coeficientes basta con hacer:
+Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \ldots, a^{l, j, \gamma}_{r_{l-1}})$ no deberían depender de la posición $j$. Con esto, para imponer los coeficientes compartidos, basta con hacer:
 
 \begin{equation}
 	\nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \ldots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}
@@ -611,6 +611,6 @@ que no tenemos en cuenta:
 	\item ¿Existen funciones implementables por un modelo \textit{HT} que no lo sean por un modelo \textit{CP}?
 \end{itemize}
 
-Respecto a la segunda pregunta, ya sabemos que en el caso de imponer compartición de coeficientes, el modelo \textit{HT} puede representar ciertos $\mathcal{A}^y$ no simétricos que el modelo \textit{CP} será incapaz de representar.
+Respecto a la segunda pregunta, ya sabemos que en el caso de imponer coeficientes compartidos, el modelo \textit{HT} puede representar ciertos $\mathcal{A}^y$ no simétricos que el modelo \textit{CP} será incapaz de representar.
 
 Responderemos a la primera pregunta con los dos resultados principales del trabajo. Pero en resumen, sí podremos representar el resultado de un modelo \textit{HT} con un modelo \textit{CP}, pero la penalización será exponencial.
