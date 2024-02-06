@@ -285,13 +285,11 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
 
 Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
-% TODO -- seguir por aqui
-
 \begin{lema}[Segundo lema fundamental] \label{lema:segundo_lema}
     Sean $p$ funciones continuas de $\R^d$ a $\espaciomatrices{M}{N}$, que llevan un punto $\nv{y} \in \R^d$ a las matrices $A_1(\nv{y}), \ldots, A_p(\nv{y})$. Supongamos que con estas funciones el siguiente conjunto tiene medida nula:
 
     \begin{equation}
-        C := \conjunto{\nv{y} \in \R^d : rank(A_i(\nv{y})) < r, \dspace \forall i \in \deltaset{p}}
+        \mathcal{C} := \conjunto{\nv{y} \in \R^d : rank(A_i(\nv{y})) < r, \dspace \forall i \in \deltaset{p}}
     \end{equation}
 
     Definimos la función
@@ -315,30 +313,24 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
 \begin{proof}
 
-    Como $A(x, y)$ es continua, y hemos probado que $\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r}$ es cerrado, entonces sabemos que $S$ es cerrado, y por tanto, medible.
+    Como $A(\nv{x}, \nv{y})$ es continua y hemos probado que el conjunto
 
-    Ahora buscamos calcular la medida de $S$. Empezamos definiendo, para cada $y \in \R^d$, el siguiente conjunto marginal:
+    $$\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r}$$
+
+    es cerrado, entonces sabemos que $S$ es cerrado y, por tanto, medible. Ahora buscamos calcular la medida de $S$. Empezamos definiendo, para cada $\nv{y} \in \R^d$, el siguiente conjunto marginal:
 
     \begin{equation}
         S^{\nv{y}} := \conjunto{x \in \R^p: rank(A(\nv{x}, \nv{y})) < r} \subseteq \R^p
     \end{equation}
 
-    que también es medible.
-
-    Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier (respecto $\nv{y} \in \R^d$). Porque en tal caso, usando \customref{lema:prop_fundamentales_medida}, sabremos que:
+    que también es medible. Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier (respecto $\nv{y} \in \R^d$). Porque en tal caso, usando \customref{lema:prop_fundamentales_medida}, sabremos que:
 
     \begin{enumerate}
-        \item $S^{\nv{y}} \times \R^d$ tiene medida nula para casi todo $\nv{y} \in \R^d$
-        \item $S$ tiene medida nula por ser $S \subseteq S^{\nv{y}} \times \R^d$
+        \item $S^{\nv{y}} \times \R^d$ tiene medida nula para casi todo $\nv{y} \in \R^d$.
+        \item $S$ tiene medida nula por ser $S \subseteq S^{\nv{y}} \times \R^d$.
     \end{enumerate}
 
-    Para probar que $S^{\nv{y}}$ tiene medida nula casi por doquier, usaremos el siguiente conjunto:
-
-    \begin{equation}
-        \mathcal{C} := \conjunto{\nv{y} \in \R^d: rank(A_i(\nv{y})) < r, \forall i \in \deltaset{p}}
-    \end{equation}
-
-    que es el conjunto de funciones que aparece en el enunciado del lema, por lo que sabemos que $\mathcal{C}$ tiene medida nula. Si tomamos $\nv{y_0} \in \mathcal{C}$ es claro que $S^{\nv{y_0}} = \R^p$. Pero esto no supone un problema puesto que $\mathcal{C}$ es de medida nula. Queda ver qué pasa en $S - \mathcal{C}$, buscando que en dicho conjunto $S^{\nv{y_0}}$ tenga medida nula:
+    Por hipótesis sabemos que $\mathcal{C}$ tiene medida nula. Si tomamos $\nv{y_0} \in \mathcal{C}$ es claro que $S^{\nv{y_0}} = \R^p$. Pero esto no supone un problema puesto que $\mathcal{C}$ es de medida nula. Queda ver qué pasa en $S - \mathcal{C}$, buscando que en dicho conjunto $S^{\nv{y_0}}$ tenga medida nula:
 
     \begin{equation}
         \begin{split}
@@ -346,16 +338,13 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         \end{split}
     \end{equation}
 
-    Sin pérdida de generalidad, supongo que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_o}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y_0})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que
+    Sin pérdida de generalidad, suponemos que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_o}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y_0})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que:
 
     \begin{equation}
-    \begin{split}
-        A(\nv{x}, \nv{y_0}) &= \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0}) \then \ldots \\
-        \ldots \then det(A(\nv{x}, \nv{y_0})) &= det(A_1(\nv{y_0})) \neq 0
-    \end{split}
+        A(\nv{x}, \nv{y_0}) = \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0}) \then det(A(\nv{x}, \nv{y_0})) = det(A_1(\nv{y_0})) \neq 0.
     \end{equation}
 
-    Por tanto, usando \customref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver. Con esto, hemos probado que la medida de $S^{\nv{y_0}}$ es nula.
+    Por tanto, usando el \propref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
 
     Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar que el conjunto $S$ tiene medida nula. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
 
@@ -366,36 +355,37 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         \end{split}
     \end{equation}
 
-    Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con $[-n, n]^{p+d}$, además, tendrán medida finita. Por tanto, la función indicadora sobre estos conjuntos medibles de medida finita será integrable \footnotemark. Y con ello, estamos en condiciones de aplicar ahora el teorema de Fubini para desarrollar:
+    Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con $[-n, n]^{p+d}$, además, tendrán medida finita. Por tanto, la función indicadora sobre estos conjuntos medibles de medida finita será integrable \footnotemark. Ahora estamos en condiciones de aplicar el teorema de Fubini para desarrollar:
 
     \footnotetext{Porque claramente $\int |\mathbb{1}_{S_n}| = \int \mathbb{1}_{S_n} = \lambda(S_n) < \infty$ }
 
     \begin{equation}
         \begin{split}
-            \int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} &= \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} = \ldots \\
-            \ldots &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = \ldots \\
-            \ldots &= 0 + 0 = 0
+            &\int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} = \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} \\
+            &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = 0 + 0 = 0
         \end{split}
     \end{equation}
 
-    Donde hemos usado:
+    Donde hemos usado que:
 
     \begin{itemize}
-        \item (1): hemos visto que la medida del conjunto $\mathcal{C}$ es cero
-        \item (2): hemos visto que si $\nv{y} \not\in \mathcal{C}$, entonces el conjunto $S^{y}$ tiene medida nula
+        \item (1): La medida del conjunto $\mathcal{C}$ es cero.
+        \item (2): Si $\nv{y} \not\in \mathcal{C}$, entonces el conjunto $S^{y}$ tiene medida nula.
     \end{itemize}
 
     Y con ello hemos probado que $\int \mathbb{1}_{S_n} = 0$, sea cual sea el valor de $n \in \N$. Es claro que, como $S$ es un conjunto medible, $\mathbb{1}_{S_n}$ es una sucesión de funciones medibles creciente, y por tanto, podemos aplicar el \textbf{teorema de convergencia monótona} para calcular:
 
     \begin{equation}
-        \int \mathbb{1}_S = \int \lim_{n \to \infty} \mathbb{1}_{S_n} \encima{=}{T.C.M} \lim_{n \to \infty} \int \mathbb{1}_{S_n} = \lim_{n \to \infty} 0  = 0
+        \int \mathbb{1}_S = \int \lim_{n \to \infty} \mathbb{1}_{S_n} \encima{=}{T.C.M} \lim_{n \to \infty} \int \mathbb{1}_{S_n} = \lim_{n \to \infty} 0 = 0.
     \end{equation}
 
-    Por lo tanto, la medida del conjunto $S$ es cero, como queríamos probar.
+    En definitiva, la medida del conjunto $S$ es cero, como queríamos probar.
 
 \end{proof}
 
 Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos su enunciado y pasamos a ver la prueba:
+
+% TODO -- seguir por aqui
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
     Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
