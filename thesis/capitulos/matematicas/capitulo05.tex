@@ -385,8 +385,6 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
 Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos su enunciado y pasamos a ver la prueba:
 
-% TODO -- seguir por aqui
-
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
     Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 \end{teorema}
@@ -466,16 +464,31 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \; \text{c.p.d.}
     \end{equation}
 
-    Podemos aplicar el \propref{lema:segundo_lema}, porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matricaciones. Aplicando dicho lema obtenemos que:
+    Podemos aplicar el \propref{lema:segundo_lema}, porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, porque sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y porque $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matricaciones. Aplicando dicho lema obtenemos que:
 
     \begin{equation}
         [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \;\; \text{tiene rango al menos} \; \; r^{\frac{2^l}{2}} \text{ c.p.d. }
     \end{equation}
 
-    Como $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por doquier para $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$, podemos hacer un argumento análogo al anterior para extender esta propiedad a todo el espacio.
-    \todo{Javier: TODO -- hacer este argumento análogo, escribirlo}
+    Así, $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por dorquier respecto al conjunto de todos los parámetros del modelo \textit{HT}, para valores concretos de $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$. Podemos hacer un argumento análogo al anterior para extender esta propiedad a todo $(j, \gamma)$ de forma conjunta. Sabemos que el siguiente conjunto
 
-    Esto concluye la prueba para el caso no compartido.
+    \begin{equation}
+        \phi_l^{\gamma} := \conjunto{j \in \deltaset{N/2^l} \; : \; rank([\phi^{l, j, \gamma}]) \neq r}
+    \end{equation}
+
+    es finito y por lo tanto tiene medida cero. Por lo tanto, el conjunto
+
+    \begin{equation}
+        \phi_l := \union_{ \gamma \in \deltaset{r_l}} \phi_l^{\gamma}
+    \end{equation}
+
+    también tiene medida cero, con lo que finalmente
+
+    \begin{equation}
+        \phi := \conjunto{(j, \gamma) \in \deltaset{N/2^l \times \deltaset{r_l} \; : \; rank([\phi^{l, j, \gamma}]) \neq r}} \subseteq \phi_l \times R
+    \end{equation}
+
+    tiene medida cero, como buscábamos ver. Esto concluye la prueba para el caso no compartido.
 
     \textbf{Caso 2: Coeficientes compartidos}
 
@@ -483,6 +496,8 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 \end{proof}
 
 \section{Prueba del corolario principal}
+
+% TODO -- seguir por aqui
 
 Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De nuevo, es tan relevante que lo presentamos aquí y no con el resto de corolarios.
 
