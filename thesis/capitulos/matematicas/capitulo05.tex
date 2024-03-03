@@ -388,31 +388,27 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 % TODO -- seguir por aqui
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
-    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 \end{teorema}
 
 \begin{proof}
-    \textbf{Caso 1: sin coeficientes compartidos}
+    \textbf{Caso 1: sin compartir coeficientes}
 
-    Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$.
+    Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$. Probamos por inducción en $l = 1, \ldots, L$ que, en casi todo punto respecto al conjunto $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$, el rango \textit{CP} de los tensores $\conjunto{\phi^{l, j, \gamma}: j \in \deltaset{N/2^l}, \gamma \in \deltaset{r_l}}$ es al menos $r^{2^{l/2}}$.
     \todo{En la página 7 del \textit{paper} dicen que por completitud, $r_L = Y$}
 
-    Probamos por inducción en $l = 1, \ldots, L$ que, en casi todo punto respecto al conjunto $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$, el rango \textit{CP} de los tensores $\conjunto{\phi^{l, j, \gamma}: j \in \deltaset{N/2^l}, \gamma \in \deltaset{r_l}}$ es al menos $r^{2^{l/2}}$.
-
-    Por \customref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{2^{l/2}}$ en casi todo punto (respecto al conjunto de los parámetros que definen el modelo \textit{HT}: $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$). Comenzamos la inducción viendo el \textbf{caso $l = 1$}.
-
-    Por definición, tenemos que para unos valores concretos de $j, \gamma$:
+    Por la \propref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{2^{l/2}}$ en casi todo punto (respecto al conjunto de los parámetros que definen el modelo \textit{HT}: $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$). Comenzamos la inducción viendo el \textbf{caso $l = 1$}. Por definición, tenemos que para unos valores concretos de $j, \gamma$:
 
     \begin{equation}
-        \phi^{1, j, \gamma} = \sum_{\alpha = 1}^{r_0} \comentardebajo{a_{\alpha}^{1, j, \gamma}}{\text{diagonal } D} \comentarencima{\varphi^{0, 2j - 1, \alpha}}{A \text{ por columnas}} \otimes \comentardebajo{\varphi^{0, 2j, \alpha}}{B \text{ por columnas}}
+        \phi^{1, j, \gamma} = \sum_{\alpha = 1}^{r_0} \comentardebajo{a_{\alpha}^{1, j, \gamma}}{\text{diagonal } D} \comentarencima{\varphi^{0, 2j - 1, \alpha}}{A \text{ por columnas}} \otimes \comentardebajo{\varphi^{0, 2j, \alpha}}{B \text{ por columnas}}.
     \end{equation}
 
     Definimos tres matrices $A, B, D$:
 
     \begin{itemize}
-        \item $A \in \espaciomatrices{M}{r_0}$ con columnas $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$
-        \item $B \in \espaciomatrices{M}{r_o}$ con columnas $\conjunto{\varphi^{0, 2j, \alpha}: \alpha \in \deltaset{r_0}}$
-        \item $D \in \espaciomatrices{r_0}{r_0}$ con valores en la diagonal $a_{\alpha}^{1, j, \gamma}, \; \alpha \in \deltaset{r_0}$
+        \item $A \in \espaciomatrices{M}{r_0}$ con columnas $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$.
+        \item $B \in \espaciomatrices{M}{r_0}$ con columnas $\conjunto{\varphi^{0, 2j, \alpha}: \alpha \in \deltaset{r_0}}$.
+        \item $D \in \espaciomatrices{r_0}{r_0}$ con valores en la diagonal $a_{\alpha}^{1, j, \gamma}, \; \alpha \in \deltaset{r_0}$.
     \end{itemize}
 
     Con ello podemos escribir $[\phi^{1, j, \gamma}] = A D B^T$. Aplicando \customref{lema:primer_lema}, sabemos que $rank([\phi^{1, j, \gamma}]) = r = \min \conjunto{r_0, M}$ en casi todo punto, respecto al conjunto de todos los parámetros que conforman $\phi^{1, j, \gamma}$. Estos parámetros son:
@@ -424,23 +420,27 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \item $\conjunto{\nv{a^{1, j, \alpha}} : \alpha \in \deltaset{r_0}}$ donde $\nv{a^{1, j, \alpha}} := (a^{1, j, \alpha}_1, \ldots,  a^{1, j, \alpha}_{r_0})$
     \end{itemize}
 
-    Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo \textit{HT}, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando \customref{lema:prop_fundamentales_medida}.
-
-    Ahora sabemos que $rank([\phi^{1, j, \gamma}]) = r$ en casi todo punto (respecto al conjunto de todos los parámetros que definen el modelo), para valores concretos de $j \in \deltaset{N/2}, \gamma \in r_1$. Veamos que esto implica que la igualdad sigue siendo válida para cualquier $j, \gamma$ de forma conjunta:
+    Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo \textit{HT}, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando el \propref{lema:prop_fundamentales_medida}. Ahora sabemos que $rank([\phi^{1, j, \gamma}]) = r$ en casi todo punto (respecto al conjunto de todos los parámetros que definen el modelo), para valores concretos de $j \in \deltaset{N/2}, \gamma \in \deltaset{r_1}$. Veamos que esto implica que la igualdad sigue siendo válida para cualquier $j, \gamma$ de forma conjunta. Como el conjunto
 
     \begin{equation}
-    \begin{split}
-        \phi_1^\gamma &:= \conjunto{j \in \deltaset{N/2}: rank([\phi^{1, j, \gamma}] \neq r} \text{ tiene medida } 0 \then \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma \text{ tiene medida } 0 \then \ldots \\
-        \ldots &\then \phi_1 \times \R \text{ tiene medida } 0 \then \ldots \\
-        \ldots &\then \phi := \conjunto{(j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}: rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R \text{ tiene medida } 0
-    \end{split}
+        \phi_1^\gamma := \conjunto{j \in \deltaset{N/2}: rank([\phi^{1, j, \gamma}] \neq r}
     \end{equation}
 
-    Esto prueba el caso $l = 1$.
+     es finito, tiene medida cero y por ello, el conjunto
 
-    \textbf{Hipótesis de inducción}: supuesto que es cierto para $l - 1$, ¿esto implica que sea cierto para $l$?.
+     \begin{equation}
+         \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma
+     \end{equation}
 
-    Usando la hipótesis de inducción sabemos que
+     también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero. Finalmente deducimos que
+
+    \begin{equation}
+        \phi := \conjunto{(j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}: rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
+    \end{equation}
+
+    tiene medida cero, lo que prueba el caso $l = 1$.
+
+    \textbf{Hipótesis de inducción}: supuesto que es cierto para $l - 1$ veamos que se cumple para $l$. Usando la hipótesis de inducción sabemos que
 
     \begin{equation}
         rank(\phi^{l-1, j, \gamma}) \geq r^{\frac{2^{l - 1}}{2}},
@@ -450,45 +450,36 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     en casi todo punto (respecto al conjunto de todos los parámetros del modelo). Fijados unos valores concretos para $j \in \deltaset{N/2^{l-1}}$, $\gamma \in \deltaset{r_{l-1}}$, tenemos que:
 
     \begin{equation}
-    \begin{split}
-        \phi^{l, j, \gamma} &:= \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha} \then \\
-        &\then [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]
-    \end{split}
+        \phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \; \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha} \then [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \; [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}].
     \end{equation}
 
-    Ahora definimos $M_\alpha := [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]$, $\forall \alpha \in \deltaset{r_{l-1}}$ y aplicamos la hipótesis de inducción junto al hecho de que $rank(A \odot B) = rank(A) \cdot rank(B)$:
+    Llamando $M_\alpha := [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]$, $\forall \alpha \in \deltaset{r_{l-1}}$, es claro que podemos escribir:
 
     \begin{equation}
-    \begin{split}
-        \substack{rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} c.p.d. \\ rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} c.p.d.} \then         rank(M_\alpha) \geq r^{\frac{2^{l-1}}{2}} \cdot r^{\frac{2^{l-1}}{2}} = r^{\frac{2^{l-1}}{2} + \frac{2^{l-1}}{2}} =
-        r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \; \text{c.p.d.} \\
-    \end{split}
+        [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \; M_\alpha.
     \end{equation}
 
-    Ahora, usando la definición de $M_\alpha$, calculamos:
+    Aplicamos la hipótesis de inducción junto al hecho de que $rank(A \odot B) = rank(A) \; rank(B)$ y obtenemos que $rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} \; c.p.d.$ y $rank([\phi^{l-1, 2j-1, \alpha}]) \geq r^{\frac{2^{l-1}}{2}} \; c.p.d.$ Por lo tanto tenemos que:
 
     \begin{equation}
-        [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot M_\alpha
+        rank(M_\alpha) \geq r^{\frac{2^{l-1}}{2}} \cdot r^{\frac{2^{l-1}}{2}} = r^{\frac{2^{l-1}}{2} + \frac{2^{l-1}}{2}} =
+        r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \; \text{c.p.d.}
     \end{equation}
 
-    Como $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ porque solo codifica las entradas tensoriales del nivel anterior, podemos aplicar \customref{lema:segundo_lema}:
+    Podemos aplicar el \propref{lema:segundo_lema}, porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matricaciones. Aplicando dicho lema obtenemos que:
 
     \begin{equation}
-        \substack{
-            rank(M_\alpha) \geq r^{\frac{2^l}{2}}\\
-            \conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha \text{ continuo } \\
-            \text{por ser productos tensoriales, sumas, matrizaciones}
-        } \then
-        [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \text{ tiene rango al menos } r^{\frac{2^l}{2}} \text{ c.p.d. }
+        [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \;\; \text{tiene rango al menos} \; \; r^{\frac{2^l}{2}} \text{ c.p.d. }
     \end{equation}
 
     Como $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por doquier para $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$, podemos hacer un argumento análogo al anterior para extender esta propiedad a todo el espacio.
+    \todo{Javier: TODO -- hacer este argumento análogo, escribirlo}
 
-    Esto concluye la prueba para el caso no compartido
+    Esto concluye la prueba para el caso no compartido.
 
     \textbf{Caso 2: Coeficientes compartidos}
 
-    Es totalmente análogo al caso 1. En la inducción, en el paso $l = 1$, usamos la versión del lema \customref{lema:primer_lema} en la que $A(\nv{x}) = B(\nv{x})$
+    La demostración es idéntica a la del caso 1 con una salvedad: en la inducción, en el paso $l = 1$, usamos esta vez la versión del \propref{lema:primer_lema} en la que $A(\nv{x}) = B(\nv{x})$.
 \end{proof}
 
 \section{Prueba del corolario principal}
