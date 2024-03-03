@@ -553,7 +553,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         \; \forall d_1, \ldots, d_N \in \deltaset{M}
     \end{equation}
 
-    Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Con todo esto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva:
+    Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Con todo esto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva, porque:
 
     \begin{equation}
     \begin{split}
@@ -562,23 +562,51 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
     \end{split}
     \end{equation}
 
-    Es claro entonces que
+    En cuyo caso tendríamos que
 
     \begin{equation}
         d(A^{(t)}, \mathcal{A}^*) \not\longto 0 \then h^{(t)} \not\longto h(\mathcal{A}^*).
     \end{equation}
 
-    Que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva equivale a su vez a que la distancia entre $[\mathcal{A}^*]$ y $\conjunto{[\mathcal{A}^\lambda]: \lambda \in \Lambda}$ sea estrictamente positiva, porque la matrización no degenera distancias \footnotemark.
-
-    \footnotetext{Esto es, si dos tensores $\mathcal{A}$, $\mathcal{B}$ están a una distancia estrictamente positiva, las matrices $[\mathcal{A}]$, $[\mathcal{B}]$ no pueden estar a una distancia nula}
-
-    Ahora, esto último es claro puesto que:
+    Ahora, esto es claro puesto que
 
     \begin{equation}
-        rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*]), \; \forall \lambda \in \Lambda \then d(\mathcal{A}^*, \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}) > 0.
+        rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*]),
+        \; \forall \lambda \in \Lambda
     \end{equation}
-    \todo{Obvio pero habŕa que demostrarlo. No conocemos $\Lambda$ y podríamos tener una sucesión de distancias que converge a cero}
+
+    y por tanto
+    \todo{Obvio pero habrá que demostrarlo. No conocemos $\Lambda$ y podríamos tener una sucesión de distancias que converge a cero}
+
+    \begin{equation}
+        d([\mathcal{A}^\lambda], [\mathcal{A}^*]) > 0,
+        \; \forall \lambda \in \Lambda.
+    \end{equation}
+
+    Usando la \propref{prop:matrizacion_no_degenera_distancias} sabemos entonces que
+
+    \begin{equation}
+        d(\mathcal{A}^\lambda, \mathcal{A}^*) > 0,
+        \; \forall \lambda \in \Lambda
+    \end{equation}
+
+    o lo que es lo mismo,
+
+    \begin{equation}
+        d(\mathcal{A}^*, \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}) > 0
+    \end{equation}
+
+    como queríamos demostrar.
+
 \end{proof}
+
+\begin{proposicion} \label{prop:matrizacion_no_degenera_distancias}
+    La matrización no degenera distancias euclídeas. Es decir, si dos tensores $\mathcal{A}$, $\mathcal{B}$ están a una distancia euclídea estrictamente positiva, las matrices $[\mathcal{A}]$, $[\mathcal{B}]$ no pueden estar a una distancia euclídea nula. O lo que es lo mismo,
+
+    \begin{equation}
+        d(\mathcal{A}, \mathcal{B}) = 0 \iif d([\mathcal{A}], [\mathcal{B}])
+    \end{equation}
+\end{proposicion}
 
 Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de este trabajo:
 
