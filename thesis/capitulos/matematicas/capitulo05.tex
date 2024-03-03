@@ -130,6 +130,16 @@ Vemos ahora tres propiedades fundamentales que tratan sobre la matrización, pro
 
 \end{observacion}
 
+Se ve claramente que se cumple la siguiente propiedad:
+
+\begin{proposicion} \label{prop:matrizacion_no_degenera_distancias}
+    La matrización no degenera distancias euclídeas. Es decir, si dos tensores $\mathcal{A}$, $\mathcal{B} \in \espaciotensores{N}{M}$ están a una distancia euclídea estrictamente positiva, las matrices $[\mathcal{A}]$, $[\mathcal{B}]$ no pueden estar a una distancia euclídea nula. O lo que es lo mismo,
+
+    \begin{equation}
+        d(\mathcal{A}, \mathcal{B}) = 0 \iif d([\mathcal{A}], [\mathcal{B}]) = 0
+    \end{equation}
+\end{proposicion}
+
 La siguiente proposición será clave a la hora de desarrollar nuestras demostraciones:
 
 \begin{proposicion}[Rango matricial de la descomposición \textit{CP}] \label{prop:rango_matricial_descomp_cp}
@@ -600,13 +610,6 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
 
 \end{proof}
 
-\begin{proposicion} \label{prop:matrizacion_no_degenera_distancias}
-    La matrización no degenera distancias euclídeas. Es decir, si dos tensores $\mathcal{A}$, $\mathcal{B}$ están a una distancia euclídea estrictamente positiva, las matrices $[\mathcal{A}]$, $[\mathcal{B}]$ no pueden estar a una distancia euclídea nula. O lo que es lo mismo,
-
-    \begin{equation}
-        d(\mathcal{A}, \mathcal{B}) = 0 \iif d([\mathcal{A}], [\mathcal{B}])
-    \end{equation}
-\end{proposicion}
 
 Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de este trabajo:
 
