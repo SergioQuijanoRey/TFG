@@ -1,0 +1,15 @@
+\chapter{Conclusiones y trabajo futuro} \label{chapter:conclusiones_trabajo_futuro}
+
+En este trabajo hemos conseguido modelar matemáticamente la tarea de aprendizaje que se realiza en la práctica del aprendizaje automático, describir dos modelos matemáticos que se asemejan muchísimo a las arquitecturas usadas en la práctica del aprendizaje automático. Con estas modelizaciones, hemos conseguido estudiar la mayor capacidad expresiva de las redes profundas frente a las redes no profundas, y dar información precisa sobre cómo de frecuente ocurre este hecho. Por lo tanto, \textbf{consideramos que los objetivos iniciales del trabajo se han cumplido de forma satisfactoria}.
+
+Sin embargo, nos hemos centrado en estudiar redes convolucionales profundas y no profundas, que se han usado sobre todo en tareas de visión por computador. No hemos estudiado otras arquitecturas más actuales usadas para visión, como pueden ser las \textit{redes generativas adversarias} o \textit{GANs}. O arquitecturas basadas en mecanismos de atención, como los \textit{Transformers}, que están teniendo mucho protagonismo tanto en tareas de visión como en otros ámbitos (principalmente en procesamiento de lenguaje natural o \textit{NLP}).
+
+Y aunque hayamos realizado una modelización muy buena de las redes convolucionales profundas y no profundas, existen algunos elementos técnicos muy presentes en estas redes que no hemos considerado. Por ejemplo, en el modelo \textit{ResNet} (que hemos usado en la parte informática del presente trabajo), se utiliza el \todo{completar}
+
+Por lo tanto, algunas mejoras y futuros trabajos sobre los que expandir el presente trabajo son:
+
+\begin{itemize}
+	\item Introducir elementos técnicos como capas residuales, capas de salto, normalización de \textit{batches} en nuestras modelizaciones. Estudiar cómo impactan estos elementos en la capacidad expresiva de las redes.
+	\item Estudiar una posible modelización usando descomposiciones tensoriales para las arquitecturas que hemos mencionado previamente.
+	\item Probar ciertos resultados en base a las modelizaciones que nos den información sobre su mayor potencia expresiva respecto a otros modelos.
+\end{itemize}
