@@ -56,7 +56,7 @@ Recordemos que, como ya hemos introducido en la \sectionref{seq:planteamiento_pr
 
 Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ donde elegir nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
 
-En \customref{subs:caracterizaciones_familias_funciones} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas. Es más, en este caso el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total y, por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$. A las funciones $\conjunto{f_d: \R^s \to \R: d \in \N}$ las llamaremos \textbf{funciones de representación}.
+En la \sectionref{subs:caracterizaciones_familias_funciones} hemos visto que, tomando $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ de forma que sea total, tenemos $\varepsilon$-aproximación en $L^2(R^s)$ con combinaciones lineales finitas. Es más, en este caso el conjunto inducido de funciones producto punto a punto, $\{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) \}_{d_1, \ldots, d_N \in \N}$, también será total y, por lo tanto, tendremos $\varepsilon$-aproximación en $L^2((R^s)^N)$. A las funciones $\conjunto{f_d: \R^s \to \R: d \in \N}$ las llamaremos \textbf{funciones de representación}.
 
 En resumen, buscamos tomar una elección de funciones $\{f_d(\nv{x}): d \in \N\} \subseteq L^2(R^s)$ que sea total, para así inducir un conjunto de funciones producto punto a punto total. Y con esto, dada cualquiera $h_y \in L^2((R^s)^N$, podemos aproximar dicha función de puntuación arbitrariamente bien ($\epsilon$-aproximación dada en la \propref{prop:conjuntos_totales_epsilon_aproximacion}) con combinaciones lineales finitas.
 
@@ -98,15 +98,7 @@ Las opciones más usadas en la práctica del aprendizaje automático son:
 
 	      donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
 
-	\item Neuronas:
-
-	      \begin{equation}
-		      f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
-	      \end{equation}
-
-	      donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$ y $\sigma$ la función de activación de la neurona, por ejemplo una \textit{sigmoide} o una \textit{ReLU}.
-
-	      \todo{Comentario JMERI: se pueden poner en una sección de herramientas}
+    \item Neuronas: véase la \sectionref{subsubs:capa_totalmente_conectada}
 
 
 \end{enumerate}

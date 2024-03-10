@@ -659,7 +659,7 @@ Por lo tanto, en el \textit{max pooling} y \textit{average pooling} tenemos que 
 
 Esta capa ayuda a que la red sea más ligera, pues al reducir la dimensionalidad de los datos, reduce el número de parámetros que necesitamos ajustar. A partir de la experimentación se piensa que además ayuda a introducir cierta invarianza frente a traslaciones.
 
-\subsubsection{Capa totalmente conectada}
+\subsubsection{Capa totalmente conectada} \label{subsubs:capa_totalmente_conectada}
 
 También conocidas como \textit{linear dense layers} o capas lineales densas. Estas capas toman un vector de valores de entrada, realizan una combinación lineal de sus valores, y en la mayoría de casos, aplican una función no lineal a la salida. Por lo tanto, una capa totalmente conectada viene dada por:
 
@@ -674,5 +674,13 @@ Por lo tanto, el funcionamiento de una capa lineal densa se resume en:
 \begin{equation}
     (x_1, \ldots, x_N) \to \sigma(\sum_{i = 1}^{N} w_i \; x_i)
 \end{equation}
+
+Estamos suponiendo que queramos que la salida de la capa sea un único valor escalar. Sin embargo, podemos generalizar esta operación para que la salida sea un vector de dimensión $S$. Para ello, basta considerar:
+
+\begin{equation}
+      f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
+\end{equation}
+
+donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$.
 
 Estas capas se suelen poner al final de las redes convolucionales, para realizar la predicción final. Toman las características jerárquicas que las convoluciones extraen y las combinan para resolver la tarea planteada. Para ello, debemos vectorizar el tensor de entrada, pero esto es una operación trivial.
