@@ -11,10 +11,10 @@ El \textbf{reconocimiento facial invariante a la edad o \textit{AIFR}} introduce
 Esto supone todavía \textbf{más dificultades específicas}, principalmente introducidas por cómo el \textbf{envejecimiento} afecta las características faciales \cite{informatica:aifr_survey}. En la \imgref{img:ejemplo_dificultad_aifr} quedan de manifiesto estas dificultades, en las que posteriormente profundizaremos.
 
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_dificultad_aifr}
-    \caption{Ejemplo de datos con los que trabajamos en una tarea de \textit{AIFR}. Deja de manifiesto las dificultades específicas a las que nos enfrentamos. Principalmente cambios en las características de la cámara y los cambios faciales introducidos por el envejecimiento. Imagen extraída de \cite{informatica:aifr_survey}}
-    \label{img:ejemplo_dificultad_aifr}
+	\centering
+	\includegraphics[width=0.8\textwidth]{informatica/ejemplo_dificultad_aifr}
+	\caption{Ejemplo de datos con los que trabajamos en una tarea de \textit{AIFR}. Deja de manifiesto las dificultades específicas a las que nos enfrentamos. Principalmente cambios en las características de la cámara y los cambios faciales introducidos por el envejecimiento. Imagen extraída de \cite{informatica:aifr_survey}}
+	\label{img:ejemplo_dificultad_aifr}
 \end{figure}
 
 Estas técnicas pueden emplearse en la búsqueda de personas desaparecidas, identificación de supuestos criminales en casos en los que haya pasado mucho tiempo desde los sucesos investigados o que hayan cometido delitos en distintos momentos de su vida, verificación de documentos de identidad como pasaportes... \cite{informatica:aifr_survey}
@@ -22,9 +22,9 @@ Estas técnicas pueden emplearse en la búsqueda de personas desaparecidas, iden
 Para resolver las dificultades que este problema plantea las técnicas de \textit{deep learning} han surgido como el enfoque más prometedor. Otros enfoques clásicos han sido superados por técnicas de \textit{deep learning}, tanto en el área de reconocimiento facial \cite{informatica:deep_fr_survey} como en el área de \textit{AIFR} \cite{informatica:aifr_survey}. Algunas características de las redes profundas que las las hace interesantes para resolver este problema son:
 
 \begin{itemize}
-    \item Representación jerárquica de las \textit{features}: estos modelos son capaces de reconocer características de alto nivel sobre los rostros. Por tanto parece que serán capaces de realizar mejores razonamientos sobre estos tipos de datos
-    \item La extracción de características faciales se aprende a partir de los datos. No dependemos de un experto que diseñe los métodos para extraer estas características
-    \item Gracias al uso de grandes conjuntos de datos podemos aprender modelos mucho más expresivos que con otros métodos, como por ejemplo, comparación de características faciales diseñadas a mano (\textit{SURF} sobre características tipo \textit{SHIFT} \cite{informatica:libro_surf})
+	\item Representación jerárquica de las \textit{features}: estos modelos son capaces de reconocer características de alto nivel sobre los rostros. Por tanto parece que serán capaces de realizar mejores razonamientos sobre estos tipos de datos
+	\item La extracción de características faciales se aprende a partir de los datos. No dependemos de un experto que diseñe los métodos para extraer estas características
+	\item Gracias al uso de grandes conjuntos de datos podemos aprender modelos mucho más expresivos que con otros métodos, como por ejemplo, comparación de características faciales diseñadas a mano (\textit{SURF} sobre características tipo \textit{SHIFT} \cite{informatica:libro_surf})
 \end{itemize}
 
 Aunque todavía no hemos introducido los fundamentos técnicos sobre los que se basa nuestro trabajo, cabe destacar que una parte fundamental de este trabajo es explorar cierta modificación técnica en una de las piezas de nuestra solución.
@@ -39,24 +39,24 @@ Como ya se ha comentado, buscamos resolver un problema de \textbf{reconocimiento
 En general, una tarea de reconocimiento facial abarca distintas \textbf{tareas específicas}:
 
 \begin{itemize}
-    \item \textbf{\textit{Retrieval}} o búsqueda: dada una imagen de una persona objetivo y una base de datos de imágenes, devolver un número específico de imágenes tomadas de la base de datos de la persona objetivo
+	\item \textbf{\textit{Retrieval}} o búsqueda: dada una imagen de una persona objetivo y una base de datos de imágenes, devolver un número específico de imágenes tomadas de la base de datos de la persona objetivo
 
-        \begin{itemize}
-            \item Esta es la tarea que intentamos resolver en el presente trabajo
-            \item Un escenario para esta tarea es, por ejemplo, tras la desaparición de una persona, tomar imágenes de distintas bases de datos policiales y estudiar las 100 imágenes con mayor probabilidad de corresponderse con la identidad de la persona desaparecida
-            \item A la acción de aportar una imagen, una base de datos, y tomar las $N$ imágenes que son más probables de coincidir en la identidad de la persona de la primera imagen, la llamaremos \textbf{consulta} o \textbf{\textit{query}}. A la imagen pasada como parámetro se le llama \textbf{\textit{key}} o llave.
-        \end{itemize}
+	      \begin{itemize}
+		      \item Esta es la tarea que intentamos resolver en el presente trabajo
+		      \item Un escenario para esta tarea es, por ejemplo, tras la desaparición de una persona, tomar imágenes de distintas bases de datos policiales y estudiar las 100 imágenes con mayor probabilidad de corresponderse con la identidad de la persona desaparecida
+		      \item A la acción de aportar una imagen, una base de datos, y tomar las $N$ imágenes que son más probables de coincidir en la identidad de la persona de la primera imagen, la llamaremos \textbf{consulta} o \textbf{\textit{query}}. A la imagen pasada como parámetro se le llama \textbf{\textit{key}} o llave.
+	      \end{itemize}
 
-    \item Verificación: dadas dos imágenes, el modelo debe decidir si se trata de la misma persona o no.
-        \begin{itemize}
-            \item Un escenario es, por ejemplo, comprobar la imagen del pasaporte y la imagen obtenida de las cámaras de los puestos de control de acceso automático \cite{informatica:docface}
-        \end{itemize}
+	\item Verificación: dadas dos imágenes, el modelo debe decidir si se trata de la misma persona o no.
+	      \begin{itemize}
+		      \item Un escenario es, por ejemplo, comprobar la imagen del pasaporte y la imagen obtenida de las cámaras de los puestos de control de acceso automático \cite{informatica:docface}
+	      \end{itemize}
 
-    \item Clasificación: tras entrenar con imágenes asociadas a un grupo de personas, dada una imagen de entrada, tenemos que reconocer la identidad de la persona que aparece en la imagen como una de las identidades usadas durante el entrenamiento
-        \begin{itemize}
-            \item Esto fuerza a que solo podamos trabajar con un número prefijado de personas, y no con personas arbitrarias que nunca hayamos visto antes. Esta restricción hace que sea la tarea menos interesante (y quizás, la más sencilla de resolver)
-            \item Por lo tanto, es inusual encontrar trabajos que usen las técnicas presentadas en este trabajo para intentar resolver este tipo de problemas
-        \end{itemize}
+	\item Clasificación: tras entrenar con imágenes asociadas a un grupo de personas, dada una imagen de entrada, tenemos que reconocer la identidad de la persona que aparece en la imagen como una de las identidades usadas durante el entrenamiento
+	      \begin{itemize}
+		      \item Esto fuerza a que solo podamos trabajar con un número prefijado de personas, y no con personas arbitrarias que nunca hayamos visto antes. Esta restricción hace que sea la tarea menos interesante (y quizás, la más sencilla de resolver)
+		      \item Por lo tanto, es inusual encontrar trabajos que usen las técnicas presentadas en este trabajo para intentar resolver este tipo de problemas
+	      \end{itemize}
 
 \end{itemize}
 
@@ -65,105 +65,105 @@ Como resultado, realmente nuestra tarea consiste en realizar \textit{retrieval} 
 La \imgref{img:ejemplo_verificacion} explica visualmente la tarea de verificación, mientras que la \imgref{img:ejemplo_retrieval} explica la tarea de \textit{retrieval}:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{informatica/ejemplos_tareas/verification}
-    \caption{Ejemplo gráfico de la tarea de verificación. Dado un par de imágenes, decidimos si se corresponden a la misma identidad o si son dos personas distintas. Imágenes extraídas de \cite{informatica:cacd_dataset}, diagrama generado con \url{draw.io}}
-    \label{img:ejemplo_verificacion}
+	\centering
+	\includegraphics[width=0.5\textwidth]{informatica/ejemplos_tareas/verification}
+	\caption{Ejemplo gráfico de la tarea de verificación. Dado un par de imágenes, decidimos si se corresponden a la misma identidad o si son dos personas distintas. Imágenes extraídas de \cite{informatica:cacd_dataset}, diagrama generado con \url{draw.io}}
+	\label{img:ejemplo_verificacion}
 \end{figure}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{informatica/ejemplos_tareas/retrieval}
-    \caption{Ejemplo gráfico de la tarea de \textit{retrieval}. Dada una imagen objetivo o \textit{query}, y una base de datos de imágenes candidatas, devolvemos las mejores $K = 2$ imágenes. Imágenes extraídas de \cite{informatica:cacd_dataset}, diagrama generado con \url{draw.io}}
-    \label{img:ejemplo_retrieval}
+	\centering
+	\includegraphics[width=0.7\textwidth]{informatica/ejemplos_tareas/retrieval}
+	\caption{Ejemplo gráfico de la tarea de \textit{retrieval}. Dada una imagen objetivo o \textit{query}, y una base de datos de imágenes candidatas, devolvemos las mejores $K = 2$ imágenes. Imágenes extraídas de \cite{informatica:cacd_dataset}, diagrama generado con \url{draw.io}}
+	\label{img:ejemplo_retrieval}
 \end{figure}
 
 Algunos problemas comunes en la visión por computador que son especialmente pertinentes en nuestra tarea son:
 
 \begin{enumerate}
-    \item \textbf{Distractores}: nuestro modelo se debe centrar en estudiar las caras que aparezcan en la imagen, ignorando otros elementos, como los que puedan aparecer en el fondo
-    \item \textbf{Eficiencia}: a la hora de que nuestro modelo reciba una \textit{query}, desconocemos el tamaño de la base de datos sobre la que tenemos que operar. Por tanto, nuestro modelo deberá ser eficiente para poder trabajar con grandes bases de datos sin que el tiempo de respuesta se vea gravemente afectado
+	\item \textbf{Distractores}: nuestro modelo se debe centrar en estudiar las caras que aparezcan en la imagen, ignorando otros elementos, como los que puedan aparecer en el fondo
+	\item \textbf{Eficiencia}: a la hora de que nuestro modelo reciba una \textit{query}, desconocemos el tamaño de la base de datos sobre la que tenemos que operar. Por tanto, nuestro modelo deberá ser eficiente para poder trabajar con grandes bases de datos sin que el tiempo de respuesta se vea gravemente afectado
 \end{enumerate}
 
 Por otro lado, nos enfrentamos a las siguientes \textbf{dificultades específicas} \cite{informatica:challenges_retrieval}:
 
 \begin{itemize}
-    \item \textbf{Invarianzas}: en nuestro problema esto es especialmente relevante. Al trabajar con imágenes tomadas en instantes de tiempo muy variados, las características de la imagen pueden variar considerablemente.
-        \begin{itemize}
-            \item Pensemos, por ejemplo, en fotografías antiguas que fueron tomadas en blanco y negro, en contraste con fotografías más actuales en color
-            \item O cambios considerables en características de la cámara con la que se toman las fotografías
-        \end{itemize}
-    \item Problemas asociados al \textbf{envejecimiento}: cómo varía la cara con el paso de los años es un proceso muy complejo. Algunos de los factores que afectan a este envejecimiento \cite{informatica:tecnica_sintesis_aifr} son:
-        \begin{itemize}
-            \item Factores intrínsecos como la genética o la etnia
-            \item Factores extrínsecos como el ambiente o los hábitos de vida
-        \end{itemize}
-    Además, algunas características de la cara cambian drásticamente con el paso de los años. Por ejemplo, la textura (aparición de arrugas, lunares, vello, \ldots), cambios en la forma de la cara (cambio en el peso corporal)
+	\item \textbf{Invarianzas}: en nuestro problema esto es especialmente relevante. Al trabajar con imágenes tomadas en instantes de tiempo muy variados, las características de la imagen pueden variar considerablemente.
+	      \begin{itemize}
+		      \item Pensemos, por ejemplo, en fotografías antiguas que fueron tomadas en blanco y negro, en contraste con fotografías más actuales en color
+		      \item O cambios considerables en características de la cámara con la que se toman las fotografías
+	      \end{itemize}
+	\item Problemas asociados al \textbf{envejecimiento}: cómo varía la cara con el paso de los años es un proceso muy complejo. Algunos de los factores que afectan a este envejecimiento \cite{informatica:tecnica_sintesis_aifr} son:
+	      \begin{itemize}
+		      \item Factores intrínsecos como la genética o la etnia
+		      \item Factores extrínsecos como el ambiente o los hábitos de vida
+	      \end{itemize}
+	      Además, algunas características de la cara cambian drásticamente con el paso de los años. Por ejemplo, la textura (aparición de arrugas, lunares, vello, \ldots), cambios en la forma de la cara (cambio en el peso corporal)
 
-\item Tenemos que trabajar con \textbf{identidades que nunca hemos visto} en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, ocurre algo parecido. Por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo. Sin embargo la diferencia radica en que en nuestro problema el modelo debe saber identificar identidades, mientras que en el modelo de clasificación este debe saber identificar categorías
+	\item Tenemos que trabajar con \textbf{identidades que nunca hemos visto} en nuestros datos de entrenamiento. En otras tareas, como por ejemplo la de clasificación de objetos cotidianos, ocurre algo parecido. Por ejemplo, tenemos imágenes de coches que nunca ha visto previamente el modelo. Sin embargo la diferencia radica en que en nuestro problema el modelo debe saber identificar identidades, mientras que en el modelo de clasificación este debe saber identificar categorías
 
-\item Nuestro modelo debe identificar como similares imágenes de la misma persona, aunque sea en momentos muy distintos. Y debe identificar como no similares imágenes de personas distintas. Es muy fácil que ocurra que dos imágenes de la misma persona tomadas con muchos años de diferencia parezcan más distintas que dos imágenes de dos personas distintas pero de la misma edad. Por ejemplo, esto se puede ver en la \imgref{img:messi_distintos_otro_adulto}
-    \begin{itemize}
-        \item El concepto de similitud con el que codificamos la identidad de los sujetos lo especificamos en \customref{isec:embeddings})
-    \end{itemize}
-\item Aunque desarrollemos esto más tarde en \customref{isec:base_datos_usada}, los \textbf{\textit{datasets} de \textit{AIFR} son escasos y presentan problemas} \cite{informatica:tecnica_sintesis_aifr}. Algunas de estas bases de datos son muy pequeñas. Otras, son de un tamaño más grande, pero presentan mucha menos variabilidad en los rangos de edad. Y por supuesto, muchas de estas bases de datos presentan problemas de representatividad (etnia, sexo).
+	\item Nuestro modelo debe identificar como similares imágenes de la misma persona, aunque sea en momentos muy distintos. Y debe identificar como no similares imágenes de personas distintas. Es muy fácil que ocurra que dos imágenes de la misma persona tomadas con muchos años de diferencia parezcan más distintas que dos imágenes de dos personas distintas pero de la misma edad. Por ejemplo, esto se puede ver en la \imgref{img:messi_distintos_otro_adulto}
+	      \begin{itemize}
+		      \item El concepto de similitud con el que codificamos la identidad de los sujetos lo especificamos en \customref{isec:embeddings})
+	      \end{itemize}
+	\item Aunque desarrollemos esto más tarde en \customref{isec:base_datos_usada}, los \textbf{\textit{datasets} de \textit{AIFR} son escasos y presentan problemas} \cite{informatica:tecnica_sintesis_aifr}. Algunas de estas bases de datos son muy pequeñas. Otras, son de un tamaño más grande, pero presentan mucha menos variabilidad en los rangos de edad. Y por supuesto, muchas de estas bases de datos presentan problemas de representatividad (etnia, sexo).
 \end{itemize}
 
 Las imágenes presentadas en \imgref{img:messi_cuatro_edades} son un buen ejemplo de los problemas específicos que acabamos de comentar. Por ejemplo, la imagen en la que aparece siendo más pequeño, \ref{img:messi_pequeno}, es de una calidad mucho menor que el resto de imágenes. No ha desarrollado todavía rasgos faciales muy característicos. La variabilidad en el estilo de pelo es total. Se puede apreciar perfectamente como el paso de los años va modificando los rasgos de la cara. Y todo esto sin comentar problemas comunes y bien conocidos en la visión por computador como cambios en la pose, iluminación, \ldots Por ejemplo, en la fotografía \ref{img:messi_adulto} podemos ver que, en el fondo de la imagen, aparece otro jugador, y nuestro modelo podría distraerse por este hecho
 
 \begin{figure}[H]
-\centering
-    \begin{subfigure}{0.5\textwidth}
-        \centering
-        \includegraphics[width=0.5\linewidth]{informatica/messi_niño}
-        \caption{Edad temprana. Imagen extraída de \cite{informatica:webimg_messi_pequeno}}
-        \label{img:messi_pequeno}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.8\linewidth]{informatica/messi_joven}
-        \caption{Edad joven. Imagen extraída de \cite{informatica:webimg_messi_joven}}
-    \end{subfigure}%
+	\centering
+	\begin{subfigure}{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.5\linewidth]{informatica/messi_niño}
+		\caption{Edad temprana. Imagen extraída de \cite{informatica:webimg_messi_pequeno}}
+		\label{img:messi_pequeno}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{informatica/messi_joven}
+		\caption{Edad joven. Imagen extraída de \cite{informatica:webimg_messi_joven}}
+	\end{subfigure}%
 
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.6\linewidth]{informatica/messi_adulto}
-        \caption{Edad adulta. Imagen extraída de \cite{informatica:webimg_messi_adulto}}
-        \label{img:messi_adulto}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.8\linewidth]{informatica/messi_rubio}
-        \caption{Otra imagen en la edad adulta, pocos años después. Imagen extraída de \cite{informatica:webimg_messi_rubio}}
-    \end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=0.6\linewidth]{informatica/messi_adulto}
+		\caption{Edad adulta. Imagen extraída de \cite{informatica:webimg_messi_adulto}}
+		\label{img:messi_adulto}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{informatica/messi_rubio}
+		\caption{Otra imagen en la edad adulta, pocos años después. Imagen extraída de \cite{informatica:webimg_messi_rubio}}
+	\end{subfigure}
 
-    \caption{Lionel Messi en cuatro momentos distintos de su vida}
-    \label{img:messi_cuatro_edades}
+	\caption{Lionel Messi en cuatro momentos distintos de su vida}
+	\label{img:messi_cuatro_edades}
 
 \end{figure}
 \todo{Conseguir que las cuatro imágenes tengan el mismo tamaño y misma relación de aspecto}
 
 \begin{figure}[hbtp]
-\centering
-    \begin{subfigure}{0.5\textwidth}
-        \centering
-        \includegraphics[width=0.6\linewidth]{informatica/messi_niño}
-        \caption{Messi en una edad temprana}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.8\linewidth]{informatica/messi_adulto}
-        \caption{Messi en edad adulta}
-    \end{subfigure}
+	\centering
+	\begin{subfigure}{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.6\linewidth]{informatica/messi_niño}
+		\caption{Messi en una edad temprana}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{informatica/messi_adulto}
+		\caption{Messi en edad adulta}
+	\end{subfigure}
 
-    \begin{subfigure}{.8\textwidth}
-        \centering
-        \includegraphics[width=0.6\linewidth]{informatica/doble_messi}
-        \caption{Riza Perestes, ciudadano iraní. Imagen extraída de \cite{informatica:imitador_messi}}
-    \end{subfigure}
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		\includegraphics[width=0.6\linewidth]{informatica/doble_messi}
+		\caption{Riza Perestes, ciudadano iraní. Imagen extraída de \cite{informatica:imitador_messi}}
+	\end{subfigure}
 
-\caption{Lionel Messi en dos momentos distintos de su vida, y Riza Perestes, ciudadano iraní con gran parecido}
-\label{img:messi_distintos_otro_adulto}
+	\caption{Lionel Messi en dos momentos distintos de su vida, y Riza Perestes, ciudadano iraní con gran parecido}
+	\label{img:messi_distintos_otro_adulto}
 \end{figure}
 
 Ya hora estudiemos el ejemplo presentado en \imgref{img:messi_distintos_otro_adulto}. En este ejemplo vemos un problema que hemos comentado previamente: tenemos más parecido entre dos personas distintas pero de la misma edad, que entre la misma persona pero a distintas edades. En este caso el parecido es extraordinario, pero es razonable que nuestro modelo tenga dificultades en asignar mayor parecido a imágenes de la misma persona en su adultez y niñez, que a imágenes de dos personas distintas, ambas con barba y mismo corte de pelo, por poner un ejemplo.
@@ -172,8 +172,8 @@ Ya hora estudiemos el ejemplo presentado en \imgref{img:messi_distintos_otro_adu
 Y para finalizar, introducimos los \textbf{dos enfoques principales usados para resolver problemas de \textit{AIFR}}, que estudiaremos en profundidad en \customref{ich:estado_arte}:
 
 \begin{enumerate}
-    \item El primer enfoque es aplicar modelos generativos adversarios (\textit{GAN}). Por ejemplo, el \textit{Age Invariant Model} o \textit{AIM} propuesto en \cite{informatica:tecnica_sintesis_aifr}.
-    \item El segundo enfoque es directamente trabajar sobre una base de datos que presente la suficiente variabilidad en la edad de los individuos, y desarrollar un modelo que realice nuestra tarea. Este enfoque casi siempre pasa por computar un \textit{embedding}. Este será el enfoque que sigamos.
+	\item El primer enfoque es aplicar modelos generativos adversarios (\textit{GAN}). Por ejemplo, el \textit{Age Invariant Model} o \textit{AIM} propuesto en \cite{informatica:tecnica_sintesis_aifr}.
+	\item El segundo enfoque es directamente trabajar sobre una base de datos que presente la suficiente variabilidad en la edad de los individuos, y desarrollar un modelo que realice nuestra tarea. Este enfoque casi siempre pasa por computar un \textit{embedding}. Este será el enfoque que sigamos.
 \end{enumerate}
 
 \section{Motivación}
@@ -183,24 +183,24 @@ El ámbito de aplicación de un modelo capaz de reconocer caras independientemen
 Algunos ejemplos de aplicación son:
 
 \begin{itemize}
-    \item Reconocer caras de sospechosos que llevan en busca un tiempo en imágenes de videovigilancia
-    \item Reconocer caras de personas desaparecidas un tiempo considerable, en imágenes de videovigilancia, controles de aeropuertos, ...
-    \item Verificación automática de documentos de identidad en puestos de control \cite{informatica:tecnica_sintesis_aifr}. Por ejemplo, los puestos de control automáticos de aeropuertos. En estos puestos, una máquina verifica que la imagen que aparece en el pasaporte coincida con una imagen tomada en ese momento con una cámara.
-    \item Consultar en una base de datos policial las 10 identidades que más se parecen a la imagen de una persona dada
+	\item Reconocer caras de sospechosos que llevan en busca un tiempo en imágenes de videovigilancia
+	\item Reconocer caras de personas desaparecidas un tiempo considerable, en imágenes de videovigilancia, controles de aeropuertos, ...
+	\item Verificación automática de documentos de identidad en puestos de control \cite{informatica:tecnica_sintesis_aifr}. Por ejemplo, los puestos de control automáticos de aeropuertos. En estos puestos, una máquina verifica que la imagen que aparece en el pasaporte coincida con una imagen tomada en ese momento con una cámara.
+	\item Consultar en una base de datos policial las 10 identidades que más se parecen a la imagen de una persona dada
 \end{itemize}
 
 Por ejemplo, en 2021 se pusieron en marcha en España máquinas \textit{ABC System} para realizar automáticamente el control de pasaportes en aeropuertos \cite{informatica:articulo_abc_system}. Una de las tareas de esta máquina es la de verificar que la fotografía que aparece en el pasaporte se corresponde con la persona que está intentando pasar el control. Esto se muestra en las siguientes imágenes:
 
 \begin{figure}[H]
-    \centering
-    \begin{subfigure}{0.4\textwidth}
-        \includegraphics[width=1.0\textwidth]{informatica/ejemplo_abc_system_01}
-    \end{subfigure}
-    \begin{subfigure}{0.4\textwidth}
-        \includegraphics[width=1.0\textwidth]{informatica/ejemplo_abc_system_02}
-    \end{subfigure}
+	\centering
+	\begin{subfigure}{0.4\textwidth}
+		\includegraphics[width=1.0\textwidth]{informatica/ejemplo_abc_system_01}
+	\end{subfigure}
+	\begin{subfigure}{0.4\textwidth}
+		\includegraphics[width=1.0\textwidth]{informatica/ejemplo_abc_system_02}
+	\end{subfigure}
 
-    \caption{Máquinas \textit{ABC System} para realizar el control de pasaportes en aeropuertos de forma automática. Entre otras tareas, verifican que la fotografía del pasaporte se corresponda con una imagen tomada por la cámara de la máquina. Imágenes extraídas de \cite{informatica:articulo_abc_system}}
+	\caption{Máquinas \textit{ABC System} para realizar el control de pasaportes en aeropuertos de forma automática. Entre otras tareas, verifican que la fotografía del pasaporte se corresponda con una imagen tomada por la cámara de la máquina. Imágenes extraídas de \cite{informatica:articulo_abc_system}}
 \end{figure}
 \todo{Arreglar la relación de aspecto de estas imágenes}
 
@@ -211,11 +211,11 @@ Todo esto justifica el interés en disponer de un modelo que resuelva la tarea q
 Los objetivos del presente trabajo son los siguientes:
 
 \begin{enumerate}
-    \item Realizar una \textbf{revisión del estado del arte} en el ámbito del \textit{AIFR} (véase \sectionref{ich:estado_arte})
-    \item Realizar un \textbf{estudio de los \textit{datasets}} disponibles (véase \sectionref{isec:base_datos_usada})
-    \item \textbf{Implementar todos los módulos necesarios} para poder aplicar las técnicas a estudiar, a partir del uso de patrones de diseño para acabar con una arquitectura limpia y cómoda de trabajar (véase \sectionref{ich:implementacion})
-    \item Llevar a cabo el proceso de \textbf{aprendizaje de un modelo profundo} que resuelva la tarea de \textit{AIFR} (véase \sectionref{ich:Experimentación})
-    \item \textbf{Estudiar los resultados obtenidos} por dicho modelo, comparándolos con los resultados obtenidos en otros trabajos del mismo ámbito
+	\item Realizar una \textbf{revisión del estado del arte} en el ámbito del \textit{AIFR} (véase \sectionref{ich:estado_arte})
+	\item Realizar un \textbf{estudio de los \textit{datasets}} disponibles (véase \sectionref{isec:base_datos_usada})
+	\item \textbf{Implementar todos los módulos necesarios} para poder aplicar las técnicas a estudiar, a partir del uso de patrones de diseño para acabar con una arquitectura limpia y cómoda de trabajar (véase \sectionref{ich:implementacion})
+	\item Llevar a cabo el proceso de \textbf{aprendizaje de un modelo profundo} que resuelva la tarea de \textit{AIFR} (véase \sectionref{ich:Experimentación})
+	\item \textbf{Estudiar los resultados obtenidos} por dicho modelo, comparándolos con los resultados obtenidos en otros trabajos del mismo ámbito
 \end{enumerate}
 
 \section{Planificación} \label{isec:planificacion}
@@ -231,36 +231,36 @@ Además, como veremos en \sectionref{ich:estado_arte}, \textbf{no existen trabaj
 Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura sobre el tema, desconocemos los posibles problemas que pueden resultar de aplicar esta técnica. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones. En cada una de las iteraciones podemos aplicar el modelo en cascada. Este modelo encaja perfectamente con nuestro enfoque, en el que buscamos iterar sobre distintas bases de datos. El funcionamiento de este modelo se explica mejor en la siguiente imagen:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{informatica/ejemplo_modelo_incremental}
-    \caption{Ejemplo del modelo de desarrollo incremental. Podemos ver que en cada iteración aplicamos un modelo de desarrollo en cascada. En nuestro caso, cada iteración corresponderá con cada una de las bases de datos sobre las que trabajamos. Imagen extraída de \cite{informatica:libro_metodologias_desarrollo}}
+	\centering
+	\includegraphics[width=0.8\textwidth]{informatica/ejemplo_modelo_incremental}
+	\caption{Ejemplo del modelo de desarrollo incremental. Podemos ver que en cada iteración aplicamos un modelo de desarrollo en cascada. En nuestro caso, cada iteración corresponderá con cada una de las bases de datos sobre las que trabajamos. Imagen extraída de \cite{informatica:libro_metodologias_desarrollo}}
 \end{figure}
 
 Para cada base de datos sobre la que trabajamos, consideramos las siguientes fases del modelo en cascada para esa iteración:
 
 \begin{itemize}
-    \item \textbf{Análisis}: realizamos un análisis exploratorio de la base de datos con la que trabajamos en esta iteración (véase \sectionref{isec:base_datos_usada}). Estudiamos las técnicas que queremos aplicar y nos marcamos una serie de objetivos para esta iteración
-    \item \textbf{Diseño}: en base al estudio realizado sobre el \textit{dataset} y las técnicas que queremos aplicar, definimos qué módulos de código debemos de introducir, qué interfaces deben cumplir para interactuar con otros módulos, las propiedades que queremos verificar en los \textit{tests}, distintos \textit{pipelines} que seguir en la experimentación...
-    \item \textbf{Implementación}: desarrollamos el código necesario para cumplir con el diseño realizado previamente. En esta fase también incluimos el desarrollo de \textit{tests} para realizar las validaciones
-    \item \textbf{Optimización}: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados, y llevamos a cabo dichos cambios. Esto se explica en detalle en \sectionref{isec:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes
-    \item \textbf{Experimentación}: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase \sectionref{isec:pipeline}), analizamos los resultados obtenidos, buscamos anomalías en el proceso o en los resultados, ... Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos
+	\item \textbf{Análisis}: realizamos un análisis exploratorio de la base de datos con la que trabajamos en esta iteración (véase \sectionref{isec:base_datos_usada}). Estudiamos las técnicas que queremos aplicar y nos marcamos una serie de objetivos para esta iteración
+	\item \textbf{Diseño}: en base al estudio realizado sobre el \textit{dataset} y las técnicas que queremos aplicar, definimos qué módulos de código debemos de introducir, qué interfaces deben cumplir para interactuar con otros módulos, las propiedades que queremos verificar en los \textit{tests}, distintos \textit{pipelines} que seguir en la experimentación...
+	\item \textbf{Implementación}: desarrollamos el código necesario para cumplir con el diseño realizado previamente. En esta fase también incluimos el desarrollo de \textit{tests} para realizar las validaciones
+	\item \textbf{Optimización}: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados, y llevamos a cabo dichos cambios. Esto se explica en detalle en \sectionref{isec:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes
+	\item \textbf{Experimentación}: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase \sectionref{isec:pipeline}), analizamos los resultados obtenidos, buscamos anomalías en el proceso o en los resultados, ... Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos
 \end{itemize}
 
 Para organizar todas las tareas de cada iteración, que nacen en las fases de análisis, diseño e implementación, usamos la \textbf{metodología \textit{Kanban}} \cite{informatica:kanban_paper}. En dicha metodología se usa un tablero, en el que tarjetas que representan tareas a realizar se colocan sobre columnas que representan distintos estados. Usamos cuatro estados:
 
 \begin{itemize}
-    \item \textit{Backlog} o tareas que no sabemos si vamos a llevar a cabo
-    \item \textit{To-do} o tareas que debemos llevar a cabo.
-    \item \textit{In-progress} o tareas que actualmente estamos trabajando
-    \item \textit{Done} o tareas que ya se han completado
+	\item \textit{Backlog} o tareas que no sabemos si vamos a llevar a cabo
+	\item \textit{To-do} o tareas que debemos llevar a cabo.
+	\item \textit{In-progress} o tareas que actualmente estamos trabajando
+	\item \textit{Done} o tareas que ya se han completado
 \end{itemize}
 
 Esto permite tener una visualización rápida del estado de la iteración. Como comentaremos detalladamente en \sectionref{isec:github_buenas_practicas}, usaremos la utilidad de proyectos que ofrece \textit{Github} para tener acceso a un tablero \textit{kanban}. En la siguiente imagen se muestra un ejemplo del estado de este tablero:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1.05\textwidth]{informatica/kanban_board}
-    \caption{Ejemplo del estado de nuestro tablero \textit{kanban} en un momento concreto durante la fase de desarrollo. Podemos ver las cuatro columnas que ya hemos descrito. \textit{Github} le da el nombre \textit{No Status} a la columna que nosotros usamos como \textit{backlog}}
+	\centering
+	\includegraphics[width=1.05\textwidth]{informatica/kanban_board}
+	\caption{Ejemplo del estado de nuestro tablero \textit{kanban} en un momento concreto durante la fase de desarrollo. Podemos ver las cuatro columnas que ya hemos descrito. \textit{Github} le da el nombre \textit{No Status} a la columna que nosotros usamos como \textit{backlog}}
 \end{figure}
 
 Comenzamos a desarrollar el proyecto en Febrero de 2022. Sabemos que, debido a los exámenes universitarios, apenas trabajaremos en los meses de Enero, Mayo y Junio. Por tanto, consideraremos que en estos meses no trabajemos ninguna hora (aunque en la práctica sí que consigamos sacar algo de tiempo). Los meses en los que más trabajaremos serán Febrero, Julio, Agosto y Septiembre. En estos meses tenemos previsto trabajar al menos 20 horas semanales. En el resto de meses consideramos que trabaremos al menos 2 horas semanales. Por tanto, en los dos años que dedicamos al proyecto de informática, dedicaremos al menos 720 horas.
@@ -268,18 +268,18 @@ Comenzamos a desarrollar el proyecto en Febrero de 2022. Sabemos que, debido a l
 Teniendo todo esto en cuenta, inicialmente planificamos el proyecto tal y como describe el siguiente diagrama de Gannt:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_ideal}
-    \caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto. El color azul corresponde al \textit{dataset} \textit{MNIST}. El color morado corresponde al \textit{dataset} \textit{LFW}. El color naranja corresponde a los \textit{datasets} \textit{FG-Net} y \textit{CACD} en conjunto. Estas bases de datos se describen en detalle en \sectionref{isec:base_datos_usada}}
+	\centering
+	\includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_ideal}
+	\caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto. El color azul corresponde al \textit{dataset} \textit{MNIST}. El color morado corresponde al \textit{dataset} \textit{LFW}. El color naranja corresponde a los \textit{datasets} \textit{FG-Net} y \textit{CACD} en conjunto. Estas bases de datos se describen en detalle en \sectionref{isec:base_datos_usada}}
 \end{figure}
 
 Sin embargo, por los problemas enfrentados durante el desarrollo, y por inexactitudes en la planificación, acabamos distribuyendo el tiempo dedicado al trabajo tal y como se muestra en el siguiente diagrama de Gannt:
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_real}
-    \caption{Diagrama de \textit{Gantt} que describe la distribución real del tiempo dedicado al proyecto. Seguimos el mismo código de colores que en el diagrama anterior}
-    \label{img:gannt_real}
+	\centering
+	\includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_real}
+	\caption{Diagrama de \textit{Gantt} que describe la distribución real del tiempo dedicado al proyecto. Seguimos el mismo código de colores que en el diagrama anterior}
+	\label{img:gannt_real}
 \end{figure}
 
 En el repositorio abierto de \textit{Github} \cite{informatica:repogithub} donde hemos desarrollado el proyecto, podemos verificar los tiempos que aparecen en \imgref{img:gannt_real} \footnote{Recordamos que explicamos en detalle el uso de \textit{Git} en \sectionref{isec:github_buenas_practicas}}.
@@ -287,9 +287,9 @@ En el repositorio abierto de \textit{Github} \cite{informatica:repogithub} donde
 En cuanto a la planificación económica, tenemos en cuenta los siguientes aspectos:
 
 \begin{itemize}
-    \item El salario aproximado de un investigador en Ciencia de Datos y Aprendizaje Automático es de 35 €/h. Teniendo en cuenta que hemos dedicado al menos 720 horas de trabajo, esto supone un coste de 25.200€
-    \item El valor del ordenador que hemos usado para trabajar: 600€
-    \item El valor de los servidores \textit{nGPU} donde se han lanzado los procesos (véase \imgref{isec:entorno_ejecucion}). Se estima un coste de unos 145€ semanales. Teniendo en cuenta que hemos tenido acceso desde Marzo de 2023, y usamos estos servidores hasta Octubre de 2023, esto supone un coste de 4.640€
+	\item El salario aproximado de un investigador en Ciencia de Datos y Aprendizaje Automático es de 35 €/h. Teniendo en cuenta que hemos dedicado al menos 720 horas de trabajo, esto supone un coste de 25.200€
+	\item El valor del ordenador que hemos usado para trabajar: 600€
+	\item El valor de los servidores \textit{nGPU} donde se han lanzado los procesos (véase \imgref{isec:entorno_ejecucion}). Se estima un coste de unos 145€ semanales. Teniendo en cuenta que hemos tenido acceso desde Marzo de 2023, y usamos estos servidores hasta Octubre de 2023, esto supone un coste de 4.640€
 \end{itemize}
 
 Todo esto supone un \textbf{coste total} de unos 30.440€.
@@ -299,11 +299,11 @@ Todo esto supone un \textbf{coste total} de unos 30.440€.
 Hemos estructurado la parte informática del presente trabajo en los siguientes capítulos:
 
 \begin{itemize}
-    \item \sectionref{ich:introduccion}: introducimos el problema, lo describimos y motivamos. Comentamos los objetivos de esta parte del trabajo. Mostramos la planificación realizada y esta estructuración
-    \item \sectionref{ich:fundamentos_teoricos}: desarrollamos todos los conceptos teóricos necesarios para entender cómo hemos solucionado el problema planteado. Introducimos conceptos básicos del aprendizaje automático y aprendizaje profundo, y definimos algunas técnicas más avanzadas, entre las que se encuentran ciertas variantes técnicas que son objeto principal e nuestro estudio, pero que el lector todavía no conoce
-    \item \sectionref{ich:estado_arte}: mostramos el interés de la comunidad científica en este área de estudio, y nos centramos en los mejores enfoques a la hora de resolver nuestra tarea
-    \item \sectionref{ich:materiales_metodos}: describimos los conjuntos de datos empleados, el entorno donde ejecutamos la experimentación y qué técnicas, tanto específicas de aprendizaje automático como de otros ámbitos de las ciencias de la computación, hemos empleado para resolver nuestro problema
-    \item \sectionref{ich:implementacion}: explicamos en profundidad cómo hemos implementado la solución al problema, cómo hemos estructurado el código para obtener una arquitectura limpia y cómoda de trabajar, y cómo hemos llevado a cabo el proceso de optimización de ciertas partes del código
-    \item \sectionref{ich:Experimentación}: explicamos los protocolos de experimentación seguidos, los resultados obtenidos y qué conclusiones obtenemos a partir de estos resultados
-    \item \sectionref{ich:conclusiones}: comentamos las conclusiones obtenidas a partir de todo el trabajo realizado
+	\item \sectionref{ich:introduccion}: introducimos el problema, lo describimos y motivamos. Comentamos los objetivos de esta parte del trabajo. Mostramos la planificación realizada y esta estructuración
+	\item \sectionref{ich:fundamentos_teoricos}: desarrollamos todos los conceptos teóricos necesarios para entender cómo hemos solucionado el problema planteado. Introducimos conceptos básicos del aprendizaje automático y aprendizaje profundo, y definimos algunas técnicas más avanzadas, entre las que se encuentran ciertas variantes técnicas que son objeto principal e nuestro estudio, pero que el lector todavía no conoce
+	\item \sectionref{ich:estado_arte}: mostramos el interés de la comunidad científica en este área de estudio, y nos centramos en los mejores enfoques a la hora de resolver nuestra tarea
+	\item \sectionref{ich:materiales_metodos}: describimos los conjuntos de datos empleados, el entorno donde ejecutamos la experimentación y qué técnicas, tanto específicas de aprendizaje automático como de otros ámbitos de las ciencias de la computación, hemos empleado para resolver nuestro problema
+	\item \sectionref{ich:implementacion}: explicamos en profundidad cómo hemos implementado la solución al problema, cómo hemos estructurado el código para obtener una arquitectura limpia y cómoda de trabajar, y cómo hemos llevado a cabo el proceso de optimización de ciertas partes del código
+	\item \sectionref{ich:Experimentación}: explicamos los protocolos de experimentación seguidos, los resultados obtenidos y qué conclusiones obtenemos a partir de estos resultados
+	\item \sectionref{ich:conclusiones}: comentamos las conclusiones obtenidas a partir de todo el trabajo realizado
 \end{itemize}

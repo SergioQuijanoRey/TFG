@@ -34,7 +34,7 @@
                         % parámetros. Al aumentar el número aumentamos el ancho de texto y disminuimos el ancho del margen. Una opción de 14 producirá márgenes estrechos y texto ancho.
 }
 
-% TODO -- mirar esto cuando vaya a imprimir el TFG
+% NOTE -- no le hago demasiado caso porque el TFG no se va a imprimir
 % INFORMACIÓN PARA LA VERSIÓN IMPRESA
 % Si el documento ha de ser impreso en papel de tamaño a4 pero el tamaño del documento (elegido en \KOMAoptions con la ocpión paper) no es a4 descomentar la línea que carga el paquete `crop` más abajo. El paquete crop se encargará de centrar el documento en un a4 e imprimir unas guías de corte. El procedimiento completo para imprenta sería el siguiente:
 % 0. Determinar, según el tipo de encuadernación del documento, el ancho reservado para el proceso de encuadernación (preguntar en la imprenta), es decir, la anchura del área del papel que se pierde durante el proceso de encuadernación. Fijar la varibale BCOR de \KOMAoptions a dicho valor.
@@ -78,7 +78,6 @@
 % El paquete microtype mejora la tipografía del documento.
 \usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
 
-% TODO -- para el codigo creo que es mejor fuente Cascadia Code (preferencia personal)
 % Las tipografías elegidas para el documento, siguiendo la guía de estilo de la UGR,
 % son las siguientes
 % Normal font: 			URW Palladio typeface.
@@ -238,8 +237,6 @@
 % --------------------------------------------------------------------
 \usepackage{xspace} % Para problemas de espaciado al definir comandos
 
-% TODO -- hay que poner un titulo al trabajo
-% TODO -- hay que poner informacion de los tutores
 \newcommand{\miTitulo}{Estudio sobre la expresividad de las redes neuronales profundas y no profundas a través de análisis tensorial y reconocimiento facial invariante a la edad introduciendo una variante \textit{online} en \textit{Triplet Loss}\xspace}
 \newcommand{\miNombre}{Sergio Quijano Rey\xspace}
 \newcommand{\miGrado}{Doble Grado en Ingeniería Informática y Matemáticas}
@@ -321,7 +318,6 @@
 \input{capitulos/informatica/capitulo05} % Implementacion
 \input{capitulos/informatica/capitulo06} % Experimentacion
 \input{capitulos/informatica/capitulo07} % Conclusiones
-% \input{capitulos/informatica/capitulo_borrado.tex} % TODO -- borrar
 
 % -------------------------------------------------------------------
 % BACKMATTER

@@ -207,20 +207,26 @@ Veamos ahora una serie de resultados para estudiar el espacio que surge al hacer
 \end{proposicion}
 
 \begin{proof}
-	Definimos $\Omega := \R \otimes \mathbb{V}$ y tomamos un tensor en $\Omega$ de la forma $\gamma = a(x \otimes \nv{u}) + b(y \otimes \nv{v})$ con $a, b \in \R$, $x, y \in \R$, $\nv{u}, \nv{v} \in \mathbb{V}$. Usando las propiedades de los tensores (\ref{prop:tensores_propiedades}), desarrollamos esta expresión:
+	Definimos $\Omega := \R \otimes \mathbb{V}$ y tomamos un tensor en $\Omega$ de la forma
+
+	\begin{equation}
+		\gamma = a(x \otimes \nv{u}) + b(y \otimes \nv{v})
+	\end{equation}
+
+	con $a, b \in \R$, $x, y \in \R$, $\nv{u}, \nv{v} \in \mathbb{V}$. Usando las propiedades de los tensores (\ref{prop:tensores_propiedades}), desarrollamos esta expresión:
 
 	\begin{equation}
 		\begin{split}
-			a(x \otimes \nv{u}) + b(y \otimes \nv{v}) &\eqtext{2.} \\
-			&= x \otimes (a\nv{u}) + y \otimes (b\nv{v}) \eqtext{2} \ldots \text{ usando que }  x,y \in \R \ldots \\
-			\ldots &= 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} \\
-			&= 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = \\
-			&= 1 \otimes \nv{w} \quad \text{con } \nv{w} := (ax)\nv{u} + (by) \; \text{luego } \nv{w} \in \mathbb{V}
+			& a(x \otimes \nv{u}) + b(y \otimes \nv{v}) \eqtext{2.} x \otimes (a\nv{u}) + y \otimes (b\nv{v}) \\
+            & \eqtext{(*)} 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = 1 \otimes \nv{w} \\
+            &\text{con } \nv{w} := (ax)\nv{u} + (by) \quad \text{luego } \nv{w} \in \mathbb{V}
 		\end{split}
 	\end{equation}
 
+    (*): usando $2.$ y que $x, y \in \R$.
+
+
 \end{proof}
-\todo{Revisar esta prueba porque la copio desde un ejemplo, puede no ser del todo correcta}
 
 Buscamos extender este resultado para un tensor cualquiera (no necesariamente puro) del espacio $\R \otimes \mathbb{V}$:
 
@@ -287,8 +293,8 @@ Generalizamos la caracterización anterior:
 
 	\begin{equation}
 		\begin{split}
-			\nv{v} \otimes \nv{w} &= (\lambda_1 \nv{e_1} + \lambda_2 \nv{e_2} + \cdots + \lambda_N \nv{e_N}) \otimes \nv{w} \eqtext{3.} \lambda_1 \nv{e_1} \otimes \nv{w} + \lambda_2 \nv{e_2} \otimes \nv{w} + \cdots + \lambda_N \nv{e_N} \otimes \nv{w} \eqtext{1., 2.} \\
-			&= \nv{e_1} \otimes \lambda_1 \nv{w} + \nv{e_2} \otimes \lambda_2 \nv{w} + \cdots + \nv{e_N} \otimes \lambda_N \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \dots + \nv{e_N} \otimes \nv{w_N} \qquad \\
+			\nv{v} \otimes \nv{w} &= (\lambda_1 \nv{e_1} + \lambda_2 \nv{e_2} + \cdots + \lambda_N \nv{e_N}) \otimes \nv{w} \eqtext{3.} \lambda_1 \nv{e_1} \otimes \nv{w} + \lambda_2 \nv{e_2} \otimes \nv{w} + \cdots + \lambda_N \nv{e_N} \otimes \nv{w} \\
+            & \eqtext{1., 2.} \nv{e_1} \otimes \lambda_1 \nv{w} + \nv{e_2} \otimes \lambda_2 \nv{w} + \cdots + \nv{e_N} \otimes \lambda_N \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \dots + \nv{e_N} \otimes \nv{w_N} \qquad \\
 			\text{con} \dspace \nv{w_i} &= \lambda_i \nv{w} \in \mathbb{V}
 		\end{split}
 	\end{equation}
@@ -309,7 +315,6 @@ Generalizamos la caracterización anterior:
 	Es decir, $\R^N \otimes \mathbb{V} \cong \mathbb{V}^N$.
 
 \end{proof}
-\todo{Revisar, antes era un ejemplo que ahora ha pasado a ser una prueba}
 
 \subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
 
@@ -335,7 +340,9 @@ $$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1},
 	En el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}, \nv{v} \in \R^{N_2}$, es directo comprobar que $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$.
 \end{observacion}
 
-\todo{Antes hablaba de un ejemplo que conectaba la definición de los tensores abstracta con esto. Comentar cómo esta definición coincide con la anterior usando apropiados isomorfismos}
+\begin{observacion}
+    Se puede comprobar que esta forma de definir los tensores y el producto tensorial coincide con el desarrollo formal realizado en la \sectionref{sec:deftensor}, a raíz de ciertos isomorfismos.
+\end{observacion}
 
 \subsection{Propiedad Universal del producto tensorial}
 
