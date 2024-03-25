@@ -10,62 +10,52 @@ En esta sección introduciremos los \textbf{conceptos teóricos} sobre los que s
 
 \section{Aprendizaje automático}
 
-El aprendizaje automático es una rama de la Inteligencia Artificial. La \textbf{inteligencia artificial} es a su vez una rama de las ciencias de la computación, dedicada al desarrollo de sistemas que resuelvan ciertas tareas de forma inteligente, en base a cierto criterio para especificar qué entendemos por inteligencia \cite{informatica:libro_europa_IA}. Esta disciplina es muy amplia y comprende muchas áreas de conocimiento, por ejemplo: sistemas expertos, sistemas basados en reglas, sistemas de planificación, visión por computador, robótica, aprendizaje automático...
+El aprendizaje automático es una rama de la Inteligencia Artificial, que a su vez es una rama de las ciencias de la computación, dedicada al desarrollo de sistemas que resuelvan ciertas tareas de forma inteligente, en base a cierto criterio para especificar qué entendemos por inteligencia \cite{informatica:libro_europa_IA}. El aprendizaje automático logra resolver las tareas propuestas de forma inteligente a partir de algoritmos y modelos capaces de aprender el comportamiento deseado a partir de un conjunto de datos. Previa a la aparición de estas técnicas y modelos, un experto humano era el que diseñaba e implementaba la solución al problema. En el aprendizaje automático, dados un modelo y un algoritmo de aprendizaje, la solución se aprende a partir de los datos \cite{informatica:libro_europa_IA}.
 
-El \textbf{aprendizaje automático} logra resolver las tareas propuestas de forma inteligente a partir de algoritmos y modelos capaces de aprender el comportamiento deseado a partir de un conjunto de datos. Previa a la aparición de estas técnicas y modelos, un experto humano era el que diseñaba e implementaba la solución al problema. En el aprendizaje automático, dados un modelo y un algoritmo de aprendizaje, la solución se aprende a partir de los datos \cite{informatica:libro_europa_IA}.
-
-Este enfoque es muy interesante en ciertos problemas en los que no sabemos cómo diseñar una solución pero disponemos de un gran conjunto de datos de ejemplo. Por ejemplo, consideremos el problema de localizar caras en una imagen. Es realmente complicado diseñar manualmente un algoritmo que resuelva esta tarea, pero es relativamente sencillo generar un conjunto de datos para que un algoritmo de aprendizaje automático genere un modelo que haya aprendido a resolver esta tarea.
-
-Otra característica interesante del \textit{machine learning} es que tiene la capacidad de mejorar su rendimiento mejorando la calidad y cantidad de datos de entrenamiento \cite{informatica:paper_que_es_ml}.
+Este enfoque es muy interesante en ciertos problemas en los que no sabemos cómo diseñar una solución pero disponemos de un gran conjunto de datos de ejemplo. Por ejemplo, consideremos el problema de localizar caras en una imagen. Es realmente complicado diseñar manualmente un algoritmo que resuelva esta tarea, pero es relativamente sencillo generar un conjunto de datos para que un algoritmo de aprendizaje automático genere un modelo que haya aprendido a resolver esta tarea. Otra característica interesante del aprendizaje automático es que tiene la capacidad de mejorar su rendimiento al mejorar la calidad y cantidad de datos de entrenamiento \cite{informatica:paper_que_es_ml}.
 
 \subsection{Aprendizaje supervisado y no supervisado}
 
-Podemos realizar una clasificación de los algoritmos de aprendizaje automático en base a la forma de los datos con los que el modelo aprende el comportamiento deseado, que puede ser representado como
+Podemos realizar una clasificación de los algoritmos de aprendizaje automático en base a la forma de los datos con los que el modelo aprende el comportamiento deseado, que puede ser representado como:
 
 \begin{equation}
     f(x) = y
 \end{equation}
 
-donde $x$ es el dato de entrada, $y$ es la salida deseada y $f$ es el cómputo que realiza nuestro modelo. Consideremos el ejemplo de calcular la edad de una persona a partir de una fotografía de su rostro. Entonces $x$ sería una imagen facial, $y$ la edad de la persona que aparece en la imagen y $f$ el cómputo que realiza el modelo entrenado.
+donde $x$ es el dato de entrada, $y$ es la salida deseada y $f$ es el cómputo que realiza nuestro modelo. Consideremos por ejemplo el problema de calcular la edad de una persona a partir de una fotografía de su rostro. Entonces $x$ sería una imagen facial, $y$ la edad de la persona que aparece en la imagen y $f$ el cómputo que realiza el modelo entrenado.
 
-Con esto en cuenta, hablamos de \textbf{aprendizaje supervisado} cuando los datos de entrenamiento están etiquetados, es decir, vienen dados como tuplas (dato de entrada, valor objetivo) o $(x, y)$. Siguiendo el ejemplo anterior, tendríamos un conjunto de datos en los que cada imagen viene acompañada con la edad de la persona que aparece en la imagen.
+Con esto en cuenta, hablamos de \textbf{aprendizaje supervisado} cuando los datos de entrenamiento están etiquetados, es decir, vienen dados como tuplas (dato de entrada, valor objetivo) o $(x, y)$. Siguiendo el ejemplo anterior, tendríamos un conjunto de datos en los que cada imagen viene acompañada con la edad de la persona que aparece en la imagen. Por otro lado, hablamos de \textbf{aprendizaje no supervisado} cuando los datos de entrenamiento vienen sin etiquetar, es decir, para un valor de entrada $x$ no conocemos cuál es el valor de salida $y$ esperado. En algunos casos, disponemos de otra información asociada a los datos de entrada, a partir de la cual podemos aprender el comportamiento deseado. En otros casos ni siquiera disponemos de esa información adicional.
 
-Por otro lado, hablamos de \textbf{aprendizaje no supervisado} cuando los datos de entrenamiento vienen sin etiquetar, es decir, para un valor de entrada $x$ no conocemos cuál es el valor de salida $y$ esperado. En algunos casos, disponemos de otra información asociada a los datos de entrada, a partir de la cual podemos aprender el comportamiento deseado. En otros casos ni siquiera disponemos de esa información adicional.
+Nuestra \textbf{solución propuesta forma parte del aprendizaje no supervisado}. Como comentaremos en la \sectionref{isec:base_datos_usada}, trabajamos con conjuntos de imágenes en las que únicamente conocemos la identidad del individuo que aparece en la imagen. Estamos cerca de tener un conjunto de datos propiamente etiquetado, pero faltaría que los datos de entrenamiento fueran dados en la forma asociada a una tarea de búsqueda, es decir, una tupla con la imagen de entrada y la lista con los $n$ mejores resultados para esa imagen.
 
-Nuestra \textbf{solución propuesta forma parte del aprendizaje no supervisado}. Como comentaremos en \sectionref{isec:base_datos_usada}, trabajamos con conjuntos de imágenes en las que únicamente conocemos la identidad del individuo que aparece en la imagen. Estamos cerca de tener un conjunto de datos propiamente etiquetado, pero faltaría que los datos de entrenamiento fueran dados en la forma asociada a una tarea de \textit{retrieval}, es decir (imagen de entrada, lista con los $n$ mejores resultados para esa imagen).
+\subsection{Tarea de aprendizaje y aprendizaje por la máxima pendiente}
 
-\subsection{Tarea de aprendizaje, aprendizaje por la máxima pendiente}
-
-Buscamos modelar cierto comportamiento que viene representado por
+Recordemos que buscamos modelar cierto comportamiento que viene representado por:
 
 \begin{equation}
     f(x) = y, \; \forall x \in \mathcal{X}
 \end{equation}
 
-donde $x$ es el dato de entrada que vive en el espacio $\mathcal{X}$, $y$ es el valor de salida para esa entrada, y $f$ es nuestra \textbf{función objetivo}. Notar que \textbf{no conocemos $f$}, pues conocer dicha función supone que ya conocemos la solución al problema. Para resolver dicho problema, disponemos de una familia paramétrica de funciones
+donde $x$ es el dato de entrada que vive en el espacio $\mathcal{X}$, $y$ es el valor de salida para esa entrada, y $f$ es nuestra función objetivo. Notar que \textbf{no conocemos $f$}, pues conocer dicha función supone que ya conocemos la solución al problema. Para resolver dicho problema, disponemos de una familia paramétrica de funciones:
 
 \begin{equation}
     \Gamma := \conjunto{f_{\theta}: \; \theta \in \Theta \subseteq \R^N }
 \end{equation}
 
-Queremos obtener, a partir de unos datos de entrenamiento $\Omega$, la función de $\Gamma$ que más se parezca a la función objetivo $f$ (desconocida). Para ello necesitamos especificar cómo vamos a medir la similitud de nuestra solución a la función objetivo, y cuál es el algoritmo que optimiza dicha noción de similitud.
-
-La primera pieza será la \textbf{función de pérdida}. Esta función toma la función candidata $f_{\theta}$, los datos de entrenamiento $\Omega$, y devuelve un valor del error cometido. Por tanto, la solución ideal tendrá un error cero, lo que indicará que dicha solución está a distancia cero de la función objetivo. Denotaremos a dicha función como $\mathcal{L}(f_\theta, \Omega)$.
-
-En caso de que dicha función sea diferenciable respecto a $\theta$, podemos aplicar el \textbf{algoritmo de descenso por la máxima pendiente} o descenso del gradiente. Dicho algoritmo busca minimizar el error de la siguiente forma:
+Queremos obtener, a partir de unos datos de entrenamiento $\Omega$, la función de $\Gamma$ que más se parezca a la función objetivo $f$ (desconocida). Para ello necesitamos especificar cómo vamos a medir la similitud de nuestra solución a la función objetivo, y cuál es el algoritmo que optimiza dicha noción de similitud. La primera pieza será la \textbf{función de pérdida}, que toma una función candidata $f_{\theta}$, los datos de entrenamiento $\Omega$ y devuelve el error cometido. Denotaremos a dicha función como $\mathcal{L}(f_\theta, \Omega)$. En caso de que dicha función sea diferenciable respecto a $\theta$, podemos aplicar el \textbf{algoritmo de descenso por la máxima pendiente} o descenso del gradiente. Dicho algoritmo busca minimizar el error de la siguiente forma:
 
 \begin{enumerate}
-    \item Toma un valor inicial de $\theta_0 \in \Theta$ en base a algún criterio. Por ejemplo, toma dicho valor inicial aleatoriamente
-    \item Actualiza el valor de los parámetros tal que
+    \item Toma un valor inicial de $\theta_0 \in \Theta$ en base a algún criterio. Por ejemplo, toma dicho valor inicial aleatoriamente.
+    \item Actualiza el valor de los parámetros tal que:
         \begin{equation}
             \theta_{i + 1} \leftarrow \theta_i - \eta \nabla \mathcal{L}(f_\theta, \Omega)
         \end{equation}
 
         donde $\eta$ es un factor de escalado al que se le conoce como \textbf{tasa de aprendizaje} o \textbf{\textit{learning rate}}.
-    \item Se repite el paso anterior hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error, hasta que no mejoremos la función de error en cierto número de iteraciones...
+    \item Se repite el paso anterior hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error o hasta que no mejoremos la función de error en cierto número de iteraciones.
 \end{enumerate}
 
-La elección del \textit{learning rate} es fundamental a la hora de obtener una buena solución. El descenso del gradiente es un método que se fundamenta en el cómputo del gradiente, y por tanto es de carácter eminentemente local. Un valor muy pequeño de $\eta$ provocará que el proceso quede atascado en mínimos locales rápidamente y que el aprendizaje sea muy lento. Un valor muy alto provocará que los cambios en los parámetros sean demasiado bruscos, y no tengamos la granularidad suficiente para explotar los óptimos (aunque sean locales). Todo esto queda explicado en la \imgref{img:valores_learning_rate}.
+La elección de la tasa de aprendizaje es fundamental a la hora de obtener una buena solución. El descenso del gradiente es un método que se fundamenta en el cómputo del gradiente, y por tanto es de carácter eminentemente local. Un valor muy pequeño de $\eta$ provocará que el proceso quede atascado en mínimos locales rápidamente y que el aprendizaje sea muy lento. Un valor muy alto provocará que los cambios en los parámetros sean demasiado bruscos y que no tengamos la granularidad suficiente para explotar los óptimos (aunque sean locales). Todo esto queda explicado en la \imgref{img:valores_learning_rate}.
 
 \begin{figure}[h]
     \centering
@@ -76,14 +66,7 @@ La elección del \textit{learning rate} es fundamental a la hora de obtener una 
 
 \subsection{Descenso del gradiente estocástico}
 
-En el algoritmo del descenso del gradiente hemos actualizado los parámetros de nuestro modelo en base al gradiente de $\mathcal{L}(f_{\theta}, \Omega)$. Esto significa que en una actualización de los parámetros usamos todos los datos de entrenamiento para computar el gradiente, lo que supone algunos problemas:
-
-\begin{itemize}
-    \item El más evidente, puede ser computacionalmente muy costoso. El tiempo de cómputo puede llegar a ser inviable. Por otro lado, estamos trabajando con conjuntos de datos tan grandes que puede que nuestro \textit{hardware} no pueda realizar cómputos de forma eficiente sin saturar la memoria
-    \item Al usar todos los datos de entrenamiento para calcular la actualización de los parámetros, podemos estar realizando cambios muy bruscos (porque acumulamos los errores sobre todos los ejemplos de entrenamiento) y poco sutiles (los cambios sutiles que proponen ciertos ejemplos concretos se ven difuminados por el resto de ejemplos)
-\end{itemize}
-
-Es por esto que se propone el uso del \textbf{descenso del gradiente estocástico}. Dividimos el conjunto de entrenamiento $\Omega$ en subconjuntos $\Omega_i$, $i \in \deltaset{n}$. A estos subconjuntos los llamaremos \textbf{\textit{batches}}. Es claro entonces que
+En el algoritmo del descenso del gradiente hemos actualizado los parámetros de nuestro modelo en base al gradiente de $\mathcal{L}(f_{\theta}, \Omega)$. Esto significa que en una actualización de los parámetros usamos todos los datos de entrenamiento para computar el gradiente, lo que supone algunos problemas. El más evidente es que puede ser computacionalmente muy costoso. Incluso podemos saturar la memoria de nuestro \textit{hardware} al estar trabajando con conjuntos de datos tan grandes. El segundo, al usar todos los datos de entrenamiento para calcular la actualización de los parámetros, podemos estar realizando cambios muy bruscos (porque acumulamos los errores sobre todos los ejemplos de entrenamiento) y poco sutiles (los cambios sutiles que proponen ciertos ejemplos concretos se ven difuminados por el resto de ejemplos). Es por estos dos problemas que se propone el uso del \textbf{descenso del gradiente estocástico}. Dividimos el conjunto de entrenamiento $\Omega$ en subconjuntos $\Omega_i$, $i \in \deltaset{n}$. A estos subconjuntos los llamaremos \textbf{\textit{batches}}. Es claro entonces que:
 
 \begin{equation}
     \Omega = \union_{i = 1}^n \Omega_i
@@ -92,52 +75,46 @@ Es por esto que se propone el uso del \textbf{descenso del gradiente estocástic
 Con esto, cambiamos ligeramente nuestro algoritmo de aprendizaje, que ahora consistirá en:
 
 \begin{enumerate}
-    \item Tomar un valor inicial de $\theta_0 \in \Theta$ en base a algún criterio. Por ejemplo, tomar dicho valor inicial aleatoriamente
-    \item Inicializar $\theta_{k + 1} \leftarrow \theta_k$
-    \item Para cada $i \in \deltaset{n}$, actualizar el valor de los parámetros usando solo información de un \textit{batch}, tal que
+    \item Tomar un valor inicial de $\theta_0 \in \Theta$ en base a algún criterio. Por ejemplo, tomar dicho valor inicial aleatoriamente.
+    \item Inicializar $\theta_{k + 1} \leftarrow \theta_k$.
+    \item Para cada $i \in \deltaset{n}$, actualizar el valor de los parámetros usando solo información de un \textit{batch}, tal que:
         \begin{equation}
-            \theta_{k + 1} \leftarrow \theta_{k + 1} - \eta \nabla \mathcal{L}(f_\theta, \Omega_i)
+            \theta_{k + 1} \leftarrow \theta_{k + 1} - \eta \nabla \mathcal{L}(f_\theta, \Omega_i).
         \end{equation}
-    \item Repetir desde el segundo paso hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error, hasta que no mejoremos la función de error en cierto número de iteraciones...
+    \item Repetir desde el segundo paso hasta que se cumpla cierta condición de parada. Por ejemplo, hasta que hayamos realizado un número dado de iteraciones, hasta que estemos por debajo de cierto umbral de error o hasta que no mejoremos la función de error en cierto número de iteraciones.
 \end{enumerate}
 
-\subsection{Deep Learning} \label{isubs:deep_learning_teoria}
+\subsection{Aprendizaje Profundo} \label{isubs:deep_learning_teoria}
 
-El \textit{deep learning} o \textbf{aprendizaje profundo} es una rama del aprendizaje automático caracterizado por el uso de cierto tipo de modelos, los conocidos como \textbf{redes neuronales profundas} \cite{informatica:paper_deep_learning_def} \cite{informatica:paper_deep_learning_def_second}.
-
-Las \textbf{redes neuronales} son modelos que usan unidades más pequeñas llamadas \textbf{neuronas}. Con el paso de los años han aparecido distintos tipos de redes neuronales, en base al tipo de neurona usada. Un primer tipo de red neuronal es el \textbf{perceptrón multicapa} o \textit{MLP}. En esta red la entrada se transforma pasando a través de distintas capa compuestas de varias neuronas que realizan una suma ponderada de las salidas previas, y se aplica una \textbf{función de activación} al valor de dicha suma. La siguiente figura muestra el funcionamiento de una neurona \textit{MLP}:
+El aprendizaje profundo o \textit{deep learning} es una rama del aprendizaje automático caracterizado por el uso de redes neuronales profundas \cite{informatica:paper_deep_learning_def} \cite{informatica:paper_deep_learning_def_second}. Las redes neuronales son modelos que usan unidades más pequeñas llamadas neuronas. Con el paso de los años han aparecido distintos tipos de redes neuronales, en base al tipo de neurona usada. Un primer tipo de red neuronal es el perceptrón multicapa o \textit{MLP}. En esta red la entrada se transforma pasando a través de distintas capa compuestas de varias neuronas que realizan una suma ponderada de las salidas previas, y se aplica una función de activación al valor de dicha suma. La siguiente figura muestra el funcionamiento de una neurona \textit{MLP}:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{informatica/neurona_mlp}
-    \caption{Ejemplo de cómputo de una neurona en una red neuronal \textit{MLP}. Imagen extraída de \cite{informatica:paper_deep_learning_def}}
+    \caption{Ejemplo de cómputo de una neurona en una red neuronal \textit{MLP}. Imagen extraída de \cite{informatica:paper_deep_learning_def}.}
 \end{figure}
 
-Las \textbf{redes neuronales profundas} se caracterizan por tener múltiples capas ocultas. Esto es, múltiples capas entre la capa de entrada, que introduce los datos a la red, y la capa de salida, de la que tomamos las predicciones de la red. Este enfoque permite la extracción y representación de características o \textit{features} de manera jerárquica, lo que es especialmente útil para tareas de procesamiento de información, como reconocimiento de imágenes, procesamiento de lenguaje natural, traducción automática, procesamiento de voz, ...
+Las \textbf{redes neuronales profundas} se caracterizan por tener múltiples capas ocultas. Esto es, múltiples capas entre la capa de entrada, que introduce los datos a la red, y la capa de salida, de la que tomamos las predicciones de la red. Este enfoque permite la extracción y representación de características de manera jerárquica, lo que es especialmente útil para tareas de procesamiento de información, como reconocimiento de imágenes, procesamiento de lenguaje natural, traducción automática o procesamiento de voz. El aprendizaje profundo implica que debemos utilizar conjuntos de datos mucho más grandes y que los tiempos de entrenamiento son mucho mayores. Sin embargo, podemos utilizar de forma efectiva dichos conjuntos de datos de gran tamaño, porque estos modelos son más expresivos.
 
-El aprendizaje profundo implica que debemos utilizar conjuntos de datos mucho más grandes y que los tiempos de entrenamiento son mucho mayores. Sin embargo, podemos utilizar de forma efectiva dichos conjuntos de datos de gran tamaño, porque estos modelos son más expresivos.
-
-El entrenamiento de estos modelos se realiza con algoritmos basados en el gradiente, como los que hemos introducido o algunas variantes más avanzadas. Actualizar los parámetros del modelo a partir de la información del gradiente de forma directa es computacionalmente muy costoso e ineficiente. El uso del algoritmo de propagación hacia atrás del gradiente o \textbf{\textit{backpropagation}} permite que la optimización de estos modelos con un número tan elevado de parámetros sea factible \cite{informatica:libro_backprop}. La idea clave es actualizar los pesos de las capas más profundas a partir del cálculo del gradiente de forma iterativa, usando la \textbf{regla de la cadena}. Para calcular el gradiente de una capa anterior (menos profunda) usamos el gradiente de la capa posterior (más profunda), y guardamos este cálculo para la siguiente capa anterior. De esta forma aliviamos notablemente la carga computacional.
+El entrenamiento de estos modelos se realiza con algoritmos basados en el gradiente, como los que hemos introducido o algunas variantes más avanzadas. Actualizar los parámetros del modelo a partir de la información del gradiente de forma directa es computacionalmente muy costoso e ineficiente. El uso del algoritmo de propagación hacia atrás del gradiente o \textbf{\textit{backpropagation}} permite que la optimización de estos modelos con un número tan elevado de parámetros sea factible \cite{informatica:libro_backprop}. La idea clave es actualizar los pesos de las capas más profundas a partir del cálculo del gradiente de forma iterativa, usando la regla de la cadena. Para calcular el gradiente de una capa anterior (menos profunda) usamos el gradiente de la capa posterior (más profunda), y guardamos este cálculo para la siguiente capa anterior. De esta forma aliviamos notablemente la carga computacional.
 
 \subsection{Redes convolucionales}
 
-Las \textbf{redes convolucionales} son un tipo de red neuronal especialmente útiles para trabajar con imágenes. A estas redes se les conoce también como \textit{CNN}, por sus siglas del inglés \textit{Convolutional Neural Networks}. Algunas tareas para las que podemos aplicar estas redes son clasificación de imágenes o detección de objetos \cite{informatica:paper_definicion_cnn}. La capacidad de estas redes para aprender representaciones jerárquicas las ha convertido en una de las herramientas más usadas en el ámbito del aprendizaje automático.
-
-Estas redes están formadas por los siguientes tipos de capas:
+Las redes convolucionales son un tipo de red neuronal especialmente útiles para trabajar con imágenes. A estas redes se les conoce también como \textit{CNN}, por sus siglas del inglés \textit{Convolutional Neural Networks}. Algunas tareas para las que podemos aplicar estas redes son la clasificación de imágenes o la detección de objetos \cite{informatica:paper_definicion_cnn}. La capacidad de estas redes para aprender representaciones jerárquicas las ha convertido en una de las herramientas más usadas en el ámbito del aprendizaje automático. Estas redes están formadas por los siguientes tipos de capas:
 
 \begin{enumerate}
-    \item \textbf{Capas convolucionales}: principal característica de las redes convolucionales. Estas capas están especialmente pensadas para explotar la estructura inherente de las imágenes con las que trabajamos
-    \item Capas de \textit{pooling}: resumen la información para reducir el número de parámetros a optimizar
-    \item Capas totalmente conectadas: capas que toman un vector de entrada y aplican una capa tipo \textit{MLP} \sectionref{isubs:deep_learning_teoria}
+    \item \textbf{Capas convolucionales}: principal característica de las redes convolucionales. Estas capas están especialmente pensadas para explotar la estructura inherente de las imágenes con las que trabajamos.
+    \item Capas de \textit{pooling}: resumen la información para reducir el número de parámetros a optimizar.
+    \item Capas totalmente conectadas: capas que toman un vector de entrada y aplican una capa tipo \textit{MLP} (véase la \sectionref{isubs:deep_learning_teoria}).
 \end{enumerate}
 
 Desarrollamos en más detalles estas componentes.
 
 \subsubsection{Capa Convolucional}
 
-La capa convolucional es la herramienta que caracteriza este tipo de redes. Esta capa aplica filtros o \textit{kernels} a los datos con los que trabaja, a partir de los cuales extraemos información de dichos datos de entrada. Estos filtros ya se usaban antes de que el \textit{deep learning} se hiciese popular. Sin embargo, dichos filtros eran diseñados manualmente por un experto. En el enfoque del aprendizaje automático los coeficientes de los filtros se aprenden a partir de los datos de entrenamiento.
+La capa convolucional es la herramienta que caracteriza este tipo de redes. Esta capa aplica filtros o \textit{kernels} a los datos con los que trabaja, a partir de los cuales extraemos información de dichos datos de entrada. Estos filtros ya se usaban antes de que el aprendizaje profundo se hiciese popular. Sin embargo, dichos filtros eran diseñados manualmente por un experto. En el enfoque del aprendizaje automático los coeficientes de los filtros se aprenden a partir de los datos de entrenamiento.
 
-Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con las que trabajamos. Esta estructura vienen dada por la propiedad de que píxeles cercanos de una imagen (es decir, un vecindario de píxeles) están relacionados entre ellos. La posición de un píxel y su vecindario tienen información inherente. Esto queda más claro considerando que si tomamos una imagen y permutamos aleatoriamente sus píxeles, la imagen pierde todo su valor, como muestra la \imgref{img:desordenar_pixeles}.
+Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con las que trabajamos. Esta estructura vienen dada por la propiedad de que píxeles cercanos de una imagen (es decir, un vecindario de píxeles) están relacionados entre ellos. Es decir, la posición de un píxel y su vecindario tienen información inherente. Esto queda más claro considerando que si tomamos una imagen y permutamos aleatoriamente sus píxeles, la imagen pierde todo su valor, como muestra la \imgref{img:desordenar_pixeles}.
 
 \begin{figure}[H]
     \centering
@@ -152,37 +129,35 @@ Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con 
         \includegraphics[width=0.9\linewidth]{informatica/ejemploperm_permutada}
         \caption{Imagen original tras aplicar una permutación aleatoria de las posiciones de los píxeles}
     \end{subfigure}
-    \caption{La posición de un píxel y su vecindario tiene información inherente. Si permutamos los píxeles entre ellos, la imagen pierde todo el sentido, porque hemos eliminado dicha información inherente}
+    \caption{La posición de un píxel y su vecindario tiene información inherente. Si permutamos los píxeles entre ellos, la imagen pierde todo el sentido, porque hemos eliminado dicha información inherente.}
     \label{img:desordenar_pixeles}
 \end{figure}
 
-Podemos aplicar una red \textit{MLP} a imágenes, vectorizando previamente la imagen de entrada (por ejemplo, tomando las columnas de la imagen y concatenando dichas columnas en un único vector). Esto es claramente ineficiente, porque en cada capa combinamos toda la información de toda la imagen. Para extraer características de la imagen no es útil tomar vecindarios distantes entre sí. Y aquí es donde las capas convolucionales son más eficientes.
-
-Las capas convolucionales se basan en el operador matemático de \textbf{convolución}. Dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
+Podemos aplicar una red \textit{MLP} a imágenes, vectorizando previamente la imagen de entrada (por ejemplo, tomando las columnas de la imagen y concatenando dichas columnas en un único vector). Esto es claramente ineficiente, porque en cada capa combinamos la información de toda la imagen. Para extraer características de la imagen no es útil tomar vecindarios distantes entre sí. Y aquí es donde las capas convolucionales son más eficientes. Estas se basan en el operador matemático de \textbf{convolución}. Dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
 
 \begin{equation}
-    (f * g)(x) := \int f(t) g(x - t) dt
+    (f * g)(x) := \int f(t) g(x - t) dt.
 \end{equation}
 
 Podemos trabajar con una versión discretizada de la convolución, de la siguiente forma:
 
 \begin{equation}
-    (f * g)(x) := \sum_{t \in \N} f(t) g(x - t)
+    (f * g)(x) := \sum_{t \in \N} f(t) g(x - t).
 \end{equation}
 
 Y a la hora de trabajar con imágenes, que podemos representar como matrices, podemos realizar una convolución discreta entre funciones de dos variables:
 
 \begin{equation}
-    (f * g)(x, y) := \sum_{s \in \N} \sum_{t \in \N} f(s, t) g(x - s, y - t)
+    (f * g)(x, y) := \sum_{s \in \N} \sum_{t \in \N} f(s, t) g(x - s, y - t).
 \end{equation}
 
-Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique filtros a imágenes de esta forma. Una \textbf{capa convolucional} vendrá dada por los siguientes hiperparámetros:
+Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique filtros a imágenes de esta forma. Para construir una \textbf{capa convolucional} deberemos fijar los valores de los siguientes hiperparámetros:
 
 \begin{itemize}
-    \item Dimensiones del filtro: podemos aplicar un filtro de tamaño $1 \times 1$, en el que en cada paso sólo nos fijamos en un píxel de la imagen. O de tamaño $3 \times 3$, en el que en cada paso nos fijamos en 9 píxeles de la imagen. O cualquier tamaño, que normalmente se toma impar
-    \item \textit{Depth}: cuántos filtros convolucionales se aplican en esta capa. Esto determina cuántas salidas tenemos tras aplicar la capa. A dichas salidas se las conoce como \textbf{mapas de activación}
-    \item \textit{Stride}: tamaño de salto al mover el filtro por la imagen. Podemos aplicar nuestro filtro dando pasos de un píxel, o podemos dar pasos mayores
-    \item \textit{Padding}: Según el tamaño del filtro y el \textit{stride}, podemos tener problemas al llegar a los bordes de la imagen. Podemos aplicar distintas políticas para resolver esto, pero una de las más comunes es ampliar la imagen por cierto tamaño (por ejemplo, copiando los píxeles del borde, usando la media de ciertos píxeles, ...)
+    \item Dimensiones del filtro: podemos aplicar un filtro de tamaño $1 \times 1$, en el que en cada paso sólo nos fijamos en un píxel de la imagen. O de tamaño $3 \times 3$, en el que en cada paso nos fijamos en 9 píxeles de la imagen. O cualquier tamaño impar.
+    \item Profundidad: cuántos filtros convolucionales se aplican en esta capa. Esto determina cuántas salidas tenemos tras aplicar la capa. A dichas salidas se las conoce como \textbf{mapas de activación}.
+    \item \textit{Stride}: tamaño de salto al mover el filtro por la imagen. Podemos aplicar nuestro filtro dando pasos de un píxel, o podemos dar pasos mayores.
+    \item \textit{Padding}: Según el tamaño del filtro y el \textit{stride}, podemos tener problemas al llegar a los bordes de la imagen. Podemos aplicar distintas políticas para resolver esto, pero una de las más comunes es ampliar la imagen por cierto tamaño (por ejemplo, copiando los píxeles del borde o usando la media de ciertos píxeles).
 \end{itemize}
 
 El funcionamiento de este operador se muestra en el siguiente diagrama:
@@ -190,25 +165,20 @@ El funcionamiento de este operador se muestra en el siguiente diagrama:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{informatica/ejemplo_capa_convolucional}
-    \caption{Ejemplo gráfico de una capa convolucional. Estamos usando una convolución de tamaño $2 \times 2$, \textit{stride} = 1 y no usamos \textit{padding} (usamos otra política, que consiste en ajustar el filtro para que no se salga de la imagen). Imagen extraída de \cite{informatica:paper_definicion_cnn}}
+    \caption{Ejemplo gráfico de una capa convolucional. Estamos usando una convolución de tamaño $2 \times 2$, \textit{stride} = 1 y no usamos \textit{padding} (usamos otra política, que consiste en ajustar el filtro para que no se salga de la imagen). Imagen extraída de \cite{informatica:paper_definicion_cnn}.}
 \end{figure}
 \todo{Solucionar imagen de mala calidad}
 
-Algunas características muy interesantes de esta operación son:
-
-\begin{itemize}
-    \item \textbf{Coeficientes compartidos}: los coeficientes del operador son independientes de la posición en la que nos encontremos. Si nuestro filtro detecta un patrón, dicha detección debe ser independiente de la posición en la que se encuentre dicho patrón
-    \item \textbf{Localidad}: el operador toma información de vecindarios de píxeles. Esto es relevante por la estructura local que hemos comentado de las imágenes
-\end{itemize}
+Esta operación tiene dos propiedades muy relevantes y que justifican su buen funcionamiento. La primera es la \textbf{compartición de coeficientes}. Los coeficientes del operador son independientes de la posición en la que nos encontremos. Si nuestro filtro detecta un patrón, dicha detección debe ser independiente de la posición en la que se encuentre dicho patrón. La segunda es la \textbf{localidad}. El operador toma información de vecindarios de píxeles. Esto es relevante por la estructura local que hemos comentado de las imágenes.
 
 \subsubsection{Capa de \textit{pooling}}
 
-El propósito de esta capa es resumir la información de la imagen (o conjunto de mapas de activación) para obtener datos de menor dimensionalidad. Hay varias formas de realizar esta operación, así que mencionamos algunas de las más usuales:
+El propósito de esta capa es resumir la información de la imagen (o conjunto de mapas de activación) para obtener datos de menor dimensionalidad. Esto ayuda a que la red sea más ligera, pues al reducir la dimensionalidad de los datos, reduce el número de parámetros que necesitamos ajustar. A partir de la experimentación se piensa que además ayuda a introducir cierta invarianza frente a traslaciones. Hay varias formas de realizar esta operación, así que mencionamos algunas de las más usuales:
 
 \begin{itemize}
-    \item \textit{Gobal pooling}: tomamos todos los datos y los resumimos como uno solo, por ejemplo, utilizando la media de todos los valores
-    \item \textit{Max Pooling}: aplicamos un filtro que recorre la imagen de la misma forma que una convolución. Pero en vez de aplicar cierta suma ponderada, toma el máximo de los valores que se están considerando en ese paso
-    \item \textit{Average Pooling}: igual que \textit{max pooling}, pero en vez de tomar el máximo, se toma la media de los valores considerados
+    \item \textit{Gobal pooling}: tomamos todos los datos y los resumimos como uno solo, por ejemplo, utilizando la media de todos los valores.
+    \item \textit{Max Pooling}: aplicamos un filtro que recorre la imagen de la misma forma que una convolución. Pero en vez de aplicar cierta suma ponderada, toma el máximo de los valores que se están considerando en ese paso.
+    \item \textit{Average Pooling}: igual que \textit{max pooling}, pero en vez de tomar el máximo, se toma la media de los valores considerados.
 \end{itemize}
 
 Esto queda explicado en la siguiente figura:
@@ -220,44 +190,28 @@ Esto queda explicado en la siguiente figura:
 \end{figure}
 \todo{Solucionar imagen de mala calidad}
 
-Esta capa ayuda a que la red sea más ligera, pues al reducir la dimensionalidad de los datos, reduce el número de parámetros que necesitamos ajustar. A partir de la experimentación se piensa que además ayuda a introducir cierta invarianza frente a traslaciones.
+\subsection{Visión por computador}
 
-\subsubsection{Capa totalmente conectada}
+La \textbf{visión por computador} es una disciplina que busca resolver problemas en base a comprender, interpretar y utilizar información visual. Esto involucra ciertas tareas, como pueden ser la adquisición de imágenes digitales, procesado de imágenes o detección de características \cite{informatica:cv_modern_approach}. Esta disciplina se fundamenta sobre muchas otras áreas del conocimiento, entre ellas, la inteligencia artificial y el aprendizaje automático, la radiometría, ingeniería eléctrica, procesado de imágenes, robótica, realidad aumentada y las ciencias cognitivas.
 
-Este tipo de capa consiste en simplemente en aplicar capas de tipo \textit{MLP}. Como ya hemos visto en \sectionref{isubs:deep_learning_teoria}, necesitamos trabajar con datos en formato vectorial. Una posible solución es transformar los datos a un vector, operación que se conoce comúnmente como \textit{flatten}. Estas capas se suelen poner al final de la red, para realizar la predicción final. Toman las características jerárquicas que las convoluciones extraen y las combinan para resolver la tarea planteada.
-
-Cabe destacar que podemos obtener las predicciones finales de la red sin estas capas, simplemente usando capas convolucionales y \textit{pooling}.
-
-\section{Visión por computador}
-
-La \textbf{visión por computador} es una disciplina que busca resolver problemas en base a comprender, interpretar y utilizar información visual. Esto involucra ciertas tareas, como pueden ser la adquisición de imágenes digitales, procesado de imágenes, detección de características... \cite{informatica:cv_modern_approach}. Esta disciplina se fundamenta sobre muchas otras áreas del conocimiento. Entre ellas, la inteligencia artificial y el aprendizaje automático, la radiometría, ingeniería eléctrica, procesado de imágenes, robótica, realidad aumentada, ciencias cognitivas...
-
-Es claro que nuestra solución forma parte del área de visión por computador. Buscamos comprender información en forma de imágenes (imágenes de rostros) para resolver una tarea (identificar personas independientemente de los cambios asociados al paso del tiempo). Y es aún más claro que esta solución está en la intersección de la visión por computador y el aprendizaje automático, pues usamos técnicas de \textit{machine learning} (principalmente, redes convolucionales) para construir un modelo que comprenda la información de las imágenes para resolver la tarea.
+Es claro que nuestra solución forma parte del área de visión por computador. Buscamos comprender información en forma de imágenes (imágenes de rostros) para resolver una tarea (identificar personas independientemente de los cambios asociados al paso del tiempo). Y es aún más claro que esta solución está en la intersección de la visión por computador y el aprendizaje automático, pues usamos técnicas de aprendizaje automático (principalmente, redes convolucionales) para construir un modelo que comprenda la información de las imágenes para resolver la tarea.
 
 \section{Codificación de la identidad}
 
-Para resolver la tarea, buscamos aprender un modelo que codifique la identidad de las personas que aparecen en imágenes de forma independiente a la edad de dichas personas. Para ello, nuestro modelo deberá aprender un \textit{embedding}, que será la herramienta principal para llevar a cabo la codificación.
-
-Por consiguiente, en esta sección definiremos qué es un \textit{embedding} semántico, qué función de pérdida podemos utilizar para que nuestro modelo aprenda dicho \textit{embedding} y cómo se ha aplicado de forma clásica dicha función de pérdida
+Para resolver la tarea, buscamos aprender un modelo que codifique la identidad de las personas que aparecen en imágenes de forma independiente a la edad de dichas personas. Para ello, nuestro modelo deberá aprender un \textit{embedding}, que será la herramienta principal para llevar a cabo la codificación. Por consiguiente, en esta sección definiremos qué es un \textit{embedding} semántico, qué función de pérdida podemos utilizar para que nuestro modelo aprenda dicho \textit{embedding} y cómo se ha aplicado de forma clásica dicha función de pérdida
 
 \subsection{\textit{Embedding} semántico} \label{isec:embeddings}
 
-Pasamos a definir qué es un \textit{embedding} semántico y por qué será la herramienta fundamental para codificar la identidad de los individuos.
-
-Un \textbf{\textit{embedding}} no es más que un mapeo desde un cierto espacio $X$ de datos de entrada (en nuestro caso, podemos considerar $X$ como el espacio de imágenes en las que aparecen caras, que a su vez puede verse como cierto $\R^M$) a un espacio vectorial $\R^N$. En algunos casos, la dimensión del espacio de llegada $N$ es menor que la dimensión del espacio $X$.
-
-Por consiguiente, buscamos que nuestro modelo aprenda una función
+Un \textbf{\textit{embedding}} no es más que un mapeo desde un cierto espacio $X$ de datos de entrada (en nuestro caso, podemos considerar $X$ como el espacio de imágenes en las que aparecen caras, que a su vez puede verse como cierto $\R^M$) a un espacio vectorial $\R^N$. En la mayoría de los casos la dimensión del espacio de llegada $N$ es menor que la dimensión del espacio $X$. Por consiguiente, buscamos que nuestro modelo aprenda una función
 
 \begin{equation}
 \begin{split}
     f_{\theta}: X & \to \R^N \\
-    x & \mapsto f_{\theta}(x)
+    x & \mapsto f_{\theta}(x).
 \end{split}
 \end{equation}
 
-que tomamos de una familia paramétrica de funciones $\{f_{\theta}: \theta \in \Theta \}$. En nuestro problema consideramos la familia de redes convolucionales profundas. Así, $\theta$ estaría compuesto por todos los coeficientes que determinan dicho modelo convolucional, por lo que podemos considerar $\Theta \subseteq \R^M$ donde $M$ es el número de coeficientes del modelo.
-
-El criterio para escoger una función u otra de mapeo es que este deberá ser \textbf{semántico}. En el espacio de llegada $\R^N$ tenemos una función de distancia:
+que tomamos de una familia paramétrica de funciones $\{f_{\theta}: \theta \in \Theta \}$. En nuestro problema consideramos la familia de redes convolucionales profundas. Así, $\theta$ estaría compuesto por todos los coeficientes que determinan dicho modelo convolucional, por lo que podemos considerar $\Theta \subseteq \R^M$ donde $M$ es el número de coeficientes del modelo. El criterio para escoger una función u otra de mapeo es que este deberá ser \textbf{semántico}. En el espacio de llegada $\R^N$ tenemos una función de distancia:
 
 \begin{equation}
 \begin{split}
@@ -266,9 +220,7 @@ El criterio para escoger una función u otra de mapeo es que este deberá ser \t
 \end{split}
 \end{equation}
 
-Por ejemplo, la distancia euclídea. Queremos que \textbf{datos semánticamente relacionados en $X$ sean mapeados a vectores en $\R^N$ cercanos} por la distancia que fijemos. Del mismo modo, datos semánticamente distintos deberán ser mapeados a vectores distantes. En nuestro problema la \textbf{semántica viene dada por la identidad} de cada persona. Es decir, dos imágenes están relacionadas semánticamente cuando corresponden a la misma persona (\textbf{independientemente de la edad} con la que aparezcan).
-
-Veamos ahora algunos ejemplos en los que podemos solucionar cierto problemas a través del uso de \textit{embeddings}.
+Por ejemplo, la distancia euclídea. Queremos que \textbf{datos semánticamente relacionados en $X$ sean mapeados a vectores en $\R^N$ cercanos} por la distancia que fijemos. Del mismo modo, datos semánticamente distintos deberán ser mapeados a vectores distantes. En nuestro problema la semántica viene dada por la identidad de cada persona. Es decir, dos imágenes están relacionadas semánticamente cuando corresponden a la misma persona (independientemente de la edad con la que aparezcan). Veamos ahora algunos ejemplos en los que podemos solucionar cierto problemas a través del uso de \textit{embeddings}.
 
 \begin{ejemplo}
     Consideremos que queremos computar un \textit{embedding} para representar palabras.
