@@ -3,12 +3,12 @@
 En este capítulo introduciremos toda la experimentación realizada. Seguiremos la siguiente estructura:
 
 \begin{itemize}
-    \item En \sectionref{isec:metricas_teoria} introduciremos las métricas que hemos utilizado para vigilar el proceso de entrenamiento de los experimentos realizados y para evaluar la calidad de los modelos obtenidos
-    \item En \sectionref{isec:experimentacion_hp_tuning} explicamos qué protocolo hemos seguido para escoger los valores de los hiperparámetros y los resultados obtenidos al llevar a cabo dicho protocolo
-    \item En \sectionref{isec:explicacion_modelo} explicaremos la arquitectura del modelo profundo que usamos y que hemos escogido en base a la previa exploración de hiperparámetros
-    \item En \sectionref{isec:entrenamiento_mejor_modelo} mostramos el proceso de entrenamiento del modelo. Mostramos cómo se ha desarrollado el proceso de entrenamiento y discutimos las métricas de calidad obtenidas por el modelo
-    \item En \sectionref{isec:experimentacion_variar_tecnicas} mostramos el impacto de modificar ciertos parámetros, concretamente aquellos relacionados con las variantes técnicas introducidas en \sectionref{isec:mejoras_tecnicas_objeto_de_estudio}. Como ya hemos comentado, estas variaciones técnicas son un importante objeto de estudio del presente trabajo. Además, en vista de los malos resultados obtenidos por el modelo, es aún más interesante estudiar el impacto de estas nuevas técnicas
-    \item En \sectionref{isec:conclusiones_experimentacion} estudiaremos qué conclusiones podemos extraer en base a la experimentación realizada
+    \item En \sectionref{isec:metricas_teoria} introduciremos las métricas que hemos utilizado para vigilar el proceso de entrenamiento de los experimentos realizados y para evaluar la calidad de los modelos obtenidos.
+    \item En \sectionref{isec:experimentacion_hp_tuning} explicamos qué protocolo hemos seguido para escoger los valores de los hiperparámetros y los resultados obtenidos al llevar a cabo dicho protocolo.
+    \item En \sectionref{isec:explicacion_modelo} explicaremos la arquitectura del modelo profundo que usamos y que hemos escogido en base a la previa exploración de hiperparámetros.
+    \item En \sectionref{isec:entrenamiento_mejor_modelo} mostramos el proceso de entrenamiento del modelo. Mostramos cómo se ha desarrollado el proceso de entrenamiento y discutimos las métricas de calidad obtenidas por el modelo.
+    \item En \sectionref{isec:experimentacion_variar_tecnicas} mostramos el impacto de modificar ciertos parámetros, concretamente aquellos relacionados con las variantes técnicas introducidas en \sectionref{isec:mejoras_tecnicas_objeto_de_estudio}. Como ya hemos comentado, estas variaciones técnicas son un importante objeto de estudio del presente trabajo. Además, en vista de los malos resultados obtenidos por el modelo, es aún más interesante estudiar el impacto de estas nuevas técnicas.
+    \item En \sectionref{isec:conclusiones_experimentacion} estudiaremos qué conclusiones podemos extraer en base a la experimentación realizada.
 \end{itemize}
 
 \section{Métricas empleadas} \label{isec:metricas_teoria}
@@ -23,9 +23,9 @@ En esta sección introduciremos algunas de las métricas más relevantes. En tod
 Como se comenta en \cite{informatica:paper_cacd}, el comportamiento esperado es el siguiente:
 
 \begin{itemize}
-    \item Al inicio, todos los elementos, independientemente de su identidad, serán atraídos hacia cierto centro de masa
-    \item Una vez hecho esto, elementos de distinta clase irán pasando a través de otros, formando los \textit{clústers} de cada individuo
-    \item Una vez que los \textit{clústers} establecen cierta estructura, estos empiezan a alejarse unos de otros
+    \item Al inicio, todos los elementos, independientemente de su identidad, serán atraídos hacia cierto centro de masa.
+    \item Una vez hecho esto, elementos de distinta clase irán pasando a través de otros, formando los \textit{clústers} de cada individuo.
+    \item Una vez que los \textit{clústers} establecen cierta estructura, estos empiezan a alejarse unos de otros.
 \end{itemize}\
 
 Todo esto ocurre mientras el valor de la función de pérdida parece no cambiar. Por tanto es relevante observar las siguientes dos métricas:
@@ -63,8 +63,8 @@ A diferencia de un modelo de clasificación que trabaja con datos de la forma \l
 En esta situación podemos calcular es lo que se conoce como \textbf{\textit{Rank@k accuracy}}. Para ello, para cada imágen de nuestro \textit{dataset}:
 
 \begin{itemize}
-    \item Realizamos una \textit{query} a nuestro modelo, usando la imagen actual como \textit{key}, contra el resto de la base de datos, solicitando las $k$ mejores imágenes,
-    \item Calculamos si esta consulta ha tenido éxito. Consideramos por éxito que, entre las $k$ respuestas devueltas por la \textit{query}, al menos haya una que corresponda a la identidad de la \textit{key}
+    \item Realizamos una \textit{query} a nuestro modelo, usando la imagen actual como \textit{key}, contra el resto de la base de datos, solicitando las $k$ mejores imágenes,.
+    \item Calculamos si esta consulta ha tenido éxito. Consideramos por éxito que, entre las $k$ respuestas devueltas por la \textit{query}, al menos haya una que corresponda a la identidad de la \textit{key}.
 \end{itemize}
 
 Al final, sumamos los éxitos y dividimos por el tamaño de la base de datos, obteniendo el \textit{Rank@k accuracy}. Cabe destacar que no debemos confundir este valor de $k$, que indica cuántas imágenes consultamos en cada \textit{query}, con el valor de $K$ que usamos en el \textit{P-K sampling}. No tienen nada que ver un parámetro con el otro.
@@ -137,8 +137,8 @@ La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que expl
 En la \tableref{table:hp_escogidos} podemos ver que la métrica \textit{Rank@1 Accuracy} es realmente mala, no llega al $0.1$. Por otro lado, de 92 pruebas de hiperparámetros, solo 11 consiguen terminar su ejecución de forma normal. Es decir, el 88\% de las pruebas fallan. La mayoría de los fallos son por explosión de gradientes y no por otros problemas, como era el caso del colapso la memoria al usar \textit{K-Fold Cross Validation}. Esto ya indica dos inconvenientes de las nuevas técnicas que estudiamos en este trabajo:
 
 \begin{enumerate}
-    \item Producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte
-    \item Provocan que el entrenamiento del modelo sea muy frágil y que sea realmente complicado encontrar configuraciones de hiperparámetros que produzcan un modelo sin errores en el proceso
+    \item Producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte.
+    \item Provocan que el entrenamiento del modelo sea muy frágil y que sea realmente complicado encontrar configuraciones de hiperparámetros que produzcan un modelo sin errores en el proceso.
 \end{enumerate}
 
 Respecto a los hiperparámetros explorados en \tableref{table:rangos_hiperparametros} cabe destacar que no estamos explorando la función de pérdida. En los experimentos realizados sobre \textit{LFW} vemos que esta es la mejor función de pérdida, pero sobre todo, que es la más estable de las dos. Por tanto, en base a la fragilidad que hemos comentado, no movemos esta función de pérdida. Si explorásemos esta elección desperdiciaríamos muchas iteraciones de prueba, sabemos que la función de pérdida seguramente sea peor y además no va a producir un valor de \textit{Rank@1 Accuracy} por el problema con la explosión del gradiente.
@@ -150,8 +150,8 @@ En base a estos resultados, entrenaremos un modelo sobre todo el conjunto \texti
 Como hemos visto en la \tableref{table:hp_escogidos}, hemos decidido usar el modelo \textit{CACDResnet18}, que es una adaptación del modelo \textit{ResNet18} para:
 
 \begin{enumerate}
-    \item Trabajar con el conjunto de datos \textit{CACD}, en vez de con el conjunto de datos \textit{ImageNet}
-    \item Producir un \textit{embedding}, de dimensión 9 en base a \tableref{table:hp_escogidos}, en vez de resolver una tarea de clasificación con 1000 clases de salida
+    \item Trabajar con el conjunto de datos \textit{CACD}, en vez de con el conjunto de datos \textit{ImageNet}.
+    \item Producir un \textit{embedding}, de dimensión 9 en base a \tableref{table:hp_escogidos}, en vez de resolver una tarea de clasificación con 1000 clases de salida.
 \end{enumerate}
 
 Para realizar esta adaptación, simplemente cambiamos la última capa de \textit{ResNet18} que pasa de ser una capa densa con 1000 valores de salida a ser una capa densa con 9 valores de salida. Además, usamos la red pre-entrenada del paquete \lstinline{torchvision} \cite{informatica:resnet18_torchvision}. Realizamos un ajuste fino de todas las capas de la red, es decir, no congelamos ninguno de los parámetros del modelo.
@@ -184,10 +184,10 @@ En base a estos elementos, la arquitectura de nuestro modelo \textit{ResNet18} s
 Entrenamos el modelo usando los hiperparámetros indicados en \tableref{table:hp_escogidos}. Además, especificamos los siguientes hiperparámetros:
 
 \begin{itemize}
-    \item Función de pérdida: \textit{batch hard} con sumandos activos, es decir, $\mathcal{L}_{BH \neq 0}$. Elegimos esta función en base a la experimentación realizada sobre los \textit{datasets} previos a \textit{CACD} y \textit{FG-Net}
-    \item Épocas de entrenamiento: una única época de entrenamiento. El conjunto de entrenamiento \textit{CACD} es lo suficientemente grande como para entrenar en una sola época. Tomamos esta decisión en base a experimentos previos y a los propios resultados de este entrenamiento.
-    \item Técnica de Aumentado de Datos: \textit{lazy}. Esta variante permite que no saturemos la memoria disponible. De otra forma, en algunos experimentos obtenemos errores al ocurrir dicha saturación de la memoria. De otra forma, en algunos experimentos obtenemos errores al ocurrir dicha saturación de la memoria
-    \item Usamos el 80\% del \textit{dataset} \textit{CACD} para entrenar, y el 20\% restante como conjunto de validación
+    \item Función de pérdida: \textit{batch hard} con sumandos activos, es decir, $\mathcal{L}_{BH \neq 0}$. Elegimos esta función en base a la experimentación realizada sobre los \textit{datasets} previos a \textit{CACD} y \textit{FG-Net}.
+    \item Épocas de entrenamiento: una única época de entrenamiento. El conjunto de entrenamiento \textit{CACD} es lo suficientemente grande como para entrenar en una sola época. Tomamos esta decisión en base a experimentos previos y a los propios resultados de este entrenamiento..
+    \item Técnica de Aumentado de Datos: \textit{lazy}. Esta variante permite que no saturemos la memoria disponible. De otra forma, en algunos experimentos obtenemos errores al ocurrir dicha saturación de la memoria. De otra forma, en algunos experimentos obtenemos errores al ocurrir dicha saturación de la memoria.
+    \item Usamos el 80\% del \textit{dataset} \textit{CACD} para entrenar, y el 20\% restante como conjunto de validación.
 \end{itemize}
 
 El proceso de entrenamiento puede estudiarse a partir de las métricas que se muestran en \imgref{img:metricas_entrenamiento}. Al finalizar el entrenamiento, evaluamos distintas métricas sobre el conjunto \textit{FG-Net}. Estos resultados se muestran en la \tableref{table:resultados_sobre_fg_net}.
@@ -263,18 +263,18 @@ El proceso de entrenamiento puede estudiarse a partir de las métricas que se mu
 En \imgref{img:metricas_entrenamiento} podemos ver que:
 
 \begin{itemize}
-    \item Como habíamos previsto, la función de pérdida cae rápidamente mientras que el resto de métricas varían su valor. Por tanto, la red está aprendiendo cierto comportamiento (que claramente no es el deseado) aunque la función de pérdida no varíe. Esto ocurre tanto en la función de pérdida \textit{running} como en la función de pérdida computada a mano sobre los datos
-    \item Tanto el \textit{Rank@1} como \textit{Rank@5 Accuracy} aumentan satisfactoriamente, aunque sus valores son realmente bajos. Además, tenemos mejores valores en validación que en entrenamiento, lo que supone un comportamiento inusual que puede indicar que la red no está aprendiendo adecuadamente
-    \item La variante local de \textit{Rank@1} y \textit{Rank@5} obtienen resultados notablemente mejores, lo que era de esperar por la naturaleza de esta variante
-    \item Como esperábamos, la distancia intracluster desciende con el paso del tiempo. Sin embargo, la distancia intercluster desciende, en vez de ascender. Acompañado del descenso de las normas de los \textit{embeddings}, podemos pensar que estamos en la primera fase del entrenamiento que hemos comentado: agrupamos todos los datos en un cierto centro de gravedad. Pero no estamos logrando pasar a la siguiente fase, en la que se forma los clústers gracias a que los elementos atraviesen el centro de gravedad para juntarse con el resto de elementos de su clúster
+    \item Como habíamos previsto, la función de pérdida cae rápidamente mientras que el resto de métricas varían su valor. Por tanto, la red está aprendiendo cierto comportamiento (que claramente no es el deseado) aunque la función de pérdida no varíe. Esto ocurre tanto en la función de pérdida \textit{running} como en la función de pérdida computada a mano sobre los datos.
+    \item Tanto el \textit{Rank@1} como \textit{Rank@5 Accuracy} aumentan satisfactoriamente, aunque sus valores son realmente bajos. Además, tenemos mejores valores en validación que en entrenamiento, lo que supone un comportamiento inusual que puede indicar que la red no está aprendiendo adecuadamente.
+    \item La variante local de \textit{Rank@1} y \textit{Rank@5} obtienen resultados notablemente mejores, lo que era de esperar por la naturaleza de esta variante.
+    \item Como esperábamos, la distancia intracluster desciende con el paso del tiempo. Sin embargo, la distancia intercluster desciende, en vez de ascender. Acompañado del descenso de las normas de los \textit{embeddings}, podemos pensar que estamos en la primera fase del entrenamiento que hemos comentado: agrupamos todos los datos en un cierto centro de gravedad. Pero no estamos logrando pasar a la siguiente fase, en la que se forma los clústers gracias a que los elementos atraviesen el centro de gravedad para juntarse con el resto de elementos de su clúster.
 \end{itemize}
 
 Los resultados obtenidos en \tableref{table:resultados_sobre_fg_net} muestran que:
 
 \begin{itemize}
-    \item Los resultados en el conjunto de entrenamiento son realmente malos. Los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} son pésimos, y están muy lejos de los valores que hemos mostrado que alcanzan modelos estado del arte. Aunque no logremos ser competitivos con el estado del arte, podríamos haber obtenido un modelo aplicable en la práctica, competente y ligero. Pero este no es el caso, en este estado el modelo no es aplicable en ningún escenario
-    \item En base a estos malos resultados, y como era de esperar, los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} sobre \textit{FG-Net} son pésimos
-    \item Los valores de \textit{Silhouette} son muy malos también. Un valor negativo implica que el \textit{embedding} aprendido es de una calidad pésima
+    \item Los resultados en el conjunto de entrenamiento son realmente malos. Los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} son pésimos, y están muy lejos de los valores que hemos mostrado que alcanzan modelos estado del arte. Aunque no logremos ser competitivos con el estado del arte, podríamos haber obtenido un modelo aplicable en la práctica, competente y ligero. Pero este no es el caso, en este estado el modelo no es aplicable en ningún escenario.
+    \item En base a estos malos resultados, y como era de esperar, los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} sobre \textit{FG-Net} son pésimos.
+    \item Los valores de \textit{Silhouette} son muy malos también. Un valor negativo implica que el \textit{embedding} aprendido es de una calidad pésima.
 \end{itemize}
 
 \section{Comparativas variando las técnicas empleadas} \label{isec:experimentacion_variar_tecnicas}

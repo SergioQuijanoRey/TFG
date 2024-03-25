@@ -494,62 +494,6 @@ A partir de esto, podemos ver que:
     \item Así que las dificultades que veíamos en la \sectionref{isubsubs:conjunta_fgnet_cacd_edades} se ven agravadas al estudiar la distribución de los rangos de edad.
 \end{itemize}
 
-\section{Entorno de ejecución} \label{isec:entorno_ejecucion}
-
-Durante la implementación del código y el proceso de experimentación, hemos trabajado en tres \textbf{entornos de desarrollo y ejecución} distintos:
-
-\begin{enumerate}
-    \item El entorno de \textbf{desarrollo local}, nuestro ordenador portátil. Lo hemos usado principalmente para implementar el código y ejecutar algunos \textit{tests}. Por su baja potencia, no lo hemos usado ni para lanzar los \textit{Notebooks} de \textit{Jupyter} sobre los que realizamos la exploración de datos, ni para lanzar los \textit{scripts} de aprendizaje. Por tanto, no resulta interesante mostrar sus especificaciones
-
-    \item En fases tempranas del proyecto hemos escrito y ejecutado código en \textbf{\textit{Google Colab}}. Esta plataforma nos permite ejecutar, a través de una interfaz \textit{web}, \textit{Notebooks} de \lstinline{Python}.
-
-        \begin{itemize}
-            \item Además, otorga de forma limitada algunos recursos como acceso a cómputo \textit{TPU}. Las \textit{Tensor Processing Units} o \textit{TPUs} son tecnología \textit{hardware} propietaria de \textit{Google}, que busca optimizar el entrenamiento e inferencia de modelos de IA \cite{informatica:google_tpu}.
-
-            \item Los \textit{Notebooks} en \textit{Google Colab} vienen con la mayoría de bibliotecas de aprendizaje automático pre-instaladas. Esto es una gran ventaja al inicio del desarrollo, puesto que evitamos enfrentarnos a la complejidad de configurar un entorno de ejecución \lstinline{Python}
-
-            \item Sin embargo, rápidamente tenemos que abandonar este entorno por dos motivos: el acceso a recursos es demasiado limitado, y solo poder usar código escrito en \textit{Notebooks} es una restricción importante.
-
-            \item El \textit{hardware} que se pone a disposición del usuario se asigna dinámicamente, en base al consumo previo de recursos del usuario y a la demanda actual. Por tanto, no podemos obtener una especificación estática de los recursos de los que disponemos \cite{informatica:google_colab_faq}. Tampoco existe documentación oficial donde se especifique qué \textit{hardware} se ofrece, cuotas de consumo, \ldots\; Sin embargo, accediendo a un \textit{Notebook}, podemos ejecutar algunos comandos para ver los recursos que nos ofrecen en un momento dado \footnote{Dichos comandos son ejecutados el 18 de Septiembre de 2023}
-
-                \begin{itemize}
-                    \item El comando \lstinline{df -h} nos muestra que tenemos disponibles 50GB de memoria permanente. Sin embargo, esto no es una limitación porque podemos conectar nuestra cuenta de usuario de \textit{Google} para acceder a todos los datos almacenados en \textit{Google Drive}
-                    \item El comando \lstinline{cat /proc/cpuinfo} nos muestra que estamos usando una \textit{CPU} \entrecomillado{Intel ( R ) Xeon ( R ) @ 2.20 GHz}
-                    \item El comando \lstinline{cat /proc/meminfo} nos muestra que disponemos de aproximadamente 12GB de memoria \textit{RAM}
-                    \item Sabemos que podemos acceder a \textit{TPUs} de \textit{Google}, pero no disponemos de ningún comando para acceder a las especificaciones de este \textit{hardware}
-                \end{itemize}
-        \end{itemize}
-
-    \item Los \textbf{servidores clúster GPU de la Universidad de Granada, \textit{nGPU}}.
-        \begin{itemize}
-            \item Estos servidores se encuentran en el Centro de Procesado de Datos (\textit{CPD}) Santa Lucía. Para trabajar con estos servidores, accedemos por \lstinline{ssh} a un nodo cabecera, y usando el programa \lstinline{slurm}, enviamos trabajos a los distintos nodos que componen el \textit{CPD}.
-            \item Hemos usado estos servidores tanto para lanzar \textit{Notebooks} en los que realizamos principalmente análisis exploratorio de datos, como para lanzar \textit{scripts} de \lstinline{Python} usados principalmente para llevar a cabo el entrenamiento y validación de modelos
-            \item El \textit{hardware} de los nodos \textit{Titan} y \textit{Atenea}, los dos nodos que hemos usado mayoritariamente, es el siguiente:
-                \begin{itemize}
-                    \item Dos procesadores \textit{Intel® Xeon® E5-2630}, cada uno
-                    \item Memoria \textit{RAM} \textit{DDR4} de 128 GB
-                    \item Memoria permantente de 2,7TB
-                    \item El nodo \textit{Titan} dispone de tres \textit{GPUs} \textit{GTX Titan X Pascal} y una \textit{GPU} \textit{GTX Titan Xp}, mientras que el nodo \textit{Atenea} dispone de cuatro \textit{GPUs} \textit{GTX Titan Xp}
-                \end{itemize}
-        \end{itemize}
-
-\end{enumerate}
-
-Como \textbf{lenguaje de programación} usaremos \lstinline{Python}, en su versión 3.10.2. Para la \textbf{gestión de entornos} de \lstinline{Python} usaremos dos tecnologías:
-
-\begin{enumerate}
-    \item El gestor de paquetes y entornos \textbf{\lstinline{Conda}} \cite{informatica:conda_web}. Este gestor nos permite instalar fácilmente paquetes de \lstinline{Python} en entornos virtuales, evitando así instalarlos a nivel de sistema (lo que puede provocar conflictos con versiones de paquetes usados en otros proyectos). Además, permite generar un archivo \lstinline{enviroment.yml} que especifica exactamente qué paquetes están instalados y con qué versión. A partir de dicho fichero podremos reproducir el entorno de desarrollo en diferentes máquinas. Por ejemplo, tenemos el mismo entorno de desarrollo en nuestro ordenador portátil y en los servidores donde se ejecutan los entrenamientos. Junto con el uso de contenedores \lstinline{docker} (enfoque que consideramos muy complejo), es la única alternativa que tenemos para configurar nuestro entorno de desarrollo en los servidores \textit{nGPU}
-    \item \textbf{\lstinline{nix}} \cite{informatica:nixos_web}. Dicha tecnología se compone de un lenguaje funcional puro, que se usa en su gestor de paquetes reproducible y declarativo. Usamos esta tecnología en nuestro ordenador por su robustez: durante los meses de desarrollo, algunas librerías se rompen en sus últimas versiones. Con \lstinline{nix} podemos volver cómodamente a versiones previas de todo el entorno de desarollo (\entrecomillado{rollback}). Esto se puede conseguir también con \lstinline{Conda} pero es mucho más complicado. Además, permite especificar paquetes de \lstinline{Python}, paquetes de \textit{Latex} usados para producir esta memoria y paquetes de \textit{Linux}. Es decir, no se limita únicamente a gestionar entornos de \lstinline{Python}
-\end{enumerate}
-
-Como \textbf{sistema operativo}, hemos usado:
-
-\begin{itemize}
-    \item En nuestro entorno de desarrollo, la distribución de \textit{Linux} \textit{NixOS} en su versión 23.11
-    \item En \textit{Google Colab}, la distribución de \textit{Linux} \textit{Ubuntu} en su versión 22.04.2 \textit{LTS} \footnote{Comprobamos esta versión ejecutando el comando \lstinline{lsb_release -d} el 19 de Septiembre de 2023}
-    \item En los servidores \textit{nGPU}, la distribución de \textit{Linux} \textit{Ubuntu} en su versión 20.04.5 \textit{LTS}
-\end{itemize}
-
 \section{Técnicas empleadas}
 
 A continuación, presentamos diversas técnicas que hemos empleado en nuestro trabajo. Estas técnicas abarcan aspectos muy diversos: en \sectionref{isec:hptuning_kfold_cross_validation} introducimos una técnica que forma parte del diseño experimental, en \sectionref{isubs:normalizacion_teoria} presentamos una técnica que forma parte del diseño de la solución y finalmente, en \sectionref{isubs:localizacion_partes_criticas} describimos una técnica fundamental para optimizar nuestra base de código.
@@ -558,38 +502,26 @@ Aunque pertenezcan a ambientes muy diferentes, incluimos estas técnicas aquí, 
 
 \subsection{Hyperparameter Tuning} \label{isec:hptuning_kfold_cross_validation}
 
-Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de \textbf{fijar una serie de hiperparámetros} que afectan de forma esencial a la calidad de dicho modelo. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase \sectionref{isubs:muestreo_datos_pk_sampling_teoria}), el número de épocas de entrenamiento, ... Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos.
-
-Una técnica de \textbf{\textit{hyperparameter tuning}} estará formada por dos componentes:
+Como veremos más adelante, a la hora de realizar un entrenamiento para producir un modelo que resuelva nuestra tarea, hemos de \textbf{fijar una serie de hiperparámetros} que afectan de forma esencial a la calidad de dicho modelo. Algunos hiperparámetros son la tasa de aprendizaje o \textit{learning rate}, la dimensión del \textit{embedding} semántico que aprende nuestro modelo, el valor de $\{P, K\}$ (véase la \sectionref{isubs:muestreo_datos_pk_sampling_teoria}) y el número de épocas de entrenamient. Buscamos por tanto técnicas que nos permitan decidir el valor de los hiperparámetros en base a los datos de los que disponemos. Una técnica de \textbf{\textit{hyperparameter tuning}} estará formada por dos componentes:
 
 \begin{itemize}
-    \item Una primera componente que, dada una configuración de hiperparámetros, compute una métrica que podamos optimizar
-    \item Una segunda componente que tome los resultados de la primera componente, y genere nuevas configuraciones de hiperparámetros a explorar. Es decir, un algoritmo de búsqueda
+    \item Una primera componente que, dada una configuración de hiperparámetros, compute una métrica que podamos optimizar.
+    \item Una segunda componente que tome los resultados de la primera componente, y genere nuevas configuraciones de hiperparámetros a explorar. Es decir, un algoritmo de búsqueda.
 \end{itemize}
 
-Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search}, \textit{Random Search}, Optimización Bayesiana, algoritmos evolutivos basados en poblaciones, ... \cite{informatica:review_algoritmos_hp} En \sectionref{isec:hp_tuning} veremos que la librería \lstinline{optuna} se encarga de implementar esta búsqueda por nosotros.
+Tenemos muchas alternativas para la segunda componente, como \textit{Grid Search}, \textit{Random Search}, Optimización Bayesiana o algoritmos evolutivos basados en poblaciones \cite{informatica:review_algoritmos_hp}. En \sectionref{isec:hp_tuning} veremos que la librería \lstinline{optuna} se encarga de implementar esta búsqueda por nosotros.
 
-Para la primera componente tenemos también varias alternativas. Una alternativa sería la de usar el subconjunto de entrenamiento para probar las configuraciones candidatas de hiperparámetros, y evaluar sobre el conjunto de \textit{test}. \textbf{Esta alternativa es completamente errónea}, pues estamos realizando \textit{data snooping}: incluimos datos de \textit{test} en el proceso de creación del modelo.
+Para la primera componente tenemos también varias alternativas. Una alternativa sería la de usar el subconjunto de entrenamiento para probar las configuraciones candidatas de hiperparámetros, y evaluar sobre el conjunto de \textit{test}. \textbf{Esta alternativa es completamente errónea}, pues estamos realizando \textit{data snooping}: incluimos datos de \textit{test} en el proceso de creación del modelo. Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, validación y \textit{test}). El conjunto de validación se genera partiendo el conjunto de entrenamiento. Entrenamos usando las configuraciones candidatas y evaluamos sobre el conjunto de validación. A esta técnica se le conoce como \textbf{\textit{holdout}}.
 
-Una fácil solución a este error es tomar tres subconjuntos (entrenamiento, validación y \textit{test}). El conjunto de validación se genera partiendo el conjunto de entrenamiento. Entrenamos usando las configuraciones candidatas y evaluamos sobre el conjunto de validación. A esta técnica se le conoce como \textbf{\textit{holdout}}. Este enfoque sí que es correcto pues no estamos usando el conjunto de \textit{test} en ningún momento, pero tiene algunos inconvenientes:
+Este enfoque sí que es correcto pues no estamos usando el conjunto de \textit{test} en ningún momento, pero tiene algunos inconvenientes. En primer lugar, estamos perdiendo una parte considerable del conjunto de entrenamiento para generar el conjunto de validación. En segundo lugar, los resultados pueden depender mucho de la selección del subconjunto de validación, y por tanto, no ser robustos.
 
-\begin{itemize}
-    \item Estamos perdiendo una parte considerable del conjunto de entrenamiento para generar el conjunto de validación
-    \item Los resultados pueden depender mucho de la selección del subconjunto de validación, y por tanto, no ser robustos
-\end{itemize}
-
-Sin embargo, en nuestro caso concreto en el que disponemos de conjuntos de datos de gran tamaño, tienen algunas ventajas:
-
-\begin{itemize}
-    \item Suponen procesos más ligeros y rápidos que métodos más avanzados (como el que introducimos a continuación). Esto es muy relevante si tenemos en cuenta que el entrenamiento de un modelo profundo es lento y, en ocasiones, puede saturar los recursos \textit{hardware} que tenemos disponibles
-    \item El gran tamaño de los conjuntos de datos reduce en parte los posibles problemas de robustez que hemos comentado. Y por tanto, técnicas más avanzadas que resuelven este problema de robustez, pero introducen ciertas contraprestaciones, pueden no tener ahora tanto sentido
-\end{itemize}
+Sin embargo, en nuestro caso concreto en el que disponemos de conjuntos de datos de gran tamaño, tienen algunas ventajas. Suponen procesos más ligeros y rápidos que métodos más avanzados (como el que introducimos a continuación). Esto es muy relevante si tenemos en cuenta que el entrenamiento de un modelo profundo es lento y, en ocasiones, puede saturar los recursos \textit{hardware} que tenemos disponibles. Además, el gran tamaño de los conjuntos de datos reduce en parte los posibles problemas de robustez que hemos comentado. Y por tanto, técnicas más avanzadas que resuelven este problema de robustez, pero introducen ciertas contraprestaciones, pueden no tener ahora tanto sentido.
 
 Teniendo en cuenta este compromiso, buscamos una técnica que nos permita seleccionar los mejores hiperparámetros, usando todo el subconjunto de entrenamiento tanto para entrenar como para evaluar. Esta técnica se conoce como \textbf{\textit{K-Fold Cross Validation}} \cite{informatica:kfold_cross_val_paper} y consiste en dividir el conjunto de entrenamiento en $K$ \textit{folds} o subconjuntos. Repetimos $K$ veces el siguiente proceso:
 
 \begin{itemize}
-    \item Seleccionamos $K-1$ \textit{folds} sobre los que entrenamos el modelo
-    \item Sobre el \textit{fold} restante que todavía no usamos, calculamos la métrica a optimizar con el modelo que acabamos de entrenar
+    \item Seleccionamos $K-1$ \textit{folds} sobre los que entrenamos el modelo.
+    \item Sobre el \textit{fold} restante que todavía no usamos, calculamos la métrica a optimizar con el modelo que acabamos de entrenar.
 \end{itemize}
 
 Obtenemos así $K$ valores de la métrica que podemos promediar. De esta forma hemos usado el conjunto de entrenamiento completamente, tanto para entrenar con configuraciones candidatas como para evaluar los modelos entrenados. Visualizamos esta técnica en la \imgref{img:visualizacion_kfold_cv}.
@@ -597,26 +529,18 @@ Obtenemos así $K$ valores de la métrica que podemos promediar. De esta forma h
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.9\textwidth]{informatica/kfold_cross_val_img_example}
-    \caption{Ejemplo gráfico del uso de \textit{K-Fold Cross Validation}, con un valor de $K = 5$. Cada fila representa una iteración del proceso. Las partes azules representan los 4 \textit{folds} elegidos en esa iteración para entrenar. La parte blanca representa el \textit{fold} que usamos para calcular la métrica a optimizar. Imagen extraída de \cite{informatica:kfold_cross_val_img_web}}
+    \caption{Ejemplo gráfico del uso de \textit{K-Fold Cross Validation}, con un valor de $K = 5$. Cada fila representa una iteración del proceso. Las partes azules representan los 4 \textit{folds} elegidos en esa iteración para entrenar. La parte blanca representa el \textit{fold} que usamos para calcular la métrica a optimizar. Imagen extraída de \cite{informatica:kfold_cross_val_img_web}.}
     \label{img:visualizacion_kfold_cv}
 \end{figure}
 
-Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta técnica:
-
-\begin{itemize}
-    \item Cuanto mayor sea el valor de $K$ mejor. De esta forma, reducimos la variabilidad que supone elegir determinados \textit{folds} para validar, y la métrica obtenida al final como un promedio es más robusta
-    \item De hecho, cuando tomamos $K$ igual al número de elementos del \textit{dataset}, estamos aplicando la técnica conocida como \textit{leave-one-out} \cite{informatica:kfold_cross_val_paper}
-    \item Sin embargo, valores altos de $K$ suponen tiempos de cómputo grandes: entrenamos $K$ veces, y sobre un porcentaje grande del \textit{dataset} de entrenamiento: $\frac{K - 1}{K}$
-\end{itemize}
-
-Describimos cómo implementamos estas dos técnicas (\textit{holdout} y \textit{K-fold Cross validation}) en \sectionref{isec:hp_tuning}.
+Tenemos que tener en cuenta una serie de cuestiones a la hora de aplicar esta técnica. Cuanto mayor sea el valor de $K$ mejor. De esta forma, reducimos la variabilidad que supone elegir determinados \textit{folds} para validar, y la métrica obtenida al final como un promedio es más robusta. De hecho, cuando tomamos $K$ igual al número de elementos del \textit{dataset}, estamos aplicando la técnica conocida como \textit{leave-one-out} \cite{informatica:kfold_cross_val_paper}. Sin embargo, valores altos de $K$ suponen tiempos de cómputo grandes: entrenamos $K$ veces, y sobre un porcentaje grande del \textit{dataset} de entrenamiento: $\frac{K - 1}{K}$. Describimos cómo implementamos estas dos técnicas (\textit{holdout} y \textit{K-fold Cross validation}) en la \sectionref{isec:hp_tuning}.
 
 \subsection{Normalización} \label{isubs:normalizacion_teoria}
 
-En \sectionref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en \sectionref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
+En la \sectionref{isec:triplet_loss} hemos comentado el problema que puede suponer que la red aprenda a colapsar cualquier entrada al vector $\vec{0}$. Aunque añadimos un margen $\alpha$ para evitar este comportamiento, en la \sectionref{isec:margenes_suaves} introducimos una variante en la que podría llegar a aprenderse este mal comportamiento. Por tanto, otra técnica a explorar es la de normalizar las salidas de la red, forzando a que tengan norma unitaria. Esta técnica se usa en \cite{informatica:facenet}. La normalización consiste en realizar la siguiente sustitución:
 
 \begin{equation} \label{ieq:normalizacion}
-    \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}
+    \hat{x} := \frac{f_{\theta}(x)}{||f_{\theta}(x)||_2}.
 \end{equation}
 
 Además del interés que pueda tener estudiar el comportamiento de los modelos al introducir la normalización, esta técnica introduce el siguiente punto a tener en cuenta. Durante los entrenamientos hemos tenido muchos problemas de inestabilidad:  en la mayoría de ocasiones, el entrenamiento se saturaba tras pocas iteraciones. Es claro que si nuestra red aprende a colapsar todas las entradas a $\vec{0}$, la ecuación \eqref{ieq:normalizacion} falla, con lo que el entrenamiento se detiene. Sin embargo, a raíz de la experimentación, vemos que la normalización ayuda enormemente a que dicho comportamiento no se aprenda. Y con ello, es mucho más fácil conseguir entrenamientos estables. El siguiente diagrama muestra un ejemplo de entrenamiento inestable:
@@ -624,55 +548,46 @@ Además del interés que pueda tener estudiar el comportamiento de los modelos a
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{informatica/ejemplo_colapso_entrenamiento}
-    \caption{Histórico de \textit{WANDB} que muestra un entrenamiento inestable que acaba por fallar. En las gráficas, los círculos indican entradas con el valor \lstinline{NaN}}
+    \caption{Histórico de \textit{WANDB} que muestra un entrenamiento inestable que acaba por fallar. En las gráficas, los círculos indican entradas con el valor \lstinline{NaN}.}
 \end{figure}
 
-En \sectionref{isubs:normalization_impl} estudiaremos la implementación de esta técnica en detalle.
+En la \sectionref{isubs:normalization_impl} estudiaremos la implementación de esta técnica en detalle.
 
 \subsection{Localización de cuellos de botella en el código para realizar optimizaciones} \label{isubs:localizacion_partes_criticas}
 
-Como hemos comentado en \sectionref{isec:planificacion} y \sectionref{isec:base_datos_usada}, hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con estos problemas, identificamos qué partes del código son las responsables. Llamamos \textbf{cuellos de botella} o \textit{bottlenecks} a estas partes de código responsables de tiempos de ejecución elevados
+Como hemos comentado en la \sectionref{isec:planificacion} y la \sectionref{isec:base_datos_usada}, hemos iterado sobre distintas bases de datos, aumentando la complejidad y tamaño de estas sin preocuparnos demasiado sobre la eficiencia de nuestras implementaciones, hasta que hemos encontrado problemas considerables debidos a los tiempos de ejecución. Una vez que nos encontramos con estos problemas, identificamos qué partes del código son las responsables. Llamamos \textbf{cuellos de botella} o \textit{bottlenecks} a estas partes de código responsables de tiempos de ejecución elevados.
 
 Realizaremos un \textit{profile} para identificar los cuellos de botella (véase \sectionref{isec:optimizacion_codigo}). Una vez identificamos \textit{bottlenecks}, sabemos en qué partes concretas debemos concentrar nuestros esfuerzos. De esta forma desarrollamos una amplia base de código inicial de forma rápida, sin aplicar optimizaciones prematuras. Y las optimizaciones que realizamos son óptimas, pues estamos localizando el código responsable de los tiempos de cómputo.
 
 El enfoque que acabamos de describir se fundamenta en la \textbf{ley de Amdahl} \cite{informatica:amdahl_original} \cite{informatica:amdahl_moderno}. Aunque esta ley se centra en medir mejoras de tiempo al introducir paralelismo, es fácilmente aplicable a nuestro ámbito: cambios en las implementaciones para acelerar los tiempos de cómputo. Si optimizamos una fracción de cómputo $f$ obteniendo una mejora en tiempo de cómputo de $S$ para esa fracción, la mejora global (mejora que obtenemos sobre toda la base de código) viene dada por:
 
 \begin{equation} \label{eq:amdahl}
-    S_{global} := \frac{1}{(1 - f) + \frac{f}{S}}
+    S_{global} := \frac{1}{(1 - f) + \frac{f}{S}}.
 \end{equation}
 
 Además, suponiendo que optimicemos infinitamente la fracción de cómputo, hasta tal punto que sea instantánea de computar, la mejora estaría limitada de la siguiente forma:
 
 \begin{equation}
-    S_{max} := \lim_{S \to \infty}\frac{1}{(1 - f) + \frac{f}{S}} = \frac{1}{1 - f}
+    S_{max} := \lim_{S \to \infty}\frac{1}{(1 - f) + \frac{f}{S}} = \frac{1}{1 - f}.
 \end{equation}
 
-Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el enfoque que empleamos en \sectionref{isec:optimizacion_codigo}.
+Por tanto, aunque una mejora de cómputo sea muy buena, si se realiza sobre una porción de código con un valor de $f$ bajo, el impacto no será relevante. Es decir, no debemos fijarnos únicamente en lo buena que sea una optimización, sino que también debemos encontrar aquellas partes del código que mayor tiempo de cómputo (mayor valor de $f$) estén suponiendo. Esto justifica el enfoque que empleamos en la \sectionref{isec:optimizacion_codigo}.
 
 \section{Mejoras técnicas objeto de estudio} \label{isec:mejoras_tecnicas_objeto_de_estudio}
 
 Hemos introducido todos los conceptos teóricos suficientes para plantear una solución basada en aprendizaje automático para nuestro problema. Sin embargo, una \textbf{parte fundamental de este trabajo consiste en explorar algunas mejoras técnicas} introducidas en \cite{informatica:principal}. Dichas mejoras se resumen en:
 
 \begin{itemize}
-    \item Introducir una técnica para minar de forma \textit{online} los triples, basada en el muestreo \textit{PK-Sampling}
-    \item A partir del nuevo muestreo podemos definir dos variaciones sobre la función de pérdida
-    \item Exploramos el uso de una nueva función de distancia
+    \item Introducir una técnica para minar de forma \textit{online} los triples, basada en el muestreo \textit{PK-Sampling}.
+    \item A partir del nuevo muestreo podemos definir dos variaciones sobre la función de pérdida.
+    \item Exploramos el uso de una nueva función de distancia.
 \end{itemize}
 
 \subsection{Enfoque online de \textit{Triplet Loss}} \label{isubs:triples_online}
 
 Buscamos modificar el minado de triples \textit{offline} para solucionar alguno de sus problemas que hemos comentado. Para ello implementaremos el siguiente proceso. En primer lugar, realizaremos un muestreo aleatorio sobre nuestros datos de la forma \lstinline{(imagen, identidad, edad)}. Este muestreo es rápido y no supone prácticamente tiempo de cómputo. Usando únicamente los datos de ese muestreo, generaremos triples y computaremos la función de pérdida apoyándonos en \eqref{ieq:triplet_loss_single_entry}. Dicha generación ya sí que supone un tiempo de cómputo considerable. Repetimos este proceso hasta agotar todos las entradas de nuestro \textit{dataset}, completando así una época de entrenamiento.
 
-Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales del proceso (muestreo y selección de triples):
-
-\begin{enumerate}
-    \item La ventaja más obvia es que, suponiendo que el tamaño de la muestra es significativamente mucho más pequeño que el tamaño de todo el conjunto de datos, la generación de triples consumirá potencialmente menos tiempo y será más efectiva
-        \begin{itemize}
-            \item Para afirmar esto rotundamente, tendríamos que realizar un estudio del tiempo del minado \textit{offline} en contraste a la suma de todos los tiempos de minado en cada muestreo
-            \item Sin embargo, el tiempo usado es más eficiente, porque en cada muestreo estamos usando la red actualizada. En el minado \textit{offline} podemos gastar muchísimo tiempo en encontrar triples difíciles que, tras entrenar en unos pocos triples previos, acaben siendo sencillos. Por tanto, cuando la red vea triples algo avanzados en la lista, estos ya serán totalmente inútiles
-        \end{itemize}
-    \item Se facilita en gran parte el ajuste de la dificultad. Podemos buscar triples realmente difíciles, pero como solo se tiene acceso a una pequeña muestra, estamos controlando la dificultad. Así que podemos variar el tamaño de las muestras para buscar un punto medio entre ejemplos muy difíciles o ejemplos demasiado sencillos. Y todo esto sin contar con el factor de que vamos a usar la red actualizada para la elección de los triples
-\end{enumerate}
+Ya podemos ver algunas \textbf{ventajas de este método}, incluso antes de haber especificado las dos partes fundamentales del proceso (muestreo y selección de triples). La ventaja más obvia es que, suponiendo que el tamaño de la muestra es significativamente mucho más pequeño que el tamaño de todo el conjunto de datos, la generación de triples consumirá potencialmente menos tiempo y será más efectiva. Para afirmar esto rotundamente, tendríamos que realizar un estudio del tiempo del minado \textit{offline} en contraste a la suma de todos los tiempos de minado en cada muestreo. Sin embargo, el tiempo usado es más eficiente, porque en cada muestreo estamos usando la red actualizada. En el minado \textit{offline} podemos gastar muchísimo tiempo en encontrar triples difíciles que, tras entrenar en unos pocos triples previos, acaben siendo sencillos. Por tanto, cuando la red vea triples algo avanzados en la lista, estos ya serán totalmente inútiles. Por otro lado, se facilita en gran parte el ajuste de la dificultad. Podemos buscar triples realmente difíciles, pero como solo se tiene acceso a una pequeña muestra, estamos controlando la dificultad. Así que podemos variar el tamaño de las muestras para buscar un punto medio entre ejemplos muy difíciles o ejemplos demasiado sencillos. Y todo esto sin contar con el factor de que vamos a usar la red actualizada para la elección de los triples.
 
 Desarrollada esta visión de forma general, veamos cómo se implementa cada una de las partes, siguiendo las técnicas introducidas en \cite{informatica:principal}.
 
@@ -755,22 +670,25 @@ En primer lugar, cabe destacar que, como señalan \cite{informatica:principal}, 
 El desarrollo que hemos realizado justifica las siguientes \textbf{ventajas} de los nuevos métodos:
 
 \begin{itemize}
-    \item El uso del \textit{P-K sampling} y las dos nuevas funciones de pérdida (con las variantes técnicas que consideran los sumandos activos) permite realizar un aprendizaje \textit{end-to-end}, sin añadir un paso adicional en el bucle de aprendizaje, evitando así la gran complejidad añadida del minado \textit{offline}
-    \item Además, conseguimos un manejo preciso de la dificultad de los triples obtenidos. Controlando el valor de $\{P, K\}$, controlamos el espacio de búsqueda y, en definitiva, la dificultad. Todo esto de forma cómoda y sin introducir apenas complejidad en nuestro \textit{pipeline}
-    \item Aunque no lo hemos comprobado, pensamos que esto acelera los tiempos de cómputo, al estar realizando el minado de triples sobre \textit{batches} de tamaño considerablemente reducidos
-    \item Y aunque no mejorásemos el tiempo de computo, lo que sí sabemos que mejoramos es la eficacia del minado de triples. El minado de triples \textit{online} usa una red mucho más actualizada, para generar una lista mucho más pequeña que probablemente no se degrade tanto como la generada por un minado \textit{offline} sobre todo el conjunto de datos, mucho más grande
-    \item Es más, estamos controlando el efecto de los triples demasiado sencillos, que no tendremos en cuenta a la hora de promediar en la función de pérdida
+    \item El uso del \textit{P-K sampling} y las dos nuevas funciones de pérdida (con las variantes técnicas que consideran los sumandos activos) permite realizar un aprendizaje \textit{end-to-end}, sin añadir un paso adicional en el bucle de aprendizaje, evitando así la gran complejidad añadida del minado \textit{offline}.
+    \item Además, conseguimos un manejo preciso de la dificultad de los triples obtenidos. Controlando el valor de $\{P, K\}$, controlamos el espacio de búsqueda y, en definitiva, la dificultad. Todo esto de forma cómoda y sin introducir apenas complejidad en nuestro \textit{pipeline}.
+    \item Aunque no lo hemos comprobado, pensamos que esto acelera los tiempos de cómputo, al estar realizando el minado de triples sobre \textit{batches} de tamaño considerablemente reducidos.
+    \item Y aunque no mejorásemos el tiempo de computo, lo que sí sabemos que mejoramos es la eficacia del minado de triples. El minado de triples \textit{online} usa una red mucho más actualizada, para generar una lista mucho más pequeña que probablemente no se degrade tanto como la generada por un minado \textit{offline} sobre todo el conjunto de datos, mucho más grande.
+    \item Es más, estamos controlando el efecto de los triples demasiado sencillos, que no tendremos en cuenta a la hora de promediar en la función de pérdida.
 \end{itemize}
 
 A pesar de esto, a raíz de trabajar con estas nuevas técnicas, identificamos los siguientes \textbf{inconvenientes}:
 
 \begin{itemize}
-    \item Introducimos dos hiperparámetros, $\{P, K\}$ que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \sectionref{isec:hptuning_kfold_cross_validation} e implementamos en \sectionref{isec:hp_tuning}
-    \item Tenemos que tener mucho cuidado con usar valores elevados de $\{P, K\}$ por dos motivos. El primero, y como ya hemos comentado, valores altos implicarán que los tiempos de cómputo para la generación de triples crecerán rápidamente. El segundo es que el tamaño de los \textit{batches} crecerán considerablemente, llegando a colapsar la memoria disponible de la \textit{GPU}
-    \item Hemos comprobado en la práctica que es realmente fácil colapsar la memoria \textit{GPU}, usando modelos profundos como \textit{ResNet50} con valores de $P \cdot K = 100$. Esto supone que, aunque no estuviéramos limitados por el tiempo de cómputo, el colapso de la memoria limita el conjunto de valores $\{P, K\}$ con los que podemos experimentar
-    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo. Por este motivo hemos estudiado esta distribución en \sectionref{isec:base_datos_usada}. Se pueden explorar técnicas como el aumentado de datos para alcanzar el número de imágenes por individuo deseado, pero solo serán efectivas si dicha distribución es buena para empezar (véase \sectionref{isec:aumentado_datos})
-    \item Tanto por el formato de los datos con los que hemos trabajado, como por el cambio fundamental realizado en el \textit{sampling} de los datos, hemos tenido que realizar un \textbf{esfuerzo considerable de implementación}, al no poder basarnos en la mayor parte de los casos en código implementado por alguna biblioteca de aprendizaje automático. Esto se ve reflejado en \sectionref{ich:implementacion}
+    \item Introducimos dos hiperparámetros, $\{P, K\}$ que deberemos ajustar correctamente, pues tienen un enorme impacto en los resultados del proceso de entrenamiento. Por tanto, se hace fundamental tener un proceso de \textit{hyperparameter tuning} robusto, como introducimos en \sectionref{isec:hptuning_kfold_cross_validation} e implementamos en \sectionref{isec:hp_tuning}.
+    \item Tenemos que tener mucho cuidado con usar valores elevados de $\{P, K\}$ por dos motivos. El primero, y como ya hemos comentado, valores altos implicarán que los tiempos de cómputo para la generación de triples crecerán rápidamente. El segundo es que el tamaño de los \textit{batches} crecerán considerablemente, llegando a colapsar la memoria disponible de la \textit{GPU}.
+    \item Hemos comprobado en la práctica que es realmente fácil colapsar la memoria \textit{GPU}, usando modelos profundos como \textit{ResNet50} con valores de $P \cdot K = 100$. Esto supone que, aunque no estuviéramos limitados por el tiempo de cómputo, el colapso de la memoria limita el conjunto de valores $\{P, K\}$ con los que podemos experimentar.
+    \item Si queremos usar valores altos de $K$, nuestro \textit{dataset} lo debe permitir, teniendo una buena distribución de imágenes por individuo. Por este motivo hemos estudiado esta distribución en \sectionref{isec:base_datos_usada}. Se pueden explorar técnicas como el aumentado de datos para alcanzar el número de imágenes por individuo deseado, pero solo serán efectivas si dicha distribución es buena para empezar (véase \sectionref{isec:aumentado_datos}).
+    \item Tanto por el formato de los datos con los que hemos trabajado, como por el cambio fundamental realizado en el \textit{sampling} de los datos, hemos tenido que realizar un \textbf{esfuerzo considerable de implementación}, al no poder basarnos en la mayor parte de los casos en código implementado por alguna biblioteca de aprendizaje automático. Esto se ve reflejado en \sectionref{ich:implementacion}.
 \end{itemize}
+
+% TODO -- seguir por aqui
+% TODO -- esto es de lo último que revisé en el último borrador de informática
 
 \subsection{Variaciones en la función de distancia}
 
