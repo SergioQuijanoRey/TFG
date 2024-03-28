@@ -1,0 +1,130 @@
+% == Comandos de la plantilla ==
+% ==============================================================================
+
+\newcommand{\N}{\mathbb{N}}     % Naturales
+\newcommand{\R}{\mathbb{R}}     % Reales
+\newcommand{\Z}{\mathbb{Z}}     % Enteros
+\newcommand{\Q}{\mathbb{Q}}     % Racionales
+\newcommand{\C}{\mathbb{C}}     % Complejos
+
+% TEOREMAS Y ENTORNOS ASOCIADOS
+
+% \newtheorem{theorem}{Theorem}[chapter]:
+\newtheorem*{teorema*}{Teorema}
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{proposicion}{Proposición}[chapter]
+\newtheorem{lema}{Lema}[chapter]
+\newtheorem{corolario}{Corolario}[chapter]
+
+\theoremstyle{definition}
+\newtheorem{definicion}{Definición}[chapter]
+\newtheorem{ejemplo}{Ejemplo}[chapter]
+
+\theoremstyle{remark}
+\newtheorem{observacion}{Observación}[chapter]
+
+% == Mis comandos propios ==
+% ==============================================================================
+
+% Comando que uso para expresar el conjunto {1, ..., param_1}
+\newcommand{\deltaset}[1]{\Delta_{#1}}
+
+% Comando que uso para expresar el conjunto {param_1, ..., param_2}
+\newcommand{\doubledeltaset}[2]{\Delta_{#1}^{#2}}
+
+
+% Espacio de matrices pxq
+\newcommand{\espaciomatrices}[2]{\mathbb{M}_{#1 \times #2}}
+
+% Espacio de tensores de orden N, #1 y de dimension M, #2 en cada modo
+\newcommand{\espaciotensores}[2]{\mathcal{T}_{#1, #2}}
+
+% Un mejor simbolo para QED
+% Hago el renew para que \begin{proof} \end{proof} muestre este simbolo como a mi me gusta
+\newcommand{\customqed}{\hfill\blacksquare}
+\renewcommand{\qedsymbol}{$\customqed$}
+
+% Elementos con explicaciones encima:
+
+% Para poner cualquier cosa encima de otra dada
+\newcommand{\encima}[2]{\ensuremath{\stackrel{#2}{#1}}}
+
+% Igualdades
+\newcommand{\eqtext}[1]{\ensuremath{\stackrel{\text{#1}}{=}}}
+\newcommand{\eqmath}[1]{\ensuremath{\stackrel{#1}{=}}}
+
+% Implicaciones
+\newcommand{\impliestext}[1]{\ensuremath{\stackrel{\text{#1}}{\implies}}}
+
+% Comando para indicar algun tipo de isomorfismo
+\newcommand{\isomorfismo}[1]{\underset{#1}{\cong}}
+
+% Expresiones logicas mas sencillas
+\newcommand{\then}{\implies}
+\newcommand{\iif}{\Longleftrightarrow}
+
+% Algunos vectores que usamos bastante
+\newcommand{\vectordd}[2]{\begin{pmatrix} #1 \\ #2 \end{pmatrix}}
+\newcommand{\vectorn}[3]{\begin{pmatrix} #1 \\ #2 \\ \vdots \\ #3 \end{pmatrix}}
+
+% Dos espacios
+\newcommand{\dspace}{\ \ }
+
+% Espacio de tensores de orden N (#1) y dimension M (#2) en cada modo
+\DeclareMathOperator*{\MediumOtimes}{\text{\raisebox{0.25ex}{\scalebox{0.8}{$\bigotimes$}}}}
+\newcommand{\esptensores}[2]{\overset{#1} \MediumOtimes \R^{#2}}
+
+% (N)otacion para los (v)ectores => (nv)
+% En el paper usan negrita, pero yo quiero usar una flechita encima
+% Con este comand, si luego quiero cambiar la notación para los vectores (ie. volver
+% a usar la notacion del paper) el cambio es sencillo
+%
+% NOTE: para poder usarse tiene que estar en un bloque de matematicas, por ejemplo:
+% `$\nv{x}$`
+\newcommand{\nv}[1]{\overrightarrow{#1}}
+
+\newcommand{\entrecomillado}[1]{\textit{``#1''}}
+
+% Forma mas comoda para escribir el producto escalar
+\newcommand{\innerproduct}[2]{\langle #1 \; | \; #2 \rangle}
+
+% Para añadir comentarios debajo o encima de elementos de una formula
+\newcommand{\comentardebajo}[2]{\underbrace{#1}_\textrm{#2}}
+\newcommand{\comentarencima}[2]{\overbrace{#1}^\textrm{#2}}
+
+% Comando para evitar que las captions de las subfiguras colisionen entre si
+\newcommand{\ajustarsubcaptions}{\captionsetup[subfigure]{width=0.9\textwidth,position=b}}
+
+% Comando para escribir conjuntos matematicos
+\newcommand{\conjunto}[1]{\{ #1 \}}
+
+% Para escribir union e interesccion
+\newcommand{\interseccion}{\bigcap}
+\newcommand{\union}{\bigcup}
+
+% Para hacer `\to` pero de forma larga, como con \longmapsto
+\newcommand{\longto}{\longrightarrow}
+
+% Para hacer el conjunto de combinaciones lineales `span`
+% Cuidado porque hay un comando de latex que ya se llama span
+\newcommand{\spansetlong}[2]{\text{span}_{#1} \conjunto{#2}}
+\newcommand{\spanset}[1]{\spansetlong{\mathbb{R}}{#1}}
+
+% El paquete `cleveref` usa los nombres de secciones en ingles, los necesito
+% en español
+\Crefname{section}{Sección}{Sección}
+\crefname{section}{Sección}{Sección}
+\Crefname{chapter}{Capítulo}{Sección}
+\crefname{chapter}{Capítulo}{Capítulo}
+\Crefname{figure}{Figura}{Figura}
+\crefname{figure}{Figura}{Figura}
+
+% Comandos para referenciar
+\newcommand{\imgref}[1]{\Cref{#1}}
+\newcommand{\sectionref}[1]{\Cref{#1}}
+\newcommand{\coderef}[1]{\Cref{#1}}
+\newcommand{\tableref}[1]{\Cref{#1}}
+\newcommand{\propref}[1]{\Cref{#1}}
+
+% Deberiamos evitar el uso de este comando generico
+\newcommand{\customref}[1]{\Cref{#1}}
