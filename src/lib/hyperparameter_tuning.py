@@ -91,6 +91,7 @@ def custom_cross_validation(
         del train_fold
         del train_index
         del train_loader
+        net = net.to("cpu")
         torch.cuda.empty_cache()
 
         # Evaluate  the network on the validation fold
