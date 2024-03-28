@@ -113,6 +113,12 @@ class AugmentatedDataset(torch.utils.data.Dataset):
                 new_images.append(new_img)
                 new_targets.append(small_class)
 
+        # Do some logging
+        if len(new_targets) == 0:
+            print("-> Data Augmentation produced no new elements")
+        else:
+            print(f"-> Data augmentation produced {len(new_targets)} new elements")
+
         return new_images, new_targets
 
 
@@ -221,6 +227,12 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
 
             # Now we can add the target to the list of new targets, the number of times needed
             new_targets += [small_class] * number_images_needed
+
+        # Do some logging
+        if len(new_targets) == 0:
+            print("-> Data Augmentation produced no new elements")
+        else:
+            print(f"-> Data augmentation produced {len(new_targets)} new elements")
 
         return new_targets
 

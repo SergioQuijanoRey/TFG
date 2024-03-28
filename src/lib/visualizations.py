@@ -203,7 +203,12 @@ def PIL_show_images_with_titles_same_window(images: List[np.ndarray], titles: Li
     plt.show()
 
 
-def plot_how_many_images_per_class(dataset: torch.utils.data.Dataset, cut: int, fig_size: (int, int) = (15, 15)):
+def plot_how_many_images_per_class(
+    dataset: torch.utils.data.Dataset,
+    cut: int,
+    fig_size: Optional[Tuple[int, int]],
+    fontopts: Optional[dict]
+):
     """
     Bar plot, where we show how many classes have certain number of images
 
@@ -237,11 +242,21 @@ def plot_how_many_images_per_class(dataset: torch.utils.data.Dataset, cut: int, 
     indexes = np.arange(len(labels))
     width = 3
 
+    # Set default values for visual configs
+    if fig_size is None:
+        fig_size = (15, 15)
+
+    if fontopts is None:
+        fontopts = {
+            'fontname': 'serif',
+            'fontsize': 14,
+        }
+
     plt.figure(figsize=fig_size)
     plt.bar(indexes, values, width)
     plt.xticks(indexes + width * 0.5, labels)
-    plt.xlabel("Images per class")
-    plt.ylabel("Number of classes having that number of images")
+    plt.xlabel("Images per class", **fontopts)
+    plt.ylabel("Number of classes having that number of images", **fontopts)
     plt.show()
 
 # TODO -- lacks documentation!
@@ -251,11 +266,19 @@ def plot_histogram(
     title: str,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
-    figsize: Tuple[int, int] = (8, 6)
+    figsize: Tuple[int, int] = (8, 6),
+    fontopts: Optional[dict] = None
 ):
 
     # Make plots bigger
-    plt.figure(figsize = figsize, dpi = 80)
+    plt.figure(figsize = figsize, dpi = 500)
+
+    # Set font values if user did not specify a value
+    if fontopts is None:
+        fontopts = {
+            'fontname': 'serif',
+            'fontsize': 14,
+        }
 
     # Get the data needed for the plot
     counts, bins = np.histogram(values, bins = num_bins)
@@ -267,8 +290,8 @@ def plot_histogram(
     plt.title(title)
 
     # Set labels for the axis if given as parameters
-    if xlabel is not None: plt.xlabel(xlabel)
-    if ylabel is not None: plt.ylabel(ylabel)
+    if xlabel is not None: plt.xlabel(xlabel, **fontopts)
+    if ylabel is not None: plt.ylabel(ylabel, **fontopts)
 
     # And finally show the plot
     plt.plot()

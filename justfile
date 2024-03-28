@@ -1,7 +1,7 @@
 # The current jupyter notebook
 # This is the notebook that we are going to use when working (upload, download)
 # with Google Colab
-CURRENT_NOTEBOOK := "LFW Notebook.ipynb"
+CURRENT_NOTEBOOK := "CACD Notebook.ipynb"
 
 # The current script
 # We are using this script to run the training / evaluation
@@ -22,6 +22,9 @@ default:
 # == GOOGLE COLAB ==
 # ==============================================================================
 
+# NOTE: `REMOTE` should be `UniDrive` or `MyDrive` (as they are my remotes
+# configured in rclone
+#
 # Uploads the notebook, the lib code and also the benchmarks
 upload_all REMOTE:
     just upload_lib "{{REMOTE}}"
@@ -73,6 +76,7 @@ upload_uni:
         --exclude 'src/data' \
         --exclude 'src/lib/__pycache__' \
         --exclude 'training.log' \
+        --exclude '.venv' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server
@@ -94,6 +98,7 @@ download_uni:
         --exclude 'src/data' \
         --exclude 'src/lib/__pycache__' \
         --exclude 'training.log' \
+        --exclude '.venv' \
         {{SSH_ALIAS}}:{{SSH_DATA_PATH}} ./
 
 # Create a remote file system, so we can work easily on the server

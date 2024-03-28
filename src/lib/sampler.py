@@ -26,13 +26,34 @@ class CustomSampler(torch.utils.data.Sampler):
     https://www.scottcondron.com/jupyter/visualisation/audio/2020/12/02/dataloaders-samplers-collate.html
 
     Raises an exception when there are less than P classes with at least K images
+
+    `avoid_failing` sets if we want to raise an exception when calling `__len__`
+    before generating the index sequence, or if we want to generate that index
+    list and then return the `__len__`
     """
 
-    def __init__(self, P: int, K: int, dataset: torch.utils.data.Dataset):
+    def __init__(
+        self,
+        P: int,
+        K: int,
+        dataset: torch.utils.data.Dataset,
+        avoid_failing: bool = False
+    ):
+
         self.P = P
         self.K = K
         self.dataset = dataset
         self.labels = self.dataset.targets
+
+        # When calling `self.__len__()`, we can be in a situation where `self.index_list`
+        # has not been yet computed. This boolean tells wether we want to raise
+        # an exception in that situation, or if we want to generate a list and
+        # then return the len
+        #
+        # First option is more correct (as the user of the class must validate
+        # that the index list has been generated), and faster (as calling to
+        # `self.__len__` will not result in unexpected long computations)
+        self.avoid_failing = avoid_failing
 
         # We precomputate a dict having lists of indixes, to speed things up
         # Also, this dict is not freezed, we remove elements of it as we add them
@@ -87,7 +108,10 @@ class CustomSampler(torch.utils.data.Sampler):
         # Raising an error if `self.len` is None to avoid problems with pytorch implementations
         # If this problem arises, we will take care of it later
         if self.len is None:
-            raise Exception("CustomSampler.__len__ has not been computed yet!")
+            if self.avoid_failing is False:
+                raise Exception("CustomSampler.__len__ has not been computed yet!")
+            else:
+                self.generate_index_sequence()
 
         return self.len
 

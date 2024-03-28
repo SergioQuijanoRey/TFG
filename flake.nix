@@ -24,6 +24,14 @@
           torchvision-bin
           scikit-learn
 
+            # Loading matlab files
+            scipy
+            h5py
+
+            # Visualizations
+            matplotlib
+            seaborn
+            snakeviz
           # Visualizations
           matplotlib
           seaborn
@@ -35,6 +43,8 @@
           # Basic library for computation
           numpy
 
+            # Downloading some datasets from google drive (CACD dataset)
+            gdown
           # Hyperparameter tuning
           # TODO -- uncomment
           # optuna
@@ -44,6 +54,16 @@
           tqdm
           python-dotenv
 
+            # Generate visualizations about the code structure
+            pydeps
+            pylint
+
+            # LSP Packages
+            python-lsp-server
+            pyls-isort
+            pyls-flake8
+            mypy
+            isort
           # LSP Packages
           python-lsp-server
           pyls-isort
@@ -78,6 +98,8 @@
             esvect
             pgf
             tikz-cd
+            todonotes
+        ;});
             tikzmark
             todonotes
             cleveref
@@ -97,6 +119,11 @@
           # For sync with Google Colab / Google Drive
           pkgs.rsync
 
+                # For launching github actions locally
+                pkgs.act
+
+                # Needed for using pyreverse (package exposed in pylint)
+                pkgs.graphviz
           # For launching github actions locally
           pkgs.act
         ];
@@ -115,6 +142,19 @@
           # Add some paths to PYTHONPATH
           PYTHONPATH = "${custom_python_env}/${custom_python_env.sitePackages}:.:./src:./src/lib";
 
+            # To install some packages using pip
+            shellHook = ''
+                if [ ! -d ".venv" ]; then
+                    python3 -m venv .venv;
+                fi
+                source .venv/bin/activate;
+
+                # Install some packages that are not present in nix repos
+                pip install optuna
+
+                # Log that we're in a custom enviroment
+                echo "❄️  Running custom dev enviroment with python and other packages"
+            '';
           shellHook = ''
             # Log that we're in a custom enviroment
             echo "❄️  Running custom dev enviroment with python and other packages"

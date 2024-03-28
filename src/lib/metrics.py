@@ -1,12 +1,13 @@
 """Different metrics in one place"""
 
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 from torch import nn
-import numpy as np
-from typing import Callable, Dict, List, Tuple
-import itertools
 from sklearn.metrics import silhouette_score
+
+import itertools
+from typing import Callable, Dict, List, Tuple, Optional
 
 import src.lib.core as core
 import src.lib.utils as utils
@@ -566,6 +567,7 @@ def rank_accuracy(
     data_loader: torch.utils.data.DataLoader,
     network: torch.nn.Module,
     max_examples: int,
+    fast_implementation: Optional[bool] = None,
 ) -> float:
     """"
     Computes the rank-k accuracy metric. Thus, this only can be used when the
@@ -593,13 +595,17 @@ def rank_accuracy(
     device = core.get_device()
     retrieval_network = retrieval_network.to(device)
 
+    # If `fast_implementation` was not given, set True as default
+    if fast_implementation is None:
+        fast_implementation = True
+
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
     embeddings, targets = __get_portion_of_dataset_and_embed(
         data_loader,
         network,
         max_examples,
-        fast_implementation = True,
+        fast_implementation = fast_implementation,
     )
 
     # We are going to use some pytorch methods to get only one part of the
