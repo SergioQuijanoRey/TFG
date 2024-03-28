@@ -4,6 +4,7 @@
 % General TODO
 % [ ] Remove `dedicatoria.tex`, we already have `agradecimientos.tex`
 % [ ] Remove the use of apendixes, we are not using them yet
+% [ ] Remove the last TODO chapter that we are not using
 
 % Sergio Quijano Rey
 % Doble Grado Ingenieria Informatica y Matematicas, UGR
@@ -33,7 +34,7 @@
                         % parámetros. Al aumentar el número aumentamos el ancho de texto y disminuimos el ancho del margen. Una opción de 14 producirá márgenes estrechos y texto ancho.
 }
 
-% TODO -- mirar esto cuando vaya a imprimir el TFG
+% NOTE -- no le hago demasiado caso porque el TFG no se va a imprimir
 % INFORMACIÓN PARA LA VERSIÓN IMPRESA
 % Si el documento ha de ser impreso en papel de tamaño a4 pero el tamaño del documento (elegido en \KOMAoptions con la ocpión paper) no es a4 descomentar la línea que carga el paquete `crop` más abajo. El paquete crop se encargará de centrar el documento en un a4 e imprimir unas guías de corte. El procedimiento completo para imprenta sería el siguiente:
 % 0. Determinar, según el tipo de encuadernación del documento, el ancho reservado para el proceso de encuadernación (preguntar en la imprenta), es decir, la anchura del área del papel que se pierde durante el proceso de encuadernación. Fijar la varibale BCOR de \KOMAoptions a dicho valor.
@@ -77,7 +78,6 @@
 % El paquete microtype mejora la tipografía del documento.
 \usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
 
-% TODO -- para el codigo creo que es mejor fuente Cascadia Code (preferencia personal)
 % Las tipografías elegidas para el documento, siguiendo la guía de estilo de la UGR,
 % son las siguientes
 % Normal font: 			URW Palladio typeface.
@@ -213,6 +213,18 @@
 % Para fijar una fuente que resalte
 \lstset{breaklines=true, basicstyle=\ttfamily}
 
+% Dejar espacios en blanco debajo en vez de ajustar el espacio de los párrafos
+% cuando usamos float para el [H] de las figuras
+\usepackage{ragged2e}
+\raggedbottom
+
+% En la plantilla este paquete se importa más tarde, pero tenemos que importarlo
+% antes que el paquete `cleveref`
+\usepackage{hyperref}
+
+% Para hacer referencias cruzadas con mejor informacion
+\usepackage{cleveref}
+
 % ---------------------------------------------------------------------
 % COMANDOS Y ENTORNOS
 % ---------------------------------------------------------------------
@@ -225,9 +237,7 @@
 % --------------------------------------------------------------------
 \usepackage{xspace} % Para problemas de espaciado al definir comandos
 
-% TODO -- hay que poner un titulo al trabajo
-% TODO -- hay que poner informacion de los tutores
-\newcommand{\miTitulo}{Estudio sobre la expresividad de las redes neuronales profundas y no profundas a través de análisis tensorial y reconocimiento facial invariante a la edad introduciendo una variante \textit{online} en \textit{Triplet Loss}\xspace}
+\newcommand{\miTitulo}{Reidentificación de personas invariante a la edad mediante redes profundas y análisis de su eficiencia frente a redes de una capa}
 \newcommand{\miNombre}{Sergio Quijano Rey\xspace}
 \newcommand{\miGrado}{Doble Grado en Ingeniería Informática y Matemáticas}
 \newcommand{\miFacultad}{Facultad de Ciencias, Escuela Superior Ingeniería Informática y Telecomunicaciones}
@@ -244,7 +254,7 @@
     \medskip
     Guillermo Gómez Trenado \\ \emph{Departamento de Ciencias de la Computación e Inteligencia Artificial}
 }
-\newcommand{\miCurso}{2022-2023\xspace}
+\newcommand{\miCurso}{2023-2024\xspace}
 
 % HYPERREFERENCES
 % --------------------------------------------------------------------
@@ -279,34 +289,35 @@
 \mainmatter % activa la numeración de capítulos, resetea la numeración de las páginas y usa números arábigos
 
 \setpartpreamble[c][0.75\linewidth]{
-    % Deja un espacio vertical en la parte superior
+	% Deja un espacio vertical en la parte superior
 	\bigskip
 
-    En esta primera parte del trabajo, introduciremos dos modelizaciones matemáticas muy cercanas a los modelos reales que se usan en la práctica del aprendizaje automático. Un modelo será no profundo (\entrecomillado{shallow}) y otro será profundo. La distinción entre los dos modelos viene dada por la descomposición tensorial que usamos para construir el tensor de coeficientes. Demostraremos que los modelos profundos son más eficientes que los modelos no profundos en la mayoría de los casos. Es más, demostraremos que los modelos no profundos no pueden aproximar de forma eficiente a los modelos profundos, en la mayoría de los casos.
+	En esta primera parte del trabajo, introduciremos dos modelizaciones matemáticas muy cercanas a los modelos reales que se usan en la práctica del aprendizaje automático. Un modelo será no profundo (\entrecomillado{shallow}) y otro será profundo (\entrecomillado{deep}). La distinción entre los dos modelos viene dada por la descomposición tensorial que usamos para construir el tensor de coeficientes. Demostraremos que los modelos profundos son más eficientes que los modelos no profundos en la mayoría de los casos. Es más, demostraremos que los modelos no profundos no pueden aproximar de forma eficiente a los modelos profundos.
 }
-\part{Primera parte}
+\part{Estudio sobre la expresividad de las redes neuronales profundas y no profundas a través de análisis tensorial}
 
 \input{capitulos/matematicas/capitulo01}
 \input{capitulos/matematicas/capitulo02}
 \input{capitulos/matematicas/capitulo03}
 \input{capitulos/matematicas/capitulo04}
 \input{capitulos/matematicas/capitulo05}
+\input{capitulos/matematicas/capitulo06}
 
 \setpartpreamble[c][0.75\linewidth]{
-    % Deja un espacio vertical en la parte superior
+	% Deja un espacio vertical en la parte superior
 	\bigskip
 
-    En esta segunda parte del trabajo, introduciremos un nuevo método para computar el \entrecomillado{Triplet Loss}. Aplicaremos este nuevo método a una tarea de reconocimiento facial invariante a cambios de edad, y justificaremos por qué esta técnica parece no ser adecuada para resolver este problema.
+	En esta segunda parte del trabajo, introduciremos un nuevo método para computar el \entrecomillado{Triplet Loss}. Aplicaremos este nuevo método a una tarea de reconocimiento facial invariante a cambios de edad, y justificaremos por qué esta técnica parece no ser adecuada para resolver este problema.
 }
-\cleardoublepage\part{Segunda parte}
+\cleardoublepage\part{Reconocimiento facial invariante a la edad introduciendo una variante \textit{online} de \textit{Triplet Loss}}
 
-\input{capitulos/informatica/capitulo01}
-\input{capitulos/informatica/capitulo02}
-\input{capitulos/informatica/capitulo03}
-\input{capitulos/informatica/capitulo04}
-\input{capitulos/informatica/capitulo05}
-\input{capitulos/informatica/capitulo06}
-\input{capitulos/informatica/capitulo07}
+\input{capitulos/informatica/capitulo01} % introduccion
+\input{capitulos/informatica/capitulo02} % fundamentos teoricos
+\input{capitulos/informatica/capitulo03} % estado del arte
+\input{capitulos/informatica/capitulo04} % materiales y metodos
+\input{capitulos/informatica/capitulo05} % Implementacion
+\input{capitulos/informatica/capitulo06} % Experimentacion
+\input{capitulos/informatica/capitulo07} % Conclusiones
 
 % -------------------------------------------------------------------
 % BACKMATTER
@@ -320,7 +331,7 @@
 
 \bibliographystyle{alpha}
 \begin{small} % Normalmente la bibliografía se imprime en un tamaño de letra más pequeño.
-\bibliography{references.bib}
+	\bibliography{references.bib}
 \end{small}
 
 \end{document}

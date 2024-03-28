@@ -5,18 +5,37 @@
 % Summary
 %*******************************************************
 
-% TODO -- lo tengo que escribir, porque es una parte obligatoria
-
 \selectlanguage{english}
-\chapter{Summary}
-
-\todo{Escribirlo cuando la parte de informática se estabilice algo}
-
-An english summary of the project (around 800 and 1500 words are recommended).
-
-File: \texttt{preliminares/summary.tex}
+\chapter{Abstract}
 
 
-% Al finalizar el resumen en inglés, volvemos a seleccionar el idioma español para el documento
+\textbf{Keywords:} Tensor Analysis, \textit{CP} Tensor Decomposition, \textit{HT} Tensor Decomposition, Machine Learning, Deep Learning, Computer Vision, Convolutional Networks, Age-Invariant Facial Recognition, \textit{Triplet Loss}.
+
+The present Bachelor's Thesis has two \textbf{main objectives}. The first one involves modeling convolutional neural networks, both deep and shallow, and studying the property commonly known as \textit{depth efficiency}. The second objective is to address an age-invariant facial recognition task. Additionally, we will explore certain variations of the \textit{Triplet Loss} loss function, aiming to resolve some issues associated with its use. Implementing these variants requires a significant effort, so we aim to apply design patterns to ensure that the resulting architecture is easy to modify and extend.
+
+The use of deep neural network-based machine learning techniques has grown enormously in recent years. Their excellent performance in certain specific tasks has been convincingly demonstrated. However, this good performance \textbf{is solely justified based on experimental evidence}. A comprehensive and fruitful study on the theoretical reasons supporting the experimental results has not been conducted. Works that undertake a study to support the experimental line of evidence often deal with mathematical modelizations that are distant from common deep learning models, and the results typically focus on specific cases where deep networks are clearly superior to shallow or non-deep networks. The main publication we primarily refer to is \cite{matematicas:principal}.
+
+Our work in this direction is innovative for two main reasons: the \textbf{mathematical modeling of neural networks is very close to reality}, and the result on \textbf{\textit{depth efficiency} provides specific information about the number of scenarios} in which this \textit{depth efficiency} occurs.
+
+We will express the scoring functions that the network aims to learn based on a tensor of coefficients over a basis of linearly independent and total functions. From here, the modeling is based on two well-known tensor decompositions, the \textit{CANDECOMP/PARAFAC} or \textit{CP} decomposition and the hierarchical \textit{Tucker} or \textit{HT} decomposition. These \textbf{modelings take into account the fundamental properties of convolutional networks}: convolutional locality, coefficient sharing, and pooling operators.
+
+We will proof \textbf{two main results}. The first shows us that, in terms of the Lebesgue measure, almost all shallow models require an exponential number of parameters to implement a deep model. The second result adds that, in fact, almost all deep models cannot even be approximated by a shallow model with fewer than an exponential number of parameters.
+
+In this vein, \textbf{the objectives of this study have been achieved}. We have presented a mathematical modeling very close to reality, and we have demonstrated two results that provide precise information on in which scenarios deep networks outperform shallow networks and how often this occurs.
+
+On the other hand, we have \textbf{attempted to solve an age-invariant facial recognition task, or \textit{AIFR}}. This task is highly interesting in the field of \textbf{forensic computing}, given all the practical applications of obtaining a model capable of identifying an individual in different images regardless of the age at which they appear in those images. We aim to apply the techniques introduced in the publication \cite{informatica:principal} to the \textit{AIFR} task, an approach that, to our knowledge, had never been applied to this task before.
+
+This task presents high complexity. In addition to the challenges posed by a typical computer vision task, we must address all the \textbf{challenges associated with how aging affects the facial features} we are working with.
+
+To address the posed problem, we conducted a state-of-the-art study, which outlined the main research directions that have been most successful. These works primarily employ generative adversarial networks to decompose the input data into two uncorrelated features: age and identity. Some works use attention-based models to learn to solve this task. This approach involves advanced techniques and models that are beyond the scope of the present study.
+
+We conducted a study of the available datasets, which are scarce and sometimes of poor quality. We examined the size of the datasets, the distributions of the number of images per individual (critical for applying our techniques), the age distribution of individuals, and the distribution of the age range of individuals. Based on this study, we made an informed decision about which datasets to use and which experimental protocol to apply. Following the most common approach in the state of the art, we trained on a large dataset, \textit{CACD}, and validated on the \textit{FG-Net} dataset, which poses a significant challenge due to its wide variety of ages and ranges.
+
+We developed an extensive codebase to apply the studied techniques. We optimized the codebase guided by the data collected during various profiles, addressing performance needs. Due to unsatisfactory results, we applied a comprehensive test suite to validate that the poor outcomes were not caused by implementation flaws.
+
+We conducted \textbf{experimentation and result analysis}. The results are dismal, far from being competitive with the state of the art, and even worse, very distant from being applicable in a practical scenario. The state of the art achieves \textit{Rank@1 Accuracy} values exceeding 90\%. Our model does not reach 0.1\%. Furthermore, given the lack of specific literature on the use of these techniques for an \textit{AIFR} problem, we must justify the poor results based on the present study.
+
+Therefore, \textbf{the objective of developing a well-designed codebase has been fulfilled}, providing a comfortable environment for work and experimentation. However, the \textbf{experimental results are very poor and fall far short of the initially proposed objectives}.
+
 \selectlanguage{spanish}
 \endinput

@@ -26,3 +26,5 @@
 /wandb/
 /wandb_data/
 /src/benchmarks/__pycache__/
+/thesis/scopus_diagrams/.ipynb_checkpoints/
+/thesis/.venv/
