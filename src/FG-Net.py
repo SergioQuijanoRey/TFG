@@ -296,9 +296,11 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
 import torchvision.datasets as datasets
+
 # For using pre-trained ResNets
 import torchvision.models as models
 import torchvision.transforms as transforms
+
 # All concrete pieces we're using form sklearn
 from sklearn.metrics import accuracy_score, roc_auc_score, silhouette_score
 from torch.utils.data import DataLoader, Dataset
@@ -320,18 +322,35 @@ import lib.utils as utils
 import wandb
 from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 from lib.embedding_to_classifier import EmbeddingToClassifier
-from lib.loss_functions import (AddSmallEmbeddingPenalization,
-                                BatchAllTripletLoss, BatchHardTripletLoss,
-                                MeanTripletBatchTripletLoss)
+from lib.loss_functions import (
+    AddSmallEmbeddingPenalization,
+    BatchAllTripletLoss,
+    BatchHardTripletLoss,
+    MeanTripletBatchTripletLoss,
+)
 from lib.models import *
-from lib.models import (CACDResnet18, CACDResnet50, FGLigthModel,
-                        LFWLightModel, LFWResNet18, NormalizedNet, ResNet18,
-                        RetrievalAdapter)
+from lib.models import (
+    CACDResnet18,
+    CACDResnet50,
+    FGLigthModel,
+    LFWLightModel,
+    LFWResNet18,
+    NormalizedNet,
+    ResNet18,
+    RetrievalAdapter,
+)
 from lib.sampler import CustomSampler
-from lib.train_loggers import (CompoundLogger, InterClusterLogger,
-                               IntraClusterLogger, LocalRankAtKLogger,
-                               RankAtKLogger, SilentLogger, TrainLogger,
-                               TripletLoggerOffline, TripletLoggerOnline)
+from lib.train_loggers import (
+    CompoundLogger,
+    InterClusterLogger,
+    IntraClusterLogger,
+    LocalRankAtKLogger,
+    RankAtKLogger,
+    SilentLogger,
+    TrainLogger,
+    TripletLoggerOffline,
+    TripletLoggerOnline,
+)
 from lib.trainers import train_model_online
 from lib.visualizations import *
 
