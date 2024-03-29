@@ -3,7 +3,7 @@
 
 \chapter{Herramientas matemáticas fundamentales} \label{ch:matematicas_fundamentales}
 
-En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo. Estas herramientas son básicas por lo que el lector experimentado puede pasar directamente al \sectionref{ch:tarea_aprendizaje}.
+En esta sección vamos a introducir algunas de las herramientas matemáticas sobre las que se apoya nuestro trabajo.
 
 \section{Notación}
 
@@ -11,22 +11,17 @@ Seguiremos en parte la notación del \textit{paper} de referencia \cite{matemati
 
 Denotaremos a los vectores con flechas sobre las letras que los identifican, tal que $\nv{v} \in \R^N$. Las coordenadas de dicho vector se denotarán como $\nv{v_i}$ con $i \in \deltaset{n}$, donde $\deltaset{n} := \{1, \ldots, n\}$. También usaremos la notación $\doubledeltaset{n}{m} := \{n, \ldots, m\}$ donde $n \leq m$. En algunas ocasiones usaremos la notación $\nv{v_i^n}$ para indicar que estamos trabajando con el índice $i$ del vector $n$-ésimo de un conjunto de vectores.
 
-Aunque más tarde definamos qué significan estos conceptos, introducimos ahora la notación usada respecto a los tensores.
+Aunque más tarde definiremos qué significan estos conceptos, introducimos ahora la notación usada respecto a los tensores. Para denotar a los tensores usaremos tipografía caligráfica, por ejemplo, $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$. Cada una de las entradas de dicho tensor serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$. Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo lo denotaremos por $\espaciotensores{N}{M}$. Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\nv{v_1}, \ldots, \nv{v_N} \in \R^{M_1}, \ldots, \R^{M_N}$, denotaremos su producto tensorial $\nv{v_1} \otimes \cdots \otimes \nv{v_N}$ como $\otimes_{i = 1}^N \nv{v_i}$.
 
-Para denotar a los tensores usaremos tipografía caligráfica, por ejemplo, $\mathcal{A} \in \R^{M_1 \times \ldots \times M_N}$. Cada una de las entradas de dicho tensor serán denotadas como $\mathcal{A}_{d_1, \ldots, d_N} \in \R$.
-
-Al espacio de tensores de orden $N$ y dimensión $M$ en cada modo lo denotaremos por $\espaciotensores{N}{M}$. Al espacio de matrices de dimensiones $p, q$ lo denotaremos de la forma usual como  $\espaciomatrices{p}{q}$.
-
-Al producto tensorial entre dos tensores $\mathcal{A}, \mathcal{B}$ lo denotaremos como $\mathcal{A} \otimes \mathcal{B}$. Dado un conjunto de vectores $\nv{v_1}, \ldots, \nv{v_N} \in \R^{M_1}, \ldots, \R^{M_N}$, denotaremos su producto tensorial $\nv{v_1} \otimes \ldots \otimes \nv{v_N}$ como $\otimes_{i = 1}^N \nv{v_i}$.
-
-Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
+Por otro lado, al espacio de matrices de dimensiones $p, q$ lo denotaremos de la forma usual como  $\espaciomatrices{p}{q}$. Al producto de Kronecker entre dos matrices $A, B$ lo denotaremos como $A \odot B$.
 
 \section{Tensores}
 
 \subsection{Definición del producto tensorial} \label{sec:deftensor}
-\todo{Tengo que referenciar algún recurso sobre esto. Yo lo he visto a partir de unos vídeos}
 
-Dados dos espacios vectoriales reales (aunque podría realizarse la construcción sobre otro cuerpo) $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa. Especificaremos esto en la \sectionref{sec:cociente_prod_formal}
+Dados dos espacios vectoriales reales \footnote{Podría realizarse la construcción sobre otro cuerpo.} $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa.
+
+Realizamos la construcción de este objeto en varios pasos. En primer lugar definimos el producto formal entre dos espacios vectoriales. Introducimos las propiedades que queremos que el producto formal cumpla y en base a esto definimos el producto tensorial. Finalmente, estudiamos algunas de las propiedades que tiene este nuevo objeto matemático.
 
 \subsubsection{Producto formal de dos espacios vectoriales}
 
@@ -36,7 +31,7 @@ Para la construcción del producto tensorial de espacios vectoriales necesitarem
 	Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales reales. Se define su \textbf{producto formal} como:
 
 	\begin{equation}
-		\mathbb{V} \ast \mathbb{W} := \spanset{v \ast w : \; v \in \mathbb{V}, w \in \mathbb{W}}
+		\mathbb{V} \ast \mathbb{W} := \spanset{v \ast w : \; v \in \mathbb{V}, \; w \in \mathbb{W}}
 	\end{equation}
 
 	donde $*$ es un símbolo con el que no sabemos operar. Por tanto, ahora mismo no sabemos simplificar muchas expresiones en este espacio.
@@ -57,13 +52,13 @@ Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar toma
 Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que en general las siguientes igualdades no se cumplen:
 
 \begin{enumerate}
-	\item $c [\nv{v} \ast \nv{w}] = (c\nv{v}) \ast \nv{w}$
-	\item $c[\nv{v} \ast \nv{w}] = \nv{v} \ast (c\nv{w})$
-	\item $(\nv{v_1} + \nv{v_2}) \ast \nv{w} = \nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}$
-	\item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$
+	\item $c [\nv{v} \ast \nv{w}] = (c\nv{v}) \ast \nv{w}$.
+	\item $c[\nv{v} \ast \nv{w}] = \nv{v} \ast (c\nv{w})$.
+	\item $(\nv{v_1} + \nv{v_2}) \ast \nv{w} = \nv{v_1} \ast \nv{w} + \nv{v_2} \ast \nv{w}$.
+	\item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$.
 \end{enumerate}
 
-Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$. Estas igualdades representan las propiedades que queremos que se cumplan para que nuestro nuevo objeto matemático tenga un buen comportamiento. Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir dichas propiedades. Para ello definimos:
+Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}$, $\nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$. Estas igualdades representan las propiedades que queremos que se cumplan para que nuestro nuevo objeto matemático tenga el comportamiento deseado. Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir dichas propiedades. Para ello definimos:
 
 \begin{equation}
 	\begin{split}
@@ -157,10 +152,11 @@ La expresión anterior motiva la siguiente definición:
 \end{definicion}
 
 \begin{proposicion}
+    % TODO -- seguir por aqui
 	Como consecuencia directa del \propref{th:base_prod_tensorial}, dados $\nv{v}, \nv{w} \in \mathbb{V}$, en general no es cierto que:
 
 	\begin{equation}
-		\nv{v} \otimes \nv{w} \neq \nv{w} \otimes \nv{v}
+		\nv{v} \otimes \nv{w} = \nv{w} \otimes \nv{v}
 	\end{equation}
 
 	\begin{observacion}
@@ -301,9 +297,9 @@ Generalizamos la caracterización anterior:
 
 	Por lo tanto, tenemos que $\forall \nv{v} \in \R^N$, $\forall \nv{w} \in \mathbb{V}$, $\exists \nv{w_1}, \ldots, \nv{w_N} \in \mathbb{V}$ tal que:
 
-	$$\nv{v} \otimes \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \ldots + \nv{e_N} \otimes \nv{w_N}$$
+	$$\nv{v} \otimes \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \cdots + \nv{e_N} \otimes \nv{w_N}$$
 
-	Con esto, podemos definir el siguiente isomorfimso:
+	Con esto, podemos definir el siguiente isomorfismo:
 
 	\begin{equation}
 		\begin{split}
