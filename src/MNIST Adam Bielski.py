@@ -2,6 +2,8 @@
 # https://github.com/adambielski/siamese-triplet in order to validate that our
 # approach is feasible
 
+from datetime import datetime
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,7 +14,42 @@ from torch.optim import lr_scheduler
 from torchvision import transforms
 from torchvision.datasets import MNIST
 
+import wandb
 from adambielski_lib.trainer import fit
+from lib import utils
+
+GLOBALS = {}
+GLOBALS["RUNNING_ENV"] = "ugr"
+
+GLOBALS["BASE_PATH"] = None
+if GLOBALS["RUNNING_ENV"] == "local":
+    GLOBALS["BASE_PATH"] = "./"
+elif GLOBALS["RUNNING_ENV"] == "remote":
+    GLOBALS["BASE_PATH"] = "/content/drive/MyDrive/Colab Notebooks/"
+elif GLOBALS["RUNNING_ENV"] == "ugr":
+    GLOBALS["BASE_PATH"] = "/mnt/homeGPU/squijano/TFG/"
+else:
+    raise Exception(f"RUNNING ENV is not valid, got value {GLOBALS['RUNNING_ENV']}")
+
+
+# Config to be able to run wandb commands from UGR's server
+
+if GLOBALS["RUNNING_ENV"] == "ugr":
+    print("-> Changing dir env values")
+    utils.change_dir_env_vars(base_path=GLOBALS["BASE_PATH"])
+    print("-> Changing done!")
+    print("")
+
+    print("-> Login again to WANDB")
+    utils.login_wandb()
+    print("-> Login done!")
+    print("")
+
+# Simply config for quick wandb
+wandb.init(
+    project="MNIST Adam Bielski",
+    name=f"{datetime.now()}",
+)
 
 cuda = torch.cuda.is_available()
 print(f"=> {cuda=}")
@@ -103,15 +140,11 @@ online_test_loader = torch.utils.data.DataLoader(
 
 from adambielski_lib.losses import OnlineTripletLoss
 from adambielski_lib.metrics import AverageNonzeroTripletsMetric
-
 # Set up the network and training parameters
 from adambielski_lib.networks import EmbeddingNet
 from adambielski_lib.utils import (  # Strategies for selecting triplets within a minibatch
-    AllTripletSelector,
-    HardestNegativeTripletSelector,
-    RandomNegativeTripletSelector,
-    SemihardNegativeTripletSelector,
-)
+    AllTripletSelector, HardestNegativeTripletSelector,
+    RandomNegativeTripletSelector, SemihardNegativeTripletSelector)
 
 margin = 1.0
 embedding_net = EmbeddingNet()
