@@ -1,14 +1,15 @@
-import torch
-import numpy as np
-from tqdm import tqdm
+import logging
 from collections import Counter
 from typing import List
 
-import src.lib.utils as utils
+import numpy as np
+import torch
+from tqdm import tqdm
 
+from . import utils
 
-import logging
 file_logger = logging.getLogger("MAIN_LOGGER")
+
 
 class AugmentatedDataset(torch.utils.data.Dataset):
     """
@@ -22,9 +23,8 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         self,
         base_dataset: torch.utils.data.Dataset,
         min_number_of_images: int,
-        transform
+        transform,
     ):
-
         super(AugmentatedDataset, self).__init__()
 
         # Store base dataset as we're going to use its information
@@ -41,25 +41,24 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         self.transform = transform
 
         # Create new images (with associated labels)
-        self.new_images, self.new_targets = self.__augmentate_base_dataset(self.min_number_of_images)
+        self.new_images, self.new_targets = self.__augmentate_base_dataset(
+            self.min_number_of_images
+        )
 
         # Now we can create the targets list
         self.targets = self.base_dataset.targets + self.new_targets
 
     def __getitem__(self, index: int):
-
         # If the index is from the original dataset, return from that
         if index < len(self.base_dataset):
             return self.base_dataset.__getitem__(index)
 
         else:
-
             # Index in the lists stored in the class
             resized_index = index - len(self.base_dataset)
 
             # Return the data from new generated images and labels
             return self.new_images[resized_index], self.new_targets[resized_index]
-
 
     def __len__(self) -> int:
         return len(self.targets)
@@ -85,7 +84,9 @@ class AugmentatedDataset(torch.utils.data.Dataset):
             if images_of_that_class < min_number_of_images
         ]
 
-        file_logger.debug(f"{len(classes_with_less_than_min)} classes need data augmentation")
+        file_logger.debug(
+            f"{len(classes_with_less_than_min)} classes need data augmentation"
+        )
 
         # Before doing the augmentation, we pre-compute dict of classes for speeding
         # up the computations
@@ -94,15 +95,17 @@ class AugmentatedDataset(torch.utils.data.Dataset):
         # Iterate over all classes that have less than min_number_of_images images
         # This process might be slow, so plot the progress using tqdm
         for small_class in tqdm(classes_with_less_than_min):
-
             # Compute how many images we need to create to reach min_number_of_images
-            number_images_needed = min_number_of_images - how_many_images_per_class[small_class]
+            number_images_needed = (
+                min_number_of_images - how_many_images_per_class[small_class]
+            )
 
             # Create number_images_needed images and put them in the new lists
             for _ in range(number_images_needed):
-
                 # Select a random image of the class
-                img_idx = int(np.random.choice(len(dict_of_classes[small_class]), size = 1))
+                img_idx = int(
+                    np.random.choice(len(dict_of_classes[small_class]), size=1)
+                )
                 img_idx = dict_of_classes[small_class][img_idx]
                 img, _ = self.base_dataset[img_idx]
 
@@ -120,7 +123,6 @@ class AugmentatedDataset(torch.utils.data.Dataset):
             print(f"-> Data augmentation produced {len(new_targets)} new elements")
 
         return new_images, new_targets
-
 
 
 class LazyAugmentatedDataset(torch.utils.data.Dataset):
@@ -143,9 +145,8 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
         self,
         base_dataset: torch.utils.data.Dataset,
         min_number_of_images: int,
-        transform
+        transform,
     ):
-
         super(LazyAugmentatedDataset, self).__init__()
 
         # Store base dataset as we're going to use its information
@@ -168,19 +169,21 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
         self.targets = self.base_dataset.targets + self.new_targets
 
         # For speeding the data augmentation method
-        self.dict_of_classes = utils.precompute_dict_of_classes(self.base_dataset.targets)
+        self.dict_of_classes = utils.precompute_dict_of_classes(
+            self.base_dataset.targets
+        )
 
     def __getitem__(self, index: int):
-
         if type(index) is not int:
-            raise TypeError(f"Index should be an integer, got {type(index)} type instead")
+            raise TypeError(
+                f"Index should be an integer, got {type(index)} type instead"
+            )
 
         # If the index is from the original dataset, return from that
         if index < len(self.base_dataset):
             return self.base_dataset.__getitem__(index)
 
         else:
-
             # Index in the lists stored in the class
             resized_index = index - len(self.base_dataset)
 
@@ -192,7 +195,6 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
 
             # Return the data from new generated images and labels
             return new_img, target
-
 
     def __len__(self) -> int:
         return len(self.targets)
@@ -216,14 +218,17 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
             if images_of_that_class < min_number_of_images
         ]
 
-        file_logger.debug(f"{len(classes_with_less_than_min)} classes need data augmentation")
+        file_logger.debug(
+            f"{len(classes_with_less_than_min)} classes need data augmentation"
+        )
 
         # Iterate over all classes that have less than min_number_of_images images
         # This process might be slow, so plot the progress using tqdm
         for small_class in tqdm(classes_with_less_than_min):
-
             # Compute how many images we need to create to reach min_number_of_images
-            number_images_needed = min_number_of_images - how_many_images_per_class[small_class]
+            number_images_needed = (
+                min_number_of_images - how_many_images_per_class[small_class]
+            )
 
             # Now we can add the target to the list of new targets, the number of times needed
             new_targets += [small_class] * number_images_needed
@@ -242,7 +247,7 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
         """
 
         # Select a random image of the class
-        img_idx = int(np.random.choice(len(self.dict_of_classes[target]), size = 1))
+        img_idx = int(np.random.choice(len(self.dict_of_classes[target]), size=1))
         img_idx = self.dict_of_classes[target][img_idx]
         img, _ = self.base_dataset[img_idx]
 
@@ -250,4 +255,3 @@ class LazyAugmentatedDataset(torch.utils.data.Dataset):
         new_img = self.transform(img)
 
         return new_img
-

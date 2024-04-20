@@ -5,11 +5,11 @@ Architecture declaration of the models used in the project will appear here
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 # In order to use pre-trained resnet
 import torchvision.models as models
 
-import src.lib.core as core
+from . import core
+
 
 class ResNet18(torch.nn.Module):
     """
@@ -20,7 +20,6 @@ class ResNet18(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(ResNet18, self).__init__()
 
         # Dimension del embedding que la red va a calcular
@@ -32,12 +31,21 @@ class ResNet18(torch.nn.Module):
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
         # de entrada
-        self.pretrained.conv1 = nn.Conv2d(in_channels = 1, out_channels = 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.pretrained.conv1 = nn.Conv2d(
+            in_channels=1,
+            out_channels=64,
+            kernel_size=7,
+            stride=2,
+            padding=3,
+            bias=False,
+        )
 
         # Cambiamos la ultima capa fc Linear(in_features=512, out_features=1000, bias=True)
         # para calcular un embedding de dimension mucho menor, especificada por parameatro
         # TODO -- comentar en la memoria el cambio de ERROR que hacer esto nos ha supuesto
-        self.pretrained.fc = nn.Linear(in_features=512, out_features=self.embedding_dimension, bias=True)
+        self.pretrained.fc = nn.Linear(
+            in_features=512, out_features=self.embedding_dimension, bias=True
+        )
 
         # Por defecto siempre realizamos la permutacion del tensor de entrada
         self.should_permute = True
@@ -66,23 +74,21 @@ class LightModel(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(LightModel, self).__init__()
 
         # Dimension del embedding que la red va a calcular
         self.embedding_dimension = embedding_dimension
 
         # Bloques convolucionales
-        self.conv1 = nn.Conv2d(in_channels = 1, out_channels = 4, kernel_size = 3)
-        self.conv2 = nn.Conv2d(in_channels = 4, out_channels = 8, kernel_size = 3)
-        self.conv3 = nn.Conv2d(in_channels = 8, out_channels = 16, kernel_size = 3)
-        self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
-        self.fc = nn.Linear(in_features = 3200, out_features = self.embedding_dimension)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=4, kernel_size=3)
+        self.conv2 = nn.Conv2d(in_channels=4, out_channels=8, kernel_size=3)
+        self.conv3 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3)
+        self.conv4 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3)
+        self.fc = nn.Linear(in_features=3200, out_features=self.embedding_dimension)
 
         self.should_permute = True
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-
         # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
         # queremos tensores (DATALOADER_BACH_SIZE, 1, 28, 28) para poder trabajar
         # con la red
@@ -119,14 +125,13 @@ class LFWResNet18(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(LFWResNet18, self).__init__()
 
         # Dimension del embedding que la red va a calcular
         self.embedding_dimension = embedding_dimension
 
         # Tomamos el modelo pre-entrenado ResNet18
-        self.pretrained = models.resnet18(weights = models.ResNet18_Weights.DEFAULT)
+        self.pretrained = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
 
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
@@ -136,7 +141,9 @@ class LFWResNet18(torch.nn.Module):
         # Cambiamos la ultima capa fc Linear(in_features=512, out_features=1000, bias=True)
         # para calcular un embedding de dimension mucho menor, especificada por parameatro
         # TODO -- comentar en la memoria el cambio de ERROR que hacer esto nos ha supuesto
-        self.pretrained.fc = nn.Linear(in_features=512, out_features=self.embedding_dimension, bias=True)
+        self.pretrained.fc = nn.Linear(
+            in_features=512, out_features=self.embedding_dimension, bias=True
+        )
 
         # Por defecto siempre realizamos la permutacion del tensor de entrada
         self.should_permute = True
@@ -165,23 +172,21 @@ class LFWLightModel(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(LFWLightModel, self).__init__()
 
         # Dimension del embedding que la red va a calcular
         self.embedding_dimension = embedding_dimension
 
         # Bloques convolucionales
-        self.conv1 = nn.Conv2d(in_channels = 3, out_channels = 4, kernel_size = 3)
-        self.conv2 = nn.Conv2d(in_channels = 4, out_channels = 8, kernel_size = 3)
-        self.conv3 = nn.Conv2d(in_channels = 8, out_channels = 16, kernel_size = 3)
-        self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
-        self.fc = nn.Linear(in_features = 468512, out_features = self.embedding_dimension)
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=4, kernel_size=3)
+        self.conv2 = nn.Conv2d(in_channels=4, out_channels=8, kernel_size=3)
+        self.conv3 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3)
+        self.conv4 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3)
+        self.fc = nn.Linear(in_features=468512, out_features=self.embedding_dimension)
 
         self.should_permute = True
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-
         # Tenemos como entrada tensores (1, DATALOADER_BACH_SIZE, 28, 28) y
         # queremos tensores (DATALOADER_BACH_SIZE, 1, 28, 28) para poder trabajar
         # con la red
@@ -195,7 +200,6 @@ class LFWLightModel(torch.nn.Module):
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
         x = F.relu(self.conv4(x))
-
 
         # Max pooling y seguido flatten de todas las dimensiones menos la del batch
         x = F.max_pool2d(x, 2)
@@ -217,24 +221,22 @@ class FGLigthModel(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(FGLigthModel, self).__init__()
 
         # Embedding dimension that the network is going to compute
         self.embedding_dimension = embedding_dimension
 
         # Basic structure for the network
-        self.conv1 = nn.Conv2d(in_channels = 3, out_channels = 4, kernel_size = 3)
-        self.conv2 = nn.Conv2d(in_channels = 4, out_channels = 8, kernel_size = 3)
-        self.conv3 = nn.Conv2d(in_channels = 8, out_channels = 16, kernel_size = 3)
-        self.conv4 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 3)
-        self.conv5 = nn.Conv2d(in_channels = 32, out_channels = 32, kernel_size = 3)
-        self.conv6 = nn.Conv2d(in_channels = 32, out_channels = 32, kernel_size = 3)
-        self.fc = nn.Linear(in_features = 14112, out_features = self.embedding_dimension)
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=4, kernel_size=3)
+        self.conv2 = nn.Conv2d(in_channels=4, out_channels=8, kernel_size=3)
+        self.conv3 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3)
+        self.conv4 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3)
+        self.conv5 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3)
+        self.conv6 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3)
+        self.fc = nn.Linear(in_features=14112, out_features=self.embedding_dimension)
         self.should_permute = True
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-
         # We have input tensors with shape (1, DATALOADER_BACH_SIZE, 28, 28)
         # and we wnat to work with shapes (DATALOADER_BACH_SIZE, 1, 28, 28)
         #
@@ -256,7 +258,6 @@ class FGLigthModel(torch.nn.Module):
         x = F.relu(self.conv6(x))
         x = F.max_pool2d(x, 2)
 
-
         # Flatten for future fully connected layers
         x = torch.flatten(x, 1)
 
@@ -268,6 +269,7 @@ class FGLigthModel(torch.nn.Module):
     def set_permute(self, should_permute: bool):
         self.should_permute = should_permute
 
+
 # TODO -- DOCS -- Some content is in spanish
 class CACDResnet18(torch.nn.Module):
     """
@@ -277,14 +279,13 @@ class CACDResnet18(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(CACDResnet18, self).__init__()
 
         # Dimension del embedding que la red va a calcular
         self.embedding_dimension = embedding_dimension
 
         # Tomamos el modelo pre-entrenado ResNet18
-        self.pretrained = models.resnet18(weights = models.ResNet18_Weights.DEFAULT)
+        self.pretrained = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
 
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
@@ -298,7 +299,7 @@ class CACDResnet18(torch.nn.Module):
         self.pretrained.fc = nn.Linear(
             in_features=previous_in_features,
             out_features=self.embedding_dimension,
-            bias=True
+            bias=True,
         )
 
         # Por defecto siempre realizamos la permutacion del tensor de entrada
@@ -330,14 +331,13 @@ class CACDResnet50(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(CACDResnet50, self).__init__()
 
         # Dimension del embedding que la red va a calcular
         self.embedding_dimension = embedding_dimension
 
         # Tomamos el modelo pre-entrenado ResNet50
-        self.pretrained = models.resnet50(weights = models.ResNet50_Weights.DEFAULT)
+        self.pretrained = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 
         # Cambiamos la primera convolucion para que en vez
         # de tres canales acepte un canal para las imagenes
@@ -351,7 +351,7 @@ class CACDResnet50(torch.nn.Module):
         self.pretrained.fc = nn.Linear(
             in_features=previous_in_features,
             out_features=self.embedding_dimension,
-            bias=True
+            bias=True,
         )
 
         # Por defecto siempre realizamos la permutacion del tensor de entrada
@@ -381,7 +381,6 @@ class RandomNet(torch.nn.Module):
     """
 
     def __init__(self, embedding_dimension: int):
-
         super(RandomNet, self).__init__()
 
         # Dimension del embedding que la red va a calcular
@@ -409,12 +408,7 @@ class NormalizedNet(torch.nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         output = self.base_model(x)
-        normalized_output = torch.nn.functional.normalize(
-            output,
-            p = 2,
-            dim = 1,
-            eps = 0.1
-        )
+        normalized_output = torch.nn.functional.normalize(output, p=2, dim=1, eps=0.1)
         return normalized_output
 
     def set_permute(self, should_permute: bool):
@@ -438,7 +432,9 @@ class RetrievalAdapter(torch.nn.Module):
         device = core.get_device()
         self.base_net.to(device)
 
-    def query(self, query: torch.Tensor, candidates: torch.Tensor, k: int = 5) -> torch.Tensor:
+    def query(
+        self, query: torch.Tensor, candidates: torch.Tensor, k: int = 5
+    ) -> torch.Tensor:
         """
         Given a `query` image, and a list of image `candidates` (list in the form
         of a pytorch tensor), returns the `k` most promising candidate indixes, ranked
@@ -452,23 +448,33 @@ class RetrievalAdapter(torch.nn.Module):
         # Query is a single image so `query.shape == [channels, width, height]`
         # and `channels in [1, 3]`
         if len(query.shape) != 3:
-            raise ValueError(f"`query` should be a tensor with three modes, only {len(query.shape)} modes were found")
+            raise ValueError(
+                f"`query` should be a tensor with three modes, only {len(query.shape)} modes were found"
+            )
 
         if query.shape[0] != 3 and query.shape[1] != 1:
-            raise ValueError(f"`query` must be an image with one or three channels, got {query.shape[0]} channels")
+            raise ValueError(
+                f"`query` must be an image with one or three channels, got {query.shape[0]} channels"
+            )
 
         # Check the dimensions of the candidates
         # `candidates` is a list of images, so `candidates.shape == [n, channels = 1 | 3, width, height]`
         # Also, as we are querying for the best `k` candidates, we should have at least
         # `k` candidates
         if len(candidates.shape) != 4:
-            raise ValueError(f"`candidates` should be a tensor with four modes, only {len(candidates.shape)} modes were found")
+            raise ValueError(
+                f"`candidates` should be a tensor with four modes, only {len(candidates.shape)} modes were found"
+            )
 
         if candidates.shape[1] != 3 and candidates.shape[1] != 1:
-            raise ValueError(f"Candidates must be images of one or three channels, got {candidates.shape[1]} channels")
+            raise ValueError(
+                f"Candidates must be images of one or three channels, got {candidates.shape[1]} channels"
+            )
 
         if candidates.shape[0] < k:
-            raise ValueError(f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total")
+            raise ValueError(
+                f"Querying for the best {k} candidates, but we only have {candidates.shape[0]} candidates in total"
+            )
 
         # Our network only accepts batches of images. Query is a single image,
         # so create a batch with a single image:
@@ -487,7 +493,12 @@ class RetrievalAdapter(torch.nn.Module):
         # using the embeddings that we have computed
         return self.query_embedding(query_embedding, candidate_embeddings, k)
 
-    def query_embedding(self, query_embedding: torch.Tensor, candidate_embeddings: torch.Tensor, k: int = 5) -> torch.Tensor:
+    def query_embedding(
+        self,
+        query_embedding: torch.Tensor,
+        candidate_embeddings: torch.Tensor,
+        k: int = 5,
+    ) -> torch.Tensor:
         """
         Does the same as `Self.query_embedding` but taking as parameters the
         embeddings, and not the images that we are going to embed
@@ -498,10 +509,14 @@ class RetrievalAdapter(torch.nn.Module):
 
         # Check the shapes of the embeddings given as parameters
         if len(query_embedding.shape) != 1:
-            raise ValueError(f"We were expecting a single embedding, thus only one mode, got {len(query_embedding.shape)} modes")
+            raise ValueError(
+                f"We were expecting a single embedding, thus only one mode, got {len(query_embedding.shape)} modes"
+            )
 
         if len(candidate_embeddings.shape) != 2:
-            raise ValueError(f"We were expecting a batch of embeddings, thus two modes, got {len(candidate_embeddings.shape)} modes")
+            raise ValueError(
+                f"We were expecting a batch of embeddings, thus two modes, got {len(candidate_embeddings.shape)} modes"
+            )
 
         # Check that embedding dimension are the same for the query and the candidates
         if query_embedding.shape[0] != candidate_embeddings.shape[1]:
@@ -512,7 +527,9 @@ class RetrievalAdapter(torch.nn.Module):
 
         # We must have at least `k` candidates to be able to compute the search
         if candidate_embeddings.shape[0] < k:
-            raise ValueError(f"Querying for the best {k} candidates, but we only have {candidate_embeddings.shape[0]} candidates in total")
+            raise ValueError(
+                f"Querying for the best {k} candidates, but we only have {candidate_embeddings.shape[0]} candidates in total"
+            )
 
         # Compute the euclidean distances between the query and the candidates
         #
@@ -527,7 +544,7 @@ class RetrievalAdapter(torch.nn.Module):
         distances = torch.sqrt(diff_squared.sum(1))
 
         # Now get the best `k` indixes
-        sorted_indixes = torch.sort(distances, descending = False)[1]
+        sorted_indixes = torch.sort(distances, descending=False)[1]
         best_k_indixes = sorted_indixes[:k]
 
         return best_k_indixes
