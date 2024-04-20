@@ -1,249 +1,152 @@
 # MNIST
 # ==============================================================================
-#
-# - Check `MNIST Notebook.ipynb` for:
-#  - EDA of the dataset
 
 # Global Parameters of the Notebook
 # ==============================================================================
-#
-# - For ease of use, we are going to store all global parameters into a dict
-# - This way, we can pass this dict directly to wandb init, so we can keep track
-# of which parameters produced which output
 
-from typing import Dict, Union
-
-GLOBALS: Dict[str, Union[str, int, float, bool]] = dict()
-
-## Paths
-# ==============================================================================
-#
-# - Parameters related to data / model / lib paths
-
-# Lib to define paths
+import datetime
 import os
-
-# Define if we are running the notebook in our computer ("local")
-# or in Google Colab ("remote")
-# or in UGR's server ("ugr")
-GLOBALS["RUNNING_ENV"] = "ugr"
-
-# Base path for the rest of paths defined in the notebook
-GLOBALS["BASE_PATH"] = None
-if GLOBALS["RUNNING_ENV"] == "local":
-    GLOBALS["BASE_PATH"] = "./"
-elif GLOBALS["RUNNING_ENV"] == "remote":
-    GLOBALS["BASE_PATH"] = "/content/drive/MyDrive/Colab Notebooks/"
-elif GLOBALS["RUNNING_ENV"] == "ugr":
-    GLOBALS["BASE_PATH"] = "/mnt/homeGPU/squijano/TFG/"
-else:
-    raise Exception(f"RUNNING ENV is not valid, got value {GLOBALS['RUNNING_ENV']}")
-
-# Path to our lib dir
-GLOBALS["LIB_PATH"] = os.path.join(GLOBALS["BASE_PATH"], "lib")
-
-# Path where we store training / test data
-GLOBALS["DATA_PATH"] = os.path.join(GLOBALS["BASE_PATH"], "data")
-
-# Dataset has images and metadata. Here we store the path to the img dir
-GLOBALS["IMAGE_DIR_PATH"] = os.path.join(GLOBALS["DATA_PATH"], "FGNET/images")
-
-# Dir with all cached models
-# This cached models can be loaded from disk when training is skipped
-GLOBALS["MODEL_CACHE_FOLDER"] = os.path.join(GLOBALS["BASE_PATH"], "cached_models")
-
-# Cache for the augmented dataset
-GLOBALS["AUGMENTED_DATASET_CACHE_FILE"] = os.path.join(
-    GLOBALS["BASE_PATH"], "cached_augmented_dataset.pt"
-)
-
-# File where the logs are written
-GLOBALS["LOGGING_FILE"] = os.path.join(GLOBALS["BASE_PATH"], "training.log")
-
-# Binary file where the stats of the profiling are saved
-GLOBALS["PROFILE_SAVE_FILE"] = os.path.join(
-    GLOBALS["BASE_PATH"], "training_profile.stat"
-)
-
-GLOBALS["OPTUNA_DATABASE"] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna.db"
-
-## ML parameters
-# ==============================================================================
-#
-# - Parameters related to machine learning
-# - For example, batch sizes, learning rates, ...
+from dataclasses import dataclass
+from typing import Optional
 
 
-# Parameters of P-K sampling
-GLOBALS["P"] = 8  # Number of classes used in each minibatch
-GLOBALS["K"] = 4  # Number of images sampled for each selected class
+@dataclass
+class GlobalParameters:
+    def __init__(self):
+        #  Where are we running the script:
+        #      - "local" => our computer
+        #      - "remote" => Google Colab
+        #      - "ugr" => NGPU UGR
+        self.running_env: str = "ugr"
 
-# Batch size for online training
-# We can use `P * K` as batch size. Thus, minibatches will be
-# as we expect in P-K sampling.
-#
-# But we can use `n * P * K`. Thus, minibatches will be n P-K sampling
-# minibatche concatenated together
-# Be careful when doing this because it can be really slow, and there is no
-# clear reason to do this
-GLOBALS["ONLINE_BATCH_SIZE"] = GLOBALS["P"] * GLOBALS["K"]
+        # TODO -- ADAM's script uses 1 and it takes almost the same time
+        self.num_workers = 1
 
-# Training epochs
-GLOBALS["TRAINING_EPOCHS"] = 1
+        self.__init_path_params()
+        self.__init_ml_params()
+        self.__init_loss_params()
+        self.__init_hptuning_params()
+        self.__init_evaluation_metrics_params()
+        self.__init_section_params()
+        self.__init_wandb_params()
 
-# Learning rate for hard triplets, online training
-GLOBALS["ONLINE_LEARNING_RATE"] = 0.01
+    def __init_path_params(self):
+        # Select the base path, which depends on the running env
+        self.base_path: str = ""
+        if self.running_env == "local":
+            self.base_path = "./"
+        elif self.running_env == "remote":
+            self.base_path = "/content/drive/MyDrive/Colab Notebooks/"
+        elif self.running_env == "ugr":
+            self.base_path = "/mnt/homeGPU/squijano/TFG/"
+        else:
+            raise ValueError(
+                f"Running env '{self.running_env}' is not a valid running env"
+            )
 
-# How many single elements we want to see before logging
-# It has to be a multiple of P * K, otherwise `should_log` would return always
-# false as `it % LOGGING_ITERATIONS != 0` always
-#
-# `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
-# minibatches
-#  GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 500
-GLOBALS["LOGGING_ITERATIONS"] = GLOBALS["P"] * GLOBALS["K"] * 1_000
+        # Path to our lib dir
+        self.lib_path = os.path.join(self.base_path, "lib")
 
-# Which percentage of the training and validation set we want to use for the logging
-GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"] = 0.005
-GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"] = 0.005
+        # Path where we store training / test data
+        self.data_path = os.path.join(self.base_path, "data")
 
-# Choose which model we're going to use
-# Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel",
-#        "CACDResNet18", "CACDResNet50"
-GLOBALS["NET_MODEL"] = "LightModel"
+        # Dir with all cached models
+        # This cached models can be loaded from disk when training is skipped
+        self.model_cache_folder = os.path.join(self.base_path, "cached_models")
 
-# Epochs used in k-Fold Cross validation
-# k-Fold Cross validation used for parameter exploration
-# TODO -- delete this, we are going to perform a search in the number of epochs
-GLOBALS["HYPERPARAMETER_TUNING_EPOCHS"] = 1
+        # Cache for the augmented dataset
+        self.augmented_dataset_cache_file = os.path.join(
+            self.base_path, "cached_augmented_dataset.pt"
+        )
 
-# Number of tries in the optimization process
-# We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
-# hyperparameter configurations
-GLOBALS["HYPERPARAMETER_TUNING_TRIES"] = 300
+        # Binary file where the stats of the profiling are saved
+        self.profile_save_file = os.path.join(self.base_path, "training_profile.stat")
 
-# Wether to use the validation set in the hp tuning process or to use k-fold
-# cross validation (which is more robust but way slower)
-GLOBALS["FAST_HP_TUNING"] = True
+        # The SQLITE database where we are going to store the hp tuning process
+        self.optuna_database = f"sqlite:///{self.base_path}/hp_tuning_optuna.db"
 
-# Number of folds used in k-fold Cross Validation
-GLOBALS["NUMBER_OF_FOLDS"] = 2
+    def __init_ml_params(self):
+        # P-K sampling main parameters
+        self.P: int = 8
+        self.K: int = 4
 
-# Margin used in the loss function
-GLOBALS["MARGIN"] = 0.840
+        self.embedding_dimension = 5
 
-# Dim of the embedding calculated by the network
-GLOBALS["EMBEDDING_DIMENSION"] = 5
+        # Minibatches must have size multiple of `P*K` in order to perform P-K sampling
+        # So we can use `n * self.P * self.K`
+        self.batch_size = self.P * self.K
 
-# Number of neighbours considered in K-NN
-# K-NN used for transforming embedding task to classification task
-GLOBALS["NUMBER_NEIGHBOURS"] = 4
+        self.training_epochs = 20
+        self.learning_rate = 1e-3
+        self.weight_decay = 1e-4
+        self.margin = 1.0
 
-# Batch Triplet Loss Function
-# This way we can choose among "hard", "all"
-GLOBALS["BATCH_TRIPLET_LOSS_FUNCTION"] = "hard"
+        #  self.logging_iterations = self.batch_size * 10
+        self.loggin_iterations = 50  # TODO <- Value set by Adam
 
-# Whether or not use softplus loss function instead of vanilla triplet loss
-GLOBALS["USE_SOFTPLUS_LOSS"] = False
+        # Logging is very slow so just use a small portion of the data
+        self.online_logger_train_percentage = 0.005
+        self.online_logger_validation_percentage = 0.005
 
-# Count all sumamnds in the mean loss or only those summands greater than zero
-GLOBALS["USE_GT_ZERO_MEAN_LOSS"] = True
+        # TODO -- we are not using this
+        # Choose which model we're going to use
+        # Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel",
+        #        "CACDResNet18", "CACDResNet50"
+        self.net_model = "LightModel"
 
-# Wether or not use lazy computations in the data augmentation
-GLOBALS["LAZY_DATA_AUGMENTATION"] = True
+        self.normalize_model_output = False
 
-# Wether or not fail when calling `CustomSampler.__len__` without having previously
-# computed the index list
-GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"] = True
+    def __init_loss_params(self):
+        # Can be either `"hard"` or `"all"`
+        self.loss_batch_variant = "hard"
 
-# Where or not add penalty term to the loss function
-GLOBALS["ADD_NORM_PENALTY"] = False
+        # Whether or not use softplus dist function instead of vanilla euclidean dist
+        self.use_softplus = False
 
-# If we add that penalty term, which scaling factor to use
-GLOBALS["PENALTY_FACTOR"] = 0.6
+        # Count all summands in the mean loss or only those summands greater than zero
+        self.use_gt_zero_mean_loss = True
 
-# If we want to wrap our model into a normalizer
-# That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
-GLOBALS["NORMALIZED_MODEL_OUTPUT"] = False
+        # Wether or not add penalty term to the loss function, and how hardly
+        self.add_norm_penalty = False
+        self.penalty_factor = 0.6
 
-# If its None, we do not perform gradient clipping
-# If its a Float value, we perform gradient clipping, using that value as a
-# parameter for the max norm
-GLOBALS["GRADIENT_CLIPPING"] = None
+        # Wether or not apply gradient clipping to avoid some stability issues
+        self.gradient_clipping: Optional[float] = None
 
-# Number of candidates that we are going to consider in the retrieval task,
-# used in the Rank@K accuracy metric
-# We use k = 1 and k = this value
-GLOBALS["ACCURACY_AT_K_VALUE"] = 5
+    def __init_hptuning_params(self):
+        # Epochs used in k-Fold Cross validation
+        self.hptuning_epochs = 1
 
-# Images in this dataset have different shapes. So this parameter fixes one shape
-# so we can normalize the images to have the same shape
-GLOBALS["IMAGE_SHAPE"] = (200, 200)
+        # Number of tries in the optimization process
+        self.hptuning_tries = 300
 
-# Degrees that we are going to use in data augmentation rotations
-GLOBALS["ROTATE_AUGM_DEGREES"] = (0, 20)
+        self.hptuning_kfolds = 2
 
-## Section parameters
-# ==============================================================================
+        # Wether to use the validation set in the hp tuning process or to use k-fold
+        # cross validation (which is more robust but way slower)
+        self.hptuning_fast = True
 
-# - Flags to choose if some sections will run or not
-# - This way we can skip some heavy computations when not needed
+    def __init_evaluation_metrics_params(self):
+        # Number of candidates that we are going to consider in the retrieval task,
+        # used in the Rank@K accuracy metric
+        # We use k = 1 and k = this value
+        self.accuracty_at_k_value = 5
 
-# Skip hyper parameter tuning for online training
-GLOBALS["SKIP_HYPERPARAMTER_TUNING"] = True
+    def __init_section_params(self):
+        self.skip_hptuning = True
 
-# Skip training and use a cached model
-# Useful for testing the embedding -> classifier transformation
-# Thus, when False training is not computed and a cached model
-# is loaded from disk
-# Cached models are stored in `MODEL_CACHE_FOLDER`
-GLOBALS["USE_CACHED_MODEL"] = False
+        # When skipping training, we can load the latest cached model and evaluate it
+        self.skip_training = False
 
-# Skip data augmentation and use the cached augmented dataset
-GLOBALS["USE_CACHED_AUGMENTED_DATASET"] = False
+        self.skip_profiling = True
 
-# Most of the time we're not exploring the data, but doing
-# either hyperparameter settings or training of the model
-# So if we skip this step we can start the process faster
-GLOBALS["SKIP_EXPLORATORY_DATA_ANALYSYS"] = True
-
-# Wether or not profile the training
-# This should be False most of the times
-# Note that profiling adds a significant overhead to the training
-GLOBALS["PROFILE_TRAINING"] = False
+    def __init_wandb_params(self):
+        self.wandb_project_name = "MNIST dataset"
+        self.wandb_run_name = str(datetime.datetime.now())
 
 
-## WANDB Parameters
-# ==============================================================================
+GLOBALS = GlobalParameters()
 
-from datetime import datetime
-
-# Name for the project
-# One project groups different runs
-GLOBALS["WANDB_PROJECT_NAME"] = "MNIST dataset"
-
-# Name for this concrete run
-# I don't care too much about it, because wandb tracks the parameters we use
-# in this run (see "Configuration for Weights and Biases" section)
-GLOBALS["WANDB_RUN_NAME"] = str(datetime.now())
-
-
-## Others
-# ==============================================================================
-
-# Number of workers we want to use
-# We can have less, equal or greater num of workers than CPUs
-# In the following forum:
-#   https://discuss.pytorch.org/t/guidelines-for-assigning-num-workers-to-dataloader/813/4
-# they recomend to explore this parameter, growing it until system RAM saturates
-# Using a value greater than 2 makes pytorch tell us that this value is not optimal
-# So sticking with what pytorch tells uss
-# TODO -- trying a higher value in UGR's server
-# TODO -- ADAM's script had 1 and the time difference was not big
-GLOBALS["NUM_WORKERS"] = 4
-
-# Fix random seed to make reproducible results
-GLOBALS["RANDOM_SEED"] = 123456789
 
 # Add some paths to PYTHONPATH
 # ==============================================================================
@@ -255,9 +158,10 @@ GLOBALS["RANDOM_SEED"] = 123456789
 
 import sys
 
-sys.path.append(GLOBALS["BASE_PATH"])
-sys.path.append(os.path.join(GLOBALS["BASE_PATH"], "src"))
-sys.path.append(os.path.join(GLOBALS["BASE_PATH"], "src/lib"))
+# TODO -- remove this
+sys.path.append(GLOBALS.base_path)
+sys.path.append(GLOBALS.base_path, "src")
+sys.path.append(GLOBALS.base_path, "src/lib")
 
 
 # Importing the modules we are going to use
@@ -333,7 +237,7 @@ from lib.visualizations import *
 # - Sometimes UGR's server does not provide GPU access
 # - In that case, fail fast so we start ASAP debugging the problem
 
-if GLOBALS["RUNNING_ENV"] == "ugr" and torch.cuda.is_available() is False:
+if GLOBALS.running_env == "ugr" and torch.cuda.is_available() is False:
     raise Exception(
         "`torch.cuda.is_available()` returned false, so we dont have access to GPU's"
     )
@@ -341,30 +245,6 @@ if GLOBALS["RUNNING_ENV"] == "ugr" and torch.cuda.is_available() is False:
 
 # TODO -- DELETE
 torch.autograd.set_detect_anomaly(True)
-
-# Configuration of the logger
-# ==============================================================================
-#
-# - Here we set the configuration for all logging done
-# - In lib, `logging.getLogger("MAIN_LOGGER")` is used everywhere, so we get it, configure it once, and use that config everywhere
-
-
-# Get the logger that is used everywhere
-file_logger = logging.getLogger("MAIN_LOGGER")
-
-# Configure it
-# Avoid propagating to upper logger, which logs to the console
-file_logger.propagate = False
-
-file_logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s::%(levelname)s::%(funcName)s::> %(message)s")
-file_handler = logging.FileHandler(GLOBALS["LOGGING_FILE"])
-file_handler.setFormatter(formatter)
-file_logger.addHandler(file_handler)
-
-# 'application' code
-file_logger.debug("debug message")
-
 
 # Configuration for Weigths and Biases
 # ==============================================================================
@@ -376,9 +256,9 @@ file_logger.debug("debug message")
 # If we're running in UGR's servers, we need to set some ENV vars
 # Otherwise, wandb is going to write to dirs that it has no access
 # Also, pytorch tries to save pretrained models in the home folder
-if GLOBALS["RUNNING_ENV"] == "ugr":
+if GLOBALS.running_env == "ugr":
     print("-> Changing dir env values")
-    utils.change_dir_env_vars(base_path=GLOBALS["BASE_PATH"])
+    utils.change_dir_env_vars(base_path=GLOBALS.base_path)
     print("-> Changing done!")
     print("")
 
@@ -390,29 +270,13 @@ if GLOBALS["RUNNING_ENV"] == "ugr":
 # Init the wandb tracker
 # We need to do this before `wandb.login`
 wandb.init(
-    project=GLOBALS["WANDB_PROJECT_NAME"],
-    name=GLOBALS["WANDB_RUN_NAME"],
-    config=GLOBALS,
+    project=GLOBALS.wandb_project_name,
+    name=GLOBALS.wandb_run_name,
+    config=str(GLOBALS),
 )
 
 # Functions that we are going to use
 # ==============================================================================
-
-
-def show_learning_curve(training_history: dict):
-    # Take two learning curves
-    loss = training_history["loss"]
-    val_loss = training_history["val_loss"]
-
-    # Move the lists to cpu, because that's what matplotlib needs
-    loss = [loss_el.cpu() for loss_el in loss]
-    val_loss = [val_loss_el.cpu() for val_loss_el in val_loss]
-
-    # Show graphics
-    plt.plot(loss)
-    plt.plot(val_loss)
-    plt.legend(["Training loss", "Validation loss"])
-    plt.show()
 
 
 def try_to_clean_memory():
@@ -426,6 +290,8 @@ def try_to_clean_memory():
 
 mean, std = 0.1307, 0.3081
 
+# TODO -- ADAM -- those base paths must change
+print("=> Downloading the MNIST dataset")
 train_dataset = torchvision.datasets.MNIST(
     "../data/MNIST",
     train=True,
@@ -453,6 +319,7 @@ print("=> Putting the dataset into dataloaders")
 
 
 # TODO -- ADAM -- use our global values
+# TODO -- ADAM -- understand what n_classes and n_samples mean in this context
 # We'll create mini batches by sampling labels that will be present in the mini batch and number of examples from each class
 train_batch_sampler = adamdatasets.BalancedBatchSampler(
     train_dataset.train_labels, n_classes=10, n_samples=25
@@ -462,7 +329,7 @@ test_batch_sampler = adamdatasets.BalancedBatchSampler(
 )
 
 cuda = torch.cuda.is_available()
-kwargs = {"num_workers": 4, "pin_memory": True} if cuda else {}
+kwargs = {"num_workers": GLOBALS.num_workers, "pin_memory": True} if cuda else {}
 online_train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_sampler=train_batch_sampler, **kwargs
 )
@@ -477,9 +344,8 @@ online_test_loader = torch.utils.data.DataLoader(
 from adambielski_lib import losses as adamlosses
 from adambielski_lib import utils as adamutils
 
-margin = 1.0
 batch_loss_function = adamlosses.OnlineTripletLoss(
-    margin, adamutils.RandomNegativeTripletSelector(margin)
+    GLOBALS.margin, adamutils.RandomNegativeTripletSelector(GLOBALS.margin)
 )
 
 
@@ -498,15 +364,12 @@ if cuda:
 from adambielski_lib import metrics as adammetrics
 from adambielski_lib import trainer as adamtrainer
 
-lr = 1e-3
-optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-4)
+optimizer = optim.Adam(
+    net.parameters(), lr=GLOBALS.learning_rate, weight_decay=GLOBALS.weight_decay
+)
 
 # TODO -- ADAM -- What is this?
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 8, gamma=0.1, last_epoch=-1)
-
-# TODO -- ADAM -- Use our globals
-n_epochs = 20
-log_interval = 50
 
 adamtrainer.fit(
     online_train_loader,
@@ -515,9 +378,9 @@ adamtrainer.fit(
     batch_loss_function,
     optimizer,
     scheduler,
-    n_epochs,
+    GLOBALS.training_epochs,
     cuda,
-    log_interval,
+    GLOBALS.loggin_iterations,
     metrics=[adammetrics.AverageNonzeroTripletsMetric()],
 )
 
