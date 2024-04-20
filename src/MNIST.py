@@ -5,9 +5,19 @@
 # ==============================================================================
 
 import datetime
+import gc
 import os
 from dataclasses import dataclass
 from typing import Dict, Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+import torchvision
+import torchvision.transforms as transforms
+
+import wandb
+from lib import utils
 
 
 @dataclass
@@ -160,104 +170,6 @@ class GlobalParameters:
 GLOBALS = GlobalParameters()
 
 
-# Add some paths to PYTHONPATH
-# ==============================================================================
-
-# Python paths are difficult to manage
-# In this script we can do something like:
-# `import lib.core as core` and that's fine
-# But in lib code we cannot import properly the modules
-
-import sys
-
-# TODO -- remove this
-sys.path.append(GLOBALS.base_path)
-sys.path.append(os.path.join(GLOBALS.base_path, "src"))
-sys.path.append(os.path.join(GLOBALS.base_path, "src/lib"))
-
-
-# Importing the modules we are going to use
-# ==============================================================================
-
-import copy
-import cProfile
-import enum
-import functools
-import gc
-import logging
-import math
-import os
-import time
-from collections import Counter
-from datetime import datetime
-from pprint import pprint
-from typing import List
-
-import dotenv
-import matplotlib.pyplot as plt
-import numpy as np
-import optuna
-import seaborn as sns
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
-import torchvision.datasets as datasets
-# For using pre-trained ResNets
-import torchvision.models as models
-import torchvision.transforms as transforms
-# All concrete pieces we're using form sklearn
-from sklearn.metrics import accuracy_score, roc_auc_score, silhouette_score
-from torch.utils.data import DataLoader, Dataset
-from tqdm import tqdm
-
-# Now that files are loaded, we can import pieces of code
-import lib.core as core
-import lib.data_augmentation as data_augmentation
-import lib.datasets as datasets
-import lib.embedding_to_classifier as embedding_to_classifier
-import lib.filesystem as filesystem
-import lib.hyperparameter_tuning as hptuning
-import lib.loss_functions as loss_functions
-import lib.metrics as metrics
-import lib.sampler as sampler
-import lib.split_dataset as split_dataset
-import lib.trainers as trainers
-import lib.utils as utils
-import wandb
-from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
-from lib.embedding_to_classifier import EmbeddingToClassifier
-from lib.loss_functions import (AddSmallEmbeddingPenalization,
-                                BatchAllTripletLoss, BatchHardTripletLoss,
-                                MeanTripletBatchTripletLoss)
-from lib.models import *
-from lib.models import (CACDResnet18, CACDResnet50, FGLigthModel,
-                        LFWLightModel, LFWResNet18, NormalizedNet, ResNet18,
-                        RetrievalAdapter)
-from lib.sampler import CustomSampler
-from lib.train_loggers import (CompoundLogger, InterClusterLogger,
-                               IntraClusterLogger, LocalRankAtKLogger,
-                               RankAtKLogger, SilentLogger, TrainLogger,
-                               TripletLoggerOffline, TripletLoggerOnline)
-from lib.trainers import train_model_online
-from lib.visualizations import *
-
-# Server security check
-# ==============================================================================
-#
-# - Sometimes UGR's server does not provide GPU access
-# - In that case, fail fast so we start ASAP debugging the problem
-
-if GLOBALS.running_env == "ugr" and torch.cuda.is_available() is False:
-    raise Exception(
-        "`torch.cuda.is_available()` returned false, so we dont have access to GPU's"
-    )
-
-
-# TODO -- DELETE
-torch.autograd.set_detect_anomaly(True)
-
 # Configuration for Weigths and Biases
 # ==============================================================================
 #
@@ -376,7 +288,7 @@ if cuda:
 from adambielski_lib import metrics as adammetrics
 from adambielski_lib import trainer as adamtrainer
 
-optimizer = optim.Adam(
+optimizer = torch.optim.Adam(
     net.parameters(), lr=GLOBALS.learning_rate, weight_decay=GLOBALS.weight_decay
 )
 
