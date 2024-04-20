@@ -130,7 +130,7 @@ test_batch_sampler = BalancedBatchSampler(
     test_dataset.test_labels, n_classes=10, n_samples=25
 )
 
-kwargs = {"num_workers": 1, "pin_memory": True} if cuda else {}
+kwargs = {"num_workers": 4, "pin_memory": True} if cuda else {}
 online_train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_sampler=train_batch_sampler, **kwargs
 )
@@ -171,7 +171,7 @@ fit(
     metrics=[AverageNonzeroTripletsMetric()],
 )
 
-train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
+train_embeddings_otl, train_labels_otl = extract_embeddings(online_train_loader, model)
 plot_embeddings(train_embeddings_otl, train_labels_otl)
-val_embeddings_otl, val_labels_otl = extract_embeddings(test_loader, model)
+val_embeddings_otl, val_labels_otl = extract_embeddings(online_test_loader, model)
 plot_embeddings(val_embeddings_otl, val_labels_otl)
