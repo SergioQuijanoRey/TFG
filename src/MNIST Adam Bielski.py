@@ -130,6 +130,8 @@ test_batch_sampler = BalancedBatchSampler(
     test_dataset.test_labels, n_classes=10, n_samples=25
 )
 
+# TODO -- ADAM had `num_workers=1` and I changed it, I don't know if it makes
+# things worse. It does not improve performance though
 kwargs = {"num_workers": 4, "pin_memory": True} if cuda else {}
 online_train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_sampler=train_batch_sampler, **kwargs
