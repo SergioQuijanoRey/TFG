@@ -26,39 +26,6 @@ class TripletSelector:
         raise NotImplementedError
 
 
-class AllTripletSelector(TripletSelector):
-    """
-    Returns all possible triplets
-    May be impractical in most cases
-    """
-
-    def __init__(self):
-        super(AllTripletSelector, self).__init__()
-
-    def get_triplets(self, embeddings, labels):
-        labels = labels.cpu().data.numpy()
-        triplets = []
-        for label in set(labels):
-            label_mask = labels == label
-            label_indices = np.where(label_mask)[0]
-            if len(label_indices) < 2:
-                continue
-            negative_indices = np.where(np.logical_not(label_mask))[0]
-            anchor_positives = list(
-                combinations(label_indices, 2)
-            )  # All anchor-positive pairs
-
-            # Add all negatives for all positive pairs
-            temp_triplets = [
-                [anchor_positive[0], anchor_positive[1], neg_ind]
-                for anchor_positive in anchor_positives
-                for neg_ind in negative_indices
-            ]
-            triplets += temp_triplets
-
-        return torch.LongTensor(np.array(triplets))
-
-
 def hardest_negative(loss_values):
     hard_negative = np.argmax(loss_values)
     return hard_negative if loss_values[hard_negative] > 0 else None

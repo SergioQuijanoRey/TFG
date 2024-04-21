@@ -145,8 +145,8 @@ from adambielski_lib.metrics import AverageNonzeroTripletsMetric
 # Set up the network and training parameters
 from adambielski_lib.networks import EmbeddingNet
 from adambielski_lib.utils import (  # Strategies for selecting triplets within a minibatch
-    AllTripletSelector, HardestNegativeTripletSelector,
-    RandomNegativeTripletSelector, SemihardNegativeTripletSelector)
+    HardestNegativeTripletSelector, RandomNegativeTripletSelector,
+    SemihardNegativeTripletSelector)
 
 margin = 1.0
 embedding_net = EmbeddingNet()
