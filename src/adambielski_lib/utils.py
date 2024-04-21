@@ -45,10 +45,14 @@ def semihard_negative(loss_values, margin):
 
 class FunctionNegativeTripletSelector(TripletSelector):
     """
-    For each positive pair, takes the hardest negative sample (with the greatest triplet loss value) to create a triplet
+    For each positive pair, takes the hardest negative sample (with the greatest
+    triplet loss value) to create a triplet.
+
     Margin should match the margin used in triplet loss.
-    negative_selection_fn should take array of loss_values for a given anchor-positive pair and all negative samples
-    and return a negative index for that pair
+
+    negative_selection_fn should take array of loss_values for a given
+    anchor-positive pair and all negative samples and return a negative index
+    for that pair.
     """
 
     def __init__(self, margin, negative_selection_fn, cpu=True):
