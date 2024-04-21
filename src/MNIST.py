@@ -648,16 +648,17 @@ with torch.no_grad():
 
     accuracy = correct / max_iterations
     print(f"=> 📈 Metrics on {max_iterations} test images")
-    print(f"Accuracy: {(accuracy * 100):.3f}% ")
+    print(f"Accuracy: {(accuracy * 100):.3f}%")
+    print("")
 
     net.set_permute(True)
 
 
-#  TODO -- ADAM -- run our plot of the embedding
-#  # Plot of the embedding
-#  # ==============================================================================
-#  #
-#  # - If the dimension of the embedding is 2, then we can plot how the transformation to a classificator works:
-#  # - That logic is encoded in the `scatter_plot` method
-#  with torch.no_grad():
-#      classifier.scatter_plot()
+# Plot of the embedding
+# ==============================================================================
+#
+# - If the dimension of the embedding is 2, then we can plot how the transformation to a classificator works:
+# - That logic is encoded in the `scatter_plot` method
+with torch.no_grad():
+    print("=> Plotting the embedding that we've learned")
+    classifier.scatter_plot(os.path.join(GLOBALS.plots_path, "embedding.png"))
