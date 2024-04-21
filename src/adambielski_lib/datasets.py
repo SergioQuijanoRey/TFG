@@ -6,7 +6,9 @@ from torch.utils.data.sampler import BatchSampler
 
 class BalancedBatchSampler(BatchSampler):
     """
-    BatchSampler - from a MNIST-like dataset, samples n_classes and within these classes samples n_samples.
+    BatchSampler - from a MNIST-like dataset, samples n_classes and within these
+    classes samples n_samples.
+
     Returns batches of size n_classes * n_samples
     """
 

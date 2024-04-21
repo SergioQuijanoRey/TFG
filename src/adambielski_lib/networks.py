@@ -30,3 +30,7 @@ class EmbeddingNet(nn.Module):
 
     def get_embedding(self, x):
         return self.forward(x)
+
+    # TODO -- remove this piece of code
+    def set_permute(self, state: bool):
+        pass

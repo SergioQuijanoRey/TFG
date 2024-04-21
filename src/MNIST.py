@@ -80,6 +80,7 @@ class GlobalParameters:
 
     def __init_ml_params(self):
         # P-K sampling main parameters
+        # TODO -- we are not using this in ADAM's pipeline!
         self.P: int = 8
         self.K: int = 4
 
@@ -89,6 +90,7 @@ class GlobalParameters:
         # So we can use `n * self.P * self.K`
         self.batch_size = self.P * self.K
 
+        # TODO -- previously was 20 training epochs
         self.training_epochs = 20
         self.learning_rate = 1e-3
         self.weight_decay = 1e-4

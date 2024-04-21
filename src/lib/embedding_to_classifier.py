@@ -1,3 +1,5 @@
+from typing import Optional
+
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -152,7 +154,7 @@ class EmbeddingToClassifier:
         knn.fit(x, y)
         return knn
 
-    def scatter_plot(self):
+    def scatter_plot(self, savefig_path: Optional[str]):
         """
         Hacemos un scatter plot del embedding obtenido
         """
@@ -172,6 +174,10 @@ class EmbeddingToClassifier:
         # El color de los puntos lo dan las etiquetas almacenadas en y
         plt.scatter(x=x[:, 0], y=x[:, 1], c=y)
         plt.show()
+
+        # Save fig if a path is given
+        if savefig_path is not None:
+            plt.savefig(savefig_path)
 
     def prepare_data_for_sklearn(self):
         """
