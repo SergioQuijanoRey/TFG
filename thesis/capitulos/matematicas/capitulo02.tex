@@ -75,36 +75,34 @@ que claramente también es un espacio vectorial. Con esto, ya podemos definir el
 
 	$$\mathbb{V} \otimes \mathbb{W} := (\mathbb{V} \ast \mathbb{W}) / I$$
 
-	con lo que dados $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$, tenemos que
+	con lo que dados $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$, tenemos que:
 
 	\begin{equation}
-		\nv{v} \otimes \nv{w} := \nv{v} \ast \nv{w} + I
+		\nv{v} \otimes \nv{w} := \nv{v} \ast \nv{w} + I.
 	\end{equation}
 \end{definicion}
 
 A partir de esta definición, son directas las siguientes propiedades:
 
 \begin{proposicion}[Propiedades del producto tensorial] \label{prop:tensores_propiedades}
-	Sean $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w} \in \mathbb{W}, \lambda \in \R$, entonces son ciertas:
+	Sean $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}, \nv{w} \in \mathbb{W}, \lambda \in \R$. Entonces son ciertas:
 	\begin{enumerate}
-		\item $\lambda [\nv{v} \otimes \nv{w}] = (\lambda \nv{v}) \otimes \nv{w}$
-		\item $\lambda [\nv{v} \otimes \nv{w}] = \nv{v} \otimes (\lambda \nv{w})$
-		\item $\nv{v} \otimes (\nv{w_1} + \nv{w_2}) = \nv{v} \otimes \nv{w_1} + \nv{v} \otimes \nv{w_2}$
-		\item ($\nv{v_1} + \nv{v_2}) \otimes \nv{w} = \nv{v_1} \otimes \nv{w} + \nv{v_2} \otimes \nv{w}$
+		\item $\lambda [\nv{v} \otimes \nv{w}] = (\lambda \nv{v}) \otimes \nv{w}$.
+		\item $\lambda [\nv{v} \otimes \nv{w}] = \nv{v} \otimes (\lambda \nv{w})$.
+		\item $\nv{v} \otimes (\nv{w_1} + \nv{w_2}) = \nv{v} \otimes \nv{w_1} + \nv{v} \otimes \nv{w_2}$.
+		\item ($\nv{v_1} + \nv{v_2}) \otimes \nv{w} = \nv{v_1} \otimes \nv{w} + \nv{v_2} \otimes \nv{w}$.
 	\end{enumerate}
 \end{proposicion}
 
 \begin{proof} Empecemos viendo la primera propiedad:
 	\begin{equation}
 		\begin{split}
-			(c\nv{v}) \otimes \nv{w} &\eqtext{def} (c\nv{v}) \ast \nv{w} + I = \ldots \ \text{usando que} \quad \nv{a} + I = \nv{a} + \nv{i} + I, \quad \forall \nv{i} \in I \\
-			\ldots &= (c\nv{v}) \ast \nv{w} + (c(\nv{v} \ast \nv{w}) - c\nv{v} \ast \nv{w}) + I = \ldots \\
-			\ldots &= \cancel{(c\nv{v}) \ast \nv{w}} + c(\nv{v} \ast \nv{w}) - \cancel{c\nv{v} \ast \nv{w}} + I = \ldots \\
-			\ldots &= c(\nv{v} \ast \nv{w}) + I = c (\nv{v} \otimes \nv{w}) \\
+			(c\nv{v}) \otimes \nv{w} &\eqtext{def} (c\nv{v}) \ast \nv{w} + I \encima{=}{\text{*}} (c\nv{v}) \ast \nv{w} + (c(\nv{v} \ast \nv{w}) - c\nv{v} \ast \nv{w}) + I \\
+            &= \cancel{(c\nv{v}) \ast \nv{w}} + c(\nv{v} \ast \nv{w}) - \cancel{c\nv{v} \ast \nv{w}} + I = c(\nv{v} \ast \nv{w}) + I = c (\nv{v} \otimes \nv{w}),
 		\end{split}
 	\end{equation}
 
-	El resto de propiedades se comprueban de forma análoga, introduciendo la propiedad que queremos probar gracias a que $\nv{a} + I = \nv{a} + \nv{i}$, $\forall \nv{i} \in I$ y operando con esto.
+    donde en $\text{*}$ hemos usado que $\nv{a} + I = \nv{a} + \nv{i} + I, \; \forall \nv{i} \in I$. El resto de propiedades se comprueban de forma análoga introduciendo la propiedad que acabamos de mencionar.
 
 \end{proof}
 
@@ -120,17 +118,17 @@ A partir de esta definición, son directas las siguientes propiedades:
 Ahora, enunciamos un importante teorema que nos ayudará a entender la naturaleza del producto vectorial:
 
 \begin{teorema}[Base del espacio vectorial \textit{producto tensorial}] \label{th:base_prod_tensorial}
-	Sean $\mathbb{B}_{\mathbb{V}} = \{\nv{v_1}, \ldots, \nv{v_n}\}$, $\mathbb{B}_{\mathbb{W}} = \{\nv{w_1}, \ldots, \nv{w_m}\}$ bases de $\mathbb{V}$ y  $\mathbb{W}$ respectivamente, entonces:
+	Sean $\mathbb{B}_{\mathbb{V}} = \{\nv{v_1}, \ldots, \nv{v_n}\}$ y  $\mathbb{B}_{\mathbb{W}} = \{\nv{w_1}, \ldots, \nv{w_m}\}$ bases de $\mathbb{V}$ y  $\mathbb{W}$ respectivamente, entonces:
 
 	\begin{equation}
-		\mathbb{B}_{\mathbb{V} \otimes \mathbb{W}} := \{\nv{v_i} \otimes \nv{w_j} / i \in \deltaset{n}, j \in \deltaset{m}\}
+		\mathbb{B}_{\mathbb{V} \otimes \mathbb{W}} := \conjunto{\nv{v_i} \otimes \nv{w_j}: \; i \in \deltaset{n}, j \in \deltaset{m}}
 	\end{equation}
 
 
 	es una base del espacio vectorial $\mathbb{V} \otimes \mathbb{W}$, y por lo tanto:
 
 	\begin{equation}
-		dim(\mathbb{V} \otimes \mathbb{W}) = dim(\mathbb{V}) \cdot dim(\mathbb{W})
+		dim(\mathbb{V} \otimes \mathbb{W}) = dim(\mathbb{V}) \cdot dim(\mathbb{W}).
 	\end{equation}
 
 \end{teorema}
@@ -142,13 +140,13 @@ Ahora, enunciamos un importante teorema que nos ayudará a entender la naturalez
 Una consecuencia inmediata es que, en caso de que $\mathbb{V}$ y $\mathbb{W}$ admitan base, todo tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se puede escribir de la forma:
 
 \begin{equation}
-	\gamma = \sum_{\substack{\nv{v_i} \in \mathbb{V}\\ \nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} \otimes \nv{w_i}, \dspace\dspace c_i \in \R \dspace \forall i \in \deltaset{n}
+	\gamma = \sum_{\substack{\nv{v_i} \in \mathbb{V}\\ \nv{w_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} \otimes \nv{w_i}, \dspace\dspace c_i \in \R \dspace \forall i \in \deltaset{n}.
 \end{equation}
 
 La expresión anterior motiva la siguiente definición:
 
 \begin{definicion}[Tensor puro] \label{def:tensor_puro}
-	Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $\nv{v} \in \mathbb{V}$, $\nv{w} \in \mathbb{W}$ tales que $\gamma = \nv{v} \otimes \nv{w}$.
+	Un tensor $\gamma \in \mathbb{V} \otimes \mathbb{W}$ se dice puro cuando existen $\nv{v} \in \mathbb{V}$ y $\nv{w} \in \mathbb{W}$ tales que $\gamma = \nv{v} \otimes \nv{w}$.
 \end{definicion}
 
 \begin{proposicion}
@@ -160,50 +158,50 @@ La expresión anterior motiva la siguiente definición:
 	\end{equation}
 
 	\begin{observacion}
-		En la anterior proposición estamos tomando el espacio $\mathbb{V} \otimes \mathbb{V}$ para que tenga sentido permutar los vectores $\nv{v}$ y $\nv{w}$ en el producto tensorial.
+		En la anterior proposición estamos considerando el espacio $\mathbb{V} \otimes \mathbb{V}$ para que tenga sentido permutar los vectores $\nv{v}$ y $\nv{w}$ en el producto tensorial.
 	\end{observacion}
 \end{proposicion}
 
-Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $\nv{v} \otimes \nv{0_w} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
+Veamos ahora otra propiedad interesante. Queremos que el producto tensorial se asemeje al producto entre escalares. Para ello, sería natural que $\nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V}}} \otimes \nv{w} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
 
 \begin{proposicion}
-	Sean $\mathbb{V}, \mathbb{W}$ espacios vectoriales sobre $\R$. Sean $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$. Entonces se verifica:
+	Sean $\mathbb{V}, \mathbb{W}$ espacios vectoriales sobre $\R$. Sean $\nv{v} \in \mathbb{V}, \nv{w} \in \mathbb{W}$. Entonces se verifica que:
 
 	\begin{enumerate}
-		\item $\nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
-		\item $\nv{0_{\mathbb{V}}} \otimes \nv{w} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$
+		\item $\nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
+		\item $\nv{0_{\mathbb{V}}} \otimes \nv{w} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$.
 	\end{enumerate}
 \end{proposicion}
 \begin{proof}
 	Empezamos con la primera igualdad. Sabemos que en un espacio vectorial se verifica que:
 
 	\begin{equation} \label{eq:dem_tensor_cero}
-		\nv{v} + \nv{w} = \nv{w} \then \nv{v} = \nv{0}
+		\nv{v} + \nv{w} = \nv{w} \then \nv{v} = \nv{0}.
 	\end{equation}
 
-	Veamos esto ahora con nuestro primer candidato a cero del espacio vectorial producto tensorial:
+    Como el producto tensorial de dos espacios vectoriales es un espacio vectorial, aplicamos la propiedad anterior sobre nuestro primer candidato a cero del producto tensorial:
 
 	\begin{equation}
 		\begin{split}
-			\nv{v} \otimes \nv{0_\mathbb{W}} + \nv{v} \otimes \nv{w} \eqtext{3.} \nv{v} \otimes (\nv{0_\mathbb{W}} + \nv{w}) = \nv{v} \otimes (\nv{w}) \then \nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}
+			\nv{v} \otimes \nv{0_\mathbb{W}} + \nv{v} \otimes \nv{w} \eqtext{3.} \nv{v} \otimes (\nv{0_\mathbb{W}} + \nv{w}) = \nv{v} \otimes (\nv{w}) \then \nv{v} \otimes \nv{0_\mathbb{W}} = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}.
 		\end{split}
 	\end{equation}
 
 	La demostración para $\nv{0_{\mathbb{V}}} \otimes w = \nv{0_{\mathbb{V} \otimes \mathbb{W}}}$ es completamente análoga.
 \end{proof}
 
-Veamos ahora una serie de resultados para estudiar el espacio que surge al hacer el producto tensorial entre un espacio vectorial real arbitrario $\mathbb{V}$ y el conjunto de los números reales $\R$.
+Veamos ahora una serie de resultados para estudiar el espacio que surge del producto tensorial entre un espacio vectorial real arbitrario $\mathbb{V}$ y el conjunto de los números reales $\R$.
 
 \begin{proposicion}
 	Sea $\gamma \in \R \otimes \mathbb{V}$ con $\mathbb{V}$ un espacio vectorial real. Entonces:
 
 	\begin{equation}
-		\gamma \text{ tensor puro} \implies \exists \nv{v} \in \mathbb{V}: \gamma = 1 \otimes \nv{v}
+		\gamma \text{ tensor puro} \implies \exists \nv{v} \in \mathbb{V}: \gamma = 1 \otimes \nv{v}.
 	\end{equation}
 \end{proposicion}
 
 \begin{proof}
-	Definimos $\Omega := \R \otimes \mathbb{V}$ y tomamos un tensor en $\Omega$ de la forma
+	Definimos $\Omega := \R \otimes \mathbb{V}$ y tomamos un tensor en $\Omega$ de la forma:
 
 	\begin{equation}
 		\gamma = a(x \otimes \nv{u}) + b(y \otimes \nv{v})
@@ -214,8 +212,8 @@ Veamos ahora una serie de resultados para estudiar el espacio que surge al hacer
 	\begin{equation}
 		\begin{split}
 			& a(x \otimes \nv{u}) + b(y \otimes \nv{v}) \eqtext{2.} x \otimes (a\nv{u}) + y \otimes (b\nv{v}) \\
-			& \eqtext{(*)} 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = 1 \otimes \nv{w} \\
-			&\text{con } \nv{w} := (ax)\nv{u} + (by) \quad \text{luego } \nv{w} \in \mathbb{V}
+			& \eqtext{(*)} 1 \otimes ((ax) \nv{u}) + 1 \otimes ((by) \nv{v}) \eqtext{3.} 1 \otimes ((ax)\nv{u} + (by) \nv{v}) = 1 \otimes \nv{w}, \\
+			&\text{con } \nv{w} := (ax)\nv{u} + (by), \; \text{luego } \nv{w} \in \mathbb{V}.
 		\end{split}
 	\end{equation}
 
@@ -224,23 +222,23 @@ Veamos ahora una serie de resultados para estudiar el espacio que surge al hacer
 
 \end{proof}
 
-Buscamos extender este resultado para un tensor cualquiera (no necesariamente puro) del espacio $\R \otimes \mathbb{V}$:
+Buscamos extender este resultado para un tensor cualquiera (no necesariamente puro) del espacio $\R \otimes \mathbb{V}$. Sin embargo, a partir de ahora nos centraremos en espacios vectoriales de dimensión finita, pues vamos a trabajar con la base del espacio:
 
 \begin{proposicion} \label{prop:r_otimes_v_es_v}
-	Sea $\gamma \in \R \otimes \mathbb{V}$ donde $\mathbb{V}$ es un espacio vectorial real de \textbf{dimensión finita}. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$
+	Sea $\gamma \in \R \otimes \mathbb{V}$ donde $\mathbb{V}$ es un espacio vectorial real de \textbf{dimensión finita}. Entonces $\exists v \in \mathbb{V}: \gamma = 1 \otimes v$.
 \end{proposicion}
 \begin{proof}
 	Como ahora consideramos que $\mathbb{V}$ tiene dimensión finita, podemos usar \ref{th:base_prod_tensorial} para expresar:
 
 	\begin{equation}
-		\gamma = \sum_{\substack{a_i \in \R\\ \nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot a_i \otimes \nv{v_i}, \dspace\dspace c_{i} \in \R \dspace \forall i \in \deltaset{n}
+		\gamma = \sum_{\substack{a_i \in \R\\ \nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot a_i \otimes \nv{v_i}, \dspace\dspace c_{i} \in \R \dspace \forall i \in \deltaset{n}.
 	\end{equation}
 
 	Usando ahora la proposición anterior en los tensores puros de la sumatoria, podemos re-escribir como:
 
 	\begin{equation}
 		\begin{split}
-			\gamma &= \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot 1 \otimes \nv{v_i} \eqtext{2.} \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} 1 \otimes (c_{i} \cdot \nv{v_i}) \eqtext{3.} 1 \otimes ( \sum_{\substack{\nv{v_i} \in \mathbb{W} \\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} ) = 1 \otimes \nv{v} \dspace\dspace \\
+			\gamma &= \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot 1 \otimes \nv{v_i} \eqtext{2.} \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} 1 \otimes (c_{i} \cdot \nv{v_i}) \eqtext{3.} 1 \otimes ( \sum_{\substack{\nv{v_i} \in \mathbb{W} \\ i \in \deltaset{n}}} c_{i} \cdot \nv{v_i} ) = 1 \otimes \nv{v}, \\
 			\text{donde } \nv{v} &:= \sum_{\substack{\nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \nv{v_i} \in \mathbb{V}. \\
 		\end{split}
 	\end{equation}
@@ -263,15 +261,15 @@ Con esto, ya podemos dar una caracterización del espacio $\mathbb{V} \otimes \R
 		\end{split}
 	\end{equation}
 
-	Donde hemos usado la \propref{prop:r_otimes_v_es_v} para expresar cualquier elemento del producto tensorial como $1 \otimes \nv{w}$ con $\nv{w} \in \mathbb{V}$. Veamos, aunque sea prácticamente inmediato, que $\phi$ es biyectiva y lineal:
+	donde hemos usado la \propref{prop:r_otimes_v_es_v} para expresar cualquier elemento del producto tensorial como $1 \otimes \nv{w}$ con $\nv{w} \in \mathbb{V}$. Veamos, aunque sea prácticamente inmediato, que $\phi$ es biyectiva y lineal:
 
-	Inyectividad: $\phi(1 \otimes \nv{w_1}) = \phi(1 \otimes \nv{w_2}) \underset{def.\ \phi}{\iif} \nv{w_1} = \nv{w_2}$
+	Inyectividad: $\phi(1 \otimes \nv{w_1}) = \phi(1 \otimes \nv{w_2}) \underset{def.\ \phi}{\iif} \nv{w_1} = \nv{w_2}$.
 
-	Sobreyectividad: $\nv{w} \in \mathbb{V} \then \phi(1 \otimes \nv{w}) = \nv{w}$
+	Sobreyectividad: $\nv{w} \in \mathbb{V} \then \phi(1 \otimes \nv{w}) = \nv{w}$.
 
-	Linealidad 1. $\phi(1 \otimes \nv{w_1} + 1 \otimes \nv{w_2}) \eqtext{3.} \phi(1 \otimes (\nv{w_1} + \nv{w_2})) = \nv{w_1} + \nv{w_2}$
+	Linealidad 1. $\phi(1 \otimes \nv{w_1} + 1 \otimes \nv{w_2}) \eqtext{3.} \phi(1 \otimes (\nv{w_1} + \nv{w_2})) = \nv{w_1} + \nv{w_2}$.
 
-	Linealidad 2. $\phi(\lambda (1 \otimes \nv{w})) \eqtext{2.} \phi(1 \otimes (\lambda \nv{w})) = \lambda \nv{w}$
+	Linealidad 2. $\phi(\lambda (1 \otimes \nv{w})) \eqtext{2.} \phi(1 \otimes (\lambda \nv{w})) = \lambda \nv{w}$.
 
 \end{proof}
 
@@ -283,21 +281,21 @@ Generalizamos la caracterización anterior:
 \begin{proof}
 	Definimos $\Omega := \R^N \otimes \mathbb{V}$ y consideramos la base usual de $\R^N$:
 
-	$$\mathbb{B}_{\R^N} := \left\{\vectorn{1}{0}{0}, \vectorn{0}{1}{0}, \ldots, \vectorn{0}{0}{1} \right\} = \left\{\nv{e_1}, \nv{e_2}, \ldots, \nv{e_N} \right\}$$
+	$$\mathbb{B}_{\R^N} := \left\{\vectorn{1}{0}{0}, \vectorn{0}{1}{0}, \ldots, \vectorn{0}{0}{1} \right\} = \left\{\nv{e_1}, \nv{e_2}, \ldots, \nv{e_N} \right\}.$$
 
 	Ahora, veamos cómo podemos manipular un tensor cualquiera del espacio $\Omega$:
 
 	\begin{equation}
 		\begin{split}
 			\nv{v} \otimes \nv{w} &= (\lambda_1 \nv{e_1} + \lambda_2 \nv{e_2} + \cdots + \lambda_N \nv{e_N}) \otimes \nv{w} \eqtext{3.} \lambda_1 \nv{e_1} \otimes \nv{w} + \lambda_2 \nv{e_2} \otimes \nv{w} + \cdots + \lambda_N \nv{e_N} \otimes \nv{w} \\
-			& \eqtext{1., 2.} \nv{e_1} \otimes \lambda_1 \nv{w} + \nv{e_2} \otimes \lambda_2 \nv{w} + \cdots + \nv{e_N} \otimes \lambda_N \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \dots + \nv{e_N} \otimes \nv{w_N} \qquad \\
-			\text{con} \dspace \nv{w_i} &= \lambda_i \nv{w} \in \mathbb{V}
+			& \eqtext{1., 2.} \nv{e_1} \otimes \lambda_1 \nv{w} + \nv{e_2} \otimes \lambda_2 \nv{w} + \cdots + \nv{e_N} \otimes \lambda_N \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \dots + \nv{e_N} \otimes \nv{w_N}, \\
+			\text{con} \dspace \nv{w_i} &= \lambda_i \nv{w} \in \mathbb{V}.
 		\end{split}
 	\end{equation}
 
 	Por lo tanto, tenemos que $\forall \nv{v} \in \R^N$, $\forall \nv{w} \in \mathbb{V}$, $\exists \nv{w_1}, \ldots, \nv{w_N} \in \mathbb{V}$ tal que:
 
-	$$\nv{v} \otimes \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \cdots + \nv{e_N} \otimes \nv{w_N}$$
+	$$\nv{v} \otimes \nv{w} = \nv{e_1} \otimes \nv{w_1} + \nv{e_2} \otimes \nv{w_2} + \cdots + \nv{e_N} \otimes \nv{w_N}.$$
 
 	Con esto, podemos definir el siguiente isomorfismo:
 
