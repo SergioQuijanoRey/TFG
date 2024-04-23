@@ -150,7 +150,6 @@ La expresión anterior motiva la siguiente definición:
 \end{definicion}
 
 \begin{proposicion}
-    % TODO -- seguir por aqui
 	Como consecuencia directa del \propref{th:base_prod_tensorial}, dados $\nv{v}, \nv{w} \in \mathbb{V}$, en general no es cierto que:
 
 	\begin{equation}
@@ -312,26 +311,16 @@ Generalizamos la caracterización anterior:
 
 \subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
 
-Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos ver un tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $i \in \deltaset{M_k}$ con $k \in \deltaset{N}$.
+Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos definir un tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $i \in \deltaset{M_k}$ con $k \in \deltaset{N}$. Con esta visión, podemos introducir algunos conceptos básicos sobre tensores.
 
-Con esta visión, podemos desarrollar los siguientes conceptos básicos sobre tensores:
+El primero de ellos es el concepto de \textbf{modo}, que se define como cada una de las entradas $d_1, \ldots, d_N$ que podemos usar para indexar los elementos del tensor. El segundo concepto es el de \textbf{orden}, que se define como el número de modos del tensor. En el caso de nuestro tensor $\mathcal{A}$, tenemos $N$ modos, y por tanto ese es su orden. Finalmente, definimos la \textbf{dimensión} del tensor como el número de valores que puede tomar cada uno de los modos. Por lo tanto, si el modo $i$-ésimo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que este modo tiene dimensión $M$. Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos, en cuyo caso denotaremos por $\espaciotensores{N}{M}$ al conjunto de tensores de orden $N$ y dimensión $M$ en cada modo. Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero cuando no de lugar a confusión abusaremos del lenguaje.
 
-\begin{itemize}
-	\item Modos: cada una de las entradas $d_1, \ldots, d_N$ que podemos usar para indexar los elementos del tensor.
-	\item Orden: el número de modos del tensor. En el caso de nuestro tensor $\mathcal{A}$, tenemos $N$ modos, y por tanto ese es su orden.
-	\item Dimensión: el número de valores que puede tomar cada uno de los modos. Por lo tanto, si el modo $i$-ésimo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que este modo tiene dimensión $M$.
-	      \begin{itemize}
-		      \item Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos. En cuyo caso denotaremos por $\espaciotensores{N}{M}$ al conjunto de tensores de orden $N$ y dimensión $M$ en cada modo.
-		      \item Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero cuando no de lugar a confusión abusaremos del lenguaje.
-	      \end{itemize}
-\end{itemize}
+Podemos definir el \textbf{producto tensorial} de una forma muy sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P$ y $Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
 
-Podemos definir el \textbf{producto tensorial} de una forma muy sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P, Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
-
-$$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}$$
+$$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}.$$
 
 \begin{observacion}
-	En el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}, \nv{v} \in \R^{N_2}$, es directo comprobar que $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$.
+	Usando esta definición es directo comprobar que en el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}$ y $\nv{v} \in \R^{N_2}$, entonces $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$.
 \end{observacion}
 
 \begin{observacion}
@@ -339,6 +328,7 @@ $$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1},
 \end{observacion}
 
 \subsection{Propiedad Universal del producto tensorial}
+% TODO -- seguir por aqui
 
 El siguiente teorema será de gran utilidad a la hora de entender la naturaleza del producto tensorial entre dos espacios vectoriales.
 
