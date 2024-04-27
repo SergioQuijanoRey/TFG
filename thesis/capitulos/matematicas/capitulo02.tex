@@ -328,7 +328,6 @@ $$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1},
 \end{observacion}
 
 \subsection{Propiedad Universal del producto tensorial}
-% TODO -- seguir por aqui
 
 El siguiente teorema será de gran utilidad a la hora de entender la naturaleza del producto tensorial entre dos espacios vectoriales.
 
@@ -379,33 +378,33 @@ En el presente trabajo usaremos dos descomposiciones tensoriales para modelizar 
 
 Una \textbf{descomposición tensorial} es una forma de expresar cierto tensor como función de otros tensores más sencillos. Tenemos también descomposiciones que expresan el tensor en función de ciertos vectores (como es el caso de la descomposición \textit{CP}).
 
-\section{Análisis Funcional} \label{sec:preliminares_funcional}
+\section{Conceptos básicos de Análisis} \label{sec:preliminares_funcional}
+\todo{JMeri: el nombre original que tenía esta sección era 'Análisis Funcional'. Aunque ya lo haya cambiado, revisarlo porque creo que el nombre de la sección es bastante relevante}
 
-Necesitaremos algunos hechos básicos sobre Análisis Funcional, que introducimos en esta sección
+Necesitaremos algunos hechos básicos sobre Análisis Funcional, que introducimos en esta sección.
 
 \subsection{Espacios de Lebesgue}
 
-A continuación, introduciremos algunos conceptos sobre espacios de funciones que serán fundamentales en la \customref{sec:justificacion_func_repr}. Empezamos introduciendo el siguiente espacio de funciones, que es de sobra conocido:
-fundamentales en la \sectionref{sec:justificacion_func_repr}. Empezamos introduciendo el siguiente espacio de funciones, que es de sobra conocido:
+A continuación, introduciremos algunos conceptos sobre espacios de funciones que serán fundamentales en la \sectionref{sec:justificacion_func_repr}. Empezamos introduciendo el siguiente espacio de funciones, que es de sobra conocido:
 
 \begin{definicion}[Espacio de Lebesgue]
 
 	Dado $\Omega \subseteq \R^N$ definimos el siguiente espacio de funciones:
 
 	\begin{equation}
-		\mathcal{L}(\Omega) := \{f: \Omega \to \R : f \dspace \text{es medible} \}
+		\mathcal{L}(\Omega) := \{f: \Omega \to \R : f \dspace \text{es medible} \}.
 	\end{equation}
 
 	Sobre dicho espacio, definimos la siguiente relación de equivalencia:
 
 	\begin{equation}
-		f \sim g \iff f = g \dspace \text{c.p.d. en } \Omega
+		f \sim g \iff f = g \dspace \text{c.p.d. en } \Omega.
 	\end{equation}
 
 	Y con ello definimos el \textbf{espacio de Lebesgue sobre $\Omega$} como:
 
 	\begin{equation}
-		L(\Omega) := \mathcal{L} / \sim
+		L(\Omega) := \mathcal{L} / \sim .
 	\end{equation}
 \end{definicion}
 
@@ -421,7 +420,7 @@ Y ahora, introducimos los siguientes espacios de funciones:
 	y, como hemos hecho previamente, definimos:
 
 	\begin{equation}
-		L^p(\Omega) := \mathcal{L}^p / \sim
+		L^p(\Omega) := \mathcal{L}^p / \sim.
 	\end{equation}
 
 \end{definicion}
@@ -433,10 +432,11 @@ A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, esc
 Sabemos que el espacio $L^2$ es de Hilbert, considerando el producto escalar:
 
 \begin{equation}
-	\innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu
+	\innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu.
 \end{equation}
 
 Además, usaremos el siguiente hecho, que es consecuencia directa del \textbf{Teorema de Proyección Ortogonal}:
+\todo{Escribir el teorema de proyección ortogonal?}
 
 \begin{proposicion}
 
@@ -462,7 +462,7 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 	\begin{equation} \label{eq:conjuntos_totales_epsilon_aproximacion}
 		\begin{split}
 			\forall \varepsilon > 0 \dspace \exists f_1, \ldots, f_n \in \mathcal{F} \dspace \exists c_1, \ldots c_n \in \R:\\
-			\int | (\sum_{i = 1}^n c_i \; f_i) - g| < \varepsilon \\
+			\int | (\sum_{i = 1}^n c_i \; f_i) - g| < \varepsilon . \\
 		\end{split}
 	\end{equation}
 
@@ -483,16 +483,17 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 \end{proposicion}
 
 \begin{observacion}
-	Estos conjuntos actuarán de forma similar a una base vectorial
+	Estos conjuntos actuarán de forma similar a una base vectorial.
 \end{observacion}
 
 \begin{observacion}
 
 	Este resultado es, de nuevo, consecuencia del \textbf{Teorema de proyección ortogonal}. Es más, sabemos que todo espacio de \textit{Hilbert} finito-dimensional admite una base ortonormal, es decir, un subconjunto de funciones ortonormales dos a dos que es total. La ortonormalidad implica independiencia lineal, por lo que esto nos da la existencia de nuestras \entrecomillado{bases}.
+    \todo{Escribir el teorema de proyección ortogonal porque ya es la segunda vez que lo menciono.}
 
 \end{observacion}
 
-En nuestros dos modelos, trabajaremos con la familia de funciones producto inducida. Así que vemos como se comporta esta transformación respecto a las dos caracterizaciones que acabamos de introducir:
+En nuestros dos modelos trabajaremos con la familia de funciones producto inducida. Así que vemos cómo se comporta esta transformación respecto a las dos caracterizaciones que acabamos de introducir:
 
 \begin{proposicion}[Conservación de la totalidad e independencia lineal en la familia de funciones producto inducida] \label{prop:conservacion_totalidad_indp_lineal_func_prod}
 	Sea $\conjunto{f_d \in L^2(\R^s): d \in \deltaset{N} }$ total (resp. linealmente independiente). Entonces el subconjunto:
@@ -505,6 +506,8 @@ En nuestros dos modelos, trabajaremos con la familia de funciones producto induc
 \end{proposicion}
 
 \subsection{Relación del producto tensorial con los espacios de Hilbert y las dos caracterizaciones}
+
+% TODO -- seguir por aquí
 
 En esta sección vamos a ver cómo se relaciona el producto tensorial con todos los conceptos que hemos introducido previamente. Empecemos viendo que la estructura de espacio de Hilbert se conserva por el producto tensorial:
 
@@ -520,11 +523,19 @@ En esta sección vamos a ver cómo se relaciona el producto tensorial con todos 
 
 \end{proposicion}
 
+\begin{proof}
+    \todo{JMeri: importante demostrar esta proposición porque la uso más tarde.}
+\end{proof}
+
 Y ahora veamos cómo se relaciona el producto tensorial con las dos caracterizaciones:
 
 \begin{proposicion}
 	Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(1)}_{\alpha_1}} \otimes \cdots \otimes  \nv{v^{(N)}_{\alpha_N}}  \} \subseteq \mathbb{V}_1 \otimes \cdots \otimes \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
 \end{proposicion}
+
+\begin{proof}
+    \todo{JMeri: importante demostrar esta proposición porque la uso más tarde.}
+\end{proof}
 
 Como ya hemos comentado, será importante estudiar la familia de funciones producto inducida. El siguiente teorema da un paso en este estudio.
 
@@ -534,12 +545,16 @@ Como ya hemos comentado, será importante estudiar la familia de funciones produ
 	\begin{equation}
 		\begin{split}
 			\MediumOtimes^{N} L^2(\R^s) &\to L^2((\R^s)^N) \\
-			f_1(\nv{x}) \otimes \cdots \otimes f_N(\nv{x}) &\mapsto \prod_{i = 1}^N f_i(\nv{x_i})
+			f_1(\nv{x}) \otimes \cdots \otimes f_N(\nv{x}) &\mapsto \prod_{i = 1}^N f_i(\nv{x_i}).
 		\end{split}
 	\end{equation}
 
 	Así, tenemos identificadas las funciones que vienen dadas como producto tensorial con funciones que vienen dadas como producto punto a punto.
 \end{teorema}
+
+\begin{proof}
+    \todo{JMeri: importante demostrar esta proposición porque la uso más tarde.}
+\end{proof}
 
 \section{Elementos fundamentales en un modelo de aprendizaje automático} \label{sec:piezas_machine_learning_matematicas}
 
