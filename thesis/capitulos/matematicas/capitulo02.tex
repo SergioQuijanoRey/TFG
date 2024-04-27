@@ -320,11 +320,11 @@ Podemos definir el \textbf{producto tensorial} de una forma muy sencilla. Sean $
 $$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}.$$
 
 \begin{observacion}
-	Usando esta definición es directo comprobar que en el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}$ y $\nv{v} \in \R^{N_2}$, entonces $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$.
+    Usando esta definición es directo comprobar que en el caso de que tengamos dos vectores $\nv{u} \in \R^{N_1}$ y $\nv{v} \in \R^{N_2}$, entonces $\nv{u} \otimes \nv{v} = \nv{u} \nv{v}^T$.
 \end{observacion}
 
 \begin{observacion}
-	Se puede comprobar que esta forma de definir los tensores y el producto tensorial coincide con el desarrollo formal realizado en la \sectionref{sec:deftensor}, a raíz de ciertos isomorfismos.
+    Se puede comprobar que esta forma de definir los tensores y el producto tensorial coincide con el desarrollo formal realizado en la \sectionref{sec:deftensor}, a raíz de ciertos isomorfismos.
 \end{observacion}
 
 \subsection{Propiedad Universal del producto tensorial}
@@ -334,44 +334,44 @@ El siguiente teorema será de gran utilidad a la hora de entender la naturaleza 
 
 \begin{teorema}[Propiedad Universal del producto tensorial] Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales. Su producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial con una aplicación bilineal asociada:
 
-	\begin{equation}
-		\begin{split}
-			\otimes : \mathbb{V} \times \mathbb{W} &\to \mathbb{V} \otimes \mathbb{V} \\
-			\nv{v}, \nv{w} & \mapsto \nv{v} \otimes \nv{w}
-		\end{split}
-	\end{equation}
+    \begin{equation}
+        \begin{split}
+            \otimes : \mathbb{V} \times \mathbb{W} &\to \mathbb{V} \otimes \mathbb{V} \\
+            \nv{v}, \nv{w} & \mapsto \nv{v} \otimes \nv{w}
+        \end{split}
+    \end{equation}
 
-	de forma que:
+    de forma que:
 
-	\begin{equation}
-		\forall h: \mathbb{V} \times \mathbb{W} \to \mathbb{Z} \text{  bilineal  } \exists! \hat{h}: \mathbb{V} \otimes \mathbb{W} \to \mathbb{Z} \text{  lineal, verificando que: }
-	\end{equation}
+    \begin{equation}
+        \forall h: \mathbb{V} \times \mathbb{W} \to \mathbb{Z} \text{  bilineal  } \exists! \hat{h}: \mathbb{V} \otimes \mathbb{W} \to \mathbb{Z} \text{  lineal, verificando que: }
+    \end{equation}
 
-	\begin{equation}
-		h = \hat{h} \circ \otimes
-	\end{equation}
+    \begin{equation}
+        h = \hat{h} \circ \otimes
+    \end{equation}
 
-	es decir:
+    es decir:
 
-	\begin{equation}
-		h(\nv{u}, \nv{v}) = \hat{h}(\nv{u} \otimes \nv{v});
-		\dspace \forall \nv{u} \in \mathbb{V}, \; \forall \nv{v} \in \mathbb{W}
-	\end{equation}
+    \begin{equation}
+        h(\nv{u}, \nv{v}) = \hat{h}(\nv{u} \otimes \nv{v});
+        \dspace \forall \nv{u} \in \mathbb{V}, \; \forall \nv{v} \in \mathbb{W}.
+    \end{equation}
 
-	Esto se resume en que el siguiente diagrama es conmutativo:
+    Esto se resume en que el siguiente diagrama es conmutativo:
 
-	\begin{equation}
-		\begin{tikzcd}
-			\mathbb{V} \times \mathbb{W} \ar{r}{h} \ar{d}[left]{\otimes} & \mathbb{Z} \\
-			\mathbb{V} \otimes \mathbb{W} \ar[dashed]{ur}[right, below]{\hat{h}}
-		\end{tikzcd}
-	\end{equation}
+    \begin{equation}
+        \begin{tikzcd}
+            \mathbb{V} \times \mathbb{W} \ar{r}{h} \ar{d}[left]{\otimes} & \mathbb{Z} \\
+            \mathbb{V} \otimes \mathbb{W} \ar[dashed]{ur}[right, below]{\hat{h}}
+        \end{tikzcd}
+    \end{equation}
 
 \end{teorema}
 
-Es decir, dada una aplicación bilineal en el producto cartesiano de dos espacios vectoriales, podemos asociar unívocamente una aplicación lineal en el producto tensorial de los dos espacios vectoriales. Esto sigue siendo cierto para aplicaciones multilineales en el producto cartesiano de un número arbitrario de espacios vectoriales.
+En resumen, dada una aplicación bilineal en el producto cartesiano de dos espacios vectoriales, podemos asociar unívocamente una aplicación lineal en el producto tensorial de los dos espacios vectoriales. Esto sigue siendo cierto para aplicaciones multilineales en el producto cartesiano de un número arbitrario de espacios vectoriales.
 
-Este teorema, que se puede probar a partir de todo lo que hemos visto hasta ahora, \textbf{sirve para dar una definición equivalente no constructiva del producto tensorial} de dos espacios vectoriales. A diferencia de lo que pasaba con la definición alternativa que se puede dar usando el \sectionref{th:base_prod_tensorial}, esta definición no depende de ninguna base, y por lo tanto es igual de general que la definición por la que hemos optado.
+Este teorema, que se puede probar a partir de todo lo que hemos visto hasta ahora, \textbf{sirve para dar una definición equivalente no constructiva del producto tensorial} de dos espacios vectoriales. Por lo tanto, dicha definición no depende de ninguna base, y con ello, es igual de general que la definición por la que hemos optado y más general que la definición alternativa que hemos comentado brevemente en la \sectionref{sec:otra_forma_tensores}.
 
 \subsection{Descomposiciones tensoriales}
 
