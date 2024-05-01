@@ -507,8 +507,6 @@ En nuestros dos modelos trabajaremos con la familia de funciones producto induci
 
 \subsection{Relación del producto tensorial con los espacios de Hilbert y las dos caracterizaciones}
 
-% TODO -- seguir por aquí
-
 En esta sección vamos a ver cómo se relaciona el producto tensorial con todos los conceptos que hemos introducido previamente. Empecemos viendo que la estructura de espacio de Hilbert se conserva por el producto tensorial:
 
 \begin{proposicion}
@@ -558,64 +556,66 @@ Como ya hemos comentado, será importante estudiar la familia de funciones produ
 
 \section{Elementos fundamentales en un modelo de aprendizaje automático} \label{sec:piezas_machine_learning_matematicas}
 
-Uno de los puntos fuertes del presente trabajo es que las dos modelizaciones que vamos a introducir en \sectionref{ch:modelizacion} son muy cercanas a las arquitecturas de aprendizaje automático que se usan en problemas reales. Por tanto, es necesario definir algunos elementos de estas arquitecturas para más tarde poder comparar nuestras modelizaciones matemáticas con las arquitecturas usuales de aprendizaje automático.
-
-Introduciremos los siguientes conceptos:
+Uno de los puntos fuertes del presente trabajo es que las dos modelizaciones matemáticas que introducimos en el \sectionref{ch:modelizacion} son muy cercanas a las arquitecturas de aprendizaje automático reales. Por tanto, es necesario definir algunos conceptos que participan en estas arquitecturas para más tarde poder compararlas con nuestras modelizaciones matemáticas. Así pues, en esta sección introduciremos los siguientes conceptos:
 
 \begin{itemize}
-    \item Convolución
-    \item Bloques convolucionales
-    \item \textit{Feature Maps}
-    \item \textit{Pooling}
-    \item \textit{Linear dense layer}
+    \item Convolución.
+    \item Bloques convolucionales.
+    \item \textit{Feature Maps}.
+    \item \textit{Pooling}.
+    \item \textit{Linear dense layer}.
 \end{itemize}
-
-\textbf{NOTA PARA JAVIER}: he hecho una definición muy similar de estos elementos en la parte de informática. No sé hasta que punto se pueden hacer secciones compartidas para ambas partes del TFG
-\todo{Borrar este comentario para Javier}
 
 \subsection{Convolución}
 
-Las \textbf{convoluciones} son el elemento que caracteriza las redes convolucionales, que son las redes utilizadas en la práctica del aprendizaje automático con las que vamos a comparar nuestras modelizaciones matemáticas. Las convoluciones \textbf{explotan eficientemente la estructura de las imágenes}, razón por la cual son utilizadas extensamente en tareas de visión por computador. También pueden explotar eficientemente otras estructuras, como pueden ser los grafos.
+La \textbf{convolución} es el elemento que caracteriza a las redes convolucionales, que son las redes utilizadas en la práctica del aprendizaje automático con las que vamos a comparar nuestras modelizaciones matemáticas. Las convoluciones \textbf{explotan eficientemente la estructura de las imágenes}, razón por la cual son utilizadas extensamente en tareas de visión por computador. También pueden explotar eficientemente otras estructuras, como pueden ser los grafos.
 
-Dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
+Para empezar, dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
 
 \begin{equation}
-    (f * g)(x) := \int f(t) g(x - t) dt
+    (f * g)(x) := \int f(t) g(x - t) dt.
 \end{equation}
 
 Podemos trabajar con una versión discretizada de la convolución, de la siguiente forma:
 
 \begin{equation}
-    (f * g)(x) := \sum_{t \in \N} f(t) g(x - t)
+    (f * g)(x) := \sum_{t \in \N} f(t) g(x - t).
 \end{equation}
 
-Y a la hora de trabajar con imágenes, que podemos representar como matrices o tensores de dimensiones $ancho, alto$, podemos realizar una convolución discreta entre funciones de dos variables:
+En la práctica vamos a trabajar sobre conjuntos finitos, por lo que la anterior serie la podemos expresar como una simple suma:
 
 \begin{equation}
-    (f * g)(x, y) := \sum_{s \in \N} \sum_{t \in \N} f(s, t) g(x - s, y - t)
+    (f * g)(x) := \sum_{t \in N} f(t) g(x - t).
+\end{equation}
+
+Para representar imágenes en blanco y negro podemos utilizar funciones de dos variables $f: \R^2 \to [0, 1]$, en las que las dos entradas marcan la posición de un píxel en concreto y la salida marca la intensidad lumínica de dicho píxel, siendo 0 un píxel totalmente negro y 1 un píxel totalmente blanco. Para imágenes en color podemos usar funciones $f: \R^2 \to [0,1]^3$ en las que las entradas siguen la misma regla y cada componente de la salida marca la intensidad lumínica del color rojo, verde y azul, esto es, el conocido formato \textit{RGB}. Por sencillez, a partir de ahora consideramos imágenes en blanco y negro. Podemos realizar la convolución de dos imágenes una vez definamos la convolución discreta entre funciones de dos variables:
+
+\begin{equation}
+    (f * g)(x, y) := \sum_{s \in N} \sum_{t \in M} f(s, t) g(x - s, y - t).
 \end{equation}
 
 Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique filtros a imágenes de esta forma. Una \textbf{operación convolucional} vendrá dada por los siguientes hiperparámetros:
 
 \begin{itemize}
-    \item Dimensiones de la convolución: podemos aplicar una convolución de tamaño $1 \times 1$, en el que en cada paso sólo nos fijamos en un elemento del tensor. O de tamaño $3 \times 3$, en el que en cada paso nos fijamos en 9 elementos del tensor. O cualquier tamaño, que normalmente se toma impar
-    \item \textit{Stride}: tamaño de salto al mover el convolución por el tensor. Podemos aplicar nuestro convolución dando pasos de un elemento, o podemos dar pasos mayores
-    \item \textit{Padding}: Según el tamaño de la convolución y el \textit{stride}, podemos tener problemas al llegar a los bordes del tensor. Podemos aplicar distintas políticas para resolver esto, pero una de las más comunes es ampliar el tensor por cierto tamaño (por ejemplo, copiando los elementos del borde, usando la media de ciertos elementos, ...)
+    \item Dimensiones de la convolución: podemos aplicar una convolución de tamaño $1 \times 1$, en la que en cada paso sólo nos fijamos en un elemento del tensor. O de tamaño $3 \times 3$, en la que en cada paso nos fijamos en 9 elementos del tensor. O cualquier tamaño, que normalmente se toma impar para poder centrar la convolución sobre cada píxel.
+    \item \textit{Stride}: tamaño de salto al mover la convolución por el tensor. Podemos aplicar nuestra convolución dando saltos de un píxel o dando saltos de más píxeles.
+    \item \textit{Padding}: Según el tamaño de la convolución y el \textit{stride}, podemos tener problemas al llegar a los bordes del tensor. Podemos aplicar distintas políticas para resolver esto, pero una de las más comunes es ampliar el tensor por cierto tamaño, copiando los elementos del borde o usando la media de ciertos elementos.
 \end{itemize}
 
-El funcionamiento de este operador se muestra en el siguiente diagrama:
+El funcionamiento de esta operación se entiende perfectamente gracias a la siguiente imagen:
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{informatica/ejemplo_capa_convolucional}
-    \caption{Ejemplo gráfico de una convolución sobre una imagen (tensor de dimensiones $4 \times 4$). Estamos usando una convolución de tamaño $2 \times 2$, \textit{stride} = 1 y no usamos \textit{padding} (usamos otra política, que consiste en ajustar la convolución para que no se salga de la imagen). Imagen extraída de \cite{informatica:paper_definicion_cnn}.}
+    \caption{Ejemplo gráfico de la operación convolución sobre una imagen. El tamaño de la convolución es $2 \times 2$, el \textit{stride} es 1 y no usamos \textit{padding}, usamos otra política que consiste en ajustar la convolución para que no se salga de la imagen. Imagen extraída de \cite{informatica:paper_definicion_cnn}.}
 \end{figure}
+\todo{Mejorar la calidad de esta imagen}
 
-Algunas características centrales de esta operación son:
+Las características principales de esta operación son:
 
 \begin{itemize}
-    \item \textbf{Coeficientes compartidos}: los coeficientes del operador son independientes de la posición en la que nos encontremos. Si nuestra convolución detecta un patrón, dicha detección debe ser independiente de la posición en la que se encuentre dicho patrón.
-    \item \textbf{Localidad}: el operador toma información de vecindarios de elementos. Esto es relevante por la estructura local que hemos comentado de las imágenes o de los grafos.
+    \item \textbf{Coeficientes compartidos}: los coeficientes del operador son independientes de la posición en la que nos encontremos. La detección de patrones dentro de la imagen debe ser independiente de la posición en la que se encuentre dicho patrón.
+    \item \textbf{Localidad}: el operador toma información de vecindarios de elementos. Esto es relevante por la estructura local que hemos comentado previamente.
 \end{itemize}
 
 \subsection{Bloques convolucionales y \textit{feature maps}}
