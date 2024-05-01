@@ -618,36 +618,30 @@ Las características principales de esta operación son:
     \item \textbf{Localidad}: el operador toma información de vecindarios de elementos. Esto es relevante por la estructura local que hemos comentado previamente.
 \end{itemize}
 
-\subsection{Bloques convolucionales y \textit{feature maps}}
+\subsection{Bloques convolucionales y mapas de características}
 
-Como hemos introducido previamente, una convolución puede operar sobre una imagen, que puede representarse como un tensor de dimensiones $ancho \times alto \times canales$, y producir un tensor de salida de dimensiones $ancho'  \times alto' \times 1$.
+Para definir la operación convolución hemos representado las imágenes como funciones, pero también las podemos representar como tensores. Una imagen en blanco y negro puede representarse como un tensor de dimensiones $ancho \times alto$. Mientras que una imagen a color en formato \textit{RGB} puede representarse como un tensor de dimensiones $ancho \times alto \times 3$. En este caso se dice que la imagen tiene 3 canales o que tiene una profundidad de 3, un canal para cada color básico (rojo, verde y azul). Con esto es claro que podemos ver la convolución como una operación que toma un tensor de entrada y devuelve otro procesado. Al trabajar con imágenes a color, transformamos el tensor de modo $ancho \times alto \times 3 \to ancho' \times alto' \times 1$, pasando de tres canales a un canal. En el caso de imágenes en blanco y negro, transformamos el tensor de modo $ancho \times alto \times 1 \to ancho' \times alto' \times 1$.
 
-Lo normal en una capa de una red convolucional es aplicar más de una convolución. Por ejemplo, aplicar 8 convoluciones sobre la imagen de entrada. Esto produce 8 tensores de salida de dimensiones $ancho' \times alto' \times 1$, que se juntan en un tensor de dimensiones $ancho' \times alto' \times 8$. Cada una de las salidas del bloque convolucional se denomina en el ámbito del aprendizaje automático como \textit{feature map} o mapa de características.
+Sabiendo esto, lo normal es aplicar distintas convoluciones al mismo tensor de entrada, en lo que se conoce como \textbf{bloque convolucional}. Por ejemplo, aplicar 8 convoluciones sobre la imagen de entrada. Esto produce 8 tensores de salida de dimensiones $ancho' \times alto' \times 1$, que se juntan en un tensor de dimensiones $ancho' \times alto' \times 8$. Cada una de las salidas del bloque convolucional se denomina en el ámbito del aprendizaje automático como \textit{feature map} o mapa de características.
 
-Por tanto, un bloque convolucional toma un tensor de dimensiones $ancho \times alto \times profundidad$ y produce otro tensor de dimensiones $ancho' \times alto' \times profundidad'$. En el caso de ser el primer bloque, la $profundidad$ se corresponde con el número de canales de la imagen (por ejemplo, 3 en el caso de trabajar con imágenes \textit{RGB}). En el caso de bloques intermedios, la $profundidad$ se corresponde con el número de \textit{feature maps} que la anterior capa produce. Y eligiendo cuántos \textit{feature maps} producimos en un bloque concreto (lo que es lo mismo, cuántas convoluciones aplicamos), escogemos el valor de $profundidad'$.
-
-Finalmente, los parámetros que definen una capa convolucional son:
+Por tanto, un bloque convolucional toma un tensor de dimensiones $ancho \times alto \times canales$ y produce otro tensor de dimensiones $ancho' \times alto' \times canales'$. En el caso de ser el primer bloque, $canales \in \conjunto{1, 3}$ dependiendo del formato de la imagen. En el caso de bloques intermedios, tendremos que tener en cuenta el número de convoluciones que forman parte del bloque anterior. Por tanto, los parámetros que definen una capa convolucional son:
 
 \begin{itemize}
-    \item Los parámetros de la operación de convolución que hemos comentado previamente
-    \item \textit{Depth}: cuántos filtros convolucionales se aplican en esta capa. Esto determina el número de \textit{feature maps} producidas
+    \item Los parámetros de la operación de convolución que hemos comentado previamente.
+    \item Profundidad: cuántos filtros convolucionales se aplican en esta capa. Esto determina el número de mapas de características producidas.
 \end{itemize}
 
 \subsection{\textit{Pooling}}
 
-El propósito de este tipo de capas es resumir la información de la imagen o del conjunto de mapas de activación para obtener datos de menor dimensionalidad. Hay varias formas de realizar esta operación, así que mencionamos algunas de las más usuales:
+El propósito de este tipo de capas es resumir la información de la imagen o del conjunto de mapas de características para obtener datos de menor dimensionalidad. Hay varias formas de realizar esta operación, así que mencionamos algunas de las más usuales:
 
 \begin{itemize}
-    \item \textit{Gobal pooling}: tomamos todos los datos y los resumimos como uno solo. Algunas formas de hace esto son:
-        \begin{itemize}
-            \item Utilizando la media de todos los valores.
-            \item Utilizando el producto de todos los valores, lo que se conoce como \textit{Global Product Pooling}.
-        \end{itemize}
+    \item \textit{Gobal pooling}: tomamos todos los datos y los resumimos como uno solo. Para ello, podemos tomar la media de todos los valores o podemos tomar el producto de todos los valores. Esto último se conoce como \textit{Global Product Pooling}.
     \item \textit{Max Pooling}: aplicamos un filtro que recorre la imagen de la misma forma que una convolución. Pero en vez de aplicar cierta suma ponderada, toma el máximo de los valores que se están considerando en ese paso.
     \item \textit{Average Pooling}: igual que \textit{max pooling}, pero en vez de tomar el máximo, se toma la media de los valores considerados.
 \end{itemize}
 
-Por lo tanto, en el \textit{max pooling} y \textit{average pooling} tenemos que definir el tamaño de ventana, que determinará cuántos elementos se agregarán en cada paso. Todo esto queda explicado en la siguiente figura:
+Por lo tanto, en el \textit{max pooling} y en el \textit{average pooling} tenemos que definir el tamaño de ventana, que determinará cuántos elementos se agregarán en cada paso. Todo esto queda explicado en la siguiente figura:
 
 \begin{figure}[H]
     \centering
@@ -660,26 +654,27 @@ Esta capa ayuda a que la red sea más ligera, pues al reducir la dimensionalidad
 
 \subsubsection{Capa totalmente conectada} \label{subsubs:capa_totalmente_conectada}
 
-También conocidas como \textit{linear dense layers} o capas lineales densas. Estas capas toman un vector de valores de entrada, realizan una combinación lineal de sus valores, y en la mayoría de casos, aplican una función no lineal a la salida. Por lo tanto, una capa totalmente conectada viene dada por:
+También conocidas como \textit{linear dense layers} o capas lineales densas. Estas capas toman un vector de valores de entrada, realizan una combinación lineal de sus valores y, en la mayoría de casos, aplican una función no lineal a la salida. Por lo tanto, una capa totalmente conectada viene dada por:
 
 \begin{itemize}
-    \item La dimensión de los vectores que puede procesar, $N$
-    \item Los pesos de la combinación lineal que realiza sobre las entradas, $w_1, \ldots, w_N$
-    \item La función de activación no lineal, si es que la hubiera, $\sigma: \R \to \R$
+    \item La dimensión de los vectores que puede procesar, $N$.
+    \item Los pesos de la combinación lineal que realiza sobre las entradas, $w_1, \ldots, w_N$.
+    \item La función de activación no lineal, si es que la hubiera, $\sigma: \R \to \R$.
 \end{itemize}
 
 Por lo tanto, el funcionamiento de una capa lineal densa se resume en:
 
 \begin{equation}
-    (x_1, \ldots, x_N) \to \sigma(\sum_{i = 1}^{N} w_i \; x_i)
+    (x_1, \ldots, x_N) \to \sigma(\sum_{i = 1}^{N} w_i \; x_i).
 \end{equation}
 
-Estamos suponiendo que queramos que la salida de la capa sea un único valor escalar. Sin embargo, podemos generalizar esta operación para que la salida sea un vector de dimensión $S$. Para ello, basta considerar:
+En este planteamiento la salida de la capa es un único valor escalar. Sin embargo, podemos generalizar esta operación para que la salida sea un vector de dimensión $S$. Para ello, basta considerar:
 
 \begin{equation}
-      f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b)
+\begin{split}
+    & f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b) \\
+    & \text{donde} \; \theta = (\nv{w}, b) \; \text{con} \nv{w} \in \R^s, \; b \in \R.
+\end{split}
 \end{equation}
 
-donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$.
-
-Estas capas se suelen poner al final de las redes convolucionales, para realizar la predicción final. Toman las características jerárquicas que las convoluciones extraen y las combinan para resolver la tarea planteada. Para ello, debemos vectorizar el tensor de entrada, pero esto es una operación trivial.
+En las redes convolucionales se suelen usar como última capa. Toman los últimos mapas de activación, que pueden vectorizarse en caso de ser necesario, y generan la predicción final de la red.
