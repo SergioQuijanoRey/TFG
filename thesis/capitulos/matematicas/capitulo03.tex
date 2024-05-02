@@ -1,16 +1,17 @@
 \chapter{Modelización de la tarea de aprendizaje} \label{ch:tarea_aprendizaje}
+% TODO -- seguir por aqui
 
 \section{Planteamiento del problema} \label{seq:planteamiento_problema}
 
-La tarea de aprendizaje que consideramos es la de \textbf{clasificación de imágenes}. El uso de redes convolucionales profundas ha supuesto un gran avance a la hora de resolver esta tarea. Nos centraremos en modelar redes convolucionales (profundas y no profundas) para clasificar imágenes.
+La tarea de aprendizaje que consideramos es la de \textbf{clasificación de imágenes}, para la cual el uso de redes convolucionales profundas ha supuesto un gran avance. Nos centraremos en modelar redes convolucionales (profundas y no profundas) para clasificar imágenes.
 
 Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \} = \deltaset{Y}$. Con esto, podemos ver que los datos de entrada viven en el espacio
 
 \begin{equation}
-	\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N
+	\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N.
 \end{equation}
 
-Esta representación de los datos de entrada es natural en muchos escenarios. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen (parche o \textit{patch}). Por la estructura local de las imágenes, cada vector de \textit{pixels} debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Puede ocurrir que existan \textit{pixels} que aparezcan en más de un parche. Las imágenes contienen información en los colores que contiene cada píxel, pero también en la posición de los píxeles. Por ejemplo, si permutamos aleatoriamente las posiciones de los píxeles de una imagen, como hacemos en \imgref{img:desordenar_pixeles_repetida_mates}, esta imagen pierde completamente el sentido. A esto nos referimos cuando hablamos de estructura local de la imagen. Una forma natural de generar estos parches a partir de las imágenes consiste en tomar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
+Esta representación de los datos de entrada es natural en muchos escenarios. En el caso de las imágenes, podemos considerar cada vector $\nv{x_i}$ como un conjunto de \textit{pixels} de la imagen, en lo que se conoce como parche o \textit{patch}. Por la estructura local de las imágenes, cada parche debería contener un vecindario de \textit{pixels}, es decir, \textit{pixels} adyacentes. Puede ocurrir que los parches no sean disjuntos, o lo que es lo mismo, que existan \textit{pixels} perteneciendo a más de un parche. Las imágenes contienen información en los colores que contiene cada píxel, pero también en su posición. Esto es claro si tenemos en cuenta que permutando aleatoriamente las posiciones de los \textit{pixels} de una imagen, ésta pierde el sentido. Mostramos un ejemplo de ello en la \imgref{img:desordenar_pixeles_repetida_mates}. A esto nos referimos cuando hablamos de estructura local de la imagen. Una forma natural de generar estos parches a partir de las imágenes consiste en tomar $\nv{x_i}$ como la fila o columna $i$-ésima de la imagen.
 
 \begin{figure}[!hbtp]
 	\centering
@@ -23,9 +24,9 @@ Esta representación de los datos de entrada es natural en muchos escenarios. En
 	\begin{subfigure}[t]{0.45\textwidth}
 		\centering
 		\includegraphics[width=0.9\linewidth]{informatica/ejemploperm_permutada}
-		\caption{Imagen original tras aplicar una permutación aleatoria de las posiciones de los píxeles}
+		\caption{Imagen original tras aplicar una permutación aleatoria de las posiciones de los \textit{pixels}}
 	\end{subfigure}
-	\caption{Tenemos que considerar la estructura local de la imagen. La posición de los píxeles y su vecindario contiene una información fundamental de la que no podemos prescindir. Por tanto, los parches deben contener vecindarios de píxeles, aunque tengamos distintas estrategias para escoger estos vecindarios.}
+	\caption{Tenemos que considerar la estructura local de la imagen. La posición de los \textit{pixels} y su vecindario contiene una información fundamental de la que no podemos prescindir. Por tanto, los parches deben contener vecindarios de \textit{pixels}, aunque tengamos distintas estrategias para escoger estos vecindarios.}
 	\label{img:desordenar_pixeles_repetida_mates}
 \end{figure}
 
@@ -35,11 +36,14 @@ Para decidir la etiqueta de un elemento, consideramos $Y$ \textbf{funciones de p
 	\conjunto{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y}}.
 \end{equation}
 
+\textbf{NOTA PARA JAVIER}: aquí me marcaste debajo de $Y$ y de $\mathcal{Y}$. Escribo $Y$ funciones de puntuación y luego $y \in \mathcal{Y}$ porque he definido $\mathcal{Y} := \deltaset{Y}$. No sé si esta definición aporta poco y lía más que otra cosa, en cuyo caso creo que es mejor quitar la definición de $\mathcal{Y} := \deltaset{Y}$. O si simplemente crees que es mejor que escoja una tipografía o letras que líen menos.
+\todo{Borrar esta nota para Javier}
+
 Con esto, dado un elemento $X \in \mathcal{X}$, lo clasificaremos buscando la etiqueta cuya función de puntuación sea máxima, es decir:
 
-$$\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X)$$
+$$\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X).$$
 
-Por tanto, nuestro \textbf{espacio de hipótesis} es el conjunto de funciones $\Gamma := \conjunto{f: \mathcal{X} \to \R}$. Tanto en la práctica con modelos de \textit{machine learning}, como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subseteq \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
+Por tanto, nuestro \textbf{espacio de hipótesis} es el conjunto de funciones $\Gamma := \conjunto{f: \mathcal{X} \to \R}$. Tanto en la práctica con modelos reales de aprendizaje automático como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subseteq \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
 
 \section{Espacio de hipótesis general}
 \todo{JMERI: leer de nuevo esta sección completa, porque es muy liosa, repito cosas, introduzco cosas donde no debería. Mirar los contenidos que he borrado}
@@ -98,7 +102,7 @@ Las opciones más usadas en la práctica del aprendizaje automático son:
 
 	      donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
 
-    \item Neuronas: véase la \sectionref{subsubs:capa_totalmente_conectada}
+	\item Neuronas: véase la \sectionref{subsubs:capa_totalmente_conectada}
 
 
 \end{enumerate}
