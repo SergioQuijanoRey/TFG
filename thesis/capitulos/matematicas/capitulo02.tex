@@ -681,30 +681,34 @@ En las redes convolucionales se suelen usar como última capa. Toman los último
 
 \section{Funciones de representación} \label{sec:funciones_representacion}
 
-\todo{Escribir}
-
-Como hemos justificado, tenemos que escoger una familia paramétrica de funciones de representación que sea numerable y además total, es decir:
+Una parte importante del presente trabajo será la justificación del modelado de las funciones de puntuación, que realizaremos en la \sectionref{sec:espacio_hipotesis_general}. En esta justificación necesitaremos tomar un conjunto de funciones totales de una familia paramétrica de funciones. En esta sección introducimos algunas de las familias más comunes en la práctica del aprendizaje automático. Dichas familias paramétricas serán de la forma:
 
 \begin{equation}
-	\mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta, \; \# \Theta = \# \N }
+	\mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta}.
 \end{equation}
 
 Las opciones más usadas en la práctica del aprendizaje automático son:
 
 \begin{enumerate}
-	\item Wavelets
-	\item Funciones de base radial (RBF), en concreto, la Gaussiana con matriz de covarianzas diagonal:
+    \item Funciones de base radial (\textit{RBF}), en concreto, la Gaussiana con matriz de covarianzas diagonal:
 
 	      \begin{equation}
 		      f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
 	      \end{equation}
 
-	      donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
+          donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$.
 
-	\item Neuronas: véase la \sectionref{subsubs:capa_totalmente_conectada}
+      \item Neuronas: aunque las hemos introducido en la  \sectionref{subsubs:capa_totalmente_conectada}, repetimos su formulación. Serán funciones de la forma:
 
+        \begin{equation}
+        \begin{split}
+            & f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b) \\
+        \end{split}
+        \end{equation}
 
+        donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$. Además, $\sigma$ será una función de activación no lineal. Las más comunes son la \textit{ReLU} $\sigma(x) := \max \conjunto{0, x}$ o la sigmoide $\sigma(x) := \frac{1}{1 + e^{-x}}$.
 \end{enumerate}
 
+\todo{Antes tenía las \textit{wavelets} pero las he quitado porque no aportaban nada. Asegurarme de que no las estoy mencionando}
 
-\todo{Revisar toda esta sección que la he copiado de otro lado}
+Para el desarrollo posterior, necesitamos que la familia de funciones sea numerable y total. Esto es directo, tomando valores en $ \Q$. Para las \textit{RBF} tomamos $\nv{\mu} \in \Q^S$ y $\nv{\sigma^2} \in \Q^S_+$. Para las neuronas tomamos $\nv{w} \in \Q^s$ y $b \in \Q$.  Pero es más, en \cite{matematicas:principal} se afirma que es suficiente con tomar un número finito de funciones ${f_1, \ldots, f_M}$. De hecho, en el caso de estar trabajando con imágenes, proponen que basta con tomar $M$ entorno a 100. Este hecho simplificará en gran medida el desarrollo posterior.
