@@ -1,31 +1,15 @@
 \chapter{Modelización de las redes neuronales} \label{ch:modelizacion}
 
-A partir de las herramientas matemáticas que hemos introducido en \customref{ch:matematicas_fundamentales} y de la modelización de la tarea de aprendizaje realizada en \customref{ch:tarea_aprendizaje}, buscamos desarrollar una modelización matemática de las redes neuronales con las que se suele trabajar en la práctica. Para que sea una \textbf{buena modelización}, esta debería cumplir que:
+A partir de las herramientas matemáticas que hemos introducido en el  \sectionref{ch:matematicas_fundamentales} y de la modelización de la tarea de aprendizaje realizada en el \sectionref{ch:tarea_aprendizaje}, buscamos desarrollar una modelización matemática de las redes neuronales usuales. Para que sea una \textbf{buena modelización}, esta debería ser lo más parecida a los modelos usados en la práctica del aprendizaje automático y debería permitir obtener resultados interesantes.
 
-\begin{itemize}
-	\item Sea lo más parecida a los modelos que se usan en la práctica.
-	\item Permita obtener resultados interesantes.
-\end{itemize}
+Usando descomposiciones tensoriales, modelaremos dos tipos de redes. Las primeras serán redes neuronales no profundas, a partir de la descomposición \textit{CANDECOMP/PARAFAC} o descomposición \textit{CP}. Las segundas serán redes convolucionales profundas, a partir de la descomposición jerárquica de \textit{Tucker} o descomposición \textit{HT}, por sus siglas en inglés.
 
-Usando descomposiciones tensoriales, modelaremos dos tipos de redes:
-
-\begin{itemize}
-	\item Redes neuronales no profundas, a partir de la descomposición \textit{CANDECOMP/PARAFAC} o descomposición \textit{CP}.
-	\item Redes convolucionales profundas, a partir de la descomposición jerárquica de \textit{Tucker} o descomposición \textit{HT} por sus siglas en inglés.
-\end{itemize}
-
-Las \textbf{modelizaciones son muy cercanas a las arquitecturas usadas en la práctica del aprendizaje automático}. Principalmente, porque tienen en cuenta las tres propiedades características de una red convolucional:
-
-\begin{enumerate}
-	\item Localidad.
-	\item Compartición de parámetros, que junto a la localidad, da lugar a la convolución.
-	\item \textit{Pooling}.
-\end{enumerate}
+Estas \textbf{modelizaciones son muy cercanas a las arquitecturas usadas en la práctica del aprendizaje automático}. Principalmente, porque tienen en cuenta las tres propiedades características de una red convolucional: localidad, compartición de parámetros y \textit{pooling}. La localidad junto a la compartición de parámetros da lugar a la convolución.
 \todo{Desarrollar de forma más extensa qué significan estas propiedades. Antes digo que voy a explicar qué son estas propiedades. Y además, estoy repitiendo el listado, por lo que tengo que desarrollar bien estas propiedades}
 
 \section{Modelo \textit{CP}}
 
-Este modelo será el resultado de aplicar la descomposición tensorial \textit{CP} en la función de puntuación dada por \eqref{eq:puntuacion_general}. Como veremos más adelante, esto resultará en un modelo \textit{shallow}, con una única capa convolucional oculta.
+Este modelo será el resultado de aplicar la descomposición tensorial \textit{CP} en la función de puntuación dada por la ecuación \eqref{eq:puntuacion_general}. Como veremos más adelante, esto resultará en un modelo somero, con una única capa convolucional oculta.
 
 \subsection{Descomposición CANDECOMP/PARAFAC} \label{subs:descomposcion_cp}
 
@@ -34,7 +18,7 @@ En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/P
 \begin{proposicion}[Rango matricial de los tensores puros]
 	Sean $\nv{v} \in \R^{N}, \nv{w} \in \R^{M}$ dos vectores. Entonces su producto tensorial puede expresarse como:
 
-	$$\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T \in \espaciomatrices{N}{M}$$
+	$$\nv{v} \otimes \nv{w} = \nv{v} \nv{w}^T \in \espaciomatrices{N}{M}.$$
 
 	Además, esta matriz es de rango uno o cero (este último caso ocurre únicamente cuando alguno de los dos vectores es $\vec{0}$)
 \end{proposicion}
@@ -44,7 +28,7 @@ En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/P
 	Sean $\nv{v} = (v_1, \ldots, v_N)$ y $\nv{w} = (w_1, \ldots, w_M)$ dos vectores cualesquiera. Entonces, usando la expresión del producto tensorial que introducimos en \customref{sec:otra_forma_tensores}, tenemos que:
 
 	\begin{equation}
-		\nv{v} \otimes \nv{w} = (v_i w_j)_{i \in \deltaset{N},\ j \in \deltaset{M}}
+		\nv{v} \otimes \nv{w} = (v_i w_j)_{i \in \deltaset{N},\ j \in \deltaset{M}}.
 	\end{equation}
 
 	O lo que es lo mismo:
@@ -58,24 +42,22 @@ En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/P
 		\end{pmatrix}
 	\end{equation}
 
-	Que claramente se corresponde con la expresión de $\nv{v} \nv{w}^T$. Además, es claro que la fila $i$-ésima viene dada por el vector fila
+	Que claramente se corresponde con la expresión de $\nv{v} \nv{w}^T$. Además, es claro que la fila $i$-ésima viene dada por el vector fila:
 
-	$$(v_i w_1, v_i w_2, \ldots, v_i w_M) = v_i (w_1, \ldots, w_M) = v_i \nv{w}^T$$
+	$$(v_i w_1, v_i w_2, \ldots, v_i w_M) = v_i (w_1, \ldots, w_M) = v_i \nv{w}^T.$$
 
-	Por tanto, todas las filas son combinación lineal de una de las filas.
+	Por tanto, todas las filas son combinación lineal de una de las filas. En el caso de que alguno de los dos vectores $\nv{v}$ o $\nv{w}$ sea $\vec{0}$, tenemos que la matriz $\nv{v} \otimes \nv{w}$ es la matriz de ceros y, por tanto, su rango es cero.
 
-	En el caso de que alguno de los dos vectores $\nv{v}$ o $\nv{w}$ sea $\vec{0}$, tenemos que la matriz $\nv{v} \otimes \nv{w}$ es la matriz de ceros, y por tanto su rango es cero.
-
-	Estudiado ese caso, ahora podemos suponer que $\nv{v}, \nv{w} \neq \vec{0}$, y por tanto se debe cumplir que $\exists i_0 \in \deltaset{N}: v_{i_0} \neq 0$. Esa será la fila que escogemos para expresar el resto de filas como combinación lineal de esta, aprovechando de que es no nula. Dicha fila se puede expresar como $v_{i_0} \nv{w}^T$. La fila $i$-ésima se puede expresar como $v_i \nv{w}^T$. Y por tanto:
+	Estudiado ese caso, ahora podemos suponer que $\nv{v}, \nv{w} \neq \vec{0}$, por lo que se debe cumplir que $\exists i_0 \in \deltaset{N}: v_{i_0} \neq 0$. Esa será la fila que escogemos para expresar el resto de filas como combinación lineal de esta, aprovechando que es no nula. Dicha fila se puede expresar como $v_{i_0} \nv{w}^T$. La fila $i$-ésima se puede expresar como $v_i \nv{w}^T$. Y por tanto:
 
 	\begin{equation}
 		\begin{split}
 			v_i \nv{w}^T = \lambda \cdot v_{i_0} \nv{w}^T \iif & \lambda = \frac{v_i}{v_{i_0}} \\
-			& \lambda \neq 0 \iif v_i \neq 0
+			& \lambda \neq 0 \iif v_i \neq 0.
 		\end{split}
 	\end{equation}
 
-	Con esto sabemos que $rank(\nv{v} \otimes \nv{w}) \leq 1$, pero podría darse el caso de que el rango fuese cero aún siendo $\nv{v}, \nv{w} \neq \vec{0}$. Sin embargo, esto no es posible. Como $\nv{v}, \nv{w} \neq \vec{0}$, entonces $\exists i_0 \in \deltaset{N}, \exists j_0 \in \deltaset{M}$ de modo que $v_{i_0}, w_{j_0} \neq 0$. Por tanto, el menor de orden 1 asociado a la fila $i_0$-ésima y columna $j_0$-ésima tiene el valor $v_{i_0} w_{j_0} \neq 0$, y con ello, $rank(\nv{v} \otimes \nv{w}) \geq 1$.
+	Con esto sabemos que $rank(\nv{v} \otimes \nv{w}) \leq 1$, pero podría darse el caso de que el rango fuese cero aún siendo $\nv{v}, \nv{w} \neq \vec{0}$. Sin embargo, esto no es posible. Como $\nv{v}, \nv{w} \neq \vec{0}$ sabemos que  $\exists i_0 \in \deltaset{N}, \exists j_0 \in \deltaset{M}$ de modo que $v_{i_0}, w_{j_0} \neq 0$. Por tanto, el menor de orden 1 asociado a la fila $i_0$-ésima y columna $j_0$-ésima tiene el valor $v_{i_0} w_{j_0} \neq 0$, y con ello, $rank(\nv{v} \otimes \nv{w}) \geq 1$.
 
 \end{proof}
 
@@ -92,7 +74,7 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 		\mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \cdots \otimes \nv{v_i^{(N)}};
 		\qquad \nv{v_i^{(k)}} \in \R^{M_k},
 		\dspace \forall i \in \deltaset{Z},
-		\dspace \forall k \in \deltaset{N},
+		\dspace \forall k \in \deltaset{N}.
 	\end{equation}
 \end{proposicion}
 
@@ -109,10 +91,10 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 		\dspace \lambda_i \in \R,
 		\dspace \forall i \in \deltaset{Z},
 		\dspace \forall k \in \deltaset{N},
-		\dspace Z \in \N
+		\dspace Z \in \N,
 	\end{equation}
 
-	Puesto que podemos considerar:
+	puesto que podemos considerar:
 
 	\begin{equation}
 		\nv{w_i^{(1)}} := \lambda_i \cdot \nv{v_i^{(1)}} \in \R^{M_1}
@@ -121,12 +103,12 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 	y usando de nuevo las propiedades del producto tensorial:
 
 	\begin{equation}
-		\lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \cdots \otimes \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \cdots \otimes  \nv{v_i^{(N)}}
+		\lambda_i \cdot \nv{v_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \cdots \otimes \nv{v_i^{(N)}} = \nv{w_i^{(1)}} \otimes \nv{v_i^{(2)}} \otimes \cdots \otimes  \nv{v_i^{(N)}}.
 	\end{equation}
 \end{observacion}
 
 \begin{observacion}
-	Nótese que el número de vectores que multiplicamos tensorialmente es constante, no varía dicho número de vectores entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
+	Nótese que el número de vectores que multiplicamos tensorialmente es constante, no varía entre sumandos. Y dicho número coincide con el orden $N$ del tensor que estemos construyendo.
 \end{observacion}
 
 \begin{proof}
@@ -135,14 +117,14 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 	Por tanto, en cada sumando buscamos encontrar vectores cuyo producto tensorial genere un tensor, de dimensiones adecuadas, con todas las entradas nulas salvo la entrada de la que nos ocupamos en esa iteración. Para que la demostración sea más clara cambiaremos la forma de indexar la suma. En la proposición estamos usando un único índice que llega hasta $Z = M_1 \cdots M_N$. Esto es lo mismo que usar $N$ índices que lleguen hasta $M_k$, y así la sumatoria queda:
 
 	\begin{equation}
-		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \lambda_{i_1, \ldots, i_N} \cdot \nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \cdots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}
+		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \lambda_{i_1, \ldots, i_N} \cdot \nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \cdots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}.
 	\end{equation}
 
 	Para llevar a cabo la idea de usar cada sumando para colocar un elemento de $\mathcal{A}$ en sus índices correctos, haremos que en cada sumando se verifique
 
 	\begin{itemize}
-		\item $\lambda_{i_1, \ldots, i_N} = \mathcal{A}_{i_1, \ldots, i_N}$. Esto es inmediato y no necesita más explicación
-		\item $\nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \cdots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}$ genere el tensor en $\R^{M_1 \times \cdots \times M_N}$ que sea cero en todas las entradas salvo en el índice $(i_1, \ldots, i_N)$, donde valdrá 1. Dicho tensor lo podemos denotar como  $\mathcal{B}^{(i_1, \ldots, i_N)}$
+		\item $\lambda_{i_1, \ldots, i_N} = \mathcal{A}_{i_1, \ldots, i_N}$. Esto es inmediato y no necesita más explicación.
+		\item $\nv{v_{(i_1, \ldots, i_N)}^{(1)}} \otimes \cdots \otimes \nv{v_{(i_1, \ldots, i_N)}^{(N)}}$ genere el tensor en $\R^{M_1 \times \cdots \times M_N}$ que sea cero en todas las entradas salvo en el índice $(i_1, \ldots, i_N)$, donde valdrá 1. Dicho tensor lo podemos denotar como  $\mathcal{B}^{(i_1, \ldots, i_N)}$.
 	\end{itemize}
 
 	Ahora, veamos cómo podemos generar el tensor $\mathcal{B}^{(i_1, \ldots, i_N)}$ como producto tensorial de ciertos vectores. La propiedad fundamental que queremos que ese tensor cumpla es:
@@ -151,7 +133,7 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 		\mathcal{B}^{(i_1, \ldots, i_N)}_{j_1, \ldots, j_N} =
 		\begin{cases}
 			1 & \text{si } i_1 = j_1, \ldots, i_N = j_N \\
-			0 & \text{en otro caso}
+			0 & \text{en otro caso}.
 		\end{cases}
 	\end{equation}
 
@@ -161,7 +143,7 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 		(\nv{\delta_{i, N}})_k =  \delta_{i, k} =
 		\begin{cases}
 			1 & \text{si } i = k    \\
-			0 & \text{en otro caso}
+			0 & \text{en otro caso}.
 		\end{cases}
 	\end{equation}
 
@@ -177,21 +159,23 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 		\mathcal{B}^{(i_1, \ldots, i_N)}_{j_1, \ldots, j_N} = (\vec{\delta}_{i_1, M_1})_{j_1} \cdots (\vec{\delta}_{i_N, M_N})_{j_N} = \delta_{i_1, j_1} \cdots \delta_{i_N, j_N} =
 		\begin{cases}
 			1 & \text{si } i_1 = j_1, \ldots, i_N = j_N \\
-			0 & \text{en otro caso}
+			0 & \text{en otro caso}.
 		\end{cases}
 	\end{equation}
 
 	como buscábamos. Y con esto es trivial ver nuestra descomposición:
 
 	\begin{equation}
-		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \; \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}
+		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \; \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}.
 	\end{equation}
 \end{proof}
+
+% TODO -- seguir por aqui
 
 
 \begin{observacion}[Descomposición conjunta] \label{observacion:descomposicion_cp_conjunta}
 
-	Obsérvese que en la demostración hemos fijado un cojunto de vectores que solo depende del tensor a descomponer en cuanto que tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots \times M_N}$, entonces este conjunto de vectores no depende del tensor a descomponer. Es decir, podemos usar estos vectores para descomponer cualquier tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$. Este conjunto de vectores es:
+	Obsérvese que en la demostración hemos fijado un conjunto de vectores que solo depende del tensor a descomponer en cuanto que tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots \times M_N}$, entonces este conjunto de vectores no depende del tensor a descomponer. Es decir, podemos usar estos vectores para descomponer cualquier tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$. Este conjunto de vectores es:
 
 	\begin{equation}
 		\conjunto{\delta_{k, L}: \; L \in \deltaset{M}, \; k \in \deltaset{L}}
