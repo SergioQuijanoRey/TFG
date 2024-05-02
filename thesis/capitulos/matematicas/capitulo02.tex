@@ -678,3 +678,33 @@ En este planteamiento la salida de la capa es un único valor escalar. Sin embar
 \end{equation}
 
 En las redes convolucionales se suelen usar como última capa. Toman los últimos mapas de activación, que pueden vectorizarse en caso de ser necesario, y generan la predicción final de la red.
+
+\section{Funciones de representación} \label{sec:funciones_representacion}
+
+\todo{Escribir}
+
+Como hemos justificado, tenemos que escoger una familia paramétrica de funciones de representación que sea numerable y además total, es decir:
+
+\begin{equation}
+	\mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta, \; \# \Theta = \# \N }
+\end{equation}
+
+Las opciones más usadas en la práctica del aprendizaje automático son:
+
+\begin{enumerate}
+	\item Wavelets
+	\item Funciones de base radial (RBF), en concreto, la Gaussiana con matriz de covarianzas diagonal:
+
+	      \begin{equation}
+		      f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
+	      \end{equation}
+
+	      donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$
+
+	\item Neuronas: véase la \sectionref{subsubs:capa_totalmente_conectada}
+
+
+\end{enumerate}
+
+
+\todo{Revisar toda esta sección que la he copiado de otro lado}
