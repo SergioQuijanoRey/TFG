@@ -322,8 +322,7 @@ Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
 
-Veamos cómo esta modelización se relaciona con una arquitectura usual de \textit{machine learning}, usando los elementos básicos que hemos introducido en la \sectionref{sec:piezas_machine_learning_matematicas}. Para comenzar, y como ya hemos comentado en la \sectionref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores
-\todo{Tenemos que escribir esta sección de definiciones de machine learning matemáticas, porque no he definido lo que es pooling, feature maps, \ldots}
+Veamos cómo esta modelización se relaciona con una arquitectura usual de aprendizaje automático, usando los elementos básicos que hemos introducido en la \sectionref{sec:piezas_machine_learning_matematicas}. Para comenzar, y como ya hemos comentado en la \sectionref{subs:capa_de_representacion}, el primer paso de nuestro modelo consiste en computar la capa de representación, esto es, los valores:
 
 \begin{equation}
     \conjunto{f_{\theta_d}(\nv{x_i}) : \; d \in \deltaset{M}, \; i \in \deltaset{N}}.
@@ -335,13 +334,13 @@ Una vez hecho esto, en la ecuación \eqref{eq:cp_model} podemos ver $\; \sum_{d 
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i).
 \end{equation}
 
-Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, así que en la \sectionref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ \textit{feature maps} o mapas de activación para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales. También es claro que el producto está actuando como un \textit{pooling} sobre los ya mencionados $N$ \textit{feature maps} por cada valor de $z$. De hecho, sabemos que el \textit{pooling} es de tipo \textbf{producto global}, porque toma los $N$ \textit{feature maps} de una posición y nos devuelve un único escalar. Por tanto, tras hacer el \textit{pooling} de los $Z$ grupos de $M$ \textit{feature maps}, acabamos con $Z$ valores escalares. De nuevo, re-escribimos la ecuación:
+Dicha convolución puede variar sus coeficientes dependiendo de la localización en la que nos encontremos sobre la capa de representación. Esto no es lo usual en la práctica, no tenemos compartición de coeficientes, así que en la \sectionref{subs:comparticion_parametros_cp} resolvemos este problema. Y escrita la ecuación de esta forma, es claro que estamos generando $N$ mapas de características para un valor de $z$ determinado. Es decir, tenemos una capa oculta convolucional con $N$ canales. También es claro que el producto está actuando como un \textit{pooling} sobre los ya mencionados $N$ mapas de características por cada valor de $z$. De hecho, sabemos que el \textit{pooling} es de tipo \textbf{producto global}, porque toma los $N$ mapas de características de una posición y nos devuelve un único escalar. Por tanto, tras hacer el \textit{pooling} de los $Z$ grupos de $M$ mapas de características, acabamos con $Z$ valores escalares. De nuevo, re-escribimos la ecuación:
 
 \begin{equation}
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace ProdPooling( Conv(i) ).
 \end{equation}
 
-Y con esto, vemos que la sumatoria final está combinando los $Z$ escalares producidos por la convolución seguida del \textit{pooling} de forma lineal, es decir, una \textit{linear dense layer} sobre dichos $Z$ escalares.
+Y con esto, vemos que la sumatoria final está combinando los $Z$ escalares producidos por la convolución seguida del \textit{pooling} de forma lineal, es decir, una capa lineal densa sobre dichos $Z$ escalares.
 
 En resumen, tras computar la capa de representación, nuestro modelo tiene una capa oculta convolucional con $M$ canales, tras la que aplicamos \textit{pooling} global en cada canal, produciendo $M$ escalares que combinamos en una capa lineal densa. Y por tanto, es razonable considerar este modelo como lo que se conoce comúnmente como una \textbf{red somera} o \textbf{red no profunda}. Podemos representar este modelo gráficamente como mostramos en la \imgref{diag:model_cp_visualizacion}.
 
@@ -362,22 +361,18 @@ En resumen, tras computar la capa de representación, nuestro modelo tiene una c
 		\draw[-stealth] (pooling.south) -- node[text width=2.0cm,midway,right,align=center]{Capa densa $\sum_{z = 1}^Z a_z^y$} (denselayer.north);
 
 	\end{tikzpicture}
-	\caption{Representación gráfica del modelo \textit{CP}}
+	\caption{Representación gráfica del modelo \textit{CP}.}
     \label{diag:model_cp_visualizacion}
 \end{figure}
 
 \subsection{Coeficientes compartidos} \label{subs:comparticion_parametros_cp}
 
-Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{coeficientes compartidos}.
+Ya hemos comentado previamente que las convoluciones pueden variar sus coeficientes dependiendo de la localización. Lo usual en la práctica es usar los mismos coeficientes independientemente de la localización, lo que se conoce como \textbf{coeficientes compartidos}. Esto es necesario para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de ésta.
 
-Los coeficientes compartidos son necesarios para que identificar ciertos patrones en la imagen no dependa de la localización del patrón en la imagen. Por ejemplo, una cara debería detectarse como tal independientemente de la localización de ésta.
-
-En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de los vectores $\nv{\omega^{z,i}} := (\omega^{z, i}_1, \ldots, \omega^{z, i}_M)$.
-
-Por tanto, para forzar que los coeficientes sean compartidos, basta con imponer en \eqref{eq:cp_decomp_conjunta}:
+En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la localización viene dada por la dependencia en $i$ de los vectores $\nv{\omega^{z,i}} := (\omega^{z, i}_1, \ldots, \omega^{z, i}_M)$. Por tanto, para forzar que los coeficientes sean compartidos, basta con imponer en la ecuación \eqref{eq:cp_decomp_conjunta} que:
 
 \begin{equation}
-	\nv{\omega^{z, 1}} = \ldots = \nv{\omega^{z, N}} =: \nv{\omega^z}
+	\nv{\omega^{z, 1}} = \cdots = \nv{\omega^{z, N}} =: \nv{\omega^z}.
 \end{equation}
 
 Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP} simétrica, es decir:
@@ -386,22 +381,22 @@ Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP}
 	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \ldots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M.
 \end{equation}
 
-Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos. En la práctica usaremos coeficientes compartidos. En el modelo profundo que vamos a introducir más tarde se presenta la misma situación, debemos imponer los coeficientes compartidos, lo que hace que el modelo pierda universalidad. Sin embargo, cuando veamos los resultados, veremos que el modelo profundo restringido es más potente que este modelo no profundo sin restringir.
+Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos. En la práctica usaremos coeficientes compartidos. En el modelo profundo que vamos a introducir más tarde se presenta la misma situación, debemos imponer los coeficientes compartidos, lo que también provoca que el modelo pierda universalidad. Sin embargo, veremos que el modelo profundo restringido es más potente que el modelo no profundo, incluso si no restringimos este último.
 
 \subsection{Número de parámetros del modelo} \label{msubsec:parametros_modelo_cp}
 
 A partir de la ecuación \eqref{eq:cp_model} vemos que para definir nuestro modelo debemos definir los siguientes parámetros:
 
 \begin{itemize}
-	\item $\{a_z^y \in \R : z \in \deltaset{Z}, \dspace y \in \deltaset{Y}\}$, lo que supone $Y \cdot Z$ coeficientes
-	\item $\{\omega_d^{z, i} \in \R: i \in \deltaset{N}, \dspace z \in \deltaset{Z}, \dspace d \in \deltaset{M}\}$, lo que lo que supone $N \cdot M \cdot Z$ coeficientes
+	\item $\{a_z^y \in \R : z \in \deltaset{Z}, \dspace y \in \deltaset{Y}\}$, lo que supone $Y \cdot Z$ coeficientes.
+	\item $\{\omega_d^{z, i} \in \R: i \in \deltaset{N}, \dspace z \in \deltaset{Z}, \dspace d \in \deltaset{M}\}$, lo que lo que supone $N \cdot M \cdot Z$ coeficientes.
 \end{itemize}
 
 Es decir, que en total nuestro modelo viene dado al especificar $N \cdot M \cdot Z + Y \cdot Z$ coeficientes reales. Usaremos este número de coeficientes para estudiar los tamaños de las redes profundas y no profundas que vamos a comparar.
 
 \section{Modelo HT} \label{sec:modelo_ht}
 
-En esta sección pasamos a presentar el segundo y último modelo con el que trabajaremos. A diferencia del modelo anterior, esta vez terminaremos con una arquitectura que puede considerarse como profunda. De nuevo, la idea es introducir una descomposición tensorial que usamos en \eqref{eq:puntuacion_general} para expresar el tensor de coeficientes $\mathcal{A}^y$. Usaremos la descomposición \textit{HT}.
+En esta sección pasamos a presentar el segundo y último modelo con el que trabajaremos. A diferencia del modelo anterior, esta vez terminaremos con una arquitectura que puede considerarse profunda. De nuevo, la idea es introducir una descomposición tensorial que usamos en la ecuación \eqref{eq:puntuacion_general} para expresar el tensor de coeficientes $\mathcal{A}^y$. Usaremos la descomposición \textit{HT}.
 
 \subsection{Descomposición \textit{HT}} \label{subs:descomposicion_ht}
 
@@ -427,24 +422,20 @@ Estudiemos detenidamente las ecuaciones \eqref{eq:descomposicion_ht}. Para facil
 	\item Los valores $r_l$, que llamaremos \textbf{rango de nivel $l$}, marcan el número de tensores que hay en cada posición $j$ de la capa $l$. Considerando que en la primera ecuación no trabajamos con tensores sino con vectores.
 \end{itemize}
 
-Una vez introducido el significado de los índices de la descomposición, estudiemos dicha descomposición. En primer lugar, estamos construyendo el tensor de coeficientes $\mathcal{A}^y$ de forma claramente recursiva. Empezamos construyendo los tensores $\phi^{1, j, \gamma}$ a partir de unos vectores iniciales $\{\nv{\varphi^{j, \alpha}} \in \R^M: \; j \in \deltaset{N}, \alpha \in \deltaset{r_0}  \}$  y unos coeficientes reales $\{a_{\alpha}^{1, j, \gamma}: \; \alpha \in \deltaset{r_0}\}$. Los tensores del nivel $l$ se construyen en función de los tensores del nivel $l-1$.
-
-A partir de las fórmulas es claro ver que los tensores de una capa tienen un orden el doble que el orden de los tensores de la capa anterior. Esto porque estamos considerando, en las sumatorias, el producto tensorial de dos tensores del mismo orden, y por tanto, su orden se duplica. En el primer paso trabajamos con vectores, que podemos considerar tensores de orden $1$. Por tanto, en una capa $l$ generada por:
+Una vez introducido el significado de los índices de la descomposición pasamos a estudiarla. En primer lugar, estamos construyendo el tensor de coeficientes $\mathcal{A}^y$ de forma claramente recursiva. Empezamos construyendo los tensores $\phi^{1, j, \gamma}$ a partir de unos vectores iniciales $\{\nv{\varphi^{j, \alpha}} \in \R^M: \; j \in \deltaset{N}, \alpha \in \deltaset{r_0}  \}$  y unos coeficientes reales $\{a_{\alpha}^{1, j, \gamma}: \; \alpha \in \deltaset{r_0}\}$. Los tensores del nivel $l$ se construyen en función de los tensores del nivel $l-1$. A partir de las fórmulas es claro ver que los tensores de una capa tienen un orden el doble que el orden de los tensores de la capa anterior. Esto porque estamos considerando, en las sumatorias, el producto tensorial de dos tensores del mismo orden y, por tanto, su orden se duplica. En el primer paso trabajamos con vectores, que podemos considerar tensores de orden $1$. Por tanto, en una capa $l$ generada por:
 
 \begin{equation}
 	\phi^{l, j, \gamma} = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
 \end{equation}
 
-estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$, para obtener el tensor $\phi^{l, j, \gamma}$ de orden $2^l$. Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta asunción también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
+estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$ para obtener el tensor $\phi^{l, j, \gamma}$ de orden $2^l$. Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta asunción también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
 
-Cabe destacar también que estamos considerando solo productos tensoriales de dos elementos. Además, estamos combinando únicamente tensores contiguos de cada capa.
-
-El siguiente ejemplo gráfico muestra el proceso de generación de los tensores, que deja claro todo lo que acabamos de comentar. Por simplicidad, suponemos que $r = 1$. Es decir, que en cada localización $j$ solo tenemos un tensor, independientemente del nivel $l$ en el que nos encontremos.
+Cabe destacar también que estamos considerando solo productos tensoriales de dos elementos. Además, estamos combinando únicamente tensores contiguos de cada capa. El siguiente ejemplo gráfico muestra el proceso de generación de los tensores, que deja claro todo lo que acabamos de comentar. Por simplicidad, suponemos que $r = 1$. Es decir, que en cada localización $j$ solo tenemos un tensor, independientemente del nivel $l$ en el que nos encontremos.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{matematicas/descomp_ht_rank_1}
-	\caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Por simplicidad, estamos suponiendo que $r = 1$. Tenemos $L = 2$ capas o niveles}
+	\caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Por simplicidad, estamos suponiendo que $r = 1$. Tenemos $L = 2$ capas o niveles.}
 	\label{img:diagrama_ht_simple}
 \end{figure}
 
@@ -463,19 +454,20 @@ Veamos ahora este mismo diagrama, pero suponiendo que $r = 2$. Por tanto, en cad
 		\includegraphics[width=0.9\linewidth]{matematicas/descomp_ht_rank_2_paso_2}
 		\caption{Segundo paso. En la construcción del tensor $\mathcal{A}^y$ participan los cuatro tensores $\phi^{l=2, j, \gamma}$}
 	\end{subfigure}
-	\caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Hemos dividido el proceso de construcción en dos pasos. Ahora $r = 2$. Por lo tanto, en cada posición de cada capa, tenemos dos tensores. Seguimos teniendo $L = 2$ capas. }
+	\caption{Ejemplo gráfico del proceso de construcción del tensor $\mathcal{A}^y$ a través de la descomposición \textit{HT}. Hemos dividido el proceso de construcción en dos pasos. Ahora $r = 2$. Por lo tanto, en cada posición de cada capa, tenemos dos tensores. Seguimos teniendo $L = 2$ capas.}
 	\label{img:diagrama_ht_complejo}
 \end{figure}
 
 La siguiente proposición nos muestra la relación de este modelo con el modelo \textit{CP}:
 
 \begin{proposicion}
-	La descomposición \textit{HT} es universal. Es más, extiende la descomposición \textit{CP}. Esto es, cualquier tensor que pueda expresarse como la descomposición \textit{CP} con rango \textit{CP} $Z$, admite una descomposición \textit{HT} con rangos $r_1 = r_2 = \ldots = r_{L - 1} = Z$.
+	La descomposición \textit{HT} es universal. Es más, extiende la descomposición \textit{CP}. Esto es, cualquier tensor que pueda expresarse como la descomposición \textit{CP} con rango \textit{CP} $Z$, admite una descomposición \textit{HT} con rangos $r_1 = r_2 = \cdots = r_{L - 1} = Z$.
 \end{proposicion}
 
 \begin{proof}
 	\todo{En la página 8 del paper se da una indicación de cómo se hace esto}
     \todo{JMeri me dice que escriba la demostración}
+    \todo{HACER ESTA DEMOSTRACION}
 \end{proof}
 
 \subsection{Número de parámetros del modelo} \label{msubs:parametros_modelo_ht}
@@ -485,14 +477,14 @@ Nuestro modelo viene dado por los siguientes parámetros:
 \begin{itemize}
 	\item Vectores iniciales:
 	      \begin{equation}
-		      \{\nv{\varphi^{j, \alpha}} \in \R^M: j \in \deltaset{N}, \alpha \in \deltaset{r_0}  \}
+		      \{\nv{\varphi^{j, \alpha}} \in \R^M: j \in \deltaset{N}, \alpha \in \deltaset{r_0}  \}.
 	      \end{equation}
 
-	      Que suponen $M \cdot r_0 \cdot N$ coeficientes
+	      Que suponen $M \cdot r_0 \cdot N$ coeficientes.
 	\item Pesos intermedios:
 
 	      \begin{equation}
-		      \{ a^{l, j, \gamma}_{\alpha} \in \R: l \in \deltaset{L-1}, j \in \deltaset{\frac{N}{2^l}}, \gamma \in \deltaset{r_l}, \alpha \in \deltaset{r_{l-1}} \}
+		      \{ a^{l, j, \gamma}_{\alpha} \in \R: l \in \deltaset{L-1}, j \in \deltaset{\frac{N}{2^l}}, \gamma \in \deltaset{r_l}, \alpha \in \deltaset{r_{l-1}} \}.
 	      \end{equation}
 
 	      Con lo que aportan $\sum_{l = 1}^{L-1} r_{l-1} \cdot \frac{N}{2^l} \cdot r_l$ coeficientes.
@@ -500,7 +492,7 @@ Nuestro modelo viene dado por los siguientes parámetros:
 	\item Pesos finales:
 
 	      \begin{equation}
-		      \{a^{L, y}_{\alpha}: y \in \deltaset{Y}, \alpha \in \deltaset{r_{L-1}} \}
+		      \{a^{L, y}_{\alpha}: y \in \deltaset{Y}, \alpha \in \deltaset{r_{L-1}} \}.
 	      \end{equation}
 
 	      Por lo tanto, suponen $r_{L-1} \cdot Y$ coeficientes.
@@ -513,12 +505,12 @@ Es decir, que nuestro modelo tiene
 	r_{L-1} \cdot Y
 \end{equation}
 
-coeficientes. Si asumimos que todos los rangos son iguales, $r := r_0 = \ldots = r_{L-1}$, entonces el número de coeficientes es:
+coeficientes. Si asumimos que todos los rangos son iguales, $r := r_0 = \cdots = r_{L-1}$, entonces el número de coeficientes es:
 
 \begin{equation}
 	\begin{split}
 		M \cdot r \cdot N + \sum_{l = 1}^{L-1} r^2 \cdot \frac{N}{2^l} + r \cdot Y &= M \cdot r \cdot N + N \cdot r^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + r \cdot Y \longmapsto \ldots \\
-		\ldots & \encima{\longmapsto}{L \mapsto \infty} M \cdot r \cdot N + N \cdot r^2 + r \cdot Y
+		\ldots & \encima{\longmapsto}{L \mapsto \infty} M \cdot r \cdot N + N \cdot r^2 + r \cdot Y,
 	\end{split}
 \end{equation}
 
@@ -530,18 +522,18 @@ donde hemos usado que
 
 \subsection{Relación entre la modelización y arquitecturas de aprendizaje automático}
 
-El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en nuestra función de puntuación \eqref{eq:puntuacion_general}. En esta sección, estudiaremos el modelo producido y cómo se relaciona con los modelos usuales de aprendizaje automático, en base a los elementos básicos que hemos introducido en la \sectionref{sec:piezas_machine_learning_matematicas}.
+El modelo \textit{HT} es el resultado de usar la descomposición \textit{HT} descrita en la ecuación \eqref{eq:descomposicion_ht} en la función de puntuación descrita por la ecuación \eqref{eq:puntuacion_general}. En esta sección estudiaremos el modelo producido y cómo se relaciona con los modelos usuales de aprendizaje automático, en base a los elementos básicos que hemos introducido en la \sectionref{sec:piezas_machine_learning_matematicas}.
 
 Como en el modelo \textit{CP}, el primer paso consiste en computar la capa de representación, $\{f_d(\nv{x_i}): d \in \deltaset{N}, \; i \in \deltaset{M}\}$. Esto genera $N \cdot M$ números reales, que serán transformados en las $L$ capas ocultas que producen la salida \eqref{eq:descomposicion_ht}.
 
-Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{product pooling} con tamaño de ventana 2 sin superposición.  Esto es debido al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican los ejemplos de la \imgref{img:diagrama_ht_simple} y la \imgref{img:diagrama_ht_complejo}, reduciendo el número de \textit{feature maps} a la mitad en cada paso. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{product pooling} y, por tanto, distintas profundidades. Nótese que en el modelo \textit{CP}, el \textit{product pooling} era global, colapsando las \textit{feature maps} a un único valor escalar.
+Cada capa oculta se compone de una convolución $1 \times 1$ y un \textit{pooling} tipo producto con tamaño de ventana 2 sin superposición.  Esto es debido al hecho de que estamos combinando los tensores dos a dos, de forma contigua, como indican los ejemplos de la \imgref{img:diagrama_ht_simple} y la \imgref{img:diagrama_ht_complejo}, reduciendo el número de mapas de características a la mitad en cada paso. Como muestra \cite{matematicas:descomposicion_ht}, podríamos haber escogido otra forma de combinar los tensores. Por ejemplo, combinando más de dos en cada paso. Esto produciría diferentes combinaciones de tamaños de ventana en el \textit{pooling} tipo producto y, por tanto, distintas profundidades. Nótese que en el modelo \textit{CP}, el \textit{pooling} tipo producto era global, colapsando los mapas de características a un único valor escalar.
 
-Así pues, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} iniciales acaban siendo una única \textit{feature map}. Y con esto, acabamos con una lista de $r_{L - 1}$ coeficientes sobre los que aplicamos una última capa oculta, dada por la última ecuación de \eqref{eq:descomposicion_ht}. En resumen, el funcionamiento de este modelo se puede observar en el siguiente diagrama:
+Así pues, tras las $L = log_2(N)$ capas ocultas, los $N$ mapas de características iniciales acaban siendo un único mapa. Y con esto, acabamos con una lista de $r_{L - 1}$ coeficientes sobre los que aplicamos una última capa oculta, dada por la última ecuación de \eqref{eq:descomposicion_ht}. En resumen, el funcionamiento de este modelo se puede observar en el siguiente diagrama:
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{matematicas/diagrama_paper_modelo_ht}
-	\caption{Funcionamiento de nuestro modelo. Imagen extraída de \cite{matematicas:principal}}
+	\includegraphics[width=0.9\textwidth]{matematicas/diagrama_paper_modelo_ht}
+	\caption{Funcionamiento de nuestro modelo. Imagen extraída de \cite{matematicas:principal}.}
 \end{figure}
 \todo{Sustituir este modelo por un diagrama realizado por mi}
 
@@ -550,7 +542,7 @@ Así pues, tras las $L = log_2(N)$ capas ocultas, las $N$ \textit{feature maps} 
 Al igual que ocurría en el modelo \textit{CP}, nuestras convoluciones $1 \times 1$ son dependientes de la localización, así que siguiendo la idea planteada en \sectionref{subs:comparticion_parametros_cp}, buscamos introducir ciertas restricciones en el modelo para imponer los coeficientes compartidos. En este modelo es muy fácil encontrar la restricción deseada, teniendo en cuenta los comentarios que hemos hecho en la \sectionref{sec:modelo_ht}. Consideremos la ecuación de la capa $l$:
 
 \begin{equation}
-	\phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
+	\phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}.
 \end{equation}
 
 En $\phi^{l, j, \gamma}$:
@@ -564,14 +556,14 @@ En $\phi^{l, j, \gamma}$:
 Por lo tanto, los coeficientes $\nv{a^{l, j, \gamma}} := (a^{l, j, \gamma}_1, \ldots, a^{l, j, \gamma}_{r_{l-1}})$ no deberían depender de la posición $j$. Con esto, para imponer los coeficientes compartidos, basta con hacer:
 
 \begin{equation}
-	\nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \cdots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}
+	\nv{a^{l, 1, \gamma}} = \nv{a^{l, 2, \gamma}} = \cdots = \nv{a^{l, N/2^l, \gamma}} =: \nv{a^{l, \gamma}}; \dspace \forall l \in \doubledeltaset{0}{L - 1} \dspace \forall \gamma \in \deltaset{r_l}.
 \end{equation}
 
 Como ocurría en la \sectionref{subs:comparticion_parametros_cp}, esta imposición provoca que nuestro modelo pierda la universalidad. Esto es, nuestro modelo no puede representar cualquier tensor, independientemente de los valores de $L$ o $r_l$. Aunque en este caso, los tensores que podemos generar con la compartición de parámetros no están limitados a ser simétricos, como en el caso \textit{CP}. Esto ya es un primer indicativo de que el modelo \textit{HT} es más expresivo que el modelo \textit{CP}.
 
 \section{Comparativa del número de coeficientes de cada modelo}
 
-El número de coeficientes de cada modelo es un aspecto central en nuestro estudio. Por tanto, comparamos ahora la diferencia en dicho número de coeficientes entre los dos modelos. En primer lugar, un modelo \textit{CP} con cierto valor de $Z$ tiene  $N \cdot M \cdot Z + Z \cdot Y$ coeficientes que especificar \footnote{Este cálculo se desarrolla en \sectionref{msubsec:parametros_modelo_cp}}. Si queremos implementar el resultado de dicho modelo con un modelo \textit{HT}, teniendo en cuenta que \textit{HT} es una extensión de \textit{CP}, deberemos considerar $r = Z$ y por ello tendremos $N \cdot M \cdot Z + N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + Z \cdot Y$ coeficientes \footnote{Este cálculo se desarrolla en \sectionref{msubs:parametros_modelo_ht}}. Por lo tanto, la diferencia en número de coeficientes (coeficientes de más que tiene un modelo \textit{HT} respecto a un modelo \textit{CP}) viene dada por:
+El número de coeficientes de cada modelo es un aspecto central en nuestro estudio. Por tanto, comparamos ahora la diferencia en dicho número de coeficientes entre los dos modelos. En primer lugar, un modelo \textit{CP} con cierto valor de $Z$ tiene  $N \cdot M \cdot Z + Z \cdot Y$ coeficientes que especificar \footnote{Este cálculo se desarrolla en la \sectionref{msubsec:parametros_modelo_cp}}. Si queremos implementar el resultado de dicho modelo con un modelo \textit{HT}, teniendo en cuenta que \textit{HT} es una extensión de \textit{CP}, deberemos considerar $r = Z$ y por ello tendremos $N \cdot M \cdot Z + N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + Z \cdot Y$ coeficientes \footnote{Este cálculo se desarrolla en la \sectionref{msubs:parametros_modelo_ht}}. Por lo tanto, la diferencia en número de coeficientes (coeficientes de más que tiene un modelo \textit{HT} respecto a un modelo \textit{CP}) viene dada por:
 
 \begin{equation}
 	N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2
