@@ -468,6 +468,36 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
 
 \end{proposicion}
 
+\begin{proof}
+
+    Basta con aplicar la definición de subconjunto total, trabajar con el cierre del conjunto y aplicar la convergencia de sucesiones para obtener lo que queremos. Recordamos que:
+
+    \begin{equation}
+        span\conjunto{\mathcal{F}} = \conjuntofit{\sum_{i = 1}^n c_i f_i: \; n \in \N, f_i \in \mathcal{F}, c_i \in \R, \forall i \in \R}.
+    \end{equation}
+
+    Por definición de totalidad, $\overline{span\conjunto{\mathcal{F}}} = L^2$. Por lo tanto, dado $g \in L^2$, se presentan dos casos. En el primero, $g \in span\conjunto{\mathcal{F}}$ y el resultado es directo. En el segundo caso, $g \not\in span\conjunto{\mathcal{F}}$, pero $g \in \overline{span\conjunto{\mathcal{F}}}$, luego:
+
+    \begin{equation}
+        \exists \conjunto{g_n}_{n \in \N} \subseteq span\conjunto{\mathcal{F}} \mapsto g.
+    \end{equation}
+
+    Aplicando la definición de convergencia de una sucesión, $\forall \epsilon > 0$, $\exists m_{\epsilon} \in \N$ de forma que:
+
+    \begin{equation}
+        n \geq m_{\epsilon} \then d(g_n, g) < \epsilon.
+    \end{equation}
+
+    Tomamos $\hat{g} := g_{m_\epsilon}$. En primer lugar, como $\hat{g} \in span\conjunto{\mathcal{F}}$, puede escribirse como una combinación lineal finita de elementos de $\mathcal{F}$. En segundo lugar:
+
+    \begin{equation}
+        d(\hat{g}, g) = \int |\hat{g} - g| < \epsilon,
+    \end{equation}
+
+    lo que concluye la demostración.
+
+\end{proof}
+
 \begin{observacion}
 	Si reducimos la cota de error $\varepsilon$, es razonable pensar que el número de elementos de la combinación lineal crezca. Y de momento no tenemos control sobre cómo es este crecimiento en el número de sumandos.
 \end{observacion}
