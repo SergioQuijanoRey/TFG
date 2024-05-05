@@ -166,7 +166,7 @@ La siguiente proposición será clave a la hora de desarrollar nuestras demostra
 
 La siguiente proposición será necesaria para ver un detalle técnico en la prueba del \propref{lema:segundo_lema}:
 
-\begin{proposicion}
+\begin{proposicion} \label{prop:conjunto_matrices_cerrado}
     Dado $r \in \R$, el conjunto $\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r }$ es cerrado.
 \end{proposicion}
 
@@ -274,10 +274,10 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
     Sean $p$ funciones continuas de $\R^d$ a $\espaciomatrices{M}{N}$, que llevan un punto $\nv{y} \in \R^d$ a las matrices $A_1(\nv{y}), \ldots, A_p(\nv{y})$. Supongamos que con estas funciones el siguiente conjunto tiene medida nula:
 
     \begin{equation}
-        \mathcal{C} := \conjunto{\nv{y} \in \R^d : rank(A_i(\nv{y})) < r, \dspace \forall i \in \deltaset{p}}
+        \mathcal{C} := \conjunto{\nv{y} \in \R^d : rank(A_i(\nv{y})) < r, \dspace \forall i \in \deltaset{p}}.
     \end{equation}
 
-    Definimos la función
+    Definimos la función:
 
     \begin{equation}
         \begin{split}
@@ -286,10 +286,10 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         \end{split}
     \end{equation}
 
-    y en base a ello el conjunto
+    y en base a ello el conjunto:
 
     \begin{equation}
-        S := \conjunto{(\nv{x}, \nv{y}) \in  \R^p \times \R^d: rank(A(\nv{x}, \nv{y})) < r} \subseteq \R^p \times \R^d.
+        S := \conjunto{(\nv{x}, \nv{y}) \in  \R^p \times \R^d: rank(A(\nv{x}, \nv{y})) < r}.
     \end{equation}
 
     Entonces el conjunto $S$ tiene medida nula.
@@ -298,32 +298,19 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
 \begin{proof}
 
-    Como $A(\nv{x}, \nv{y})$ es continua y hemos probado que el conjunto
-
-    $$\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r}$$
-
-    es cerrado, entonces sabemos que $S$ es cerrado y, por tanto, medible. Ahora buscamos calcular la medida de $S$. Empezamos definiendo, para cada $\nv{y} \in \R^d$, el siguiente conjunto marginal:
+    Como $A(\nv{x}, \nv{y})$ es continua y hemos probado en la \propref{prop:conjunto_matrices_cerrado} que el conjunto $\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r}$ es cerrado, sabemos que $S$ es cerrado y, por tanto, medible. Ahora buscamos calcular la medida de $S$. Empezamos definiendo, para cada $\nv{y} \in \R^d$, el siguiente conjunto marginal:
 
     \begin{equation}
         S^{\nv{y}} := \conjunto{x \in \R^p: rank(A(\nv{x}, \nv{y})) < r} \subseteq \R^p
     \end{equation}
 
-    que también es medible. Con esto, basta probar que la medida de $S^{\nv{y}}$ es nula casi por doquier (respecto $\nv{y} \in \R^d$). Porque en tal caso, usando \customref{lema:prop_fundamentales_medida}, sabremos que:
-
-    \begin{enumerate}
-        \item $S^{\nv{y}} \times \R^d$ tiene medida nula para casi todo $\nv{y} \in \R^d$.
-        \item $S$ tiene medida nula por ser $S \subseteq S^{\nv{y}} \times \R^d$.
-    \end{enumerate}
-
-    Por hipótesis sabemos que $\mathcal{C}$ tiene medida nula. Si tomamos $\nv{y_0} \in \mathcal{C}$ es claro que $S^{\nv{y_0}} = \R^p$. Pero esto no supone un problema puesto que $\mathcal{C}$ es de medida nula. Queda ver qué pasa en $S - \mathcal{C}$, buscando que en dicho conjunto $S^{\nv{y_0}}$ tenga medida nula:
+    que también es medible porque $A(\cdot, \nv{y})$ es continua. Probamos que la medida de $S^{\nv{y}}$ es nula casi por doquier (respecto $\nv{y} \in \R^d$). Si tomamos $\nv{y_0} \in \mathcal{C}$ es claro que $S^{\nv{y_0}} = \R^p$, pero esto no supone un problema puesto que $\mathcal{C}$ es de medida nula. Queda ver qué pasa para $\nv{y_0} \in \R^d \setminus \mathcal{C}$, buscando que en dicho conjunto $S^{\nv{y_0}}$ tenga medida nula:
 
     \begin{equation}
-        \begin{split}
-            \nv{y_o} \in S - \mathcal{C} \encima{\then}{\nv{y_o} \notin \mathcal{C}} \substack{\exists i \in \deltaset{p}: \\ rank(A_i(\nv{y_o})) \geq r}
-        \end{split}
+        \nv{y_o} \in \R^d \setminus \mathcal{C} \encima{\then}{\nv{y_o} \notin \mathcal{C}} \exists i \in \deltaset{p}: rank(A_i(\nv{y_o})) \geq r.
     \end{equation}
 
-    Sin pérdida de generalidad, suponemos que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_o}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y_0})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que:
+    Sin pérdida de generalidad, suponemos que $i = 1$ y que la submatriz $r \times r$ superior izquierda de $A_1(\nv{y_0})$ es no singular. Viendo $\nv{y_0}$ como un valor fijo, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y_0})$ es un polinomio en $\nv{x}$. Además, no es el polinomio idénticamente nulo, porque tomando $\nv{x} = (1, \ldots, 0)$ tenemos que:
 
     \begin{equation}
         A(\nv{x}, \nv{y_0}) = \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0}) \then det(A(\nv{x}, \nv{y_0})) = det(A_1(\nv{y_0})) \neq 0.
@@ -335,19 +322,18 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
     \begin{equation}
         \begin{split}
-            S_n &:= S \interseccion [-n, n]^{p+d} \\
-            \R_n &:= \R \interseccion [-n, n]^{p+d} = [-n, n]^{p+d}
+            S_n &:= S \interseccion [-n, n]^{p+d}. \\
+            \R_n^{p+d} &:= \R^{p+d} \interseccion [-n, n]^{p+d} = [-n, n]^{p+d}. \\
+            \R_n^p &:= \R^p \interseccion [-n, n] ^ p, \; \R_n^d := \R^d \interseccion [-n, n] ^ d. \\
         \end{split}
     \end{equation}
 
-    Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con $[-n, n]^{p+d}$, además, tendrán medida finita. Por tanto, la función indicadora sobre estos conjuntos medibles de medida finita será integrable \footnotemark. Ahora estamos en condiciones de aplicar el teorema de Fubini para desarrollar:
-
-    \footnotetext{Porque claramente $\int |\mathbb{1}_{S_n}| = \int \mathbb{1}_{S_n} = \lambda(S_n) < \infty$ }
+    Todos los conjuntos con los que estamos trabajando son medibles. Al intersecar con una potencia de $[-n, n]$, además, tendrán medida finita. Por tanto, la función indicadora sobre estos conjuntos medibles de medida finita será integrable. Ahora estamos en condiciones de aplicar el teorema de Fubini para desarrollar:
 
     \begin{equation}
         \begin{split}
             &\int_{(\nv{x}, \nv{y}) \in \R^{p+d}} \mathbb{1}_{S_n} = \int_{(\nv{x},\nv{y}) \in \R_n^{p+d}} \mathbb{1}_{S} \encima{=}{Fubini} \int_{\nv{y} \in \R_n^d} \int_{\nv{x} \in \R_n^p} \mathbb{1}_{S^y} \\
-            &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d - \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = 0 + 0 = 0
+            &= \comentardebajo{\int_{\nv{y} \in \R_n^d \interseccion \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(1)} + \comentardebajo{\int_{\nv{y} \in \R_n^d \setminus \mathcal{C}} \int_{\nv{x} \in \R^p_n} \mathbb{1}_{S^y}}{(2)} = 0 + 0 = 0
         \end{split}
     \end{equation}
 
@@ -371,16 +357,13 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos su enunciado y pasamos a ver la prueba:
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
-    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT}, $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT}, $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos coeficientes compartidos en la ecuación \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 \end{teorema}
 
 \begin{proof}
     \textbf{Caso 1: sin compartir coeficientes}
 
-    Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$. Probamos por inducción en $l = 1, \ldots, L$ que, en casi todo punto respecto al conjunto $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$, el rango \textit{CP} de los tensores $\conjunto{\phi^{l, j, \gamma}: j \in \deltaset{N/2^l}, \gamma \in \deltaset{r_l}}$ es al menos $r^{2^{l/2}}$.
-    \todo{En la página 7 del \textit{paper} dicen que por completitud, $r_L = Y$}
-
-    Por la \propref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{2^{l/2}}$ en casi todo punto (respecto al conjunto de los parámetros que definen el modelo \textit{HT}: $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$). Comenzamos la inducción viendo el \textbf{caso $l = 1$}. Por definición, tenemos que para unos valores concretos de $j, \gamma$:
+    Como hemos hecho al introducir el modelo \textit{HT}, denotamos por conveniencia $\phi^{L, 1, 1}:= A^y$ y consideramos que $r_L = 1$. Probamos por inducción en $l = 1, \ldots, L$ que, en casi todo punto respecto al conjunto $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$, el rango \textit{CP} de los tensores $\conjunto{\phi^{l, j, \gamma}: j \in \deltaset{N/2^l}, \gamma \in \deltaset{r_l}}$ es al menos $r^{\frac{2^l}{2}}$. Por la \propref{prop:rango_matricial_descomp_cp}, bastará probar que los rangos de las matrizaciones $[\phi^{l, j, \gamma}]$ tienen al menos rango matricial $r^{\frac{2^l}{2}}$ en casi todo punto (respecto al conjunto de los parámetros que definen el modelo \textit{HT}: $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$). Comenzamos la inducción viendo el \textbf{caso $l = 1$}. Por definición, tenemos que para unos valores concretos de $j, \gamma$:
 
     \begin{equation}
         \phi^{1, j, \gamma} = \sum_{\alpha = 1}^{r_0} \comentardebajo{a_{\alpha}^{1, j, \gamma}}{\text{diagonal } D} \comentarencima{\varphi^{0, 2j - 1, \alpha}}{A \text{ por columnas}} \otimes \comentardebajo{\varphi^{0, 2j, \alpha}}{B \text{ por columnas}}.
@@ -394,13 +377,13 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \item $D \in \espaciomatrices{r_0}{r_0}$ con valores en la diagonal $a_{\alpha}^{1, j, \gamma}, \; \alpha \in \deltaset{r_0}$.
     \end{itemize}
 
-    Con ello podemos escribir $[\phi^{1, j, \gamma}] = A D B^T$. Aplicando \customref{lema:primer_lema}, sabemos que $rank([\phi^{1, j, \gamma}]) = r = \min \conjunto{r_0, M}$ en casi todo punto, respecto al conjunto de todos los parámetros que conforman $\phi^{1, j, \gamma}$. Estos parámetros son:
+    Con ello podemos escribir $[\phi^{1, j, \gamma}] = A D B^T$. Aplicando el \propref{lema:primer_lema}, sabemos que $rank([\phi^{1, j, \gamma}]) = r = \min \conjunto{r_0, M}$ en casi todo punto, respecto al conjunto de todos los parámetros que conforman $\phi^{1, j, \gamma}$. Estos parámetros son:
     \todo{Hay que probar o desarrollar mejor esta matrización}
 
     \begin{itemize}
-        \item $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$
-        \item $\conjunto{\varphi^{0, 2j, \alpha}: \alpha \in \deltaset{r_0}}$
-        \item $\conjunto{\nv{a^{1, j, \alpha}} : \alpha \in \deltaset{r_0}}$ donde $\nv{a^{1, j, \alpha}} := (a^{1, j, \alpha}_1, \ldots,  a^{1, j, \alpha}_{r_0})$
+        \item $\conjunto{\varphi^{0, 2j - 1, \alpha}: \alpha \in \deltaset{r_0}}$.
+        \item $\conjunto{\varphi^{0, 2j, \alpha}: \alpha \in \deltaset{r_0}}$.
+        \item $\conjunto{\nv{a^{1, j, \alpha}} : \alpha \in \deltaset{r_0}}$ donde $\nv{a^{1, j, \alpha}} := (a^{1, j, \alpha}_1, \ldots,  a^{1, j, \alpha}_{r_0})$.
     \end{itemize}
 
     Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo \textit{HT}, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando el \propref{lema:prop_fundamentales_medida}. Ahora sabemos que $rank([\phi^{1, j, \gamma}]) = r$ en casi todo punto (respecto al conjunto de todos los parámetros que definen el modelo), para valores concretos de $j \in \deltaset{N/2}, \gamma \in \deltaset{r_1}$. Veamos que esto implica que la igualdad sigue siendo válida para cualquier $j, \gamma$ de forma conjunta. Como el conjunto
@@ -415,7 +398,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma
     \end{equation}
 
-    también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero. Finalmente deducimos que
+    también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero. Finalmente deducimos que:
 
     \begin{equation}
         \phi := \conjunto{(j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}: rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
@@ -423,11 +406,11 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 
     tiene medida cero, lo que prueba el caso $l = 1$.
 
-    \textbf{Hipótesis de inducción}: supuesto que es cierto para $l - 1$ veamos que se cumple para $l$. Usando la hipótesis de inducción sabemos que
+    \textbf{Hipótesis de inducción}: supuesto que es cierto para $l - 1$ veamos que se cumple para $l$. Usando la hipótesis de inducción sabemos que:
 
     \begin{equation}
         rank(\phi^{l-1, j, \gamma}) \geq r^{\frac{2^{l - 1}}{2}},
-        \; \forall j \in \deltaset{N/2^{l-1}}, \forall \gamma \in \deltaset{r_{l-1}}
+        \; \forall j \in \deltaset{N/2^{l-1}}, \forall \gamma \in \deltaset{r_{l-1}},
     \end{equation}
 
     en casi todo punto (respecto al conjunto de todos los parámetros del modelo). Fijados unos valores concretos para $j \in \deltaset{N/2^{l-1}}$, $\gamma \in \deltaset{r_{l-1}}$, tenemos que:
@@ -436,7 +419,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \phi^{l, j, \gamma} := \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \; \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha} \then [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \; [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}].
     \end{equation}
 
-    Llamando $M_\alpha := [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]$, $\forall \alpha \in \deltaset{r_{l-1}}$, es claro que podemos escribir:
+    Llamando $M_\alpha := [\phi^{l-1, 2j-1, \alpha}] \odot [\phi^{l-1, 2j, \alpha}]$, $\forall \alpha \in \deltaset{r_{l-1}}$, podemos escribir:
 
     \begin{equation}
         [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \; M_\alpha.
@@ -467,7 +450,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \phi_l := \union_{ \gamma \in \deltaset{r_l}} \phi_l^{\gamma}
     \end{equation}
 
-    también tiene medida cero, con lo que finalmente
+    también tiene medida cero, con lo que finalmente:
 
     \begin{equation}
         \phi := \conjunto{(j, \gamma) \in \deltaset{N/2^l \times \deltaset{r_l} \; : \; rank([\phi^{l, j, \gamma}]) \neq r}} \subseteq \phi_l \times R
