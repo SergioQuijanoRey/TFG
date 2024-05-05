@@ -2,39 +2,31 @@
 
 \section{Introducción a los resultados principales}
 
-En esta sección introduciremos los dos resultados principales del trabajoque demostraremos en secciones posteriores. El teorema principal del trabajo es el siguiente:
+En esta sección introduciremos los dos resultados principales del trabajo que demostraremos en secciones posteriores. El teorema principal del trabajo es el siguiente:
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_introduccion}
 
-Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en la ecuación \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 
 \end{teorema}
 
-En resumen, casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$. Esto implica que en la ecuación de la descomposición \textit{CP} \eqref{eq:cp_decomp}, el número de sumandos deberá ser al menos $r^{N/2}$. Luego, conforme el tamaño de la imagen $N$ aumenta, el número de parámetros del modelo \textit{CP} crece exponencialmente. Y cuando el número de canales $M$ aumenta, el número de parámetros del modelo \textit{CP} crece de forma potencial. A partir de este teorema, obtenemos el corolario, que es el segundo resultado principal en nuestro trabajo:
+En resumen, casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$. Esto implica que en la ecuación de la descomposición \textit{CP} \eqref{eq:cp_decomp}, el número de sumandos deberá ser al menos $r^{N/2}$. Luego, conforme el tamaño de la imagen $N$ aumenta, el número de parámetros del modelo \textit{CP} crece exponencialmente. Y cuando el número de canales $M$ aumenta, el número de parámetros del modelo \textit{CP} crece de forma potencial. A partir de este teorema obtenemos el siguiente corolario, que es el segundo resultado principal en nuestro trabajo:
 
 \begin{corolario}[Incapacidad del modelo \textit{CP} para aproximar eficientemente el modelo \textit{HT}] \label{corol:corol_principal}
 
-    Dado un conjunto de funciones de representación linealmente independientes
-
-    \begin{equation}
-        \conjunto{f_{\theta_d}: \; d \in \deltaset{M}}
-    \end{equation}
-
-     aleatorizar los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando los coeficientes compartidos en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
+    Dado un conjunto de funciones de representación linealmente independientes, $\conjunto{f_{\theta_d}: \; d \in \deltaset{M}}$, aleatorizar los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando los coeficientes compartidos en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
 
 \end{corolario}
 
 El teorema nos afirmaba que casi todos los tensores realizables por una descomposición \textit{HT} no pueden realizarse eficientemente por un modelo \textit{CP}. El corolario añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
 
-El \propref{corol:corol_principal} introduce una mejora muy grande respecto a los trabajos previos. En estos, se aportan ejemplos de funciones realizables por el modelo \textit{HT} que no son realizables por un modelo \textit{CP} con un número de parámetros sustancialmente superior al número de parámetros del modelo \textit{HT}. Es decir, establecen la \textit{depth efficiency} de ejemplos concretos de funciones. Nuestro corolario establece la \textit{depth efficiency} casi por doquier.
+El \propref{corol:corol_principal} introduce una mejora notable respecto a los trabajos previos. En estos, se aportan ejemplos de funciones realizables por el modelo \textit{HT} que no son realizables por un modelo \textit{CP} con un número de parámetros sustancialmente superior al número de parámetros del modelo \textit{HT}. Es decir, establecen la eficiencia en profundidad de ejemplos concretos de funciones. Nuestro corolario establece la eficiencia en profundida casi por doquier. Por otro lado, estos resultados también mejoran los trabajos previos sobre análisis tensorial. El trabajo que introduce la descomposición \textit{HT} \cite{matematicas:descomposicion_ht} da ejemplos específicos de tensores realizables por el modelo \textit{HT} y no por un modelo \textit{CP} con un número exponencial de parámetros. Nuestro corolario indica que esto no ocurre únicamente en ejemplos aislados, sino en casi todos los tensores realizables por un modelo \textit{HT}.
 
-Por otro lado, estos resultados también mejoran los trabajos previos sobre análisis tensorial. El trabajo que introduce la descomposición \textit{HT} \cite{matematicas:descomposicion_ht} da ejemplos específicos de tensores realizables por el modelo \textit{HT} y no por un modelo \textit{CP} con un número exponencial de parámetros. Nuestro corolario indica que esto no ocurre únicamente en ejemplos aislados, sino en casi todos los tensores realizables por un modelo \textit{HT}.
-
-Teniendo en cuenta que cualquier tensor realizable por un modelo \textit{CP} puede ser realizado por un modelo \textit{HT} con un aumento polinomial del número de coeficientes (véase \customref{msubs:parametros_modelo_ht}), esto implica que la descomposición \textit{HT} es asintóticamente más eficiente que la \textit{CP}.
+Finalmente, que cualquier tensor realizable por un modelo \textit{CP} pueda ser realizado por un modelo \textit{HT} con un aumento polinomial del número de coeficientes (véase la \sectionref{msubs:parametros_modelo_ht}) implica que la descomposición \textit{HT} es asintóticamente más eficiente que la \textit{CP}.
 
 \section{Lemas previos} \label{sec:lemas_previos}
 
-En esta sección introduciremos algunos resultados que serán usados en las demostraciones del teorema \propref{teorema:teorema_principal_especificacion} y el \propref{corolario:corolario_principal_concreto}. Empezamos con los siguientes resultados de teoría de la medida de Lebesgue:
+En esta sección introduciremos algunos resultados que serán usados en las demostraciones del \propref{teorema:teorema_principal_especificacion} y el \propref{corolario:corolario_principal_concreto}. Empezamos con los siguientes resultados sobre la medida de Lebesgue:
 
 \begin{lema}[Propiedades fundamentales de la medida] \label{lema:prop_fundamentales_medida} Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
 
@@ -53,8 +45,8 @@ Usaremos la siguiente \textbf{matrización} de un tensor:
 Sea $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ un tensor de orden $N$ y dimensión $M_i$ en cada modo $i \in \deltaset{N}$. Por simplicidad, supondremos que el orden del tensor es par. Denotaremos por $[\mathcal{A}]$ a la \textbf{matrización} del tensor $\mathcal{A}$, que será una matriz donde las filas corresponden a modos impares del tensor, y las columnas corresponden a los modos pares. Por lo tanto, $[\mathcal{A}]$ tiene $M_1 \cdot M_3 \cdots M_{N-1}$ filas y $M_2 \cdot M_4 \cdots M_N$ columnas. Asignaremos el valor de $\mathcal{A}_{d_1, \ldots, d_N}$ en $[\mathcal{A}]$ en la posición:
 
 \begin{itemize}
-    \item Fila $1 + \sum_{i = 1}^{N/2} (d_{2i - 1} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j - 1}$
-    \item Columna $1 + \sum_{i = 1}^{N/2} (d_{2i} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j}$
+    \item Fila $1 + \sum_{i = 1}^{N/2} (d_{2i - 1} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j - 1}$.
+    \item Columna $1 + \sum_{i = 1}^{N/2} (d_{2i} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j}$.
 \end{itemize}
 
 \end{definicion}
@@ -80,13 +72,13 @@ Sean las siguientes matrices:
         A := \begin{pmatrix}
             a_{11} & a_{12} \\
             a_{21} & a_{22} \\
-        \end{pmatrix}
+        \end{pmatrix}.
     \end{equation}
 
     \begin{equation}
         B := \begin{pmatrix}
             b_{11} & b_{12} \\
-        \end{pmatrix}
+        \end{pmatrix}.
     \end{equation}
 
     Entonces, la matriz $A \odot B$ se computa de la siguiente forma:
@@ -99,7 +91,7 @@ Sean las siguientes matrices:
         \begin{pmatrix}
             a_{11} b_{11} & a_{11} b_{12} & a_{12} b_{11} & a_{12} b_{12} \\
             a_{21} b_{11} & a_{11} b_{12} & a_{22} b_{11} & a_{22} b_{12} \\
-        \end{pmatrix}
+        \end{pmatrix}.
     \end{equation}
 
 \end{ejemplo}
@@ -108,9 +100,9 @@ Sean las siguientes matrices:
     El anterior ejemplo nos muestra cómo con el producto de Kronecker podemos operar dos matrices cualesquiera, independientemente de sus dimensiones.
 \end{observacion}
 
-Vemos ahora tres propiedades fundamentales que tratan sobre la matrización, producto de Kronecker y el producto tensorial
+Vemos ahora tres propiedades fundamentales que tratan sobre la matrización, producto de Kronecker y el producto tensorial.
 
-\begin{proposicion}[Propiedades fundamentales de la matrización y producto de Kronecker] Las siguientes afirmaciones son ciertas:
+\begin{proposicion}[Propiedades fundamentales de la matrización y producto de Kronecker] \label{prop:fundamentales_matrizacion_kronecker} Las siguientes afirmaciones son ciertas:
 
     \begin{enumerate}
         \item Matrización y producto tensorial: Sean $\mathcal{A}, \mathcal{B}$ dos tensores. Entonces se verifica que $[\mathcal{A} \otimes \mathcal{B}] = [\mathcal{A}] \odot [\mathcal{B}]$ \label{prop:prop_fundamentales_primera}.
@@ -120,7 +112,7 @@ Vemos ahora tres propiedades fundamentales que tratan sobre la matrización, pro
 
 \end{proposicion}
 
-\begin{observacion} A partir de la primera propiedad es directo ver que el producto de Kronecker verifica las mismas propiedades que el producto tensorial (véase \propref{prop:tensores_propiedades}). Es decir, sean $A, B, C$ tres matrices cualesquiera y $\lambda \in \R$. Entonces:
+\begin{observacion} A partir de la primera propiedad es directo ver que el producto de Kronecker verifica las mismas propiedades que el producto tensorial (véase la \propref{prop:tensores_propiedades}). Es decir, sean $A, B, C$ tres matrices cualesquiera y $\lambda \in \R$. Entonces:
 
 \begin{itemize}
     \item $\lambda \cdot (A \odot B) = (\lambda A) \odot B = A \odot (\lambda B)$.
@@ -136,7 +128,7 @@ Se ve claramente que se cumple la siguiente propiedad:
     La matrización no degenera distancias euclídeas. Es decir, si dos tensores $\mathcal{A}$, $\mathcal{B} \in \espaciotensores{N}{M}$ están a una distancia euclídea estrictamente positiva, las matrices $[\mathcal{A}]$, $[\mathcal{B}]$ no pueden estar a una distancia euclídea nula. O lo que es lo mismo,
 
     \begin{equation}
-        d(\mathcal{A}, \mathcal{B}) = 0 \iif d([\mathcal{A}], [\mathcal{B}]) = 0
+        d(\mathcal{A}, \mathcal{B}) = 0 \iif d([\mathcal{A}], [\mathcal{B}]) = 0.
     \end{equation}
 \end{proposicion}
 
@@ -145,7 +137,7 @@ La siguiente proposición será clave a la hora de desarrollar nuestras demostra
 \begin{proposicion}[Rango matricial de la descomposición \textit{CP}] \label{prop:rango_matricial_descomp_cp}
 
     \begin{equation}
-        rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \cdots \otimes \nv{v_{2^L}}^{(z)}]) = Z.
+        rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \cdots \otimes \nv{v_{2^L}}^{(z)}]) \leq Z.
     \end{equation}
 
     Es decir, un tensor de orden $2^L$ dado como descomposición \textit{CP} con $Z$ términos tiene una matrización de rango matricial menor o igual que $Z$.
@@ -158,35 +150,28 @@ La siguiente proposición será clave a la hora de desarrollar nuestras demostra
 
     \begin{equation}
         \begin{split}
-            rank([\nv{v_1^{(z)}} \otimes \ldots \otimes \nv{v_{2^L}^{(z)}}]) &= \ldots \text{  agrupando dos a dos   } \ldots \\
-            &= \prod_{i = 1}^{2^{L/2}} rank([\nv{v_{2i - 1}^{(z)}} \otimes\nv{v_{2i}^{(z)}}]) = \prod_{i = 1}^{2^{L/2}} rank(\nv{v_{2i - 1}^{(z)}} \nv{v_{2i}^{(z)}}^T) = \prod_{i = 1}^{2^{L/2}} 1 = 1.
+            rank([\nv{v_1^{(z)}} \otimes \cdots \otimes \nv{v_{2^L}^{(z)}}]) \encima{=}{*} \prod_{i = 1}^{2^{L-1}} rank([\nv{v_{2i - 1}^{(z)}} \otimes\nv{v_{2i}^{(z)}}]) = \prod_{i = 1}^{2^{L-1}} rank(\nv{v_{2i - 1}^{(z)}} \nv{v_{2i}^{(z)}}^T) = \prod_{i = 1}^{2^{L-1}} 1 = 1,
         \end{split}
     \end{equation}
 
-    Usamos esto para calcular nuestra ecuación
+    donde en $*$ estamos agrupando dos a dos. Tenemos $2^L$ vectores, luego acabamos con $2^{L-1}$ elementos en el producto. También estamos usando las propiedades 1. y 2. de la \propref{prop:fundamentales_matrizacion_kronecker}. Usamos esto para calcular nuestra ecuación:
 
     \begin{equation}
         \begin{split}
-            &rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) \encima{=}{linealidad} rank(\sum_{z = 1}^Z \lambda_z [\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) \\
-            &\leq \sum_{z = 1}^Z rank([\nv{v_1}^{(z)} \otimes \ldots \otimes \nv{v_{2^L}}^{(z)}]) = \sum_{z = 1}^Z 1 = Z.
+            &rank([\sum_{z = 1}^Z \lambda_z \nv{v_1}^{(z)} \otimes \cdots \otimes \nv{v_{2^L}}^{(z)}]) \encima{=}{linealidad} rank(\sum_{z = 1}^Z \lambda_z [\nv{v_1}^{(z)} \otimes \cdots \otimes \nv{v_{2^L}}^{(z)}]) \\
+            &\encima{\leq}{\text{Prop. Matriciales}} \sum_{z = 1}^Z rank([\nv{v_1}^{(z)} \otimes \cdots \otimes \nv{v_{2^L}}^{(z)}]) = \sum_{z = 1}^Z 1 = Z.
         \end{split}
     \end{equation}
-    \todo{No sé de donde sale la desigualdad!}
-    \todo{No estoy explicando qué propiedades fundamentales que acabo de introducir uso en la prueba}
 \end{proof}
 
 La siguiente proposición será necesaria para ver un detalle técnico en la prueba del \propref{lema:segundo_lema}:
 
 \begin{proposicion}
-    Dado $r \in \R$, el siguiente conjunto es cerrado:
-
-    \begin{equation}
-        \conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r }
-    \end{equation}
+    Dado $r \in \R$, el conjunto $\conjunto{A \in \espaciomatrices{M}{N}: rank(A) < r }$ es cerrado.
 \end{proposicion}
 
 \begin{proof}
-    Llamamos $\zeta := \conjunto{M \in \espaciomatrices{M}{N}: \; rank(M) < r}$ y buscamos probar que todas las sucesiones de elementos de $\zeta$ que convergen lo hacen a un elemento de $\zeta$. Es decir
+    Llamamos $\zeta := \conjunto{M \in \espaciomatrices{M}{N}: \; rank(M) < r}$ y buscamos probar que todas las sucesiones de elementos de $\zeta$ que convergen lo hacen a un elemento de $\zeta$. Es decir:
 
     \begin{equation}
         \begin{split}
@@ -196,13 +181,7 @@ La siguiente proposición será necesaria para ver un detalle técnico en la pru
         \then M \in \zeta.
     \end{equation}
 
-    Sea $A_n$ un menor cualquiera de orden $r$ de $M_n$. Sea $A$ el menor de orden $r$ de $M$ asociado a las mismas entradas que el orden que hemos tomado en $M_n$. Entonces es claro que
-
-    \begin{equation}
-        \conjunto{A_n} \to A.
-    \end{equation}
-
-    Como el determinante es una función continua, es claro entonces que
+    Sea $A_n$ un menor cualquiera de orden $r$ de $M_n$. Para cada $n \in \N$ elegiremos el mismo menor. Sea $A$ el menor de orden $r$ de $M$ asociado a las mismas entradas que el orden que hemos tomado en $M_n$. Entonces es claro que $\conjunto{A_n} \to A$. Como el determinante es una función continua, es claro entonces que:
 
     \begin{equation}
         \conjunto{0}_{n \in \N} = \conjunto{det(A_n)} \to det(A).
@@ -225,25 +204,19 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
         \item $D(\nv{x}) \in \espaciomatrices{N}{N}$ es una matriz diagonal con los últimos $N$ elementos de $\nv{x}$ en la diagonal.
     \end{enumerate}
 
-    Definimos con ello la función $U$ que lleva $\nv{x}$ a la matriz $U(\nv{x}) := A(\nv{x}) \; D(\nv{x}) \; B(\nv{x})^T \in \espaciomatrices{M}{M}$. Entonces el conjunto de puntos $\nv{x} \in \R^{2MN + N}$ para los cuales el rango de $U(\nv{x})$ es distinto de $r := \min \{M, N\}$ tienen medida nula. El resultado sigue siendo cierto si consideramos $\nv{x} \in \R^{MN+N}$ y cambiamos la asignación de $B(x)$ por $B(x) := A(x)$.
+    Definimos con ello la función $U$ que lleva $\nv{x}$ a la matriz $U(\nv{x}) := A(\nv{x}) \; D(\nv{x}) \; B(\nv{x})^T \in \espaciomatrices{M}{M}$. Entonces el conjunto de puntos $\nv{x} \in \R^{2MN + N}$ para los cuales el rango de $U(\nv{x})$ es distinto de $r := \min \{M, N\}$ tiene medida nula. El resultado sigue siendo cierto si consideramos $\nv{x} \in \R^{MN+N}$ y cambiamos la asignación de $B(x)$ por $B(x) := A(x)$.
 \end{lema}
 
 \begin{proof}
-    \textbf{Caso General}
-
-    Sin pérdida de generalidad, suponemos que $M \leq N$, luego $r = M$. Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ es claro que
+    \textbf{Caso General}. Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ y $D(\nv{x}) \in \espaciomatrices{N}{N}$, es claro que:
 
     \begin{equation}
-        rank(U(\nv{x})) \leq M \leq r := \min \{N, M \}; \dspace \forall \nv{x} \in \R^{2MN + N}.
+        rank(U(\nv{x})) \leq r := \min \conjunto{N, M }; \dspace \forall \nv{x} \in \R^{2MN + N}.
     \end{equation}
 
-    Por tanto, queda probar que $rank(U(x)) \geq r; \dspace \text{c.p.d. } x \in \R^{2MN + N}$. Definimos $U_r(x)$ como la submatriz superior izquierda $r \times r$ de $U(x)$.
+    Por tanto, queda probar que $rank(U(\nv{x})) \geq r; \dspace \text{c.p.d. } \nv{x} \in \R^{2MN + N}$. Definimos $U_r(\nv{x})$ como la submatriz superior izquierda $r \times r$ de $U(\nv{x})$. Si fuese $U_r(\nv{x})$ no singular para cierto $\nv{x}$, claramente sabríamos que $r = rank(U_r(\nv{x})) \leq rank(U(\nv{x}))$. Así pues, buscamos probar que $U_r(\nv{x})$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{\nv{x} \in \R^{2MN + N} : det(U_r(\nv{x})) = 0 }$ tiene medida nula.
 
-    Si fuese $U_r(x)$ no singular para cierto $x$, claramente sabríamos que $r = rank(U_r(x)) \leq rank(U(x))$. Por tanto, buscamos probar que $U_r(x)$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{x \in \R^{2MN + N} : det(U_r(x)) = 0 }$ tiene medida nula.
-
-    Para ver esto tenemos en cuenta que $det(U_r(\nv{x}))$ es un polinomio con entradas en $x \in \R^{2MN + N}$. Por el \propref{lema:prop_fundamentales_medida} sabemos que entonces o bien es el polinomio idénticamente nulo o bien el conjunto de sus ceros tiene medida nula. Basta ver por tanto que no es el polinomio idénticamente nulo.
-
-    Para ello es suficiente probar que $\exists \nv{x_0} \in \R^{2MN + N}$ con el que se verifique que $det(U_r(\nv{x})) \neq 0$. Tomamos $x_0$ de forma que $D(x_0) = \mathbb{I}_d$ y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0})$ y $B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. Por cómo definimos las matrices $A(\nv{x})$, $B(\nv{x})$ y $D(\nv{x})$, es trivial realizar esta elección de $\nv{x_0}$. En esta situación tenemos:
+    Para ver esto tenemos en cuenta que $det(U_r(\nv{x}))$ es un polinomio con entradas en $\nv{x} \in \R^{2MN + N}$. Por el \propref{lema:prop_fundamentales_medida} sabemos que entonces o bien es el polinomio idénticamente nulo o bien el conjunto de sus ceros tiene medida nula. Basta ver por tanto que no es el polinomio idénticamente nulo. Para ello es suficiente probar que $\exists \nv{x_0} \in \R^{2MN + N}$ con el que se verifique que $det(U_r(\nv{x_0})) \neq 0$. Tomamos $\nv{x_0}$ de forma que $D(\nv{x_0}) = \mathbb{I}d_{N \times N}$ (haciendo que las últimas $N$ entradas de $\nv{x_0}$ sean 1) y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0})$ y $B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. Por cómo definimos las matrices $A(\nv{x})$, $B(\nv{x})$ y $D(\nv{x})$, es sencillo realizar esta elección de $\nv{x_0}$. En esta situación tenemos:
 
     \begin{equation}
         \begin{split}
@@ -253,30 +226,31 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
             \mathbb{I}d_{N \times N}
             \begin{pmatrix}
                 \mathbb{I}d_{r \times r} & \vline & 0 \\
-            \end{pmatrix}^T_{N \times M} = \begin{pmatrix}
+            \end{pmatrix}^T_{N \times M} \\
+            &= \begin{pmatrix}
                 \mathbb{I}d_{r \times r} & \vline & 0 \\
             \end{pmatrix}_{M \times N}
             \mathbb{I}d_{N \times N}
             \begin{pmatrix}
-                0 \\
+                \mathbb{I}d_{r \times r} \\
                 \hline
-                \mathbb{I}d_{r \times r}
+                0
             \end{pmatrix}_{N \times M} \\
             &= \begin{pmatrix}
                 \mathbb{I}d_{r \times r} & \vline & 0 \\
             \end{pmatrix}_{M \times N}
             \begin{pmatrix}
-                0 \\
+                \mathbb{I}d_{r \times r} \\
                 \hline
-                \mathbb{I}d_{r \times r}
-            \end{pmatrix}_{N \times M} = \mathbb{I}d_M.
+                0
+            \end{pmatrix}_{N \times M} = \mathbb{I}d_{r \times r}.
         \end{split}
     \end{equation}
 
-    Por tanto, es claro que
+    Por tanto, es claro que:
 
     \begin{equation}
-        det(U_r(\nv{x_0})) = det(\mathbb{I}d_M) = 1 \neq 0
+        det(U_r(\nv{x_0})) = det(\mathbb{I}d_{r \times r}) = 1 \neq 0,
     \end{equation}
 
     como buscábamos probar.
@@ -289,9 +263,10 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
         \item $U(\nv{x}) := A(\nv{x}) \; D(\nv{x}) \; A(\nv{x})^T$.
     \end{itemize}
 
-    Es claro que $U(\nv{x}) \in \espaciomatrices{M}{M}$. A partir de esto, podemos repetir análogamente todo el razonamiento, y en el último paso tomar de forma todavía más sencilla $\nv{x_0} \in \R^{MN + N}$ para que $D(\nv{x}) = \mathbb{I}_d$ y que $A(\nv{x}) = (\delta_{i, j})_{i, j}$.
+    Es claro que $U(\nv{x}) \in \espaciomatrices{M}{M}$. A partir de esto, podemos repetir análogamente todo el razonamiento, y en el último paso tomar de forma todavía más sencilla $\nv{x_0} \in \R^{MN + N}$ para que $D(\nv{x}) = \mathbb{I}d_{N \times N}$ y que $A(\nv{x}) = (\delta_{i, j})_{i, j}$.
 \end{proof}
 
+% TODO -- seguir por aqui
 
 Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
@@ -396,7 +371,7 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos su enunciado y pasamos a ver la prueba:
 
 \begin{teorema}[Rango \textit{CP} exponencial de un modelo \textit{HT}] \label{teorema:teorema_principal_especificacion}
-    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+    Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT}, $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos coeficientes compartidos en \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
 \end{teorema}
 
 \begin{proof}
@@ -434,13 +409,13 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \phi_1^\gamma := \conjunto{j \in \deltaset{N/2}: rank([\phi^{1, j, \gamma}] \neq r}
     \end{equation}
 
-     es finito, tiene medida cero y por ello, el conjunto
+    es finito, tiene medida cero y por ello, el conjunto
 
-     \begin{equation}
-         \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma
-     \end{equation}
+    \begin{equation}
+        \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma
+    \end{equation}
 
-     también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero. Finalmente deducimos que
+    también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero. Finalmente deducimos que
 
     \begin{equation}
         \phi := \conjunto{(j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}: rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
@@ -514,10 +489,10 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
     Sean $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ un conjunto de funciones linealmente independientes. Dado un tensor $\mathcal{A} \in \espaciotensores{N}{M}$ definimos la siguiente función:
 
     \begin{equation}
-    \begin{split}
-        h(\mathcal{A}): (\R^s)^N &\to \R \\
-        (\nv{x_1}, \ldots, \nv{x_N}) &\mapsto \sum_{d_1, \ldots, d_N = 1}^M \mathcal{A}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
-    \end{split}
+        \begin{split}
+            h(\mathcal{A}): (\R^s)^N &\to \R \\
+            (\nv{x_1}, \ldots, \nv{x_N}) &\mapsto \sum_{d_1, \ldots, d_N = 1}^M \mathcal{A}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+        \end{split}
     \end{equation}
 
     que es la función de puntuación introducida en \eqref{eq:puntuacion_general} dado el tensor de coeficientes $\mathcal{A}$. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^* \in \espaciotensores{N}{M}$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon > 0$ tal que
@@ -564,10 +539,10 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
     Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Con todo esto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva, porque:
 
     \begin{equation}
-    \begin{split}
-        h^{(t)} \encima{\longmapsto}{t \mapsto \infty} h(\mathcal{A}^*) &\iif \sum \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \encima{\longmapsto}{t \mapsto \infty} \sum \mathcal{A}^*_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \iif \\
-        &\iif \mathcal{A}^{(t)} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^* \iif \lim_{t \to \infty} d(A^{(t)}, \mathcal{A}^*) = 0. \\
-    \end{split}
+        \begin{split}
+            h^{(t)} \encima{\longmapsto}{t \mapsto \infty} h(\mathcal{A}^*) &\iif \sum \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \encima{\longmapsto}{t \mapsto \infty} \sum \mathcal{A}^*_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \iif \\
+            &\iif \mathcal{A}^{(t)} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^* \iif \lim_{t \to \infty} d(A^{(t)}, \mathcal{A}^*) = 0. \\
+        \end{split}
     \end{equation}
 
     En cuyo caso tendríamos que
