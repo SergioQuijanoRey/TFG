@@ -465,7 +465,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 
 \section{Prueba del corolario principal}
 
-Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De nuevo, es tan relevante que lo presentamos aquí y no con el resto de corolarios.
+Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De nuevo, es tan relevante que lo presentamos aquí y no con el resto de lemas.
 \todo{Javier: A lo mejor merece la pena quitar la sección de herramientas}
 
 \begin{lema}[Tercer lema fundamental] \label{lema:lema_previo_corolario}
@@ -478,7 +478,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         \end{split}
     \end{equation}
 
-    que es la función de puntuación introducida en \eqref{eq:puntuacion_general} dado el tensor de coeficientes $\mathcal{A}$. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^* \in \espaciotensores{N}{M}$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon > 0$ tal que
+    que es la función de puntuación introducida en la ecuación \eqref{eq:puntuacion_general} dado el tensor de coeficientes $\mathcal{A}$. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^* \in \espaciotensores{N}{M}$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon > 0$ tal que:
 
     \begin{equation}
         \int |h(\mathcal{A}^\lambda) - h(\mathcal{A}^*)|^2 > \epsilon, \quad (\forall \lambda \in \Lambda).
@@ -489,41 +489,39 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
     Como la familia de funciones $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ es linealmente independiente, sabemos que la familia de funciones producto inducida
 
     \begin{equation}
-        \zeta = \conjunto{\prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}): d_1, \ldots d_N \in \deltaset{M}}
+        \zeta = \conjuntofit{\prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}): d_1, \ldots d_N \in \deltaset{M}}
     \end{equation}
 
-    también es linealmente independiente (\customref{prop:conservacion_totalidad_indp_lineal_func_prod}).
-
-    Consideramos ahora una sucesión de funciones $\conjunto{h^{(t)}}_{t \in \N}$ en $span\conjunto{\zeta}$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la base dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente y obviamente total en $span \conjunto{\zeta}$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene determinado por la siguiente igualdad:
+    también es linealmente independiente, por la \propref{prop:conservacion_totalidad_indp_lineal_func_prod}. Consideramos ahora una sucesión de funciones $\conjunto{h^{(t)}}_{t \in \N}$ en $span\conjunto{\zeta}$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la base dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente y obviamente total en $span \conjunto{\zeta}$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene determinado por la siguiente igualdad:
 
     \begin{equation}
-        h^{(t)}(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1 = 1, \ldots, d_N = 1}^M \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i})
+        h^{(t)}(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1 = 1, \ldots, d_N = 1}^M \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}).
     \end{equation}
 
     En caso de que $\conjunto{h^{(t)}}_{t \in \N}$ no converja a $h(\mathcal{A}^*)$ nuestra proposición es trivial. Por lo tanto, supongamos que $\conjunto{h^{(t)}}_{t \in \N}$ converge a $h(\mathcal{A}^*)$ en $L^2((\R^s)^N)$, es decir:
 
     \begin{equation}
-        \lim_{t \to \infty} d_{L^2}(h^{(t)}, h(\mathcal{A}^*)) = 0
+        \lim_{t \to \infty} d_{L^2}(h^{(t)}, h(\mathcal{A}^*)) = 0.
     \end{equation}
 
     O lo que es lo mismo:
 
     \begin{equation}
-        \lim_{t \to \infty} \int | h^{(t)} - h(\mathcal{A}^*)|^2 = 0
+        \lim_{t \to \infty} \int | h^{(t)} - h(\mathcal{A}^*)|^2 = 0.
     \end{equation}
 
-    Sabemos, por \customref{prop:convergencia_norma_coeficientes}, que en un espacio de Hilbert de dimensión finita, como es nuestro caso, convergencia en norma implica convergencia en los coeficientes de representación. Como hemos supuesto la convergencia en norma, con lo anterior tenemos que:
+    Sabemos, por la \propref{prop:hilbert_convnorma_convcoef}, que en un espacio de Hilbert de dimensión finita, como es nuestro caso, convergencia en norma implica convergencia en los coeficientes de representación. Como hemos supuesto la convergencia en norma, con lo anterior tenemos que:
 
     \begin{equation}
         \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^*_{d_1, \ldots, d_N},
-        \; \forall d_1, \ldots, d_N \in \deltaset{M}
+        \; \forall d_1, \ldots, d_N \in \deltaset{M}.
     \end{equation}
 
     Luego en el espacio $\espaciotensores{N}{M}$ el tensor $\mathcal{A}^*$ pertenece al cierre de $\conjunto{\mathcal{A}^{(t)}: t \in \N}$. Con todo esto, para probar que la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva bastará con ver que la distancia en $\espaciotensores{N}{M}$ entre $\mathcal{A}^*$ y $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva, porque:
 
     \begin{equation}
         \begin{split}
-            h^{(t)} \encima{\longmapsto}{t \mapsto \infty} h(\mathcal{A}^*) &\iif \sum \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \encima{\longmapsto}{t \mapsto \infty} \sum \mathcal{A}^*_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \iif \\
+            h^{(t)} \encima{\longmapsto}{t \mapsto \infty} h(\mathcal{A}^*) &\iif \sum \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \encima{\longmapsto}{t \mapsto \infty} \sum \mathcal{A}^*_{d_1, \ldots, d_N} \prod f_{\theta_{d_i}}(\nv{x_i}) \\
             &\iif \mathcal{A}^{(t)} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^* \iif \lim_{t \to \infty} d(A^{(t)}, \mathcal{A}^*) = 0. \\
         \end{split}
     \end{equation}
@@ -538,31 +536,14 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
 
     \begin{equation}
         rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*]),
-        \; \forall \lambda \in \Lambda
-    \end{equation}
-
-    y por tanto
-    \todo{Obvio pero habrá que demostrarlo. No conocemos $\Lambda$ y podríamos tener una sucesión de distancias que converge a cero}
-
-    \begin{equation}
-        d([\mathcal{A}^\lambda], [\mathcal{A}^*]) > 0,
         \; \forall \lambda \in \Lambda.
     \end{equation}
 
-    Usando la \propref{prop:matrizacion_no_degenera_distancias} sabemos entonces que
+    Al tomar límite, el rango puede disminuir pero no aumentar. Además, usando la \propref{prop:matrizacion_no_degenera_distancias} sabemos que la matrización no degenera distancias, con lo que concluimos que:
 
     \begin{equation}
-        d(\mathcal{A}^\lambda, \mathcal{A}^*) > 0,
-        \; \forall \lambda \in \Lambda
+        d(\mathcal{A}^*, \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}) > 0.
     \end{equation}
-
-    o lo que es lo mismo,
-
-    \begin{equation}
-        d(\mathcal{A}^*, \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}) > 0
-    \end{equation}
-
-    como queríamos demostrar.
 
 \end{proof}
 
@@ -580,7 +561,7 @@ Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de
 
 \begin{proof}
 
-    En la prueba del \propref{teorema:teorema_principal_especificacion}, para mostrar la separación entre coeficientes del modelo \textit{HT} y el modelo \textit{CP} usamos como herramienta el rango de la matrización. En concreto, habíamos encontrado constantes $Rank^{HT}, Rank^{CP} \in \N$ con $Rank^{HT} > Rank^{CP}$ de forma que el modelo \textit{HT} tenía rango mayor o igual que $Rank^{HT}$ mientras que el modelo \textit{CP} tenía rango menor o igual que $Rank^{CP}$. Usando este hecho, aplicamos el lema \customref{lema:lema_previo_corolario}:
+    En la prueba del \propref{teorema:teorema_principal_especificacion}, para mostrar la separación entre coeficientes del modelo \textit{HT} y el modelo \textit{CP} usamos como herramienta el rango de la matrización. En concreto, habíamos encontrado constantes $Rank^{HT}, Rank^{CP} \in \N$ con $Rank^{HT} > Rank^{CP}$ de forma que el modelo \textit{HT} tenía rango mayor o igual que $Rank^{HT}$ mientras que el modelo \textit{CP} tenía rango menor o igual que $Rank^{CP}$. Usando este hecho, aplicamos el \propref{lema:lema_previo_corolario}:
 
     \begin{itemize}
         \item Consideramos como $\mathcal{A}^*$ el tensor de coeficientes generado por el modelo \textit{HT}. Por tanto, $h(\mathcal{A}^*)$ es la función de puntuación que dicho modelo implementa como una red profunda.
@@ -597,7 +578,7 @@ Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de
     Por tanto, no podemos aproximar arbitrariamente bien, estamos limitados por la constante $\epsilon_0$. Es decir, no es cierto que dada $h_y$ inducida al tomar coeficientes aleatorios en un modelo \textit{HT}, podamos aproximar arbitrariamente bien con un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}} = r^{\frac{N}{2}}$ canales en la capa oculta. De ser cierto, tendríamos que $\forall \epsilon > 0$, $\exists \mathcal{A}_\epsilon \in \Omega$ de forma que $d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}_\epsilon)) < \epsilon$ donde:
 
     \begin{equation}
-        \Omega := \conjunto{\mathcal{A} \in \espaciotensores{N}{M}: \mathcal{A} \text{ es realizable por un modelo \textit{CP} con menos de } r^{\frac{N}{2}} \text{ canales en la capa oculta}}
+        \Omega := \conjunto{\mathcal{A} \in \espaciotensores{N}{M}: \mathcal{A} \text{ realizable por un modelo \textit{CP} con menos de } r^{\frac{N}{2}} \text{ canales en la capa oculta}}.
     \end{equation}
 
     Pero acabamos de ver que esto es falso $\forall \epsilon < \epsilon_0$.
