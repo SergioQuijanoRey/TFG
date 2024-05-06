@@ -552,7 +552,7 @@ En esta sección vamos a ver cómo se relaciona el producto tensorial con todos 
 \end{proposicion}
 
 \begin{proof}
-    Para realizar la prueba, comprobamos que la operación definida es en efecto un producto escalar. Una vez hecho esto, aplicamos la completación del espacio en base al producto escalar y consideramos el resultado de este proceso como el espacio de Hilbert producto tensorial, llegando a lo que se busca.
+    Para realizar la prueba, comprobamos que la operación definida es en efecto un producto escalar. Una vez hecho esto, como consecuencia del teorema de Jordan-Von Neumann, aplicamos la completación del espacio en base al producto escalar y consideramos el resultado de este proceso como el espacio de Hilbert producto tensorial, llegando a lo que se busca.
 
     Por lo tanto, solo resta comprobar que la operación es un producto escalar, aplicando adecuadamente la definición de la operación y las propiedades del producto escalar. Por simplicidad, realizaremos esta comprobación para $(\mathbb{V_1}, \innerproduct{\cdot}{\cdot}_1)$, $(\mathbb{V_2}, \innerproduct{\cdot}{\cdot}_2)$. Además, cabe recordar que estamos trabajando con espacios vectoriales reales, no complejos.
 
@@ -593,7 +593,7 @@ En esta sección vamos a ver cómo se relaciona el producto tensorial con todos 
         \innerproduct{\phi_1 \otimes \phi_2}{\phi_1 \otimes \phi_2} \encima{=}{Def.} \innerproduct{\phi_1}{\phi_1}_1 \innerproduct{\phi_2}{\phi_2}_2 \geq 0
     \end{equation}
 
-    por ser producto de dos reales mayores o iguales que cero, y es cero sí y solo sí $\innerproduct{\phi_1}{\phi_1}_1 = 0$ ó $\innerproduct{\phi_2}{\phi_2}_2 = 0$, en cuyo caso, $\phi_1 = 0$ ó $\phi_2 = 0$. Y usando la \propref{prop:cero_tensorial_vector} sabemos que entonces $\phi_1 \otimes \phi_2 = 0$.
+    por ser producto de dos reales mayores o iguales que cero, y es cero si, y sólo si, $\innerproduct{\phi_1}{\phi_1}_1 = 0$ ó $\innerproduct{\phi_2}{\phi_2}_2 = 0$, en cuyo caso, $\phi_1 = 0$ ó $\phi_2 = 0$. Y usando la \propref{prop:cero_tensorial_vector} sabemos que entonces $\phi_1 \otimes \phi_2 = 0$.
 
 \end{proof}
 
@@ -623,7 +623,33 @@ Como ya hemos comentado, será importante estudiar la familia de funciones produ
 \end{teorema}
 
 \begin{proof}
-    \todo{JMeri: importante demostrar esta proposición porque la uso más tarde.}
+
+    Para simplificar la demostración estudiaremos el isomorfismo entre $L^2(\R^S) \otimes L^2(\R^S)$ y $L^2((\R^S)^2)$. Sabemos que los espacios $L^2(\R^N)$ admiten una base ortonormal, así que denotaremos por $\conjunto{\phi_n}_{n \in \N}$ a la de $L^2(\R^S)$. Por lo tanto, sabemos que $\conjunto{\phi_n \otimes \phi_m}_{n, m \in \N}$ es una base ortonormal de $L^2(\R^S) \otimes L^2(\R^S)$. Consideramos la función lineal $U$ que lleva la base ortonormal de $L^2(\R^S) \otimes L^2(\R^S)$ a la base ortonormal de $L^2((\R^S)^2)$ como:
+
+    \begin{equation}
+        U(\phi_i \otimes \phi_j) := \phi_i(x) \phi_j(y).
+    \end{equation}
+
+    Podemos extenderla por linealidad a una función de $L^2(\R^S) \otimes L^2(\R^S)$ a $L^2((\R^S)^2)$. Dicha extensión será un isomorfimos de espacios de Hilbert, por llevar una base ortonormal en otra base ortonormal. Falta comprobar que dicha extensión coincide con la función del enunciado del teorema. Para ello, definimos las funciones $f, g \in L^2(\R^s)$ como:
+
+    \begin{equation}
+    \begin{split}
+        f &:= \sum_i c_i \phi_i, \\
+        g &:= \sum_j d_j \phi_j, \\
+    \end{split}
+    \end{equation}
+
+    y calculamos:
+
+    \begin{equation}
+    \begin{split}
+        U(f \otimes g) &= U((\sum_i c_i \phi_i) (\sum_j d_j \phi_j)) = U(\sum_{i, j} c_i d_j (\phi_i \otimes \phi_j)) \\
+        &= \sum_{i, j} c_i d_j \phi_i \phi_j = (\sum_i c_i \phi_i) (\sum_j d_i \phi_j) = f g.
+    \end{split}
+    \end{equation}
+
+    Y por tanto, el isomorfismo $U$ coincide con nuestra función, lo que concluye la prueba.
+
 \end{proof}
 
 \section{Elementos fundamentales en un modelo de aprendizaje automático} \label{sec:piezas_machine_learning_matematicas}
