@@ -208,7 +208,7 @@ Nuestra tarea ahora es aplicar la descomposición \textit{CP}, que acabamos de i
 
 Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por la ecuación \eqref{eq:cp_decomp}, que $a_z^y \in \R$, y por tanto, podemos escribir $\nv{a^y} := (a_1^y, \ldots, a_Z^y) \in \R^Z$. En segundo lugar, y de nuevo, conforme a la ecuación \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien refleja los índices de la fórmula. Veamos que esta descomposición conjunta es universal:
 
-\begin{proposicion}[Universalidad de la descomposición \textit{CP} conjunta]
+\begin{proposicion}[Universalidad de la descomposición \textit{CP} conjunta]  \label{prop:cp_conjunta_universal}
 	Tomando $Z = M^N$ en la ecuación \eqref{eq:cp_decomp_conjunta}, la descomposición es universal. Esto es, podemos fijar un conjunto de vectores $\conjunto{\nv{\omega^{z, i}} \in \R^M: \; z \in \deltaset{Z}, \; i \in \deltaset{N}}$ de forma que cualquier tensor $\mathcal{A}^y$ de orden $N$ y dimensión $M$ en cada modo puede ser representado. Es decir:
 
 	\begin{equation}
@@ -462,9 +462,37 @@ La siguiente proposición nos muestra la relación de este modelo con el modelo 
 \end{proposicion}
 
 \begin{proof}
-	\todo{En la página 8 del paper se da una indicación de cómo se hace esto}
-    \todo{JMeri me dice que escriba la demostración}
-    \todo{HACER ESTA DEMOSTRACION}
+    En la \propref{prop:cp_conjunta_universal} hemos visto que la descomposición \textit{CP} es universal. Así que basta con que probemos que la descomposición \textit{HT} extiende a la \textit{CP}. Partimos de esta última descomposición para un $\mathcal{A} \in \espaciotensores{N}{M}$:
+
+    \begin{equation}
+        \mathcal{A} = \sum_{z = 1}^{Z} a_z \; \nv{\omega^{z, 1}} \otimes \cdots \otimes \nv{\omega^{z, N}}.
+    \end{equation}
+
+    Buscamos expresar el tensor $\mathcal{A}$ con la descomposición \textit{HT}. Para ello, los vectores de entrada serán los vectores usados como base en la descomposición \textit{CP}, es decir:
+
+    \begin{equation}
+        \phi^{1, j, \gamma} = \sum_{\alpha = 1}^Z 1 \cdot \nv{\omega^{\alpha, 2j-1}} \otimes \nv{\omega^{\alpha, 2j}}.
+    \end{equation}
+
+    En la última capa introduciremos los coeficientes escalares de la descomposición \textit{CP}, esto es:
+
+    \begin{equation}
+        \mathcal{A} = \sum_{\alpha = 1}^Z a_z \; \phi^{L-1, 1, \alpha} \otimes \phi^{L-1, 2, \alpha},
+    \end{equation}
+
+    donde repetimos que los escalares $a_z$ los tomamos de los de la descomposición \textit{CP}. En base a esto, para que ambas descomposiciones coincidan, debe cumplirse que:
+
+    \begin{equation}
+        \phi^{L-1, 1, \alpha} \otimes \phi^{L-1, 2, \alpha} = \nv{\omega^{z,1}} \otimes \cdots \otimes \nv{\omega^{z, N}}.
+    \end{equation}
+
+    Gracias a que hemos tomado $N$ como una potencia de dos para simplificar el desarrollo, podemos ir dividiendo el tensor $\nv{\omega^{z,1}} \otimes \cdots \otimes \nv{\omega^{z, N}}$ de dos en dos en cada nivel, hasta la capa de entrada. Para hacer esto, es suficiente con que en las capas intermedias escribamos:
+
+    \begin{equation}
+        \phi^{l, j, \gamma} = \sum_{\alpha = 1}^Z a_{\alpha}^{l, j, \gamma} \; \phi^{l-1, 2j - 1, \alpha} \otimes \phi^{l-1, 2j, \alpha},
+    \end{equation}
+
+    con $a_{\alpha}^{l, j, \gamma} \in \conjunto{0, 1}$ para elegir si incluimos o no ese tensor en nuestro árbol, asegurándonos de que todos los vectores $\nv{\omega^{z, i}}$ participan pero sin repetirse.
 \end{proof}
 
 \subsection{Número de parámetros del modelo} \label{msubs:parametros_modelo_ht}
