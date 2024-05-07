@@ -166,7 +166,7 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 	como buscábamos. Y con esto es trivial ver nuestra descomposición:
 
 	\begin{equation}
-		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \; \vec{\delta}_{i_1, M_1} \otimes \ldots \otimes \vec{\delta}_{i_N, M_N}.
+		\mathcal{A} = \sum_{d_1 = 1}^{M_1} \sum_{d_2 = 1}^{M_2} \cdots \sum_{d_N = 1}^{M_N} \mathcal{A}_{i_1, \ldots, i_N} \; \vec{\delta}_{i_1, M_1} \otimes \cdots \otimes \vec{\delta}_{i_N, M_N}.
 	\end{equation}
 \end{proof}
 
@@ -375,7 +375,7 @@ En el modelo \textit{CP}, la variación de los coeficientes dependiendo de la lo
 Esto convierte la descomposición \textit{CP} en una descomposición \textit{CP} simétrica, es decir:
 
 \begin{equation}
-	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \ldots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M.
+	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \cdot \comentardebajo{\nv{\omega^z} \otimes \cdots \otimes \nv{\omega^z}}{N veces}; \dspace \nv{\omega^z} \in \R^M.
 \end{equation}
 
 Por lo tanto, \textbf{perdemos la universalidad del modelo}: no podemos representar cualquier tensor, independientemente de lo grande que sea $Z$. Solo podemos representar tensores simétricos. En la práctica usaremos coeficientes compartidos. En el modelo profundo que vamos a introducir más tarde se presenta la misma situación, debemos imponer los coeficientes compartidos, lo que también provoca que el modelo pierda universalidad. Sin embargo, veremos que el modelo profundo restringido es más potente que el modelo no profundo, incluso si no restringimos este último.

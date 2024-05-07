@@ -855,6 +855,4 @@ Las opciones más usadas en la práctica del aprendizaje automático son:
         donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$. Además, $\sigma$ será una función de activación no lineal. Las más comunes son la \textit{ReLU} $\sigma(x) := \max \conjunto{0, x}$ o la sigmoide $\sigma(x) := \frac{1}{1 + e^{-x}}$.
 \end{enumerate}
 
-\todo{Antes tenía las \textit{wavelets} pero las he quitado porque no aportaban nada. Asegurarme de que no las estoy mencionando}
-
 Para el desarrollo posterior, necesitamos que la familia de funciones sea numerable y total. Esto es directo, tomando valores en $ \Q$. Para las \textit{RBF} tomamos $\nv{\mu} \in \Q^S$ y $\nv{\sigma^2} \in \Q^S_+$. Para las neuronas tomamos $\nv{w} \in \Q^s$ y $b \in \Q$.  Pero es más, en \cite{matematicas:principal} se afirma que es suficiente con tomar un número finito de funciones ${f_1, \ldots, f_M}$. De hecho, en el caso de estar trabajando con imágenes, proponen que basta con tomar $M$ entorno a 100. Este hecho simplificará en gran medida el desarrollo posterior.
