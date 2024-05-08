@@ -60,7 +60,6 @@ Recordemos que los datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$
 Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ donde elegir nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
 
 Comenzaremos tomando un conjunto de funciones $\conjunto{f_d(\nv{x}): \; d \in \N} \subseteq L^2(\R^S)$ de forma que sea total y linealmente independiente. Llamaremos \textbf{funciones de representación} a las funciones de este conjunto. Gracias a la \propref{prop:conservacion_totalidad_indp_lineal_func_prod} sabemos que la familia de funciones producto inducida $\conjunto{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) }_{d_1, \ldots, d_N \in \N} \subseteq L^2((\R^S)^N)$ es también total y linealmente independiente. Por ser total, la \propref{prop:conjuntos_totales_epsilon_aproximacion} nos dice que podemos aproximar funciones de $L^2((\R^S)^N)$ arbitrariamente bien con combinaciones lineales finitas de funciones producto. En la \sectionref{sec:funciones_representacion} hemos visto que podemos escoger funciones de base radial \textit{RBF} o neuronas para tomar un conjunto de funciones de representación que sea total, linealmente independiente y además finito.
-\todo{JMeri: hacer la prueba de estos dos resultados que menciono, porque mi desarrollo matemático depende de ellos}
 
 \subsection{Representación tensorial}
 
