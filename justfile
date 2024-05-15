@@ -77,6 +77,7 @@ upload_uni:
         --exclude 'src/lib/__pycache__' \
         --exclude 'training.log' \
         --exclude '.venv' \
+        --exclude 'thesis' \
         ./ {{SSH_ALIAS}}:{{SSH_DATA_PATH}}
 
 # Download code from the UNI server

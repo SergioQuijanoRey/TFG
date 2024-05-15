@@ -1,13 +1,12 @@
-import torch
-from torch.utils.data import Dataset, DataLoader, Subset
-import numpy as np
-from sklearn.model_selection import ShuffleSplit
 from enum import Enum
+from typing import Callable, List
 
-import src.lib.metrics as metrics
-from src.lib.split_dataset import WrappedSubset
+import numpy as np
+import torch
+from sklearn.model_selection import ShuffleSplit
+from torch.utils.data import DataLoader, Dataset, Subset
 
-from typing import List, Callable
+from .split_dataset import WrappedSubset
 
 
 class FoldType(Enum):
@@ -15,8 +14,10 @@ class FoldType(Enum):
     Enumerate to define which fold are we dealing with
     Some functions might behave different if we are in one fold or another
     """
+
     TRAIN_FOLD = "Train Fold"
     VALIDATION_FOLD = "Validation Fold"
+
 
 def custom_cross_validation(
     train_dataset: Dataset,
@@ -25,7 +26,7 @@ def custom_cross_validation(
     network_creator: Callable[[], torch.nn.Module],
     network_trainer: Callable[[DataLoader, torch.nn.Module], torch.nn.Module],
     loader_generator: Callable[[Dataset, FoldType], DataLoader],
-    loss_function: Callable[[torch.nn.Module, DataLoader], float]
+    loss_function: Callable[[torch.nn.Module, DataLoader], float],
 ) -> np.ndarray:
     """
     Perform k-fold cross validation
@@ -61,7 +62,6 @@ def custom_cross_validation(
 
     # Iterate over each fold
     for train_index, validation_index in ss.split(train_dataset):
-
         # This transformation avoids using np.int to index a dataset
         train_index = [int(idx) for idx in train_index]
         validation_index = [int(idx) for idx in validation_index]
@@ -71,7 +71,6 @@ def custom_cross_validation(
         # We use our WrappedSubset class to avoid the problems that Subset provokes
         train_fold = WrappedSubset(Subset(train_dataset, train_index))
         validation_fold = WrappedSubset(Subset(train_dataset, validation_index))
-
 
         # Transform dataset folds to dataloaders
         train_loader = loader_generator(train_fold, FoldType.TRAIN_FOLD)
@@ -104,7 +103,7 @@ def custom_cross_validation(
         # https://discuss.pytorch.org/t/memory-management-using-pytorch-cuda-alloc-conf/157850/8
         loss: float = float(loss.detach())
         losses.append(loss)
-        torch.cuda.empty_cache() # Trying to avoid mem issues
+        torch.cuda.empty_cache()  # Trying to avoid mem issues
 
         # k-fold cross validation can be very slow
         # So this logs are very important to watch the process

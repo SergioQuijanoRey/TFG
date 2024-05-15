@@ -2,11 +2,13 @@
 Module for displaying visualizations that are not included in tensorboard
 """
 
+from collections import Counter
+from typing import List, Optional, Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Tuple, List, Optional
-from collections import Counter
 import torch
+
 
 def is_black_and_white(img: np.ndarray) -> bool:
     """Checks if a given image is in color or in black & white format"""
@@ -15,7 +17,8 @@ def is_black_and_white(img: np.ndarray) -> bool:
 
     return False
 
-def show_img(img: np.ndarray, color_format_range = (0, 255)):
+
+def show_img(img: np.ndarray, color_format_range=(0, 255)):
     """
     Displays an image
 
@@ -27,21 +30,29 @@ def show_img(img: np.ndarray, color_format_range = (0, 255)):
 
     # Security check
     if img.min() < color_format_range[0] or img.max() > color_format_range[1]:
-        raise Exception(f"Expected img in range [{color_format_range[0]}, {color_format_range[1]}], got range [{img.min()}, {img.max()}]")
+        raise Exception(
+            f"Expected img in range [{color_format_range[0]}, {color_format_range[1]}], got range [{img.min()}, {img.max()}]"
+        )
 
     if is_black_and_white(img):
         # B/W images displayed in gray scale
-        plt.imshow(img, cmap = "gray")
+        plt.imshow(img, cmap="gray")
 
     else:
-        plt.imshow(img, vmin = color_format_range[0], vmax = color_format_range[1])
+        plt.imshow(img, vmin=color_format_range[0], vmax=color_format_range[1])
 
     # Make it visible right now
     # This is specially useful when working in Jupyter Notebooks
     plt.show()
 
+
 # TODO -- DOCS -- spanish documentation!
-def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = (0, 255), columns: int = 4, figsize: Tuple[int, int] = None):
+def show_images(
+    images: List[np.ndarray],
+    color_format_range: Tuple[int, int] = (0, 255),
+    columns: int = 4,
+    figsize: Tuple[int, int] = None,
+):
     """
     Shows multiple images in one figure, using rows & cols layout
 
@@ -56,7 +67,8 @@ def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = 
 
     # Tamaño de cada imagen que mostramos en el mosaico
     # Si no se pasa por parametro, usamos un valor por defecto
-    if figsize is None: figsize = (15, 15)
+    if figsize is None:
+        figsize = (15, 15)
     fig = plt.figure(figsize=figsize)
 
     # Calculamos el numero de filas necesarias para nuestras imagenes que depende
@@ -76,17 +88,23 @@ def show_images(images: List[np.ndarray], color_format_range: Tuple[int, int] = 
         if is_black_and_white(img) is True:
             plt.imshow(img)
         else:
-            plt.imshow(img[:,:,::-1])
+            plt.imshow(img[:, :, ::-1])
 
     # Para el espaciado entre filas
     # Esta es la orden que menciono en el enlace al problema con el espaciado
-    plt.subplots_adjust(top = 0.5, bottom=0.2, hspace=0.5, wspace=0.5)
+    plt.subplots_adjust(top=0.5, bottom=0.2, hspace=0.5, wspace=0.5)
 
     # Mostramos la composicion y espero en caso de estar en local
     plt.show()
 
+
 # TODO -- DOCS -- spanish documentation!
-def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[str], columns: int = 4, figsize: Tuple[int, int] = None):
+def show_images_with_titles_same_window(
+    images: List[np.ndarray],
+    titles: List[str],
+    columns: int = 4,
+    figsize: Tuple[int, int] = None,
+):
     """
     Muestra varias imagenes con sus respectivos titulos en una misma ventana
 
@@ -109,13 +127,16 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
 
     # Comprobacion de seguridad
     if len(images) != len(titles):
-        err_msg = "La lista de imagenes debe tener el mismo tamaño que la lista de titulos\n"
+        err_msg = (
+            "La lista de imagenes debe tener el mismo tamaño que la lista de titulos\n"
+        )
         err_msg += f"{len(images)} imagenes, {len(titles)} titulos"
         raise Exception(err_msg)
 
     # Tamaño de cada imagen que mostramos en el mosaico
     # Si no se pasa por parametro el valor, tomamos un figsize por defecto
-    if figsize is None: figsize = (15, 15)
+    if figsize is None:
+        figsize = (15, 15)
     fig = plt.figure(figsize=figsize)
 
     # Calculamos el numero de filas necesarias para nuestras imagenes que depende
@@ -127,7 +148,7 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
         # Añado el subplot del mosaico para esta imagen concreta en
         # la posicion que le corresponde
         # Ademas le estamos pasando los titulos dados por parametro
-        fig.add_subplot(rows, columns, index + 1, title = title)
+        fig.add_subplot(rows, columns, index + 1, title=title)
 
         # Añado la imagen a la posicion especificada
         # Tenemos que cambiar los canales si la imagen es tricolor, pues
@@ -135,11 +156,11 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
         if is_black_and_white(img) is True:
             plt.imshow(img)
         else:
-            plt.imshow(img[:,:,::-1])
+            plt.imshow(img[:, :, ::-1])
 
     # Para el espaciado entre filas
     # Esta es la orden que menciono en el enlace al problema con el espaciado
-    plt.subplots_adjust(top = 0.5, bottom=0.2, hspace=0.5, wspace=0.5)
+    plt.subplots_adjust(top=0.5, bottom=0.2, hspace=0.5, wspace=0.5)
 
     # Mostramos la composicion y espero en caso de estar en local
     plt.show()
@@ -147,7 +168,12 @@ def show_images_with_titles_same_window(images: List[np.ndarray], titles: List[s
 
 # TODO -- document that this is a special function for `show_images_with_titles_same_window`
 # in case we are using PIL images!
-def PIL_show_images_with_titles_same_window(images: List[np.ndarray], titles: List[str], columns: int = 4, figsize: Tuple[int, int] = None):
+def PIL_show_images_with_titles_same_window(
+    images: List[np.ndarray],
+    titles: List[str],
+    columns: int = 4,
+    figsize: Tuple[int, int] = None,
+):
     """
     Muestra varias imagenes con sus respectivos titulos en una misma ventana
 
@@ -170,13 +196,16 @@ def PIL_show_images_with_titles_same_window(images: List[np.ndarray], titles: Li
 
     # Comprobacion de seguridad
     if len(images) != len(titles):
-        err_msg = "La lista de imagenes debe tener el mismo tamaño que la lista de titulos\n"
+        err_msg = (
+            "La lista de imagenes debe tener el mismo tamaño que la lista de titulos\n"
+        )
         err_msg += f"{len(images)} imagenes, {len(titles)} titulos"
         raise Exception(err_msg)
 
     # Tamaño de cada imagen que mostramos en el mosaico
     # Si no se pasa por parametro el valor, tomamos un figsize por defecto
-    if figsize is None: figsize = (15, 15)
+    if figsize is None:
+        figsize = (15, 15)
     fig = plt.figure(figsize=figsize)
 
     # Calculamos el numero de filas necesarias para nuestras imagenes que depende
@@ -188,7 +217,7 @@ def PIL_show_images_with_titles_same_window(images: List[np.ndarray], titles: Li
         # Añado el subplot del mosaico para esta imagen concreta en
         # la posicion que le corresponde
         # Ademas le estamos pasando los titulos dados por parametro
-        fig.add_subplot(rows, columns, index + 1, title = title)
+        fig.add_subplot(rows, columns, index + 1, title=title)
 
         # Añado la imagen a la posicion especificada
         # Tenemos que cambiar los canales si la imagen es tricolor, pues
@@ -197,7 +226,7 @@ def PIL_show_images_with_titles_same_window(images: List[np.ndarray], titles: Li
 
     # Para el espaciado entre filas
     # Esta es la orden que menciono en el enlace al problema con el espaciado
-    plt.subplots_adjust(top = 0.5, bottom=0.2, hspace=0.5, wspace=0.5)
+    plt.subplots_adjust(top=0.5, bottom=0.2, hspace=0.5, wspace=0.5)
 
     # Mostramos la composicion y espero en caso de estar en local
     plt.show()
@@ -207,7 +236,7 @@ def plot_how_many_images_per_class(
     dataset: torch.utils.data.Dataset,
     cut: int,
     fig_size: Optional[Tuple[int, int]],
-    fontopts: Optional[dict]
+    fontopts: Optional[dict],
 ):
     """
     Bar plot, where we show how many classes have certain number of images
@@ -248,8 +277,8 @@ def plot_how_many_images_per_class(
 
     if fontopts is None:
         fontopts = {
-            'fontname': 'serif',
-            'fontsize': 14,
+            "fontname": "serif",
+            "fontsize": 14,
         }
 
     plt.figure(figsize=fig_size)
@@ -259,6 +288,7 @@ def plot_how_many_images_per_class(
     plt.ylabel("Number of classes having that number of images", **fontopts)
     plt.show()
 
+
 # TODO -- lacks documentation!
 def plot_histogram(
     values: List[float],
@@ -267,31 +297,32 @@ def plot_histogram(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     figsize: Tuple[int, int] = (8, 6),
-    fontopts: Optional[dict] = None
+    fontopts: Optional[dict] = None,
 ):
-
     # Make plots bigger
-    plt.figure(figsize = figsize, dpi = 500)
+    plt.figure(figsize=figsize, dpi=500)
 
     # Set font values if user did not specify a value
     if fontopts is None:
         fontopts = {
-            'fontname': 'serif',
-            'fontsize': 14,
+            "fontname": "serif",
+            "fontsize": 14,
         }
 
     # Get the data needed for the plot
-    counts, bins = np.histogram(values, bins = num_bins)
+    counts, bins = np.histogram(values, bins=num_bins)
 
     # Set the plotting data
-    plt.hist(bins[:-1], bins, weights = counts)
+    plt.hist(bins[:-1], bins, weights=counts)
 
     # Set the title of the plot
     plt.title(title)
 
     # Set labels for the axis if given as parameters
-    if xlabel is not None: plt.xlabel(xlabel, **fontopts)
-    if ylabel is not None: plt.ylabel(ylabel, **fontopts)
+    if xlabel is not None:
+        plt.xlabel(xlabel, **fontopts)
+    if ylabel is not None:
+        plt.ylabel(ylabel, **fontopts)
 
     # And finally show the plot
     plt.plot()

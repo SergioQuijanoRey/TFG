@@ -1,19 +1,26 @@
-import torch
-import torch.nn as nn
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import datetime
+import torch
+import torch.nn as nn
 
-import src.lib.metrics as metrics
+from . import metrics
+
 
 def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
+    img = img / 2 + 0.5  # unnormalize
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
-def test_model_online(model: nn.Module, test_loader: torch.utils.data.DataLoader, loss_function, online = False):
+
+def test_model_online(
+    model: nn.Module,
+    test_loader: torch.utils.data.DataLoader,
+    loss_function,
+    online=False,
+):
     """
     Loads a neural net to make predictions
 
@@ -27,6 +34,7 @@ def test_model_online(model: nn.Module, test_loader: torch.utils.data.DataLoader
     test_loss = metric(model, test_loader, loss_function, 1.0)
     print(f"Test Loss: {test_loss}")
 
+
 def get_device() -> str:
     """
     Returns the most optimal device available
@@ -38,10 +46,11 @@ def get_device() -> str:
     """
 
     if torch.cuda.is_available():
-      device = "cuda:0"
+        device = "cuda:0"
     else:
-      device = "cpu"
+        device = "cpu"
     return device
+
 
 def get_datetime_str() -> str:
     """Returns a string having a date/time stamp"""

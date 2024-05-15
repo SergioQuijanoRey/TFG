@@ -2,14 +2,16 @@
 Module where custom samplers go
 """
 
-import torch
-import random
-from typing import Iterator, List, Dict, Optional
-
-import src.lib.utils as utils
-
 import logging
+import random
+from typing import Dict, Iterator, List, Optional
+
+import torch
+
+from . import utils
+
 file_logger = logging.getLogger("MAIN_LOGGER")
+
 
 class CustomSampler(torch.utils.data.Sampler):
     """
@@ -37,9 +39,8 @@ class CustomSampler(torch.utils.data.Sampler):
         P: int,
         K: int,
         dataset: torch.utils.data.Dataset,
-        avoid_failing: bool = False
+        avoid_failing: bool = False,
     ):
-
         self.P = P
         self.K = K
         self.dataset = dataset
@@ -84,7 +85,6 @@ class CustomSampler(torch.utils.data.Sampler):
         )
 
     def __iter__(self) -> Iterator:
-
         # Generate random index list
         self.index_list = self.generate_index_sequence()
 
@@ -151,15 +151,16 @@ class CustomSampler(torch.utils.data.Sampler):
         # Make minibatches while there are at least `self.P` classes with at least `self.K` elements
         # each class
         while len(available_classes) >= self.P:
-
             # Choose the P classes used in this iteration
             random.shuffle(available_classes)
-            curr_classes = available_classes[:self.P]
+            curr_classes = available_classes[: self.P]
 
             # Generate new batch and add to the list of indixes
             # We use + operator because we want a plain list, not a list of list
             # (list of minibatches)
-            list_of_indixes = list(list_of_indixes) + list(self.__new_batch(curr_classes))
+            list_of_indixes = list(list_of_indixes) + list(
+                self.__new_batch(curr_classes)
+            )
 
             # Check for classes that has less than self.K images available
             available_classes = self.remove_empty_classes(available_classes)
@@ -184,15 +185,15 @@ class CustomSampler(torch.utils.data.Sampler):
         """
 
         return [
-            curr_class for curr_class in class_list
+            curr_class
+            for curr_class in class_list
             if
-                # We remove classes that have less than self.K elements
-                # But some classes could not be in the dict, so check first if they're stored
-                # in the dict first, to avouid `KeyError 0`
-                self.dict_of_classes.get(curr_class) is not None and
-                len(self.dict_of_classes[curr_class]) >= self.K
+            # We remove classes that have less than self.K elements
+            # But some classes could not be in the dict, so check first if they're stored
+            # in the dict first, to avouid `KeyError 0`
+            self.dict_of_classes.get(curr_class) is not None
+            and len(self.dict_of_classes[curr_class]) >= self.K
         ]
-
 
     def __new_batch(self, classes: List[int]) -> List[int]:
         """
@@ -202,15 +203,18 @@ class CustomSampler(torch.utils.data.Sampler):
 
         # Check that `self.P` classes are picked
         # TODO -- remove this in the future, because is checked in unit tests
-        assert self.P == len(classes), f"We have {len(classes)} classes, when P = {self.P}"
+        assert self.P == len(
+            classes
+        ), f"We have {len(classes)} classes, when P = {self.P}"
 
         batch = []
 
         for curr_class in classes:
             for _ in range(self.K):
-
                 # Choose a random image of this class
-                curr_idx_position = random.randint(0, len(self.dict_of_classes[curr_class]) - 1)
+                curr_idx_position = random.randint(
+                    0, len(self.dict_of_classes[curr_class]) - 1
+                )
                 curr_idx = self.dict_of_classes[curr_class][curr_idx_position]
 
                 # Then, this image is no longer available
