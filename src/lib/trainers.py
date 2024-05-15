@@ -166,7 +166,6 @@ def train_model_online(
     path: dir where models are going to be saved
     parameters: dict having the following data:
                 - "lr": learning rate
-                - "momentum": momentum of the optimizer
                 - "criterion": loss function
                 - "epochs": epochs to train
     train_loader: pytorch DataLoader wrapping training set
@@ -238,6 +237,7 @@ def train_model_online(
             # Backward + Optimize
             # Clip the gradient if that is specified
             # Gradient Clipping is performed after backward and before step
+            print(f"TODO -- {loss=}")
             loss.backward()
 
             if gradient_clipping is not None:
