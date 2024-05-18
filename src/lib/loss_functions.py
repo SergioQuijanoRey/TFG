@@ -4,7 +4,7 @@ Different loss functions used in the project
 
 import itertools as it
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -40,10 +40,15 @@ class TripletLoss(nn.Module):
         self.margin = margin
 
     def forward(
-        self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor
+        self,
+        anchor: torch.Tensor,
+        positive: torch.Tensor,
+        negative: torch.Tensor,
+        correcting_factor: Optional[torch.Tensor] = None,
     ) -> float:
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
+        self.correcting_factor = correcting_factor
 
         # Usamos Relu para que el error sea cero cuando la resta de las distancias
         # este por debajo del margen. Si esta por encima del margen, devolvemos la
@@ -61,7 +66,13 @@ class TripletLoss(nn.Module):
         """
 
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
-        return torch.relu(positive_distance - negative_distance + self.margin)
+        if self.correcting_factor is None:
+            return torch.relu(positive_distance - negative_distance + self.margin)
+        else:
+            return torch.relu(
+                (positive_distance - negative_distance) / self.correcting_factor
+                + self.margin
+            )
 
 
 class OnlineTripletLoss(nn.Module):
@@ -89,7 +100,9 @@ class OnlineTripletLoss(nn.Module):
         an_distances = (
             (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)
         )  # .pow(.5)
-        losses = F.relu(ap_distances - an_distances + self.margin)
+        losses = F.relu(
+            (ap_distances - an_distances) / an_distances.mean() + self.margin
+        )
 
         return losses.mean(), len(triplets)
 
@@ -129,6 +142,7 @@ class SoftplusTripletLoss(nn.Module):
         """
 
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
+        # TODO -- apply division by negative mean trick?
         return self.softplus(positive_distance - negative_distance)
 
 
@@ -410,7 +424,15 @@ class BatchHardTripletLoss(nn.Module):
             worst_positive = embeddings[worst_positive_idx]
             worst_negative = embeddings[worst_negative_idx]
 
-            curr_loss = self.base_loss(embedding, worst_positive, worst_negative)
+            # TODO -- trying to fix the collapsing problem
+            correcting_factor = torch.tensor(negatives).float().mean()
+
+            curr_loss = self.base_loss(
+                embedding,
+                worst_positive,
+                worst_negative,
+                correcting_factor=correcting_factor,
+            )
             loss += curr_loss
 
             if curr_loss > 0:
