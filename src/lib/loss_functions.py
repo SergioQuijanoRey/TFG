@@ -425,7 +425,7 @@ class BatchHardTripletLoss(nn.Module):
             worst_negative = embeddings[worst_negative_idx]
 
             # TODO -- trying to fix the collapsing problem
-            correcting_factor = torch.tensor(negatives).float().mean() ** 2.0
+            correcting_factor = negative_distances.float().mean() ** 2
 
             curr_loss = self.base_loss(
                 embedding,
