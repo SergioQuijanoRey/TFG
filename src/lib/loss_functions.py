@@ -74,6 +74,22 @@ class TripletLoss(nn.Module):
                 + self.margin
             )
 
+    # TODO -- remove this cluttered function
+    def loss_from_distances_corrected(
+        self,
+        positive_distance: float,
+        negative_distance: float,
+        correcting_factor: float,
+    ) -> float:
+        """
+        Compute the loss using the using the pre-computed distances
+        @param positive_distance the distance among anchor and positive
+        @param negative_distance the distance among anchor and negative
+        """
+        return torch.relu(
+            (positive_distance - negative_distance) / correcting_factor + self.margin
+        )
+
 
 class OnlineTripletLoss(nn.Module):
     """
@@ -534,17 +550,33 @@ class BatchAllTripletLoss(nn.Module):
 
         # Iterate over all elements, that act as anchors
         for [anchor_idx, _], anchor_label in zip(enumerate(embeddings), labels):
+            # TODO
+            # Compute the correcting factor to try to fix loss func collapsing
+            # to the margin value
+            negative_distances = torch.tensor(
+                [
+                    self.pairwise_distances[
+                        self.__resort_dict_idx(anchor_idx, negative_idx)
+                    ]
+                    for positive_idx in self.dict_of_classes[int(anchor_label)]
+                    for negative_idx in self.list_of_negatives[int(anchor_label)]
+                ]
+            )
+            correcting_factor = negative_distances.float().mean() ** 2
+
             # Compute all combinations of positive / negative loss
             # Use the precomputed distances to speed up this calculation
             losses = torch.tensor(
                 [
-                    self.base_loss.loss_from_distances(
+                    # TODO -- put this back
+                    self.base_loss.loss_from_distances_corrected(
                         self.pairwise_distances[
                             self.__resort_dict_idx(anchor_idx, positive_idx)
                         ],
                         self.pairwise_distances[
                             self.__resort_dict_idx(anchor_idx, negative_idx)
                         ],
+                        correcting_factor=correcting_factor,
                     )
                     for positive_idx in self.dict_of_classes[int(anchor_label)]
                     if positive_idx != anchor_idx
