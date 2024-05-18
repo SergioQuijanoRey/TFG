@@ -69,9 +69,9 @@ class TripletLoss(nn.Module):
         if self.correcting_factor is None:
             return torch.relu(positive_distance - negative_distance + self.margin)
         else:
-            return torch.relu(
-                (positive_distance - negative_distance) / self.correcting_factor
-                + self.margin
+            return (
+                torch.relu(positive_distance - negative_distance + self.margin)
+                / self.correcting_factor
             )
 
     # TODO -- remove this cluttered function
