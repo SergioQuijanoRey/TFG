@@ -69,9 +69,9 @@ class TripletLoss(nn.Module):
         if self.correcting_factor is None:
             return torch.relu(positive_distance - negative_distance + self.margin)
         else:
-            return (
-                torch.relu(positive_distance - negative_distance + self.margin)
-                / self.correcting_factor
+            epsilon = 1e-4
+            return torch.relu(positive_distance - negative_distance + self.margin) / (
+                self.correcting_factor + epsilon
             )
 
     # TODO -- remove this cluttered function
@@ -441,7 +441,7 @@ class BatchHardTripletLoss(nn.Module):
             worst_negative = embeddings[worst_negative_idx]
 
             # TODO -- trying to fix the collapsing problem
-            correcting_factor = negative_distances.float().mean() ** 2
+            correcting_factor = negative_distances.float().mean()
 
             curr_loss = self.base_loss(
                 embedding,
