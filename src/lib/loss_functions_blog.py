@@ -127,9 +127,15 @@ class BatchAllTtripletLoss(nn.Module):
         anchor_positive_dists = distance_matrix.unsqueeze(2)
         # shape: (batch_size, 1, batch_size)
         anchor_negative_dists = distance_matrix.unsqueeze(1)
+
+        # TODO -- correcting factor
+        correcting_factor = anchor_negative_dists.float().mean()
+
         # get loss values for all possible n^3 triplets
         # shape: (batch_size, batch_size, batch_size)
-        triplet_loss = anchor_positive_dists - anchor_negative_dists + self.margin
+        triplet_loss = (
+            anchor_positive_dists - anchor_negative_dists
+        ) / correcting_factor + self.margin
 
         # step 3 - filter out invalid or easy triplets by setting their loss values to 0
 
