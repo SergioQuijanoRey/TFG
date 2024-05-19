@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 import wandb
 
-from . import filesystem, utils
+from . import filesystem, loss_functions_blog, utils
 from .core import get_datetime_str, get_device
 from .train_loggers import SilentLogger, TrainLogger
 
@@ -208,6 +208,10 @@ def train_model_online(
     # We have to compute it adding up every time a new batch is seen. Because of P-K sampling
     # different epochs mean different number of elements seen
     how_may_elements_seen = 0
+
+    # TODO -- trying to fix problems with loss computing
+    # TODO -- margin is hardcoded!
+    criterion = loss_functions_blog.BatchAllTtripletLoss(margin=1.0)
 
     # Training the network
     for epoch in range(epochs):
