@@ -204,7 +204,9 @@ class HardTripletLoss(nn.Module):
             )
 
             # Combine biggest d(a, p) and smallest d(a, n) into final triplet loss
-            triplet_loss = F.relu(hardest_positive_dist - hardest_negative_dist + 0.1)
+            triplet_loss = F.relu(
+                hardest_positive_dist - hardest_negative_dist + self.margin
+            )
             triplet_loss = torch.mean(triplet_loss)
         else:
             anc_pos_dist = pairwise_dist.unsqueeze(dim=2)
