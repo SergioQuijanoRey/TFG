@@ -114,24 +114,7 @@ Desarrollamos en más detalles estas componentes.
 
 La capa convolucional es la herramienta que caracteriza este tipo de redes. Esta capa aplica filtros o \textit{kernels} a los datos con los que trabaja, a partir de los cuales extraemos información de dichos datos de entrada. Estos filtros ya se usaban antes de que el aprendizaje profundo se hiciese popular. Sin embargo, dichos filtros eran diseñados manualmente por un experto. En el enfoque del aprendizaje automático los coeficientes de los filtros se aprenden a partir de los datos de entrenamiento.
 
-Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con las que trabajamos. Esta estructura vienen dada por la propiedad de que píxeles cercanos de una imagen (es decir, un vecindario de píxeles) están relacionados entre ellos. Es decir, la posición de un píxel y su vecindario tienen información inherente. Esto queda más claro considerando que si tomamos una imagen y permutamos aleatoriamente sus píxeles, la imagen pierde todo su valor, como muestra la \imgref{img:desordenar_pixeles}.
-
-\begin{figure}[H]
-	\centering
-	\ajustarsubcaptions
-	\begin{subfigure}[t]{0.45\textwidth}
-		\centering
-		\includegraphics[width=0.9\linewidth]{informatica/ejemploperm_normal}
-		\caption{Imagen original}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.45\textwidth}
-		\centering
-		\includegraphics[width=0.9\linewidth]{informatica/ejemploperm_permutada}
-		\caption{Imagen original tras aplicar una permutación aleatoria de las posiciones de los píxeles}
-	\end{subfigure}
-	\caption{La posición de un píxel y su vecindario tiene información inherente. Si permutamos los píxeles entre ellos, la imagen pierde todo el sentido, porque hemos eliminado dicha información inherente.}
-	\label{img:desordenar_pixeles}
-\end{figure}
+Estas capas \textbf{explotan eficientemente la estructura de las imágenes} con las que trabajamos. Esta estructura vienen dada por la propiedad de que píxeles cercanos de una imagen (es decir, un vecindario de píxeles) están relacionados entre ellos. Es decir, la posición de un píxel y su vecindario tienen información inherente. Esto queda más claro considerando que si tomamos una imagen y permutamos aleatoriamente sus píxeles, la imagen pierde todo su valor, como hemos mostrado en la \imgref{img:desordenar_pixeles_repetida_mates}.
 
 Podemos aplicar una red \textit{MLP} a imágenes, vectorizando previamente la imagen de entrada (por ejemplo, tomando las columnas de la imagen y concatenando dichas columnas en un único vector). Esto es claramente ineficiente, porque en cada capa combinamos la información de toda la imagen. Para extraer características de la imagen no es útil tomar vecindarios distantes entre sí. Y aquí es donde las capas convolucionales son más eficientes. Estas se basan en el operador matemático de \textbf{convolución}. Dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
 
