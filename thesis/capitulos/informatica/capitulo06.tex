@@ -333,6 +333,8 @@ Como arquitectura usaremos un modelo muy ligero que especificamos en la \tablere
 \caption{Métricas observadas durante el entrenamiento.}
 \end{figure}
 
+\todo{Introducir las intra inter cluster de las que hablo pero que no he puesto}
+
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|l|l|}
@@ -358,7 +360,141 @@ En la \imgref{img:progreso_entrenamiento_mnist_mal} podemos ver que tenemos exac
 
 Por otro lado, en la \tableref{table:resultados_mnist_mal} podemos ver unos resultados nefastos que siguen la misma línea que el experimento original. Estos son aún menos defendibles al estar trabajando sobre \textit{MNIST}, conjunto de datos sobre el que es muy fácil obtener resultados excelentes. Por lo tanto nos planteamos dos opciones. La primera, que hayamos cometido un error o bien en la implementación de las distintas técnicas o bien en la ejecución de estas. La segunda, que exista algún problema de diseño al aplicar las dos variantes \textit{online} sobre la función de pérdida \textit{Triplet Loss}. El siguiente experimento nos servirá para descartar la primera posibilidad antes de intentar encontrar un fallo de diseño.
 
-\subsection{Experimentación usando otra base de código para confirmar los problemas de diseño} \label{isubsec:experiemntacion_base_codigo_externa}
+\subsection{Experimentación usando otras bases de código para confirmar los problemas de diseño} \label{isubsec:experiemntacion_base_codigo_externa}
+
+Buscamos confirmar que existe un problema en el diseño de las técnicas que estamos empleando, es decir, que usar las variantes \textit{Batch Hard} y \textit{Batch All} sobre \textit{Triplet Loss} produce el problema que estamos observando. Un primer paso es descartar posibles fallos en la implementación o ejecución de estas técnicas por nuestra parte. Para ello, hemos desarrollado un extenso conjunto de pruebas para validar nuestras implementaciones, como hemos explicado en la \sectionref{isec:test_suite}. Pero además, estudiaremos los experimentos realizados en \cite{informatica:adambielski_github} para confirmar estos problemas.
+
+En el repositorio de \textit{Github} \cite{informatica:adambielski_github} disponemos de dos experimentos, uno sobre \textit{MNIST} y otro sobre \textit{Fashion-MNIST}. Nos centraremos en los experimentos realizados sobre \textit{MNIST}. Compara las siguientes técnicas:
+
+\begin{itemize}
+    \item Entrenar usando un enfoque directo, que emplea como \textit{baseline}.
+    \item Entrenar usando \textit{contrastive loss}, tanto de forma \textit{offline} como \textit{online}
+    \item Entrenar usando \textit{triplet loss} con minado \textit{offline}.
+    \item Entrenar usando \textit{triplet loss} con minado \textit{online} a partir de triples aleatorios.
+\end{itemize}
+
+Cabe destacar que el autor ha implementado la estrategia \textit{Batch Hard} y una variante de esta a la que llama \textit{Batch SemiHard}. A pesar de esto, no las muestra en su experimentación, lo que parece indicar que está enfrentándose a los mismos problemas que nosotros. Por lo tanto, adaptamos su código para utilizar estas dos estrategias con su implementación. Al estar usando su base de código, no observamos tantas métricas como en experimentos previos, pero esto no va a ser un problema pues el comportamiento observado va a ser exactamente el mismo.
+
+Comencemos viendo los resultados sobre \textit{Batch Hard}. Usamos la misma arquitectura que en \sectionref{isubsec:experimentos_iniciales_mnist} y que hemos especificado en \tableref{table:arquitectura_mnist}. De hecho la arquitectura es original de este autor, y la hemos replicado en el anterior experimento para que sea más fácil realizar comparaciones entre ambos. Los hiperparámetros empleados se muestran en la \tableref{table:hp_adam_mnist}. El proceso de entrenamiento se pueden observar en la \imgref{img:proceso_entrenamiento_adam_mnist} y, finalmente, los resultados obtenidos se recogen en la \tableref{table:resultados_adam_mnist}.
+
+\begin{table}[!hbtp]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    Hiperparámetro & Valor \\
+    \hline
+
+    P & 16 \\
+    K & 8 \\
+    $\alpha$ & 1.0 \\
+    Función de pérdida & \textit{Batch Hard} \\
+    Dimensión del \textit{embedding} & 2 \\
+    \textit{Learning Rate} & 0.001 \\
+    Épocas de entrenamiento & 20 \\
+    \hline
+\end{tabular}
+    \caption{Hiperparámetros empleados para el entrenamiento sobre el cojunto de datos \textit{MNIST} con la base de código \cite{informatica:adambielski_github}. Algunos hiperparámetros los impone la base de código, como la dimensión del \textit{embedding}.}
+    \label{table:hp_adam_mnist}
+\end{table}
+
+\begin{figure}[!hbtp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/wandb/experimento_mnist_adam/running_loss.png}
+    \caption{Función de pérdida durante el entrenamiento, usando \textit{Batch Hard}.}
+    \label{img:proceso_entrenamiento_adam_mnist}
+\end{figure}
+
+\begin{table}[!hbtp]
+\centering
+\begin{tabular}{|l|l|l|l|}
+    \hline
+    Métrica & Conjunto & Valor \\
+    \hline
+
+    \textit{Rank@1 Accuracy} & Entrenamiento & 0.05 \\
+    \textit{Rank@1 Accuracy} & Test & 0.05  \\
+    \textit{Rank@5 Accuracy} & Entrenamiento & 0.523  \\
+    \textit{Rank@5 Accuracy} & Test & 0.101 \\
+    \textit{Silhouette} & Entrenamiento & 0.000 \\
+    \textit{Silhouette} & Test & 0.000 \\
+    \hline
+
+\end{tabular}
+\caption{Métricas de evaluación obtenidas tras entrenar el modelo sobre \textit{MNIST}, usando \textit{Batch Hard}.}
+    \label{table:resultados_adam_mnist}
+\end{table}
+
+De nuevo, en base a la \imgref{img:proceso_entrenamiento_adam_mnist} y \tableref{table:resultados_adam_mnist}, aseguramos que esta implementación está enfrentando los mismos problemas que nuestra implementación. Con ello, tenemos más confianza en que exista un problema de diseño y no un problema por nuestra parte. De hecho, como esta base de código impone la dimensión del \textit{embedding} a dos para hacer visualizaciones, mostramos esta visualización en la \imgref{img:train_hard_embeddings}. Estas visualizaciones han sido fundamentales para encontrar el motivo del mal comportamiento de todos los experimentos que estamos viendo. El modelo está transformando todas las entradas a dos vectores fijos del espacio, uno de ellos no nulo.
+
+\begin{figure}
+\ajustarsubcaptions
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/hard_train_embedding.png}
+        \caption{\textit{Embeddings} aprendidos sobre el conjunto de entrenamiento.}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/hard_test_embedding.png}
+        \caption{\textit{Embeddings} aprendidos sobre el conjunto de test.}
+    \end{subfigure}
+\caption{Visualización de los \textit{embeddings} producidos por el modelo \textit{Batch Hard}. }
+    \label{img:train_hard_embeddings}
+\end{figure}
+
+Veamos ahora los resultados de la técnica \textit{Batch Semihard}. Esta es ligeramente distinta de las dos técnicas que estamos estudiando. En ella, dado un \textit{batch} de $P-K$ elementos, se elige aleatoriamente un triple entre aquellos que tienen un valor de \textit{Triplet Loss} no nulo. Los hiperparámetros serán los mismos que \tableref{table:hp_adam_mnist} salvo por la función de pérdida. El proceso de entrenamiento se muestra en la \imgref{img:proceso_entrenamiento_adam_mnist_random} y los resultados en la \tableref{table:resultados_adam_mnist_random}. Los \textit{embeddings} producidos se visualizan en la \imgref{img:embeddings_adam_random}.
+
+\begin{figure}[!hbtp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{informatica/wandb/experimento_mnist_adam/running_loss_random.png}
+    \caption{Función de pérdida durante el entrenamiento, usando \textit{Batch SemiHard}.}
+    \label{img:proceso_entrenamiento_adam_mnist_random}
+\end{figure}
+
+\begin{table}[!hbtp]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    Métrica & Conjunto & Valor \\
+    \hline
+
+    \textit{Rank@1 Accuracy} & Entrenamiento & 0.916  \\
+    \textit{Rank@1 Accuracy} & Test & 0.940  \\
+    \textit{Rank@5 Accuracy} & Entrenamiento & 0.980   \\
+    \textit{Rank@5 Accuracy} & Test & 0.976  \\
+    \textit{Silhouette} & Entrenamiento & 0.648 \\
+    \textit{Silhouette} & Test & 0.632 \\
+    \hline
+
+
+\end{tabular}
+\caption{Métricas de evaluación obtenidas tras entrenar el modelo sobre \textit{MNIST}, usando \textit{Batch SemiHard}.}
+\label{table:resultados_adam_mnist_random}
+\end{table}
+
+\begin{figure} [!hbtp]
+\ajustarsubcaptions
+\centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/random_train_embeddings.png}
+        \caption{\textit{Embeddings} aprendidos sobre el conjunto de entrenamiento.}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/random_test_embeddings.png}
+        \caption{\textit{Embeddings} aprendidos sobre el conjunto de test.}
+    \end{subfigure}
+\caption{Visualización de los \textit{embeddings} producidos por el modelo \textit{Batch SemiHard}.}
+\label{img:embeddings_adam_random}
+\end{figure}
+
+La función de pérdida que observamos en \imgref{img:proceso_entrenamiento_adam_mnist_random} ya no sufre de los problemas que estamos comentando. Aunque tiene una forma algo inusual alejada de la curva que decrece monótonamente, es esperable debido a la fuerte naturaleza aleatoria de la función. Los resultados obtenidos y que mostramos en la \tableref{table:resultados_adam_mnist} ahora sí que son los esperables en este conjunto de datos. Y para finalizar, los \textit{embeddings} obtenidos en la \imgref{img:embeddings_adam_random} ya no son triviales, se aprecia claramente que el modelo ha aprendido a resolver el problema planteado.
+
+Para finalizar, empleamos el código de \cite{informatica:implementacion_batch_distancias} para calcular las funciones de pérdida y así comprobar finalmente que no tenemos un fallo en nuestra implementación. Repetimos los experimentos tanto para \textit{MNIST} como para \textit{CACD} usando esta nueva implementación, obteniendo exactamente el mismo comportamiento y resultados nefastos.
+
+En conclusión, todo indica que existe un fallo en el diseño de las dos técnicas que estamos estudiando, y que los malos resultados no se deben a un fallo de implementación por nuestra parte. Por tanto, deberemos justificar por qué ocurre esto y qué podemos hacer para solventarlo.
 
 \subsection{Detección del problema de diseño y propuesta de una solución} \label{isubsec:identificacion_problemas_propuesta_solucion}
 
