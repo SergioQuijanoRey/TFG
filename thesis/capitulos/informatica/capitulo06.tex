@@ -266,11 +266,32 @@ Inicialmente cometemos un error al interpretar estos datos. Pensábamos que el c
 
 \subsection{Experimentación inicial con \textit{MNIST}} \label{isubsec:experimentos_iniciales_mnist}
 
-El primer paso que tomamos para solventar los problemas que se nos presentan es intentar entrenar un modelo sencillo sobre \textit{MNIST}. De esta forma, si obtuviésemos buenos resultados aplicando las técnicas objeto de estudio, podríamos descartar un posible error por nuestra parte. Y a partir de ahí, buscar ciertas soluciones, como por ejemplo, emplear una arquitectura distinta, probar con una exploración de hiperparámetros más extensa o realizar entrenamientos mucho más extensos.
+El primer paso que tomamos para solventar los problemas que se nos presentan es intentar entrenar un modelo sencillo sobre \textit{MNIST}. De esta forma, si obtuviésemos buenos resultados podríamos descartar un posible error por nuestra parte. Y a partir de ahí, buscar ciertas soluciones, como por ejemplo, emplear una arquitectura distinta, probar con una exploración de hiperparámetros más extensa o realizar entrenamientos mucho más extensos.
 
-Como arquitectura usaremos un modelo muy ligero que consiste en TODO. Validamos esta arquitectura base realizando un entrenamiento para resolver un problema de clasificación clásico, con el que obtenemos más del 95\% de \textit{accuracy} sobre el conjunto de test.
+Como arquitectura usaremos un modelo muy ligero que especificamos en la \tableref{table:arquitectura_mnist}. Validamos esta arquitectura base realizando un entrenamiento para resolver un problema de clasificación clásico, con el que obtenemos más del 95\% de \textit{accuracy} sobre el conjunto de test. Al ser un conjunto de datos tan sencillo no realizamos una exploración de hiperparámetros. Los escogemos a mano realizando ligeros cambios que no cambian sustancialmente los resultados que vamos a mostrar. Finalmente, los hiperparámetros usados y que se corresponden con los resultados que mostramos se exponen en la \tableref{table:hiperparametros_mnist_mal}. El proceso de entrenamiento se puede ver en la \imgref{img:progreso_entrenamiento_mnist_mal} y los resultados en la \tableref{table:resultados_mnist_mal}.
 
-Al ser un conjunto de datos tan sencillo no realizamos una exploración de hiperparámetros. Los escogemos a mano realizando ligeros cambios que no cambian sustancialmente los resultados que vamos a mostrar. Finalmente, los hiperparámetros usados y que se corresponden con los resultados que mostramos se exponen en la \tableref{table:hiperparametros_mnist_mal}.
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+    \hline
+    Elemento & Parámetros \\
+    \hline
+    Convolución & Canales Entrada = 1, Canales Salida = 32, Kernel = 5 \\
+    \textit{PreLu} & - \\
+    \textit{MaxPool} & Kernel = 2, Stride = 2 \\
+    Convolución & Canales Entrada = 32, Canales Salida = 64, Kernel = 5 \\
+    \textit{PreLU} & - \\
+    \textit{MaxPool} & Kernel = 2, Stride = 2 \\
+    Capa densa & Entrada = 1024, Salida = 256 \\
+    \textit{PreLU} & - \\
+    Capa densa & Entrada = 256, Salida = 256 \\
+    \textit{PreLU} & - \\
+    Capa densa & Entrada = 256, Salida = tamaño \textit{embedding} \\
+    \hline
+\end{tabular}
+\caption{Descripción de la arquitectura empleada.}
+\label{table:arquitectura_mnist}
+\end{table}
 
 \begin{table}[!hbtp]
 \centering
@@ -295,18 +316,16 @@ Al ser un conjunto de datos tan sencillo no realizamos una exploración de hiper
     \label{table:hiperparametros_mnist_mal}
 \end{table}
 
-El proceso de entrenamiento se puede ver en la \imgref{img:progreso_entrenamiento_mnist_mal} y los resultados en la \tableref{table:resultados_mnist_mal}.
-
 \begin{figure}
 \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_mal/running_loss.png}
+        \includegraphics[width=0.95\linewidth]{informatica/wandb/experimento_mnist_mal/running_loss.png}
         \caption{Función de pérdida durante el entrenamiento.}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_mal/embedding_norm.png}
+        \includegraphics[width=0.95\linewidth]{informatica/wandb/experimento_mnist_mal/embedding_norm.png}
         \caption{Norma de los \textit{embeddings} durante el entrenamiento.}
     \end{subfigure}
     \label{img:progreso_entrenamiento_mnist_mal}
@@ -334,9 +353,9 @@ El proceso de entrenamiento se puede ver en la \imgref{img:progreso_entrenamient
     \label{table:resultados_mnist_mal}
 \end{table}
 
-En la \imgref{img:progreso_entrenamiento_mnist_mal} podemos ver que tenemos exactamente los mismos problemas. La función de pérdida cae rápidamente hasta el valor exacto del margen, quedando estancada en este valor durante todo el proceso. Da igual el valor del margen que usemos, que siempre ocurre este comportamiento. Esta vez la norma de los \textit{embeddings} tiene un comportamiento algo distinto. Decrece rápidamente Pero en un punto aumenta drásticamente, se mantiene constante pero vuelve a caer hasta cero. Sigue estando lejos de ser el comportamiento que buscamos, una norma que poco a poco aumente. Las distancias intracluster e intercluster siguen teniendo un comportamiento indeseado.
+En la \imgref{img:progreso_entrenamiento_mnist_mal} podemos ver que tenemos exactamente los mismos problemas que en el experimento anterior. La función de pérdida cae rápidamente hasta el valor exacto del margen, quedando estancada en este durante todo el proceso. Cambiando el valor del margen cambiamos el valor exacto en el que la función de pérdida se estanca. Esta vez la norma de los \textit{embeddings} tiene un comportamiento algo distinto. Decrece rápidamente Pero en un punto aumenta drásticamente, se mantiene constante y vuelve a caer hasta cero. Sigue estando lejos de ser el comportamiento que buscamos, una norma que poco a poco aumente. Las distancias intracluster e intercluster siguen teniendo un comportamiento indeseado. Ambas caen rápidamente hacia cero.
 
-Por otro lado, en la \taberef{table:resultados_mnist_mal} podemos ver los mismos resultados nefastos que hemos observado en el experimento anterior. Estos son aún menos defendibles al estar trabajando sobre \textit{MNIST}, conjunto de datos sobre el que es muy fácil obtener resultados excelentes.
+Por otro lado, en la \tableref{table:resultados_mnist_mal} podemos ver unos resultados nefastos que siguen la misma línea que el experimento original. Estos son aún menos defendibles al estar trabajando sobre \textit{MNIST}, conjunto de datos sobre el que es muy fácil obtener resultados excelentes. Por lo tanto nos planteamos dos opciones. La primera, que hayamos cometido un error o bien en la implementación de las distintas técnicas o bien en la ejecución de estas. La segunda, que exista algún problema de diseño al aplicar las dos variantes \textit{online} sobre la función de pérdida \textit{Triplet Loss}. El siguiente experimento nos servirá para descartar la primera posibilidad antes de intentar encontrar un fallo de diseño.
 
 \subsection{Experimentación usando otra base de código para confirmar los problemas de diseño} \label{isubsec:experiemntacion_base_codigo_externa}
 
