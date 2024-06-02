@@ -649,7 +649,7 @@ Observando la \imgref{img:procesos_entrenamiento_mnist_corregido} lo primero que
 
 \subsection{Resultados sobre \textit{CACD} con nuestra propuesta de solución} \label{isubsec:experimentacion_cacd_bien}
 
-Repetimos el mismo proceso que en el experimento anterior. Realizamos dos experimentos, uno con \textit{Batch Hard} y otro con \textit{Batch All}, tras introducir nuestra propuesta de solución. En este punto nuestro objetivo es lograr una mejora de rendimiento considerable que valide que nuestra solución es efectiva. Sin embargo, por la complejidad del problema, no esperamos obtener resultados competitivos con el estado del arte, ni siquiera resultados que permitan utilizar esta red en una aplicación real.
+Repetimos el mismo proceso que en el experimento anterior. Realizamos dos experimentos, uno con \textit{Batch Hard} y otro con \textit{Batch All}, tras introducir nuestra propuesta de solución. En este punto nuestro objetivo es lograr una mejora de rendimiento considerable que valide que nuestra solución es efectiva. Sin embargo, por la complejidad del problema, no esperamos obtener resultados competitivos con el estado del arte, ni siquiera resultados que permitan utilizar esta red en una aplicación real. Por lo tanto, usaremos únicamente \textit{CACD}, tanto para entrenar como para validar. Para ello, reservamos un 20\% del conjunto de datos para el \textit{holdout}. Además, lo hacemos de forma disjunta, es decir, en el conjunto de test no existen identidades que hayamos visto durante el entrenamiento.
 
 Los hiperparámetros empleados para los dos experimentos se recogen en la tabla \tableref{table:hp_cacd_corregido}. Esta vez hemos realizado algunos cambios sobre estos valores. Como hemos comentado, nuestro objetivo ahora no es conseguir los mejores resultados sino validar que la solución es efectiva. Esto, junto con la falta de tiempo para lanzar un proceso de búsqueda de hiperparámetros, hace que escojamos estos valores en base a nuestra experiencia y tras haber realizado una exploración manual con pequeños experimentos. El proceso de entrenamiento puede estudiarse en la \imgref{img:proceso_entrenamiento_cacd_corregido} y los resultados producidos se exponen en la \tableref{table:resultados_cacd_corregido}.
 
@@ -733,9 +733,51 @@ Los hiperparámetros empleados para los dos experimentos se recogen en la tabla 
 
 \end{tabular}
 \caption{Métricas de evaluación obtenidas sobre \textit{CACD} y \textit{FG-Net}, tras entrenar con la corrección aplicada a \textit{Batch Hard} y \textit{Batch All}.}
-\label{table:resultados_mnist_corregido}
+\label{table:resultados_cacd_corregido}
 \end{table}
 
+Se repite la mejora de comportamiento observada en la anterior experimentación sobre \textit{MNIST}. En la \imgref{img:proceso_entrenamiento_cacd_corregido} podemos ver que las funciones de pérdida ya no se quedan atascadas en el valor del margen. Sin embargo, esta vez quedan por encima disminuyendo lentamente. Esto nos indica que quizás deberíamos emplear otros hiperparámetros para lograr mejores resultados. Por ejemplo, tiempos de entrenamiento más largos o valores distintos para el \textit{learning rate}. Pero de nuevo, nuestro objetivo ahora no es obtener el mejor modelo posible sino validar la eficacia de nuestra solución. Las normas de los \textit{embeddings} muestran el comportamiento deseado, incrementan con el paso de las épocas de entrenamiento. Por otro lado, los resultados expuestos en la \tableref{table:resultados_cacd_corregido} son buenos. Aunque estén alejados de ser realmente competentes, son más que suficientes para validar nuestra solución. Los valores de las métricas \textit{Rank@k} han mejorado significativamente en ambos casos. Los valores de \textit{Silhouette} siguen siendo igual de malos, pero de nuevo, esto nos indica que para obtener un modelo con alto rendimiento deberíamos realizar un estudio en profundidad de la arquitectura e hiperparámetros utilizados.
+
+Para poder comparar adecuadamente respecto a la implementación sin corrección, repetiremos el experimento sin corrección usando los hiperparámetros especificados en la \tableref{table:hp_cacd_corregido}. Además, como ya hemos comentado previamente, usaremos una parte de \textit{CACD} para evaluar el modelo, en vez de usar \textit{FG-Net}. No volvemos a mostrar el proceso de entrenamiento pues los comportamientos que hemos estudiado no cambian con estos nuevos hiperparámetros. Así que únicamente mostramos los resultados en la \tableref{table:resultados_cacd_mal_nueva} y la comparación entre experimentos antes y después de la corrección en la \tableref{table:comparaciones_cacd_resultados}.
+
+
+\begin{table}[!hbtp]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    Métrica & Conjunto & Valor \\
+    \hline
+    \textit{Rank@1 Accuracy} & Entrenamiento & 0.0092  \\
+    \textit{Rank@1 Accuracy} & Test & 0.0312  \\
+    \textit{Rank@5 Accuracy} & Entrenamiento & 0.0136   \\
+    \textit{Rank@5 Accuracy} & Test & 0.0781  \\
+    \textit{Silhouette} & Entrenamiento & -0.1366 \\
+    \textit{Silhouette} & Test & -0.1596 \\
+    \hline
+\end{tabular}
+    \caption{Métricas de evaluación obtenidas tras entrenar usando \textit{Batch Hard} sin corregir empleando los hiperparámetros especificados en \tableref{table:hp_cacd_corregido}. Usamos \textit{CACD} para extraer un subconjunto de \textit{test}.}
+\label{table:resultados_cacd_mal_nueva}
+\end{table}
+
+\begin{table}[!hbtp]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|}
+        \hline
+        Métrica & Conjunto & Antes & Después & Mejora \\
+        \hline
+        \textit{Rank@1 Accuracy} & Entrenamiento & 0.0092 & 0.2676 & 29.09 \\
+        \textit{Rank@1 Accuracy} & Test & 0.0312 & 0.3732 & 11.96  \\
+        \textit{Rank@5 Accuracy} & Entrenamiento & 0.0136 & 0.4639 & 34.11 \\
+        \textit{Rank@5 Accuracy} & Test & 0.0781 & 0.6152 & 7.88  \\
+        \textit{Silhouette} & Entrenamiento & -0.1366 & -0.1648 & -0.02 \\
+        \textit{Silhouette} & Test & -0.1596 & -0.1832 & -0.023 \\
+        \hline
+    \end{tabular}
+    \caption{Comparación de los resultados obtenidos antes y después de aplicar nuestra solución, usando los mismos hiperparámetros, usando \textit{Batch Hard}.}
+    \label{table:comparaciones_cacd_resultados}
+\end{table}
+
+En primer lugar, los resultados recogidos por la \tableref{table:resultados_cacd_mal_nueva} son compatibles con los resultados del experimento original recogidos en la \tableref{table:resultados_mnist_mal}. Por lo tanto, el cambio de hiperparámetros claramente no ha afectado al mal rendimiento de la técnica sin nuestra corrección. En segundo lugar, la comparativa confirma lo que veníamos comentando. Aunque podemos mejorar ampliamente los resultados explorando otras arquitecturas para el modelo base, repitiendo el proceso de búsqueda de hiperparámetros o realizando entrenamientos más largos, esto no es necesario para \textbf{confirmar contundentemente que la solución ha sido efectiva}. En las métricas \textit{Rank@k} obtenemos resultados entre 10 y 29 veces mejores. En el mismo orden de magnitud se encuentran las mejoras sobre las variantes locales de estas métricas. Únicamente los valores de la métrica \textit{Silhouette} no han mejorado. Empeoran ligeramente pero de forma no significativa. Esto nos indica que, para obtener un modelo realmente competente, hace falta ejecutar los pasos que acabamos de comentar.
 
 \section{Conclusiones extraídas de la experimentación} \label{isec:conclusiones_experimentacion}
 
