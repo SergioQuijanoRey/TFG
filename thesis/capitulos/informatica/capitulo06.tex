@@ -529,9 +529,7 @@ A continuación repetiremos los experimentos sobre \textit{MNIST} y \textit{CACD
 
 \subsection{Resultados sobre \textit{MNIST} con nuestra propuesta de solución} \label{isubsec:experimentacion_mnist_bien}
 
-A continuación mostraremos dos procesos de entrenamiento, uno para \textit{Batch Hard} y otro para \textit{Batch All}, tras haber aplicado nuestra propuesta de solución.
-
-Los dos procesos de entrenamiento se pueden estudiar en la \imgref{img:procesos_entrenamiento_mnist_corregido}. Los resultados obtenidos con ambas técnicas corregidas se muestra en la \tableref{table:resultados_mnist_corregido}. Finalmente, para comparar los resultados antes y después de aplicar la técnica, la arquitectura empleada es la misma que describimos en la \tableref{table:arquitectura_mnist} y los hiperparámetros son los mismos que los mostrados en la \tableref{table:hiperparametros_mnist_mal}, salvo en la función de pérdida que aplicamos en cada caso una de las dos.
+Para comparar los resultados antes y después de aplicar la técnica usamos la misma arquitectura (que hemos descrito en la \tableref{table:arquitectura_mnist}) y los mismos hiperparámetros (que hemos especificado en la \tableref{table:hiperparametros_mnist_mal}). Con la salvedad de que estamos ejecutando dos experimentos, uno para \textit{Batch Hard} y otro para \textit{Batch All}. Los dos procesos de entrenamiento se pueden estudiar en la \imgref{img:procesos_entrenamiento_mnist_corregido}. Los resultados obtenidos con ambas técnicas corregidas se muestra en la \tableref{table:resultados_mnist_corregido}.
 
 \begin{figure}[!hbtp]
 \centering
@@ -591,8 +589,6 @@ Los dos procesos de entrenamiento se pueden estudiar en la \imgref{img:procesos_
 \label{table:resultados_mnist_corregido}
 \end{table}
 
-Observando la \imgref{img:procesos_entrenamiento_mnist_corregido} lo primero que destacamos es que en ambos casos las funciones de pérdida no se quedan estancadas en el margen. En el caso de \textit{Batch Hard} la función de pérdida tiende a cero y, en el caso de \textit{Batch All}, pasamos rápidamente a estar por debajo del margen $\alpha = 1.0$. Las normas de los \textit{embeddings} muestran un buen comportamiento, descienden rápidamente hasta estabilizarse y van aumentando ligeramente con el paso de las épocas de entrenamiento. Los resultados que muestran la \tableref{table:resultados_mnist_corregido} son muy contundentes en ambos casos. Tanto las métricas \textit{Rank@k accuracy} como los valores de \textit{Silhouette} son casi perfectas tanto en entrenamiento como en \textit{test}, que es lo que cabe esperar en este conjunto de datos tan sencillo. Por lo tanto, \textbf{es claro que nuestra solución ha sido efectiva} a la hora de solucionar los problemas que estábamos teniendo. La \tableref{table:comparaciones_mnist_resultados} refuerza aún más esta conclusión. En las métricas originales \textit{Rank@k} estamos obteniendo resultados diez veces mejores. En las variantes locales, por la permisividad de estas, las mejoras bajan hasta algo más del doble. Y no podemos calcular mejoras sobre \textit{Silhouette} por ser nulas, pero cabe destacar que estamos pasando de uno de los peores valores de la métrica a un valor casi perfecto.
-
 \begin{table}[!hbtp]
 \centering
 \begin{tabular}{|l|l|l|l|l|}
@@ -611,6 +607,9 @@ Observando la \imgref{img:procesos_entrenamiento_mnist_corregido} lo primero que
 \caption{Comparación de los resultados obtenidos antes y después de aplicar nuestra solución. Los resultados tras aplicar la solución se muestran solo para \textit{Batch Hard}, ya que para el experimento inicial solo mostramos estos.}
 \label{table:comparaciones_mnist_resultados}
 \end{table}
+
+
+Observando la \imgref{img:procesos_entrenamiento_mnist_corregido} lo primero que destacamos es que en ambos casos las funciones de pérdida no se quedan estancadas en el margen. En el caso de \textit{Batch Hard} la función de pérdida tiende a cero y, en el caso de \textit{Batch All}, pasamos rápidamente a estar por debajo del margen $\alpha = 1.0$. Las normas de los \textit{embeddings} muestran un buen comportamiento, descienden rápidamente hasta estabilizarse y van aumentando ligeramente con el paso de las épocas de entrenamiento. Los resultados que muestran la \tableref{table:resultados_mnist_corregido} son muy contundentes en ambos casos. Tanto las métricas \textit{Rank@k accuracy} como los valores de \textit{Silhouette} son casi perfectas tanto en entrenamiento como en \textit{test}, que es lo que cabe esperar en este conjunto de datos tan sencillo. Por lo tanto, \textbf{es claro que nuestra solución ha sido efectiva} a la hora de solucionar los problemas que estábamos teniendo. La \tableref{table:comparaciones_mnist_resultados} refuerza aún más esta conclusión. En las métricas originales \textit{Rank@k} estamos obteniendo resultados diez veces mejores. En las variantes locales, por la permisividad de estas, las mejoras bajan hasta algo más del doble. Y no podemos calcular mejoras sobre \textit{Silhouette} por ser nulas, pero cabe destacar que estamos pasando de uno de los peores valores de la métrica a un valor casi perfecto.
 
 \subsection{Resultados sobre \textit{CACD} con nuestra propuesta de solución} \label{isubsec:experimentacion_cacd_bien}
 
