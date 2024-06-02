@@ -701,6 +701,28 @@ Los hiperparámetros empleados para los dos experimentos se recogen en la tabla 
         \includegraphics[width=0.8\linewidth]{informatica/wandb/cacd_corregido/batch_hard_embedding_norms.png}
         \caption{Norma de los \textit{embeddings}.}
     \end{subfigure}
+
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/cacd_corregido/batch_hard_intracluster.png}
+        \caption{Distancias intracluster.}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/cacd_corregido/batch_all_intracluster.png}
+        \caption{Distancias intracluster.}
+    \end{subfigure}
+
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/cacd_corregido/batch_hard_intercluster.png}
+        \caption{Distancias intercluster.}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{informatica/wandb/cacd_corregido/batch_all_intercluster.png}
+        \caption{Distancias intercluster.}
+    \end{subfigure}
     \caption{Métricas observadas durante el proceso de entrenamiento. \textit{Batch Hard} se corresponde con las métricas de la izquierda, \textit{Batch All} con las métricas de la derecha.}
     \label{img:proceso_entrenamiento_cacd_corregido}
 \end{figure}
@@ -721,13 +743,12 @@ Los hiperparámetros empleados para los dos experimentos se recogen en la tabla 
 
     \hline
 
-    % TODO -- estan mal
-    \textit{Batch All} & \textit{Rank@1 Accuracy} & Entrenamiento & 0.994 \\
-    \textit{Batch All} & \textit{Rank@1 Accuracy} & Test & 0.992  \\
-    \textit{Batch All} & \textit{Rank@5 Accuracy} & Entrenamiento & 0.1313  \\
-    \textit{Batch All} & \textit{Rank@5 Accuracy} & Test & 0.969 \\
-    \textit{Batch All} & \textit{Silhouette} & Entrenamiento & 0.968 \\
-    \textit{Batch All} & \textit{Silhouette} & Test & 0.949 \\
+    \textit{Batch All} & \textit{Rank@1 Accuracy} & Entrenamiento & 0.1757 \\
+    \textit{Batch All} & \textit{Rank@1 Accuracy} & Test & 0.3125  \\
+    \textit{Batch All} & \textit{Rank@5 Accuracy} & Entrenamiento & 0.4126  \\
+    \textit{Batch All} & \textit{Rank@5 Accuracy} & Test & 0.5816 \\
+    \textit{Batch All} & \textit{Silhouette} & Entrenamiento & -0.1513 \\
+    \textit{Batch All} & \textit{Silhouette} & Test & -0.1171 \\
 
     \hline
 
@@ -736,7 +757,7 @@ Los hiperparámetros empleados para los dos experimentos se recogen en la tabla 
 \label{table:resultados_cacd_corregido}
 \end{table}
 
-Se repite la mejora de comportamiento observada en la anterior experimentación sobre \textit{MNIST}. En la \imgref{img:proceso_entrenamiento_cacd_corregido} podemos ver que las funciones de pérdida ya no se quedan atascadas en el valor del margen. Sin embargo, esta vez quedan por encima disminuyendo lentamente. Esto nos indica que quizás deberíamos emplear otros hiperparámetros para lograr mejores resultados. Por ejemplo, tiempos de entrenamiento más largos o valores distintos para el \textit{learning rate}. Pero de nuevo, nuestro objetivo ahora no es obtener el mejor modelo posible sino validar la eficacia de nuestra solución. Las normas de los \textit{embeddings} muestran el comportamiento deseado, incrementan con el paso de las épocas de entrenamiento. Por otro lado, los resultados expuestos en la \tableref{table:resultados_cacd_corregido} son buenos. Aunque estén alejados de ser realmente competentes, son más que suficientes para validar nuestra solución. Los valores de las métricas \textit{Rank@k} han mejorado significativamente en ambos casos. Los valores de \textit{Silhouette} siguen siendo igual de malos, pero de nuevo, esto nos indica que para obtener un modelo con alto rendimiento deberíamos realizar un estudio en profundidad de la arquitectura e hiperparámetros utilizados.
+Se repite la mejora de comportamiento observada en la anterior experimentación sobre \textit{MNIST}, aunque esta vez los resultados no sean tan buenos. En la \imgref{img:proceso_entrenamiento_cacd_corregido} podemos ver que las funciones de pérdida ya no se quedan atascadas en el valor del margen. Sin embargo, esta vez quedan por encima disminuyendo lentamente. Esto nos indica que quizás deberíamos emplear otros hiperparámetros para lograr mejores resultados. Por ejemplo, tiempos de entrenamiento más largos o valores distintos para el \textit{learning rate}. Pero de nuevo, nuestro objetivo ahora no es obtener el mejor modelo posible sino validar la eficacia de nuestra solución. Las normas de los \textit{embeddings} muestran el comportamiento deseado, incrementan con el paso de las épocas de entrenamiento. Las distancias intracluster e intercluster ya no tienden a cero, aunque se mantienen estáticas y no parecen aumentar lo suficiente. De nuevo, esto es compatible con una solución eficaz, pero necesitaríamos realizar un estudio más profundo de otros factores para obtener buenos resultados. Por otro lado, los resultados expuestos en la \tableref{table:resultados_cacd_corregido} son buenos. Aunque estén alejados de ser realmente competentes, son más que suficientes para validar nuestra solución. Los valores de las métricas \textit{Rank@k} han mejorado significativamente en ambos casos. Los valores de \textit{Silhouette} siguen siendo igual de malos, pero de nuevo, esto nos indica que para obtener un modelo con alto rendimiento deberíamos realizar un estudio en profundidad de la arquitectura e hiperparámetros utilizados. Cabe destacar que el rendimiento del modelo entrenado usando \textit{Batch All} es algo menor que el entrenado con \textit{Batch Hard}, pero sigue siendo suficiente para validar la eficacia de nuestra solución.
 
 Para poder comparar adecuadamente respecto a la implementación sin corrección, repetiremos el experimento sin corrección usando los hiperparámetros especificados en la \tableref{table:hp_cacd_corregido}. Además, como ya hemos comentado previamente, usaremos una parte de \textit{CACD} para evaluar el modelo, en vez de usar \textit{FG-Net}. No volvemos a mostrar el proceso de entrenamiento pues los comportamientos que hemos estudiado no cambian con estos nuevos hiperparámetros. Así que únicamente mostramos los resultados en la \tableref{table:resultados_cacd_mal_nueva} y la comparación entre experimentos antes y después de la corrección en la \tableref{table:comparaciones_cacd_resultados}.
 
@@ -781,7 +802,7 @@ En primer lugar, los resultados recogidos por la \tableref{table:resultados_cacd
 
 \section{Conclusiones extraídas de la experimentación} \label{isec:conclusiones_experimentacion}
 
-En base a \imgref{img:metricas_entrenamiento} y \tableref{table:resultados_sobre_fg_net} queda claro que el entrenamiento de este modelo, a partir de las técnicas que hemos ido desarrollando en este trabajo, no han producido un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una \textbf{comparativa entre algunos modelos del estado del arte y nuestro modelo}:
+El experimento inicial que mostramos en la \imgref{img:metricas_entrenamiento} y la \tableref{table:resultados_sobre_fg_net} deja claro que el entrenamiento de este modelo, a partir de las técnicas que hemos ido desarrollando en este trabajo, no producen un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una comparativa entre algunos modelos del estado del arte y nuestro modelo.
 
 \begin{table}[!hbtp]
 \centering
@@ -791,18 +812,19 @@ En base a \imgref{img:metricas_entrenamiento} y \tableref{table:resultados_sobre
     \hline
 
     \textbf{\textit{MTLFace}} & \textbf{94.78}                              \\
-    \textit{DAL}              & 94.5                                        \\
-    \textit{AIM}              & 93.20                                       \\
-    Nuestro modelo            & 0.07185                                     \\
+    \textit{DAL}              & 0.945                                       \\
+    \textit{AIM}              & 0.9320                                      \\
+    Nuestro modelo            & 0.0718                                      \\
     \hline
 
 \end{tabular}
-\caption{Resultados \textit{Rank@1 Accuracy} de distintos modelos del estado del arte y el modelo que hemos entrenado en este trabajo}
+\caption{Resultados \textit{Rank@1 Accuracy} de distintos modelos del estado del arte y el modelo inicial que hemos entrenado en este trabajo.}
 \label{table:estado_del_arte_y_mi_modelo}
 \end{table}
 
-Claramente, \textbf{nuestro modelo está muy lejos de ser competitivo con los modelos del estado del arte}. Es más, está \textbf{lejos de ser aplicable en ningún escenario práctico}. Podríamos haber obtenido un modelo que, aunque no fuera competitivo con el estado del arte, tuviese un rendimiento decente. En cuyo caso tendríamos un modelo aplicable mucho más ligero que los modelos del estado del arte. Pero estamos muy lejos de encontrarnos en esa situación.
+Claramente, nuestro modelo está muy lejos de ser competitivo con los modelos del estado del arte. Es más, está lejos de ser aplicable en ningún escenario práctico. Podríamos haber obtenido un modelo que, aunque no fuera competitivo con el estado del arte, tuviese un rendimiento decente. En cuyo caso tendríamos un modelo aplicable mucho más ligero que los modelos del estado del arte. Pero estamos muy lejos de encontrarnos en esa situación.
 
-El rendimiento ha sido tan malo que hemos pensado que existía un error en nuestra extensa base de código. Esto ha motivado la implementación de una amplia gama de \textit{tests} para descartar esta opción, como hemos desarrollado en \sectionref{isec:test_suite}. Gracias a esta amplia \textit{suite} de \textit{tests} descartamos, con cierto grado de confianza, que los malos resultados se deban a un error de implementación.
+Estos resultados son demasiado malos como para ser defendibles. En base a ello aplicamos las técnicas de estudio al conjunto de datos \textit{MNIST}. Volvemos a obtener malos resultados, como mostramos en la \imgref{img:progreso_entrenamiento_mnist_mal} y la \tableref{table:resultados_mnist_mal}. Exploramos distintas bases de código en la \sectionref{isubsec:experiemntacion_base_codigo_externa} para descartar la posibilidad de que la raíz del problema sea un fallo por nuestra parte, o bien en la implementación o bien en la ejecución de las distintas técnicas. Estas bases de código exhiben los mismos problemas que los que nosotros estamos enfrentando. Así que descartamos la posibilidad de que exista un fallo por nuestra parte y en \sectionref{isubsec:identificacion_problemas_propuesta_solucion} identificamos la raíz del problema. Además, la extensa base de \textit{tests}, que explicamos en \sectionref{isec:test_suite}, respalda este hecho.
 
-Los resultados son tan malos que \textbf{no consideramos que merezca la pena realizar modificaciones a las técnicas empleadas}, basadas en \textit{triplet loss}, para buscar mejoras futuras de rendimiento. En base a estos resultados, el enfoque más adecuado sería explorar técnicas radicalmente diferentes, como las propuestas por los distintos modelos del estado del arte que hemos estudiado en \sectionref{isec:mejores_modelos_estado_arte}.
+A partir de identificar la raíz de los problemas que estamos enfrentando, nuestro objetivo pasa a ser proponer una solución a dicho problema y validar su eficacia. Por lo tanto, ya no nos preocupamos tanto de obtener un modelo competente entrenado sobre \textit{CACD} y que funcione adecuadamente sobre \textit{FG-Net}, por lo que pasamos a trabajar exclusivamente sobre \textit{CACD}. En este sentido cumplimos satisfactoriamente estos nuevos objetivos. En la \sectionref{isubsec:experimentacion_mnist_bien} y \sectionref{isubsec:experimentacion_cacd_bien} validamos la eficacia de la solución propuesta. Las mejoras de rendimiento son muy significativas, como muestran la \tableref{table:comparaciones_mnist_resultados} y la \tableref{table:comparaciones_cacd_resultados}.
+
