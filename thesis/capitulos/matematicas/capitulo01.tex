@@ -28,12 +28,12 @@ Los principales \textbf{objetivos} del presente trabajo son:
 	      \end{itemize}
 	\item Demostrar dos resultados centrales que pondrán de manifiesto la superioridad de las redes profundas, en lo que se conoce como eficiencia en profundidad, a través de las ya mencionadas descomposiciones tensoriales.
 	      \begin{itemize}
-		      \item El primer resultado central, el \propref{teorema:teorema_principal_especificacion}, que dice que si tenemos un modelo profundo con un número polinomial de coeficientes, el modelo somero necesitará al menos un número exponencial de coeficientes para poder implementar el mismo modelo. Esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo.
+		      \item El primer resultado central, el \propref{teorema:teorema_principal_especificacion}, dice que si tenemos un modelo profundo con un número polinomial de coeficientes, el modelo somero necesitará al menos un número exponencial de coeficientes para poder implementar el mismo modelo. Esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo.
 		      \item El segundo resultado central, el \propref{corolario:corolario_principal_concreto}, indica que no es que un modelo somero no pueda realizar el modelo profundo con menos de un número exponencial de parámetros, sino que no es capaz ni de aproximar al modelo profundo con menos de un número exponencial de parámetros. De nuevo, esto ocurre casi por doquier respecto al espacio de los coeficientes que determinan el modelo profundo.
 	      \end{itemize}
 \end{enumerate}
 
-Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas de las herramientas que usaremos serán la teoría básica sobre tensores, las descomposiciones tensoriales \textit{CP} y \textit{HT}, la matrización de tensores, la teoría de la medida y finalmente el álgebra de matrices básica.
+Nos basaremos principalmente en el trabajo \cite{matematicas:principal}. Algunas de las herramientas que usaremos serán la teoría básica sobre tensores, las descomposiciones tensoriales \textit{CP} y \textit{HT}, la matrización de tensores, algunos resultados conocidos sobre la medida de Lebesgue y finalmente el álgebra de matrices básica.
 
 \section{Estructura del trabajo}
 \todo{No sé si me termina de gustar que ahora esto sea una lista}
@@ -42,8 +42,8 @@ Estructuraremos el trabajo de la siguiente manera:
 
 \begin{itemize}
 	\item En el \sectionref{ch:matematicas_fundamentales} introduciremos las herramientas básicas sobre las que fundamentaremos nuestro trabajo. En concreto, introduciremos el concepto de producto tensorial.
-	\item En el \sectionref{ch:tarea_aprendizaje} indicaremos cómo modelizamos la tarea de aprendizaje. Modelizaremos un espacio de hipótesis general, para lo cual justificaremos la elección de ciertas funciones de puntuación, que serán clave en el desarrollo del trabajo, y la elección de ciertas funciones de representación. En la \sectionref{sec:repr_funciones_puntuacion} daremos un primer paso común en la modelización de ambas arquitecturas de aprendizaje automático.
+	\item En el \sectionref{ch:tarea_aprendizaje} indicaremos cómo modelizamos la tarea de aprendizaje. Modelizaremos un espacio de hipótesis general, para lo cual justificaremos la elección de ciertas funciones de puntuación, que serán clave en el desarrollo del trabajo, y la elección de ciertas funciones de representación. En la \sectionref{subs:capa_de_representacion} daremos un primer paso común en la modelización de ambas arquitecturas de aprendizaje automático.
 	\item En el \sectionref{ch:modelizacion} desarrollaremos las dos modelizaciones (somera y profunda) a partir de dos descomposiciones tensoriales (\textit{CP} y \textit{HT}, respectivamente). Veremos en ambos casos cómo las modelizaciones realizadas se corresponden con arquitecturas usadas en la práctica del aprendizaje automático. Compararemos el número de parámetros que definen cada modelo, pues será fundamental en nuestros resultados teóricos.
 	\item En el \sectionref{chapter:teoremas_y_demostraciones} introduciremos los dos resultados principales, veremos y demostraremos algunos resultados previos necesarios para las demostraciones, y probaremos el teorema y corolario principal.
-	\item En el \sectionref{chapter:conclusiones_trabajo_futuro} comentaremos los resultados obtenidos a partir del presente trabajo e introduciremos posibles lineas de estudio en base a nuestros resultados.
+	\item En el \sectionref{chapter:conclusiones_trabajo_futuro} comentaremos los resultados obtenidos a partir del presente trabajo e introduciremos posibles líneas de estudio en base a nuestros resultados.
 \end{itemize}
