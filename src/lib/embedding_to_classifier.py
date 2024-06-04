@@ -1,10 +1,13 @@
+from typing import Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 
-import src.lib.core as core
+from . import core
+
 
 # TODO -- trasnlate documentation to english
 class EmbeddingToClassifier:
@@ -13,8 +16,9 @@ class EmbeddingToClassifier:
     Using this class, we use K-NN algorithm to adapt our model to a classification task
     """
 
-    def __init__(self, embedder: nn.Module, k: int, data_loader, embedding_dimension: int):
-
+    def __init__(
+        self, embedder: nn.Module, k: int, data_loader, embedding_dimension: int
+    ):
         # El modelo que calcula los embeddings
         self.embedder = embedder
 
@@ -36,7 +40,6 @@ class EmbeddingToClassifier:
         self.knn = self.__fit_knn()
 
     def predict_proba(self, img, batch_mode: bool = False) -> int:
-
         # Ponemos la red en modo evaluacion
         self.embedder.eval()
 
@@ -64,7 +67,6 @@ class EmbeddingToClassifier:
         return self.knn.predict(img_embedding)
 
     def predict(self, img, batch_mode: bool = False) -> int:
-
         # Ponemos la red en modo evaluacion
         self.embedder.eval()
 
@@ -90,7 +92,6 @@ class EmbeddingToClassifier:
 
         # Usamos dicho embedding para clasificar con knn
         return self.knn.predict(img_embedding)
-
 
     def predict_using_embedding(self, embedding: np.ndarray) -> int:
         """
@@ -127,7 +128,6 @@ class EmbeddingToClassifier:
         self.embedder.set_permute(False)
 
         for img, img_class in self.data_loader:
-
             # TODO -- esto hay que borrarlo
             if np.random.rand() < 0.01:
                 break
@@ -146,16 +146,15 @@ class EmbeddingToClassifier:
         return embedded_imgs, labels
 
     def __fit_knn(self):
-
         # Tomamos los datos en el formato que espera sklearn
         # para realizar el fit
         x, y = self.prepare_data_for_sklearn()
 
-        knn = KNeighborsClassifier(n_neighbors = self.k)
+        knn = KNeighborsClassifier(n_neighbors=self.k)
         knn.fit(x, y)
         return knn
 
-    def scatter_plot(self):
+    def scatter_plot(self, savefig_path: Optional[str]):
         """
         Hacemos un scatter plot del embedding obtenido
         """
@@ -163,7 +162,9 @@ class EmbeddingToClassifier:
         # Solo hacemos este plot cuando la dimension del
         # embedding es 2
         if self.embedding_dimension != 2:
-            print(f"Skipping the scatter plot, as we have {self.embedding_dimension} dimensions")
+            print(
+                f"Skipping the scatter plot, as we have {self.embedding_dimension} dimensions"
+            )
             return
 
         # Tomamos los datos en el formato adecuado para hacer el plot
@@ -171,8 +172,12 @@ class EmbeddingToClassifier:
 
         # Los ejes x,y son los datos de nuestro vector x
         # El color de los puntos lo dan las etiquetas almacenadas en y
-        plt.scatter(x = x[:, 0], y = x[:, 1], c = y)
+        plt.scatter(x=x[:, 0], y=x[:, 1], c=y)
         plt.show()
+
+        # Save fig if a path is given
+        if savefig_path is not None:
+            plt.savefig(savefig_path)
 
     def prepare_data_for_sklearn(self):
         """

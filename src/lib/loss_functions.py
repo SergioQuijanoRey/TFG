@@ -4,26 +4,27 @@ Different loss functions used in the project
 
 import itertools as it
 import logging
-from typing import List, Tuple, Dict, Callable
+from typing import Dict, List, Tuple
 
 import torch
 import torch.nn as nn
-import wandb
 from torch.autograd import Variable
 
-import src.lib.utils as utils
+import wandb
+
+from . import utils
 
 file_logger = logging.getLogger("MAIN_LOGGER")
 
 # Bases for more complex loss functions
 # ==================================================================================================
 
+
 def distance_function(first: torch.Tensor, second: torch.Tensor) -> torch.Tensor:
     """
     Basic distance function. It's the base for all losses implemented in this module
     """
     return ((first - second) * (first - second)).sum().sqrt()
-
 
 
 class TripletLoss(nn.Module):
@@ -39,11 +40,8 @@ class TripletLoss(nn.Module):
         self.margin = margin
 
     def forward(
-        self, anchor: torch.Tensor,
-        positive: torch.Tensor,
-        negative: torch.Tensor
+        self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor
     ) -> float:
-
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
 
@@ -53,7 +51,9 @@ class TripletLoss(nn.Module):
         # tenemos debajo
         return self.loss_from_distances(distance_positive, distance_negative)
 
-    def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
+    def loss_from_distances(
+        self, positive_distance: float, negative_distance: float
+    ) -> float:
         """
         Compute the loss using the using the pre-computed distances
         @param positive_distance the distance among anchor and positive
@@ -62,6 +62,36 @@ class TripletLoss(nn.Module):
 
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
         return torch.relu(positive_distance - negative_distance + self.margin)
+
+
+class OnlineTripletLoss(nn.Module):
+    """
+    Online Triplets loss
+    Takes a batch of embeddings and corresponding labels.
+    Triplets are generated using triplet_selector object that take embeddings and targets and return indices of
+    triplets
+    """
+
+    def __init__(self, margin, triplet_selector):
+        super(OnlineTripletLoss, self).__init__()
+        self.margin = margin
+        self.triplet_selector = triplet_selector
+
+    def forward(self, embeddings, target):
+        triplets = self.triplet_selector.get_triplets(embeddings, target)
+
+        if embeddings.is_cuda:
+            triplets = triplets.cuda()
+
+        ap_distances = (
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]]).pow(2).sum(1)
+        )  # .pow(.5)
+        an_distances = (
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)
+        )  # .pow(.5)
+        losses = F.relu(ap_distances - an_distances + self.margin)
+
+        return losses.mean(), len(triplets)
 
 
 class SoftplusTripletLoss(nn.Module):
@@ -76,15 +106,11 @@ class SoftplusTripletLoss(nn.Module):
 
     def __init__(self):
         super(SoftplusTripletLoss, self).__init__()
-        self.softplus = nn.Softplus(beta = 1, threshold = 1)
+        self.softplus = nn.Softplus(beta=1, threshold=1)
 
     def forward(
-        self,
-        anchor: torch.Tensor,
-        positive: torch.Tensor,
-        negative: torch.Tensor
+        self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor
     ) -> float:
-
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
 
@@ -93,7 +119,9 @@ class SoftplusTripletLoss(nn.Module):
         # That's what ReLU does
         return self.loss_from_distances(distance_positive, distance_negative)
 
-    def loss_from_distances(self, positive_distance: float, negative_distance: float) -> float:
+    def loss_from_distances(
+        self, positive_distance: float, negative_distance: float
+    ) -> float:
         """
         Compute the loss using the using the pre-computed distances
         @param positive_distance the distance among anchor and positive
@@ -103,8 +131,10 @@ class SoftplusTripletLoss(nn.Module):
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
         return self.softplus(positive_distance - negative_distance)
 
+
 # Loss functions for batches of triplets
 # ==================================================================================================
+
 
 class MeanTripletBatchTripletLoss(nn.Module):
     """
@@ -114,20 +144,24 @@ class MeanTripletBatchTripletLoss(nn.Module):
     Thus, some offline mechanism for mining triplets is needed (ie. random triplets)
     """
 
-    def __init__(self, margin=1.0, use_softplus = False):
+    def __init__(self, margin=1.0, use_softplus=False):
         super(MeanTripletBatchTripletLoss, self).__init__()
         self.margin = margin
-        self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+        self.base_loss = (
+            TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+        )
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
         losses = torch.tensor(
             [self.base_loss(current[0], current[1], current[2]) for current in batch],
-            requires_grad=True
+            requires_grad=True,
         )
         return losses.mean()
 
+
 # Loss functions for batches of images (and not triplets)
 # ==================================================================================================
+
 
 # Copiamos esto de https://stackoverflow.com/a/22279947
 # Lo necesitamos para saltarnos el elemento de una lista de
@@ -167,8 +201,7 @@ class BatchBaseTripletLoss(nn.Module):
 
     # TODO -- move to utils module
     def precompute_negative_class(
-        self,
-        dict_of_classes: Dict[int, List[int]]
+        self, dict_of_classes: Dict[int, List[int]]
     ) -> Dict[int, List[int]]:
         """
         Computes a dictionary `dict_of_negatives`. Each key i has associated a list with all the
@@ -187,14 +220,14 @@ class BatchBaseTripletLoss(nn.Module):
         # Iterate over all classes present in the dataset
         # The labels are enconded as the keys of `dict_of_classes`
         for label in dict_of_classes.keys():
-
             dict_of_negatives[label] = []
             for other_label in dict_of_classes.keys():
-
                 if other_label == label:
                     continue
 
-                dict_of_negatives[label] = dict_of_negatives[label] + dict_of_classes[other_label]
+                dict_of_negatives[label] = (
+                    dict_of_negatives[label] + dict_of_classes[other_label]
+                )
 
         return dict_of_negatives
 
@@ -218,14 +251,13 @@ class BatchBaseTripletLoss(nn.Module):
 
         # Embeddings should be a tensor matrix
         if utils.is_matrix_tensor(embeddings) is False:
-
             err_msg = f"""`embeddings` should be a tensor containing a matrix
             `embeddings` has {utils.number_of_modes(embeddings)} modes, instead of two"""
 
             raise ValueError(err_msg)
 
         # Use pytorch function to compute all pairwise distances
-        distances = torch.cdist(embeddings, embeddings, p = 2)
+        distances = torch.cdist(embeddings, embeddings, p=2)
         return distances
 
     def precompute_pairwise_distances(
@@ -267,6 +299,7 @@ class BatchBaseTripletLoss(nn.Module):
 
         return distances
 
+
 class BatchHardTripletLoss(nn.Module):
     """
     Implementation of Batch Hard Triplet Loss
@@ -280,13 +313,17 @@ class BatchHardTripletLoss(nn.Module):
     we need to constantly compute all positive all negative distances.
     """
 
-    def __init__(self, margin: float = 1.0, use_softplus = False, use_gt_than_zero_mean = False):
+    def __init__(
+        self, margin: float = 1.0, use_softplus=False, use_gt_than_zero_mean=False
+    ):
         super(BatchHardTripletLoss, self).__init__()
 
         self.margin = margin
 
         # Select base loss depending on given parameters
-        self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+        self.base_loss = (
+            TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+        )
 
         # Select if all summands have to taken in account to compute the mean or only those sumamnds
         # greater than zero
@@ -311,40 +348,49 @@ class BatchHardTripletLoss(nn.Module):
         # demasiadas veces
         self.list_of_negatives = None
 
-
         # Precompute all pairwise distances to speed up computation
         self.pairwise_distances = None
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
-
         loss = 0
 
         # Pre-computamos la separacion en positivos y negativos
-        self.dict_of_classes = utils.precompute_dict_of_classes([int(label) for label in labels])
+        self.dict_of_classes = utils.precompute_dict_of_classes(
+            [int(label) for label in labels]
+        )
 
         # Pre-computamos la lista de negativos de cada clase
-        self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
+        self.list_of_negatives = self.precomputations.precompute_negative_class(
+            self.dict_of_classes
+        )
 
         # Precompute all pairwise distances
-        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings)
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(
+            embeddings
+        )
 
         # Count non zero losses in order to compute the > 0 mean
         non_zero_losses = 0
 
         # Iteramos sobre todas los embeddings de las imagenes del dataset
         # TODO -- try to use pre-computed pairwise distances and see if it speeds up the calculation
-        for embedding_indx, (embedding, img_label) in enumerate(zip(embeddings, labels)):
-
+        for embedding_indx, (embedding, img_label) in enumerate(
+            zip(embeddings, labels)
+        ):
             # Calculamos las distancias a positivos y negativos
             # Nos aprovechamos de la pre-computacion
             positive_distances = [
-                self.pairwise_distances[self.__resort_dict_idx(embedding_indx, positive_indx)]
+                self.pairwise_distances[
+                    self.__resort_dict_idx(embedding_indx, positive_indx)
+                ]
                 for positive_indx in self.dict_of_classes[int(img_label)]
             ]
 
             # Ahora nos aprovechamos del segundo pre-computo realizado
             negative_distances = [
-                self.pairwise_distances[self.__resort_dict_idx(embedding_indx, negative_indx)]
+                self.pairwise_distances[
+                    self.__resort_dict_idx(embedding_indx, negative_indx)
+                ]
                 for negative_indx in self.list_of_negatives[int(img_label)]
             ]
 
@@ -397,6 +443,7 @@ class BatchHardTripletLoss(nn.Module):
 
         return first, second
 
+
 class BatchAllTripletLoss(nn.Module):
     """
     Implementation of Batch All Triplet Loss
@@ -406,12 +453,14 @@ class BatchAllTripletLoss(nn.Module):
     out of RAM. That is not the case for BatchHardTripletLoss, where large minibatches are encouraged
     """
 
-    def __init__(self, margin=1.0, use_softplus = False, use_gt_than_zero_mean = False):
+    def __init__(self, margin=1.0, use_softplus=False, use_gt_than_zero_mean=False):
         super(BatchAllTripletLoss, self).__init__()
         self.margin = margin
 
         # Select the base loss depending on given parameters
-        self.base_loss = TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+        self.base_loss = (
+            TripletLoss(self.margin) if use_softplus is False else SoftplusTripletLoss()
+        )
 
         # Class to access shared code across all Batch Triplet Loss functions
         self.precomputations = BatchBaseTripletLoss()
@@ -441,34 +490,45 @@ class BatchAllTripletLoss(nn.Module):
         self.pairwise_distances = None
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
-
         loss = 0
 
         # Precomputations to speed up calculations
-        self.dict_of_classes = utils.precompute_dict_of_classes([int(label) for label in labels])
-        self.list_of_negatives = self.precomputations.precompute_negative_class(self.dict_of_classes)
-        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(embeddings)
+        self.dict_of_classes = utils.precompute_dict_of_classes(
+            [int(label) for label in labels]
+        )
+        self.list_of_negatives = self.precomputations.precompute_negative_class(
+            self.dict_of_classes
+        )
+        self.pairwise_distances = self.precomputations.precompute_pairwise_distances(
+            embeddings
+        )
 
         # For computing the mean
         # We have to instantiate the var using this syntax so backpropagation can be done properly
-        summands_used = Variable(torch.tensor(0.0), requires_grad = True)
+        summands_used = Variable(torch.tensor(0.0), requires_grad=True)
 
         # For logging purposes, see how many summands in total are seen
         seen_summands = 0
 
         # Iterate over all elements, that act as anchors
         for [anchor_idx, _], anchor_label in zip(enumerate(embeddings), labels):
-
             # Compute all combinations of positive / negative loss
             # Use the precomputed distances to speed up this calculation
-            losses = torch.tensor([
-                self.base_loss.loss_from_distances(
-                    self.pairwise_distances[self.__resort_dict_idx(anchor_idx, positive_idx)],
-                    self.pairwise_distances[self.__resort_dict_idx(anchor_idx, negative_idx)]
-                )
-                for positive_idx in self.dict_of_classes[int(anchor_label)] if positive_idx != anchor_idx
-                for negative_idx in self.list_of_negatives[int(anchor_label)]
-            ])
+            losses = torch.tensor(
+                [
+                    self.base_loss.loss_from_distances(
+                        self.pairwise_distances[
+                            self.__resort_dict_idx(anchor_idx, positive_idx)
+                        ],
+                        self.pairwise_distances[
+                            self.__resort_dict_idx(anchor_idx, negative_idx)
+                        ],
+                    )
+                    for positive_idx in self.dict_of_classes[int(anchor_label)]
+                    if positive_idx != anchor_idx
+                    for negative_idx in self.list_of_negatives[int(anchor_label)]
+                ]
+            )
 
             # Accumulate loss
             loss += torch.sum(losses)
@@ -482,7 +542,6 @@ class BatchAllTripletLoss(nn.Module):
             # In both cases, the seen summands are the same
             # Again, this is used for logging purposes
             seen_summands += len(losses)
-
 
         # Keep track of active triplets
         # Try is because before this we must have executed `wandb.init`
@@ -533,7 +592,6 @@ class AddSmallEmbeddingPenalization(nn.Module):
         self.epsilon = 0.0001
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> float:
-
         # Start computing base loss
         loss = self.base_loss(embeddings, labels)
 

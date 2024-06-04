@@ -1,21 +1,20 @@
 """Different metrics in one place"""
 
-import torch
-import numpy as np
-from torch.utils.data import DataLoader
-from torch import nn
-from sklearn.metrics import silhouette_score
-
 import itertools
-from typing import Callable, Dict, List, Tuple, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
-import src.lib.core as core
-import src.lib.utils as utils
-import src.lib.loss_functions as loss_functions
-import src.lib.metrics as metrics
-import src.lib.models as models
+import numpy as np
+import torch
+from sklearn.metrics import silhouette_score
+from torch import nn
+from torch.utils.data import DataLoader
 
-def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function) -> float:
+from . import core, loss_functions, metrics, models, utils
+
+
+def calculate_mean_loss(
+    net: nn.Module, data_loader: DataLoader, max_examples: int, loss_function
+) -> float:
     """
     Calculates mean loss over a data set
 
@@ -52,7 +51,10 @@ def calculate_mean_loss(net: nn.Module, data_loader: DataLoader, max_examples: i
     mean_loss = acumulated_loss / curr_examples
     return mean_loss
 
-def calculate_accuracy(net: nn.Module, data_loader: DataLoader, max_examples: int) -> float:
+
+def calculate_accuracy(
+    net: nn.Module, data_loader: DataLoader, max_examples: int
+) -> float:
     """
     Calculates accuracy over a data set
 
@@ -91,7 +93,10 @@ def calculate_accuracy(net: nn.Module, data_loader: DataLoader, max_examples: in
     acc = correct_predictions / curr_examples * 100.0
     return acc
 
-def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader, loss_function) -> float:
+
+def calculate_mean_triplet_loss_offline(
+    net: nn.Module, data_loader: DataLoader, loss_function
+) -> float:
     """
     Calculates mean loss over a data set, for a triplet-like loss
     Offline version
@@ -112,7 +117,6 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
     # Calculate loss in the given dataset
     acumulated_loss = 0.0
     for data in data_loader:
-
         # Calculate embeddings
         # Put them together in one batch
         batch = [net(item[None, ...].to(device)) for item in data]
@@ -120,9 +124,9 @@ def calculate_mean_triplet_loss_offline(net: nn.Module, data_loader: DataLoader,
         # Calculate loss
         acumulated_loss += loss_function(batch)
 
-
     mean_loss = acumulated_loss / len(data_loader.dataset)
     return mean_loss
+
 
 # TODO -- PERF -- this function is taking a lot of time
 # TODO -- PERF -- but most of the time is spent getting the data
@@ -131,7 +135,7 @@ def calculate_mean_loss_function_online(
     data_loader: DataLoader,
     loss_function: Callable,
     max_examples: int,
-    greater_than_zero: bool = False
+    greater_than_zero: bool = False,
 ) -> float:
     """
     Calculates mean loss over a data set, for a triplet-like loss online version
@@ -157,7 +161,6 @@ def calculate_mean_loss_function_online(
     curr_examples = 0
     gt_than_zero_examples = 0
     for data in data_loader:
-
         # Unwrap the data
         imgs, labels = data
 
@@ -176,12 +179,12 @@ def calculate_mean_loss_function_online(
         if current_loss > 0:
             gt_than_zero_examples += imgs.size(0)
 
-
     # Compute mean loss in function of gt_than_zero_examples
     denominator = gt_than_zero_examples if greater_than_zero else curr_examples
     mean_loss = acumulated_loss / denominator
 
     return mean_loss
+
 
 # TODO -- BUG -- sometimes we get a lot more of values than `max_examples`
 def __get_portion_of_dataset_and_embed(
@@ -217,6 +220,7 @@ def __get_portion_of_dataset_and_embed(
         net,
         max_examples,
     )
+
 
 def __get_portion_of_dataset_and_embed_fast(
     data_loader: torch.utils.data.DataLoader,
@@ -264,10 +268,7 @@ def __get_portion_of_dataset_and_embed_fast(
     # Convert to numpy array
     # Numpy arrays cannot live in GPU memory
     # Also, we have a python list of tensors
-    targets = np.array([
-        target.cpu()
-        for target in targets
-    ])
+    targets = np.array([target.cpu() for target in targets])
 
     # Make the conversion for the embeddings
     # We have a list of tensors. For computing its distance, we need a matrix
@@ -284,9 +285,8 @@ def __get_portion_of_dataset_and_embed_fast(
     if utils.is_vector_tensor(embeddings[0]):
         conversion_method = lambda embeddings: torch.stack(embeddings)
     elif utils.is_matrix_tensor(embeddings[1]):
-        conversion_method = lambda embeddings: torch.cat(embeddings, dim = 0)
+        conversion_method = lambda embeddings: torch.cat(embeddings, dim=0)
     else:
-
         # Raise an informative exception
         err_msg = f"""`embeddings` has {utils.number_of_modes(embeddings)}
         We don't have a conversion method to get the correct format for \
@@ -300,7 +300,6 @@ def __get_portion_of_dataset_and_embed_fast(
     # Check that the embeddings tensor is in fact a matrix tensor
     # That's to say, that it has two modes
     if utils.is_matrix_tensor(embeddings) is False:
-
         err_msg = f"""Embeddings should be a matrix tensor or a vector matrix
         Embeddings tensor has {len(embeddings.shape)} modes, instead of two or one
         """
@@ -308,6 +307,7 @@ def __get_portion_of_dataset_and_embed_fast(
         raise Exception(err_msg)
 
     return embeddings, targets
+
 
 def __get_portion_of_dataset_and_embed_slow(
     data_loader: torch.utils.data.DataLoader,
@@ -336,11 +336,12 @@ def __get_portion_of_dataset_and_embed_slow(
 
     return embeddings, targets
 
+
 def compute_cluster_sizes_metrics(
     data_loader: torch.utils.data.DataLoader,
     net: torch.nn.Module,
     max_examples: int,
-    fast_implementation: bool
+    fast_implementation: bool,
 ) -> Dict[str, float]:
     """
     Computes metrics about cluster sizes
@@ -364,10 +365,7 @@ def compute_cluster_sizes_metrics(
     # Get the portion of the dataset we're interested in
     # Also, use this step to compute the embeddings of the images
     embeddings, targets = __get_portion_of_dataset_and_embed(
-        data_loader,
-        net,
-        max_examples,
-        fast_implementation = fast_implementation
+        data_loader, net, max_examples, fast_implementation=fast_implementation
     )
 
     # Pre-compute dict of classes for efficiency
@@ -389,9 +387,9 @@ def compute_cluster_sizes_metrics(
 
     return metrics
 
+
 def compute_intracluster_distances(
-    dict_of_classes: Dict[int, List[int]],
-    elements: torch.Tensor
+    dict_of_classes: Dict[int, List[int]], elements: torch.Tensor
 ) -> Dict[int, List[float]]:
     """
     Aux function that computes, for each cluster, all the distance between two points of that cluster
@@ -407,7 +405,6 @@ def compute_intracluster_distances(
     for curr_class in dict_of_classes.keys():
         for first_indx in dict_of_classes[curr_class]:
             for second_indx in dict_of_classes[curr_class]:
-
                 # We don't want the distance of an element with itself
                 # Also, as d(a, b) = d(b, a), we only compute distance for a < b
                 # We skip if a > b or a == b, thus, when a >= b
@@ -429,12 +426,13 @@ def compute_intracluster_distances(
 
     return class_distances
 
+
 def compute_intercluster_metrics(
-        data_loader: torch.utils.data.DataLoader,
-        net: torch.nn.Module,
-        max_examples: int,
-        fast_implementation: bool
-    ) -> Dict[str, float]:
+    data_loader: torch.utils.data.DataLoader,
+    net: torch.nn.Module,
+    max_examples: int,
+    fast_implementation: bool,
+) -> Dict[str, float]:
     """
     Computes metrics about intercluster metrics
     This information will be:
@@ -459,10 +457,7 @@ def compute_intercluster_metrics(
     # Also, use this step to compute the embeddings of the images
     # TODO -- PERF -- this is taking too much time
     embeddings, targets = __get_portion_of_dataset_and_embed(
-        data_loader,
-        net,
-        max_examples,
-        fast_implementation
+        data_loader, net, max_examples, fast_implementation
     )
 
     # Pre-compute dict of classes for efficiency
@@ -472,7 +467,9 @@ def compute_intercluster_metrics(
     distances = __compute_pairwise_distances(embeddings)
 
     # Now compute inter distances
-    intercluster_distances: Dict[Tuple[int, int], float] = compute_intercluster_distances(distances, dict_of_classes)
+    intercluster_distances: Dict[Tuple[int, int], float] = (
+        compute_intercluster_distances(distances, dict_of_classes)
+    )
 
     # Flatten prev dict, indexed by two indixes
     flatten_intercluster_distances = intercluster_distances.values()
@@ -485,14 +482,14 @@ def compute_intercluster_metrics(
         "min": float(min(flatten_intercluster_distances)),
         "max": float(max(flatten_intercluster_distances)),
         "mean": float(torch.mean(flatten_intercluster_distances)),
-        "sd": float(torch.std(flatten_intercluster_distances, unbiased = False)),
+        "sd": float(torch.std(flatten_intercluster_distances, unbiased=False)),
     }
 
     return metrics
 
+
 def compute_intercluster_distances(
-    distances: torch.Tensor,
-    dict_of_classes: Dict[int, List[int]]
+    distances: torch.Tensor, dict_of_classes: Dict[int, List[int]]
 ) -> Dict[Tuple[int, int], float]:
     """
     Computes the intercluster distances of a given set of embedding clusters
@@ -511,8 +508,7 @@ def compute_intercluster_distances(
 
     # For each cluster pair, compute its intercluster distance
     intercluster_distance = dict()
-    for (first_cluster, second_cluster) in cluster_pairs:
-
+    for first_cluster, second_cluster in cluster_pairs:
         intercluster_distances = [
             # Distances have only indixes (first, second) such that first < second
             # So we rearrange them for assuring this condition
@@ -521,11 +517,16 @@ def compute_intercluster_distances(
             for second_indx in dict_of_classes[second_cluster]
         ]
 
-        intercluster_distance[(first_cluster, second_cluster)] = min(intercluster_distances)
+        intercluster_distance[(first_cluster, second_cluster)] = min(
+            intercluster_distances
+        )
 
     return intercluster_distance
 
-def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, int], float]:
+
+def __compute_pairwise_distances(
+    embeddings: torch.Tensor,
+) -> Dict[Tuple[int, int], float]:
     """
     Computes the pairwise distance of elements in the embeddings set. Only for elements indexed a, b
     such that a < b
@@ -536,9 +537,12 @@ def __compute_pairwise_distances(embeddings: torch.Tensor) -> Dict[Tuple[int, in
     distances = base_loss.precompute_pairwise_distances(embeddings)
 
     # Prev dict has elements [a, a] with distance 0. We are not interested in those
-    distances = {index: distances[index] for index in distances.keys() if index[0] != index[1]}
+    distances = {
+        index: distances[index] for index in distances.keys() if index[0] != index[1]
+    }
 
     return distances
+
 
 def silhouette(
     data_loader: torch.utils.data.DataLoader,
@@ -548,8 +552,8 @@ def silhouette(
     embeddings, targets = metrics.__get_portion_of_dataset_and_embed(
         data_loader,
         network,
-        max_examples = len(data_loader),
-        fast_implementation = False,
+        max_examples=len(data_loader),
+        fast_implementation=False,
     )
     # Compute the parwise distances
     base_loss = loss_functions.BatchBaseTripletLoss().raw_precompute_pairwise_distances
@@ -559,8 +563,9 @@ def silhouette(
     return silhouette_score(
         pairwise_distances.cpu().detach().numpy(),
         targets.cpu().detach().numpy(),
-        metric = "euclidean"
+        metric="euclidean",
     )
+
 
 def rank_accuracy(
     k: int,
@@ -569,7 +574,7 @@ def rank_accuracy(
     max_examples: int,
     fast_implementation: Optional[bool] = None,
 ) -> float:
-    """"
+    """ "
     Computes the rank-k accuracy metric. Thus, this only can be used when the
     network performs information retrieval
 
@@ -605,7 +610,7 @@ def rank_accuracy(
         data_loader,
         network,
         max_examples,
-        fast_implementation = fast_implementation,
+        fast_implementation=fast_implementation,
     )
 
     # We are going to use some pytorch methods to get only one part of the
@@ -617,14 +622,13 @@ def rank_accuracy(
     # In each step, we are going to use one entry as the query, and the rest
     # of the entries as the candidates. This function takes a tensor `data`
     # and a position, `n` and returns the same tensor without the `n`-th entry
-    deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
+    deleter = lambda data, n: torch.cat((data[:n], data[n + 1 :]), dim=0)
 
     # Iterate over all entries and count the number of successes
     # We consider a success when in the returned `k` best candidates, there is
     # at least one candidate of the same class as the query entry
     successes = 0
     for index, (embedding, target) in enumerate(zip(embeddings, targets)):
-
         # Get all the data withot the current query entry
         embeddings_without_query = deleter(embeddings, index)
         targets_without_query = deleter(targets, index)
@@ -635,9 +639,9 @@ def rank_accuracy(
 
         # Use the network to retrieve the best `k` candidates for our current query
         best_k_candidates = retrieval_network.query_embedding(
-            query_embedding = embedding,
-            candidate_embeddings = embeddings_without_query,
-            k = k
+            query_embedding=embedding,
+            candidate_embeddings=embeddings_without_query,
+            k=k,
         )
         best_k_candidates = best_k_candidates.to(device)
 
@@ -656,7 +660,7 @@ def local_rank_accuracy(
     network: torch.nn.Module,
     max_examples: int,
 ) -> float:
-    """"
+    """ "
     Computes the rank-k accuracy metric. Thus, this only can be used when the
     network performs information retrieval
 
@@ -688,14 +692,13 @@ def local_rank_accuracy(
     #
     # TODO -- extract this deleter function, because it is used twice, and
     # test properly
-    deleter = lambda data, n: torch.cat((data[:n], data[n + 1:]), dim = 0)
+    deleter = lambda data, n: torch.cat((data[:n], data[n + 1 :]), dim=0)
 
     # Count seen examples (so we respect `max_examples`) and count successes,
     # so we can compute the accuracy
     seen_examples = 0
     successes = 0
     for images, targets in data_loader:
-
         # Compute the embedding of the images inside this batch
         embeddings = network(images.to(device))
         embeddings = embeddings.to(device)
@@ -712,16 +715,13 @@ def local_rank_accuracy(
 
         # Now iterate over the elements of the current batch
         for index, (embedding, target) in enumerate(zip(embeddings, targets)):
-
             # Get the data we are interested in
             other_embeddings = deleter(embeddings, index)
             other_targets = deleter(targets, index)
 
             # Perform the query, within the current batch!
             best_k_candidates = retrieval_network.query_embedding(
-                query_embedding = embedding,
-                candidate_embeddings = other_embeddings,
-                k = k
+                query_embedding=embedding, candidate_embeddings=other_embeddings, k=k
             )
             best_k_candidates = best_k_candidates.to(device)
 

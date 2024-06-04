@@ -1,16 +1,16 @@
+import logging
 from abc import ABC, abstractmethod
+from typing import Callable, Dict, List
 
 import torch
-from torch.utils.data import DataLoader
 from torch import nn
-import wandb
-from typing import List, Callable, Dict
+from torch.utils.data import DataLoader
 
-import logging
+import wandb
+
 file_logger = logging.getLogger("MAIN_LOGGER")
 
-import src.lib.core as core
-import src.lib.metrics as metrics
+from . import core, metrics
 
 
 class TrainLogger(ABC):
@@ -27,7 +27,7 @@ class TrainLogger(ABC):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
         """
         Logs an iteration of training process. This log can be just printing to terminal or saving
@@ -58,6 +58,7 @@ class TrainLogger(ABC):
         """
         pass
 
+
 class IterationLogger(TrainLogger):
     """
     Many classes log only when a certain number of iterations hits. So this abstract
@@ -78,7 +79,6 @@ class IterationLogger(TrainLogger):
         self.__iterations = new_it
 
     def should_log(self, iteration: int) -> bool:
-
         if iteration % self.iterations == 0:
             return True
 
@@ -88,13 +88,20 @@ class IterationLogger(TrainLogger):
 class SilentLogger(TrainLogger):
     """Logger that does not log data"""
 
-    def log_process(self, train_loader: DataLoader, validation_loader: DataLoader, epoch: int, iteration: int) -> None:
+    def log_process(
+        self,
+        train_loader: DataLoader,
+        validation_loader: DataLoader,
+        epoch: int,
+        iteration: int,
+    ) -> None:
         # This code should never be triggered, because of `should_log`, but just in case just pass
         pass
 
     def should_log(self, epoch_iteration: int) -> bool:
         # Always return false in order to never log
         return False
+
 
 # TODO -- TEST -- write some unit tests for this class
 class CompoundLogger(TrainLogger):
@@ -118,34 +125,32 @@ class CompoundLogger(TrainLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # TODO -- this break the return type that we've annotated
         ret_values: Dict[str, float] = dict()
 
         # Iterate over all the loggers that want to log
         for indx, logger in enumerate(self.loggers):
             if self.logger_should_log[indx] is True:
-
                 # Get the returned dict of this logger
                 ret_val = logger.log_process(
-                    train_loader,
-                    validation_loader,
-                    epoch,
-                    epoch_iteration
+                    train_loader, validation_loader, epoch, epoch_iteration
                 )
 
                 # Check that there is no repeated key
                 for key in ret_val.keys():
                     if key in ret_values.keys():
-
                         # Log some extra information before raising the exception
-                        file_logger.error((f"Two loggers return a value with the same key, {key}"))
+                        file_logger.error(
+                            (f"Two loggers return a value with the same key, {key}")
+                        )
                         file_logger.error((f"key was: {key}"))
                         file_logger.error((f"ret_values.keys() = {ret_values.keys()}"))
 
-                        raise Exception(f"Two loggers return a value with the same key, {key}")
+                        raise Exception(
+                            f"Two loggers return a value with the same key, {key}"
+                        )
 
                 # Merge the dict returned by the current logger to our global dict
                 # Google Colab does not support expression `ret_values | ret_val`
@@ -154,12 +159,14 @@ class CompoundLogger(TrainLogger):
         return ret_values
 
     def should_log(self, iteration: int) -> bool:
-
         # Compute the list of loggers that want to log
-        self.logger_should_log = [logger.should_log(iteration) for logger in self.loggers]
+        self.logger_should_log = [
+            logger.should_log(iteration) for logger in self.loggers
+        ]
 
         # Now, we can tell if there's at least one logger that wants to log
         return any(self.logger_should_log)
+
 
 # TODO -- check if I can use same logger for offline and online triplet training
 class TripletLoggerOffline(IterationLogger):
@@ -186,17 +193,15 @@ class TripletLoggerOffline(IterationLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # Seleccionamos la funcion de perdida
-        metric =  metrics.calculate_mean_triplet_loss_offline
+        metric = metrics.calculate_mean_triplet_loss_offline
 
         # Empezamos calculando las metricas que queremos mostrar
 
         # Para tener mas eficiencia en inferencia
         with torch.no_grad():
-
             # Para tener todavia mas eficiencia en inferencia
             self.net.eval()
 
@@ -205,7 +210,6 @@ class TripletLoggerOffline(IterationLogger):
 
             # Funcion de perdida en validacion
             mean_val_loss = metric(self.net, validation_loader, self.loss_func)
-
 
         # Volvemos a poner la red en modo entrenamiento
         self.net.train()
@@ -235,7 +239,7 @@ class TripletLoggerOnline(IterationLogger):
         loss_func: Callable[[torch.Tensor], float],
         train_percentage: float = 1.0,
         validation_percentage: float = 1.0,
-        greater_than_zero: bool = False
+        greater_than_zero: bool = False,
     ):
         """
         Initializes the logger
@@ -263,9 +267,8 @@ class TripletLoggerOnline(IterationLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- Online loss metric")
 
@@ -274,20 +277,33 @@ class TripletLoggerOnline(IterationLogger):
 
         # Calculamos el numero maximo de ejemplos que evaluar
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
-        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+        validation_max_examples = int(
+            len(validation_loader.dataset) * self.validation_percentage
+        )
 
         # Empezamos calculando las metricas que queremos mostrar
         # Para tener mas eficiencia en inferencia
         with torch.no_grad():
-
             # Para tener todavia mas eficiencia en inferencia
             self.net.eval()
 
             # Funcion de perdida en entrenamiento
-            mean_train_loss = metric(self.net, train_loader, self.loss_func, train_max_examples, self.greater_than_zero)
+            mean_train_loss = metric(
+                self.net,
+                train_loader,
+                self.loss_func,
+                train_max_examples,
+                self.greater_than_zero,
+            )
 
             # Funcion de perdida en validacion
-            mean_val_loss = metric(self.net, validation_loader, self.loss_func, validation_max_examples, self.greater_than_zero)
+            mean_val_loss = metric(
+                self.net,
+                validation_loader,
+                self.loss_func,
+                validation_max_examples,
+                self.greater_than_zero,
+            )
 
         # Volvemos a poner la red en modo entrenamiento
         self.net.train()
@@ -297,10 +313,7 @@ class TripletLoggerOnline(IterationLogger):
         print(f"\tValidation loss: {mean_val_loss}")
         print("")
 
-        wandb.log({
-            "training loss": mean_train_loss,
-            "validation loss": mean_val_loss
-        })
+        wandb.log({"training loss": mean_train_loss, "validation loss": mean_val_loss})
 
         # Devolvemos las funciones de perdida
         return {
@@ -356,28 +369,25 @@ class IntraClusterLogger(IterationLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- Intracluster metrics")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
-        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+        validation_max_examples = int(
+            len(validation_loader.dataset) * self.validation_percentage
+        )
 
         # Compute the metrics faster
         with torch.no_grad():
-
             # Compute the metrics faster
             self.net.eval()
 
             # Get the two metrics
             train_metrics = metrics.compute_cluster_sizes_metrics(
-                train_loader,
-                self.net,
-                train_max_examples,
-                self.fast_implementation
+                train_loader, self.net, train_max_examples, self.fast_implementation
             )
             validation_metrics = metrics.compute_cluster_sizes_metrics(
                 validation_loader,
@@ -385,7 +395,6 @@ class IntraClusterLogger(IterationLogger):
                 validation_max_examples,
                 self.fast_implementation,
             )
-
 
         # Get the network in training mode again
         self.net.train()
@@ -395,17 +404,18 @@ class IntraClusterLogger(IterationLogger):
         print(f"\tValidation cluster distances: {validation_metrics}")
         print("")
 
-        wandb.log({
-            "Train Min Cluster Distance": train_metrics["min"],
-            "Train Max Cluster Distance": train_metrics["max"],
-            "Train Mean Cluster Distance": train_metrics["mean"],
-            "Train SD Cluster Distance": train_metrics["sd"],
-
-            "Validation Min Cluster Distance": validation_metrics["min"],
-            "Validation Max Cluster Distance": validation_metrics["max"],
-            "Validation Mean Cluster Distance": validation_metrics["mean"],
-            "Validation SD Cluster Distance": validation_metrics["sd"],
-        })
+        wandb.log(
+            {
+                "Train Min Cluster Distance": train_metrics["min"],
+                "Train Max Cluster Distance": train_metrics["max"],
+                "Train Mean Cluster Distance": train_metrics["mean"],
+                "Train SD Cluster Distance": train_metrics["sd"],
+                "Validation Min Cluster Distance": validation_metrics["min"],
+                "Validation Max Cluster Distance": validation_metrics["max"],
+                "Validation Mean Cluster Distance": validation_metrics["mean"],
+                "Validation SD Cluster Distance": validation_metrics["sd"],
+            }
+        )
 
         # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
         # names for the keys
@@ -414,7 +424,6 @@ class IntraClusterLogger(IterationLogger):
             "Train Max Cluster Distance": train_metrics["max"],
             "Train Mean Cluster Distance": train_metrics["mean"],
             "Train SD Cluster Distance": train_metrics["sd"],
-
             "Validation Min Cluster Distance": validation_metrics["min"],
             "Validation Max Cluster Distance": validation_metrics["max"],
             "Validation Mean Cluster Distance": validation_metrics["mean"],
@@ -472,34 +481,31 @@ class InterClusterLogger(IterationLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- Intercluster Metrics")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
-        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+        validation_max_examples = int(
+            len(validation_loader.dataset) * self.validation_percentage
+        )
 
         # Compute the metrics faster
         with torch.no_grad():
-
             # Compute the metrics faster
             self.net.eval()
 
             # Get the two metrics
             train_metrics = metrics.compute_intercluster_metrics(
-                train_loader,
-                self.net,
-                train_max_examples,
-                self.fast_implementation
+                train_loader, self.net, train_max_examples, self.fast_implementation
             )
             validation_metrics = metrics.compute_intercluster_metrics(
                 validation_loader,
                 self.net,
                 validation_max_examples,
-                self.fast_implementation
+                self.fast_implementation,
             )
 
         # Get the network in training mode again
@@ -510,17 +516,18 @@ class InterClusterLogger(IterationLogger):
         print(f"\tValidation intercluster distances: {validation_metrics}")
         print("")
 
-        wandb.log({
-            "Train Min Intercluster Distance": train_metrics["min"],
-            "Train Max intercluster Distance": train_metrics["max"],
-            "Train Mean Intercluster Distance": train_metrics["mean"],
-            "Train SD Intercluster Distance": train_metrics["sd"],
-
-            "Validation Min Intercluster Distance": validation_metrics["min"],
-            "Validation Max Intercluster Distance": validation_metrics["max"],
-            "Validation Mean Intercluster Distance": validation_metrics["mean"],
-            "Validation SD Intercluster Distance": validation_metrics["sd"],
-        })
+        wandb.log(
+            {
+                "Train Min Intercluster Distance": train_metrics["min"],
+                "Train Max intercluster Distance": train_metrics["max"],
+                "Train Mean Intercluster Distance": train_metrics["mean"],
+                "Train SD Intercluster Distance": train_metrics["sd"],
+                "Validation Min Intercluster Distance": validation_metrics["min"],
+                "Validation Max Intercluster Distance": validation_metrics["max"],
+                "Validation Mean Intercluster Distance": validation_metrics["mean"],
+                "Validation SD Intercluster Distance": validation_metrics["sd"],
+            }
+        )
 
         # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
         # names for the keys
@@ -529,7 +536,6 @@ class InterClusterLogger(IterationLogger):
             "Train Max intercluster Distance": train_metrics["max"],
             "Train Mean Intercluster Distance": train_metrics["mean"],
             "Train SD Intercluster Distance": train_metrics["sd"],
-
             "Validation Min Intercluster Distance": validation_metrics["min"],
             "Validation Max Intercluster Distance": validation_metrics["max"],
             "Validation Mean Intercluster Distance": validation_metrics["mean"],
@@ -585,35 +591,35 @@ class RankAtKLogger(IterationLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- Rank@{self.k}")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
-        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+        validation_max_examples = int(
+            len(validation_loader.dataset) * self.validation_percentage
+        )
 
         # Compute the metrics faster
         with torch.no_grad():
-
             # Compute the metrics faster
             self.net.eval()
 
             # Get the train / validation metrics
             train_rank_k_accuracy = metrics.rank_accuracy(
-                k = self.k,
-                data_loader = train_loader,
-                network = self.net,
-                max_examples = train_max_examples,
+                k=self.k,
+                data_loader=train_loader,
+                network=self.net,
+                max_examples=train_max_examples,
             )
 
             validation_rank_k_accuracy = metrics.rank_accuracy(
-                k = self.k,
-                data_loader = validation_loader,
-                network = self.net,
-                max_examples = validation_max_examples,
+                k=self.k,
+                data_loader=validation_loader,
+                network=self.net,
+                max_examples=validation_max_examples,
             )
 
         # Get the network in training mode again
@@ -625,10 +631,12 @@ class RankAtKLogger(IterationLogger):
         print("")
 
         # Log that metrics to wandb
-        wandb.log({
-            f"Train Rank@{self.k} accuracy": train_rank_k_accuracy,
-            f"Validation Rank@{self.k} accuracy": validation_rank_k_accuracy,
-        })
+        wandb.log(
+            {
+                f"Train Rank@{self.k} accuracy": train_rank_k_accuracy,
+                f"Validation Rank@{self.k} accuracy": validation_rank_k_accuracy,
+            }
+        )
 
         # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
         # names for the keys
@@ -690,35 +698,35 @@ class LocalRankAtKLogger(IterationLogger):
         train_loader: DataLoader,
         validation_loader: DataLoader,
         epoch: int,
-        epoch_iteration: int
+        epoch_iteration: int,
     ) -> Dict[str, float]:
-
         # This log can be slow so we print this beforehand to have a notion on how slow it is
         print(f"[{epoch} / {epoch_iteration}] <-- Local Rank@{self.k}")
 
         # Compute the maximun number of examples to use in the metrics
         train_max_examples = int(len(train_loader.dataset) * self.train_percentage)
-        validation_max_examples = int(len(validation_loader.dataset) * self.validation_percentage)
+        validation_max_examples = int(
+            len(validation_loader.dataset) * self.validation_percentage
+        )
 
         # Compute the metrics faster
         with torch.no_grad():
-
             # Compute the metrics faster
             self.net.eval()
 
             # Get the train / validation metrics
             train_rank_k_accuracy = metrics.local_rank_accuracy(
-                k = self.k,
-                data_loader = train_loader,
-                network = self.net,
-                max_examples = train_max_examples,
+                k=self.k,
+                data_loader=train_loader,
+                network=self.net,
+                max_examples=train_max_examples,
             )
 
             validation_rank_k_accuracy = metrics.local_rank_accuracy(
-                k = self.k,
-                data_loader = validation_loader,
-                network = self.net,
-                max_examples = validation_max_examples,
+                k=self.k,
+                data_loader=validation_loader,
+                network=self.net,
+                max_examples=validation_max_examples,
             )
 
         # Get the network in training mode again
@@ -726,14 +734,18 @@ class LocalRankAtKLogger(IterationLogger):
 
         # Show obtained metrics
         print(f"\tTrain Local Rank@{self.k} accuracy: {train_rank_k_accuracy}")
-        print(f"\tValidation Local Rank@{self.k} accuracy: {validation_rank_k_accuracy}")
+        print(
+            f"\tValidation Local Rank@{self.k} accuracy: {validation_rank_k_accuracy}"
+        )
         print("")
 
         # Log that metrics to wandb
-        wandb.log({
-            f"Train Local Rank@{self.k} accuracy": train_rank_k_accuracy,
-            f"Validation Local Rank@{self.k} accuracy": validation_rank_k_accuracy,
-        })
+        wandb.log(
+            {
+                f"Train Local Rank@{self.k} accuracy": train_rank_k_accuracy,
+                f"Validation Local Rank@{self.k} accuracy": validation_rank_k_accuracy,
+            }
+        )
 
         # If we are using more than one metric logger, in `CompoundLogger`, we need to have unique
         # names for the keys

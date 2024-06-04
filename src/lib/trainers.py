@@ -2,24 +2,23 @@
 Code for different types of training
 """
 
-
 import logging
 import os
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import wandb
 from torch.utils.data import DataLoader
 
-import src.lib.filesystem as filesystem
-import src.lib.utils as utils
-from src.lib.core import get_device, get_datetime_str
-from src.lib.train_loggers import TrainLogger, SilentLogger
+import wandb
 
+from . import filesystem, utils
+from .core import get_datetime_str, get_device
+from .train_loggers import SilentLogger, TrainLogger
 
 file_logger = logging.getLogger("MAIN_LOGGER")
+
 
 def train_model_offline(
     net: nn.Module,
@@ -29,7 +28,7 @@ def train_model_offline(
     validation_loader: DataLoader = None,
     name: str = "Model",
     logger: TrainLogger = None,
-    snapshot_iterations: int = None
+    snapshot_iterations: int = None,
 ) -> dict:
     """
     Trains and saves a neural net
@@ -60,7 +59,7 @@ def train_model_offline(
     epochs = parameters["epochs"]
 
     # Use Adam as optimizer
-    optimizer = optim.Adam(net.parameters(), lr = lr)
+    optimizer = optim.Adam(net.parameters(), lr=lr)
 
     # Select proper device and move the net to that device
     device = get_device()
@@ -88,7 +87,6 @@ def train_model_offline(
 
     # Training the network
     for epoch in range(epochs):
-
         # Logger needs to know the parameter `epoch_iteration`
         # This, as `TrainLogger(ABC)` documentation says, it's the number of seen single elements
         # in this epoch. Thus, it's not the same as `how_may_elements_seen`.
@@ -97,7 +95,6 @@ def train_model_offline(
         epoch_iteration = 0
 
         for i, data in enumerate(train_loader):
-
             # zero the parameter gradients
             optimizer.zero_grad()
 
@@ -114,13 +111,9 @@ def train_model_offline(
             epoch_iteration += len(outputs)
 
             if logger.should_log(how_may_elements_seen):
-
                 # Log and return loss from training and validation
                 training_loss, validation_loss = logger.log_process(
-                    train_loader,
-                    validation_loader,
-                    epoch,
-                    epoch_iteration
+                    train_loader, validation_loader, epoch, epoch_iteration
                 )
 
                 # Save loss of training and validation sets
@@ -131,22 +124,26 @@ def train_model_offline(
 
             # Snapshots -- same as Statistics, we reuse current iteration calc
             # TODO -- create a SnapshotTaker class as we have for logs -- snapshot_taker.should_log(i)
-            if snapshot_iterations is not None and how_may_elements_seen % snapshot_iterations == 0:
-
+            if (
+                snapshot_iterations is not None
+                and how_may_elements_seen % snapshot_iterations == 0
+            ):
                 snapshot_name = "snapshot_" + name + "==" + get_datetime_str()
                 snapshot_folder = os.path.join(path, "snapshots")
-                filesystem.save_model(net, folder_path = snapshot_folder, file_name = snapshot_name)
+                filesystem.save_model(
+                    net, folder_path=snapshot_folder, file_name=snapshot_name
+                )
 
     print("Finished training")
-
 
     # Save the model -- use name + date stamp to save the model
     date = get_datetime_str()
     name = name + "==" + date
-    filesystem.save_model(net = net, folder_path = path, file_name = name)
+    filesystem.save_model(net=net, folder_path=path, file_name=name)
 
     # Return the training hist
     return training_history
+
 
 def train_model_online(
     net: nn.Module,
@@ -169,7 +166,6 @@ def train_model_online(
     path: dir where models are going to be saved
     parameters: dict having the following data:
                 - "lr": learning rate
-                - "momentum": momentum of the optimizer
                 - "criterion": loss function
                 - "epochs": epochs to train
     train_loader: pytorch DataLoader wrapping training set
@@ -194,7 +190,7 @@ def train_model_online(
     epochs = parameters["epochs"]
 
     # Use Adam as optimizer
-    optimizer = optim.Adam(net.parameters(), lr = lr)
+    optimizer = optim.Adam(net.parameters(), lr=lr)
 
     # Select proper device and move the net to that device
     device = get_device()
@@ -215,7 +211,6 @@ def train_model_online(
 
     # Training the network
     for epoch in range(epochs):
-
         # Logger needs to know the parameter `epoch_iteration`
         # This, as `TrainLogger(ABC)` documentation says, it's the number of seen single elements
         # in this epoch. Thus, it's not the same as `how_may_elements_seen`.
@@ -226,7 +221,6 @@ def train_model_online(
         file_logger.info(f"Started epoch {epoch}")
 
         for i, data in enumerate(train_loader, 0):
-
             # Unwrap the data
             imgs, labels = data
 
@@ -236,15 +230,20 @@ def train_model_online(
             # Forward
             outputs = net(imgs.to(device))
             loss = criterion(outputs, labels.to(device))
-            file_logger.debug(f"Obtained running loss at {i} iteration of epoch {epoch} is {loss}")
+            file_logger.debug(
+                f"Obtained running loss at {i} iteration of epoch {epoch} is {loss}"
+            )
 
             # Backward + Optimize
             # Clip the gradient if that is specified
             # Gradient Clipping is performed after backward and before step
+            print(f"TODO -- {loss=}")
             loss.backward()
 
             if gradient_clipping is not None:
-                torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm = gradient_clipping)
+                torch.nn.utils.clip_grad_norm_(
+                    net.parameters(), max_norm=gradient_clipping
+                )
 
             optimizer.step()
 
@@ -253,7 +252,9 @@ def train_model_online(
             epoch_iteration += len(labels)
 
             # Log the running loss
-            file_logger.debug(f"In iteration {i} of epoch {epoch}, {len(labels)} elements have been seen")
+            file_logger.debug(
+                f"In iteration {i} of epoch {epoch}, {len(labels)} elements have been seen"
+            )
             wandb.log({"Running loss": loss})
 
             # If running loss is NaN, and caller specified to fail fast, raise
@@ -274,27 +275,24 @@ def train_model_online(
                 "Embeddings norm, min": torch.min(embeddings_norm),
                 "Embeddings norm, max": torch.max(embeddings_norm),
                 "Embeddings norm, mean": torch.mean(embeddings_norm),
-                "Embeddings norm, std": torch.std(embeddings_norm, unbiased = False),
+                "Embeddings norm, std": torch.std(embeddings_norm, unbiased=False),
             }
             wandb.log(norm_metrics)
-            file_logger.debug(f"In iteration {i} of epoch {epoch}, embedding norms have the following metrics:\n{norm_metrics}")
+            file_logger.debug(
+                f"In iteration {i} of epoch {epoch}, embedding norms have the following metrics:\n{norm_metrics}"
+            )
 
             # Check if we should log, based on how many elements we have seen
             if logger.should_log(how_may_elements_seen):
-
                 file_logger.info("Started logging loss information")
 
                 # Log and return loss from training and validation
                 logger_metrics = logger.log_process(
-                    train_loader,
-                    validation_loader,
-                    epoch,
-                    epoch_iteration
+                    train_loader, validation_loader, epoch, epoch_iteration
                 )
 
                 # Save the metrics returned by the logger
                 for metric_key, metric_value in logger_metrics.items():
-
                     # Check if this is the first time we access this metric
                     # In that case, create at this key a list with that element
                     if training_history.get(metric_key) is None:
@@ -308,13 +306,17 @@ def train_model_online(
 
             # Take a snapshot of the network, in case the notebook crashes or we get a timeout
             # TODO -- create a SnapshotTaker class as we have for logs -- snapshot_taker.should_log(i)
-            if snapshot_iterations is not None and how_may_elements_seen % snapshot_iterations == 0:
-
+            if (
+                snapshot_iterations is not None
+                and how_may_elements_seen % snapshot_iterations == 0
+            ):
                 file_logger.info("Saving a snapshot of the model")
 
                 snapshot_name = "snapshot_" + name + "==" + get_datetime_str()
                 snapshot_folder = os.path.join(path, "snapshots")
-                filesystem.save_model(net, folder_path = snapshot_folder, file_name = snapshot_name)
+                filesystem.save_model(
+                    net, folder_path=snapshot_folder, file_name=snapshot_name
+                )
 
     print("Finished training")
     file_logger.info("Finished training")
@@ -323,7 +325,7 @@ def train_model_online(
     file_logger.info("Saving the trained model in disk")
     date = get_datetime_str()
     name = name + "==" + date
-    filesystem.save_model(net = net, folder_path = path, file_name = name)
+    filesystem.save_model(net=net, folder_path=path, file_name=name)
 
     # Return the training hist
     return training_history
