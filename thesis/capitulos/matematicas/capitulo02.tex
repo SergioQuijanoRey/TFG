@@ -382,80 +382,49 @@ Una \textbf{descomposición tensorial} es una forma de expresar cierto tensor co
 
 Necesitaremos algunas herramientas básicas sobre Análisis, que introducimos en esta sección.
 
-\subsection{Espacios de Lebesgue}
+\subsection{Espacios de Hilbert} \label{subsec:espacios_hilbert}
 
-A continuación, introduciremos algunos conceptos sobre espacios de funciones que serán fundamentales en la \sectionref{sec:justificacion_func_repr}. Empezamos introduciendo el siguiente espacio de funciones, que es de sobra conocido:
-
-\begin{definicion}[Espacio de Lebesgue]
-
-    Dado $\Omega \subseteq \R^N$ definimos el siguiente espacio de funciones:
-
-    \begin{equation}
-        \mathcal{L}(\Omega) := \{f: \Omega \to \R : f \dspace \text{es medible} \}.
-    \end{equation}
-
-    Sobre dicho espacio, definimos la siguiente relación de equivalencia:
-
-    \begin{equation}
-        f \sim g \iff f = g \dspace \text{c.p.d. en } \Omega.
-    \end{equation}
-
-    Y con ello definimos el \textbf{espacio de Lebesgue sobre $\Omega$} como:
-
-    \begin{equation}
-        L(\Omega) := \mathcal{L} / \sim .
-    \end{equation}
-\end{definicion}
-
-Y ahora, introducimos los siguientes espacios de funciones:
-
-\begin{definicion}[Espacios de Lebesgue $L^p$]
-    Dados $\Omega \subseteq \R^N$ y $p \in [1, \infty)$, definimos
-
-    \begin{equation}
-        \mathcal{L}^p := \{ f \in \mathcal{L} : \int_{\Omega} |f|^p d\mu < \infty \}
-    \end{equation}
-
-    y, como hemos hecho previamente, definimos:
-
-    \begin{equation}
-        L^p(\Omega) := \mathcal{L}^p / \sim.
-    \end{equation}
-
-\end{definicion}
-
-A partir de estas definiciones, nos centraremos en los espacios $L^2(\R^N)$, escribiendo simplemente $L^2$ cuando esto no de lugar a confusión.
-
-\subsection{Espacios de Hilbert}
-
-Sabemos que el espacio $L^2$ es de Hilbert, considerando el producto escalar:
+Recordamos que por $L^2(\R^N)$ nos referimos al espacio de Lebesgue de dimensión $p = 2$, que denotaremos simplemente como $L^2$ cuando no de lugar a confusión. Sabemos que este espacio es de Hilbert, considerando el producto escalar:
 
 \begin{equation}
     \innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu.
 \end{equation}
+
+Introducimos la definición del siguiente concepto conocido:
+
+\begin{definicion}[Base Hilbertiana] Sea $\mathbb{H}$ un espacio de Hilbert y $\innerproduct{\cdot}{\cdot}$ su producto escalar. Una base Hilbertiana del espacio es una sucesión $\conjunto{\nv{e_i}}_{i \in \N} \subseteq \mathbb{H}$ verificando:
+
+\begin{enumerate}
+    \item $\innerproduct{\nv{e_i}}{\nv{e_j}} = \delta_{i, j}$, $\forall i, j \in \N$
+    \item $\forall \nv{v} \in \mathbb{H}$, $\exists \conjunto{\lambda_i}_{i \in \N} \subseteq \R$: $\nv{x} = \sum_{i \in \N} \lambda_i \; \nv{e_i}$.
+\end{enumerate}
+
+\end{definicion}
+
+\begin{observacion}
+En un espacio de Hilbert de dimensión finita, una base Hilbertiana no es más que una base vectorial ortonormal.
+\end{observacion}
 
 Además, usaremos el siguiente hecho, que es consecuencia directa del \textbf{Teorema de Proyección Ortogonal}:
 \todo{Escribir el teorema de proyección ortogonal?}
 
 \begin{proposicion} \label{prop:hilbert_convnorma_convcoef}
 
-    Sea $\mathbb{V}$ un espacio vectorial de Hilbert y sea $\mathbb{B}$ una base ortonormal de $\mathbb{V}$. Entonces, convergencia en norma implica convergencia en los coeficientes de dicha base.
+    Sea $\mathbb{V}$ un espacio vectorial de Hilbert y sea $\mathbb{B}$ una base Hilbertiana de $\mathbb{V}$. Entonces, convergencia en norma implica convergencia en los coeficientes de dicha base.
 
 \end{proposicion}
-
 \todo{Hay que relacionar esto con el estudio que hago posterior de conjuntos l.indp y totales, que creo que es lo mismo que esto, y que J. Meri más tarde creo que remarca}
+\todo{Lo he pasado a base hilbertiana. Antes era que en espacios hilbert finito-dimensionales, convergencia en norma implica convergencia en los coeficientes de la base. No sé si en infinito dimensional sigue siendo cierto}
 
-\subsection{Dos caracterizaciones sobre familias de funciones} \label{subs:caracterizaciones_familias_funciones}
-
-Introducimos ahora dos caracterizaciones fundamentales sobre familias de funciones, que serán de gran importancia a la hora de desarrollar nuestros resultados:
+Introducimos ahora \textbf{dos tipos familias de funciones}, que serán de gran importancia a la hora de desarrollar nuestros resultados:
 
 \begin{definicion}[Subconjuntos de funciones totales]
     Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$.
 \end{definicion}
 
-La principal ventaja de trabajar con un subconjunto de funciones de este tipo viene dada por la siguiente proposición:
+% TODO -- seguir por aqui
+\begin{observacion} Aunque sea trivial por la propia definición de conjunto total, en este caso tenemos que podemos aproximar cualquier función del espacio por una sucesión de combinaciones lineales finitas. Es decir:
 
-\begin{proposicion}[Aproximaciones con subconjuntos totales de funciones] \label{prop:conjuntos_totales_epsilon_aproximacion}
     Sea $\mathcal{F} \subseteq L^2$ total. Entonces podemos aproximar arbitrariamente bien cualquier función $g \in L^2$ usando combinaciones lineales finitas, es decir:
 
     \begin{equation} \label{eq:conjuntos_totales_epsilon_aproximacion}
@@ -465,38 +434,9 @@ La principal ventaja de trabajar con un subconjunto de funciones de este tipo vi
         \end{split}
     \end{equation}
 
-\end{proposicion}
+\end{observacion}
 
-\begin{proof}
-
-    Basta con aplicar la definición de subconjunto total, trabajar con el cierre del conjunto y aplicar la convergencia de sucesiones para obtener lo que queremos. Recordamos que:
-
-    \begin{equation}
-        span\conjunto{\mathcal{F}} = \conjuntofit{\sum_{i = 1}^n c_i f_i: \; n \in \N, f_i \in \mathcal{F}, c_i \in \R, \forall i \in \R}.
-    \end{equation}
-
-    Por definición de totalidad, $\overline{span\conjunto{\mathcal{F}}} = L^2$. Por lo tanto, dado $g \in L^2$, se presentan dos casos. En el primero, $g \in span\conjunto{\mathcal{F}}$ y el resultado es directo. En el segundo caso, $g \not\in span\conjunto{\mathcal{F}}$, pero $g \in \overline{span\conjunto{\mathcal{F}}}$, luego:
-
-    \begin{equation}
-        \exists \conjunto{g_n}_{n \in \N} \subseteq span\conjunto{\mathcal{F}} \mapsto g.
-    \end{equation}
-
-    Aplicando la definición de convergencia de una sucesión, $\forall \epsilon > 0$, $\exists m_{\epsilon} \in \N$ de forma que:
-
-    \begin{equation}
-        n \geq m_{\epsilon} \then d(g_n, g) < \epsilon.
-    \end{equation}
-
-    Tomamos $\hat{g} := g_{m_\epsilon}$. En primer lugar, como $\hat{g} \in span\conjunto{\mathcal{F}}$, puede escribirse como una combinación lineal finita de elementos de $\mathcal{F}$. En segundo lugar:
-
-    \begin{equation}
-        d(\hat{g}, g) = \int |\hat{g} - g| < \epsilon,
-    \end{equation}
-
-    lo que concluye la demostración.
-
-\end{proof}
-
+% TODO -- borrar esto?
 \begin{observacion}
     Si reducimos la cota de error $\varepsilon$, es razonable pensar que el número de elementos de la combinación lineal crezca. Y de momento no tenemos control sobre cómo es este crecimiento en el número de sumandos.
 \end{observacion}
