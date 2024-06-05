@@ -19,7 +19,7 @@ Por otro lado, al espacio de matrices de dimensiones $p, q$ lo denotaremos de la
 
 \subsection{Definición del producto tensorial} \label{sec:deftensor}
 
-Dados dos espacios vectoriales reales \footnote{Podría realizarse la construcción sobre otro cuerpo como $\mathbb{C}$.}. $\mathbb{V}, \mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa.
+Dados dos espacios vectoriales reales \footnote{Podría realizarse la construcción sobre otro cuerpo como $\mathbb{C}$.}, $\mathbb{V}$ y $\mathbb{W}$, queremos construir el espacio producto tensorial de estos espacios vectoriales, denotado como $\mathbb{V} \otimes \mathbb{W}$. Buscamos que este nuevo objeto matemático tenga propiedades similares a las del producto entre escalares, principalmente la propiedad distributiva y la propiedad asociativa.
 
 Realizamos la construcción de este objeto en varios pasos. En primer lugar definimos el producto formal entre dos espacios vectoriales. Introducimos las propiedades que queremos que el producto formal cumpla y en base a esto definimos el producto tensorial. Finalmente, estudiamos algunas de las propiedades que tiene este nuevo objeto matemático.
 
@@ -49,7 +49,7 @@ Es claro que por ser $\mathbb{V}, \mathbb{W}$ espacios vectoriales, y estar toma
 
 \subsubsection{Producto tensorial a partir del producto formal} \label{sec:cociente_prod_formal}
 
-Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que en general las siguientes igualdades no se cumplen:
+Para motivar la necesidad de construir un nuevo objeto matemático, hay que tener en cuenta que en general las siguientes igualdades no se cumplen:
 
 \begin{enumerate}
 	\item $c [\nv{v} \ast \nv{w}] = (c\nv{v}) \ast \nv{w}$.
@@ -58,7 +58,7 @@ Para motivar el nuevo objeto que vamos a construir, hay que tener en cuenta que 
 	\item $\nv{v} \ast (\nv{w_1} + \nv{w_2}) = \nv{v} \ast \nv{w_1} + \nv{v} \ast \nv{w_2}$.
 \end{enumerate}
 
-Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}$, $\nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$. Estas igualdades representan las propiedades que queremos que se cumplan para que nuestro nuevo objeto matemático tenga el comportamiento deseado. Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir dichas propiedades. Para ello definimos:
+Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}$, $\nv{w}, \nv{w_1}, \nv{w_2} \in \mathbb{W}, c \in \R$. Estas igualdades representan las propiedades que queremos que se cumplan para que el nuevo objeto tenga el comportamiento deseado. Como $\mathbb{V} \ast \mathbb{W}$ es un espacio vectorial, podemos usar el espacio cociente para introducir dichas propiedades. Para ello definimos:
 
 \begin{equation}
 	\begin{split}
@@ -71,7 +71,7 @@ Donde estamos tomando $\nv{v}, \nv{v_1}, \nv{v_2} \in \mathbb{V}$, $\nv{w}, \nv{
 que claramente también es un espacio vectorial. Con esto, ya podemos definir el producto tensorial.
 
 \begin{definicion}[Producto tensorial]
-	Dados dos espacios vectoriales $\mathbb{V}, \mathbb{W}$, se define su \textbf{producto tensorial} $\mathbb{V} \otimes \mathbb{W}$ como:
+	Dados dos espacios vectoriales $\mathbb{V}$ y $\mathbb{W}$, se define su \textbf{producto tensorial} $\mathbb{V} \otimes \mathbb{W}$ como:
 
 	$$\mathbb{V} \otimes \mathbb{W} := (\mathbb{V} \ast \mathbb{W}) / I$$
 
@@ -107,7 +107,7 @@ A partir de esta definición, son directas las siguientes propiedades:
 \end{proof}
 
 \begin{proposicion}
-	Sean $\mathbb{V}$, $\mathbb{W}$ dos espacios vectoriales reales. Entonces el espacio producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial real.
+	Sean $\mathbb{V}$ y $\mathbb{W}$ dos espacios vectoriales reales. Entonces el espacio producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial real.
 \end{proposicion}
 
 \begin{proof}
@@ -233,7 +233,7 @@ Buscamos extender este resultado para un tensor cualquiera (no necesariamente pu
         \gamma = \sum_{\substack{a_i \in \R\\ \nv{v_i} \in \mathbb{W}\\ i \in \deltaset{n}}} c_{i} \cdot a_i \otimes \nv{v_i}, \dspace\dspace c_{i} \in \R \dspace \forall i \in \deltaset{n}.
     \end{equation}
 
-    Usando ahora la proposición anterior en los tensores puros de la sumatoria, podemos re-escribir como:
+    Usando ahora la proposición anterior en los tensores puros de la sumatoria, podemos re-escribir la ecuación como:
 
     \begin{equation}
         \begin{split}
@@ -274,7 +274,7 @@ Con esto, ya podemos dar una caracterización del espacio $\mathbb{V} \otimes \R
 
 Generalizamos la caracterización anterior:
 
-\begin{proposicion} Sea $\mathbb{V}$ un espacio vectorial real de dimensión finita. Entonces $\R^N \otimes \mathbb{V}  \cong \mathbb{V}^N$
+\begin{proposicion} Sea $\mathbb{V}$ un espacio vectorial real de dimensión finita. Entonces $\R^N \otimes \mathbb{V}  \cong \mathbb{V}^N$.
 \end{proposicion}
 
 \begin{proof}
@@ -311,11 +311,11 @@ Generalizamos la caracterización anterior:
 
 \subsection{Otra forma de ver los tensores} \label{sec:otra_forma_tensores}
 
-Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos definir un tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ como un \textit{array} multidimensional. Tenemos $N$ entradas sobre las que podemos indexar, y en cada entrada podemos usar un índice $i \in \deltaset{M_k}$ con $k \in \deltaset{N}$. Con esta visión, podemos introducir algunos conceptos básicos sobre tensores.
+Introducimos ahora una forma mucho más directa y concreta de definir los tensores y el producto tensorial. Podemos definir un tensor $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ como un \textit{array} multidimensional en el que tenemos $N$ entradas sobre las que podemos indexar usando en cada una de ellas un índice $i \in \deltaset{M_k}$ con $k \in \deltaset{N}$. Con esta visión, podemos introducir algunos conceptos básicos sobre tensores.
 
 El primero de ellos es el concepto de \textbf{modo}, que se define como cada una de las entradas $d_1, \ldots, d_N$ que podemos usar para indexar los elementos del tensor. El segundo concepto es el de \textbf{orden}, que se define como el número de modos del tensor. En el caso de nuestro tensor $\mathcal{A}$, tenemos $N$ modos, y por tanto ese es su orden. Finalmente, definimos la \textbf{dimensión} del tensor como el número de valores que puede tomar cada uno de los modos. Por lo tanto, si el modo $i$-ésimo $d_i$ puede tomar valores en $\deltaset{M}$, diremos que este modo tiene dimensión $M$. Un tensor puede tener distintas dimensiones en cada uno de los modos, o tener la misma dimensión para todos los modos, en cuyo caso denotaremos por $\espaciotensores{N}{M}$ al conjunto de tensores de orden $N$ y dimensión $M$ en cada modo. Por tanto, sería más correcto hablar de \textit{"dimensiones de los modos"} que de \textit{"dimensión de un tensor"}, pero cuando no de lugar a confusión abusaremos del lenguaje.
 
-Podemos definir el \textbf{producto tensorial} de una forma muy sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P$ y $Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
+Con esto, podemos definir el \textbf{producto tensorial} de una forma muy sencilla. Sean $\mathcal{A}, \mathcal{B}$ dos tensores de órdenes $P$ y $Q$ respectivamente. Entonces el producto tensorial de estos dos, que ya sabemos que se denota como $\mathcal{A} \otimes \mathcal{B}$, es un tensor de orden $P + Q$ cuyos elementos se pueden expresar como:
 
 $$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1}, \ldots, d_{P + Q}}.$$
 
@@ -331,7 +331,7 @@ $$(A \otimes B)d_1, \ldots, d_{P + Q} = A_{d_1, \ldots, d_P} \cdot B_{d_{P + 1},
 
 El siguiente teorema será de gran utilidad a la hora de entender la naturaleza del producto tensorial entre dos espacios vectoriales.
 
-\begin{teorema}[Propiedad Universal del producto tensorial] Sean $\mathbb{V}, \mathbb{W}$ dos espacios vectoriales. Su producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial con una aplicación bilineal asociada:
+\begin{teorema}[Propiedad Universal del producto tensorial] Sean $\mathbb{V}$ y $\mathbb{W}$ dos espacios vectoriales. Su producto tensorial $\mathbb{V} \otimes \mathbb{W}$ es un espacio vectorial con una aplicación bilineal asociada:
 
     \begin{equation}
         \begin{split}
@@ -343,17 +343,17 @@ El siguiente teorema será de gran utilidad a la hora de entender la naturaleza 
     de forma que:
 
     \begin{equation}
-        \forall h: \mathbb{V} \times \mathbb{W} \to \mathbb{Z} \text{  bilineal  } \exists! \hat{h}: \mathbb{V} \otimes \mathbb{W} \to \mathbb{Z} \text{  lineal, verificando que: }
+        \forall h: \mathbb{V} \times \mathbb{W} \to \mathbb{Z} \text{  bilineal  } \exists! \widehat{h}: \mathbb{V} \otimes \mathbb{W} \to \mathbb{Z} \text{  lineal, verificando que: }
     \end{equation}
 
     \begin{equation}
-        h = \hat{h} \circ \otimes
+        h = \widehat{h} \circ \otimes
     \end{equation}
 
     es decir:
 
     \begin{equation}
-        h(\nv{u}, \nv{v}) = \hat{h}(\nv{u} \otimes \nv{v});
+        h(\nv{u}, \nv{v}) = \widehat{h}(\nv{u} \otimes \nv{v});
         \dspace \forall \nv{u} \in \mathbb{V}, \; \forall \nv{v} \in \mathbb{W}.
     \end{equation}
 
@@ -362,7 +362,7 @@ El siguiente teorema será de gran utilidad a la hora de entender la naturaleza 
     \begin{equation}
         \begin{tikzcd}
             \mathbb{V} \times \mathbb{W} \ar{r}{h} \ar{d}[left]{\otimes} & \mathbb{Z} \\
-            \mathbb{V} \otimes \mathbb{W} \ar[dashed]{ur}[right, below]{\hat{h}}
+            \mathbb{V} \otimes \mathbb{W} \ar[dashed]{ur}[right, below]{\widehat{h}}
         \end{tikzcd}
     \end{equation}
 
