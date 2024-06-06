@@ -542,16 +542,27 @@ El siguiente teorema nos indica que la familia de funciones producto inducida pe
 \end{teorema}
 
 \section{Elementos fundamentales en un modelo de aprendizaje automático} \label{sec:piezas_machine_learning_matematicas}
+% TODO -- seguir por aqui
 
-Uno de los puntos fuertes del presente trabajo es que las dos modelizaciones matemáticas que introducimos en el \sectionref{ch:modelizacion} son muy cercanas a las arquitecturas de aprendizaje automático reales. Por tanto, es necesario definir algunos conceptos que participan en estas arquitecturas para más tarde poder compararlas con nuestras modelizaciones matemáticas. Así pues, en esta sección introduciremos los siguientes conceptos:
+Uno de los puntos fuertes del presente trabajo es que las dos modelizaciones matemáticas que introducimos en el \sectionref{ch:modelizacion} son muy cercanas a las arquitecturas de aprendizaje automático reales. Concretamente, a las redes convolucionales, que son utilizadas extensamente para tareas de visión por computador. Estas redes explotan eficientemente la estructura local de las imágenes. Combina la información a través de distintas capas, lo que permite una representación jerárquica de la información. Por tanto, es necesario definir algunos conceptos que participan en estas arquitecturas para más tarde poder compararlas con nuestras modelizaciones matemáticas. Así pues, en esta sección introduciremos los siguientes conceptos:
 
+% TODO -- pasar a español
 \begin{itemize}
-    \item Convolución.
-    \item Bloques convolucionales.
-    \item \textit{Feature Maps}.
-    \item \textit{Pooling}.
-    \item \textit{Linear dense layer}.
+    \item La convolución como operación fundamental que explota eficientemente las estructuras locales de las imágenes.
+    \item Los bloques convolucionales como la implementación concreta que se aplica sobre las imágenes.
+    \item Los \textit{feature maps} como productos de los bloques convolucionales y que codifican la información de forma jerárquica.
+    \item El \textit{pooling} como operación que ayuda a resumir el flujo de información a través de la red y que introduce ciertas invarianzas.
+    \item La \textit{linear dense layer} como operación que combina la información final para producir una predicción.
 \end{itemize}
+
+La \imgref{img:ejemplo_cnn} ayuda a entender el funcionamiento de las redes convolucionales y los distintos conceptos que pasamos a explicar.
+
+\begin{figure}[!hbtp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{matematicas/cnn_ejemplo.png}
+    \caption{Ejemplo visual de la arquitectura de una red neuronal convolucional. Podemos observar los distintos elementos que vamos a desarrollar: convolución, bloques convolucionales, \textit{feature maps}, \textit{poolings} y \textit{linear dense layers}. Imagen extraída de \cite{matematicas:ejemplo_cnn}.}
+    \label{img:ejemplo_cnn}
+\end{figure}
 
 \subsection{Convolución}
 
