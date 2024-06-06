@@ -387,7 +387,7 @@ Necesitaremos algunas herramientas básicas sobre Análisis, que introducimos en
 Empezamos recordando que por $L^2(\R^N)$ nos referimos al espacio de Lebesgue de dimensión $p = 2$, que denotaremos simplemente como $L^2$ cuando no de lugar a confusión. Sabemos que este espacio es de Hilbert, considerando el producto escalar:
 
 \begin{equation}
-    \innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu.
+    \innerproduct{f}{g} := \int_{\Omega} f \cdot g \; d\mu.
 \end{equation}
 
 Introducimos la definición del siguiente concepto conocido:
@@ -520,13 +520,13 @@ En esta sección vamos a ver cómo se relaciona el producto tensorial con todos 
 
 \end{proof}
 
-Y ahora veamos cómo se relaciona el producto tensorial con las familias totales y las familias linealmente independientes.
+Veamos ahora cómo se relaciona el producto tensorial con las familias totales y las familias linealmente independientes.
 
 \begin{proposicion} \label{prop:conservacion_totalidad_indp_lineal_general}
-	Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(\alpha_1)}_{(1)}} \otimes \cdots \otimes  \nv{v^{\alpha_N}_{(N)}}  \} \subseteq \mathbb{V}_1 \otimes \cdots \otimes \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
+	Si los conjuntos $\{\nv{v_{(i)}^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V}_i, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(\alpha_1)}_{(1)}} \otimes \cdots \otimes  \nv{v^{\alpha_N}_{(N)}}  \} \subseteq \mathbb{V}_1 \otimes \cdots \otimes \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
 \end{proposicion}
 
-La familia de funciones producto inducida permite identificar el producto tensorial de espacios $L^2$.
+El siguiente teorema nos indica que la familia de funciones producto inducida permite identificar el producto tensorial de espacios $L^2$.
 
 \begin{teorema}
 	La siguiente función induce un isomorfismo entre espacios de Hilbert:
