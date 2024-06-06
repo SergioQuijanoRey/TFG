@@ -384,7 +384,7 @@ Necesitaremos algunas herramientas básicas sobre Análisis, que introducimos en
 
 \subsection{Espacios de Hilbert} \label{subsec:espacios_hilbert}
 
-Recordamos que por $L^2(\R^N)$ nos referimos al espacio de Lebesgue de dimensión $p = 2$, que denotaremos simplemente como $L^2$ cuando no de lugar a confusión. Sabemos que este espacio es de Hilbert, considerando el producto escalar:
+Empezamos recordando que por $L^2(\R^N)$ nos referimos al espacio de Lebesgue de dimensión $p = 2$, que denotaremos simplemente como $L^2$ cuando no de lugar a confusión. Sabemos que este espacio es de Hilbert, considerando el producto escalar:
 
 \begin{equation}
     \innerproduct{f}{g} := \int_{\Omega} f \cdot g d\mu.
@@ -416,16 +416,13 @@ Además, usaremos el siguiente hecho, que es consecuencia directa del \textbf{Te
 \todo{Hay que relacionar esto con el estudio que hago posterior de conjuntos l.indp y totales, que creo que es lo mismo que esto, y que J. Meri más tarde creo que remarca}
 \todo{Lo he pasado a base hilbertiana. Antes era que en espacios hilbert finito-dimensionales, convergencia en norma implica convergencia en los coeficientes de la base. No sé si en infinito dimensional sigue siendo cierto}
 
-Introducimos ahora \textbf{dos tipos familias de funciones}, que serán de gran importancia a la hora de desarrollar nuestros resultados:
+Presentamos ahora \textbf{dos tipos familias de funciones}, que serán de gran importancia a la hora de desarrollar nuestros resultados:
 
 \begin{definicion}[Subconjuntos de funciones totales]
     Un subconjunto de funciones $\mathcal{F} \subseteq L^2$ se dirá \textbf{total} cuando el cierre de sus combinaciones lineales finitas sea todo el espacio $L^2$.
 \end{definicion}
 
-% TODO -- seguir por aqui
-\begin{observacion} Aunque sea trivial por la propia definición de conjunto total, en este caso tenemos que podemos aproximar cualquier función del espacio por una sucesión de combinaciones lineales finitas. Es decir:
-
-    Sea $\mathcal{F} \subseteq L^2$ total. Entonces podemos aproximar arbitrariamente bien cualquier función $g \in L^2$ usando combinaciones lineales finitas, es decir:
+\begin{observacion} Aunque sea trivial por la propia definición de conjunto total, en este caso tenemos que podemos aproximar cualquier función del espacio por una sucesión de combinaciones lineales finitas. Es decir, dada $\mathcal{F} \subseteq L^2$ total, tenemos que:
 
     \begin{equation} \label{eq:conjuntos_totales_epsilon_aproximacion}
         \begin{split}
@@ -436,10 +433,7 @@ Introducimos ahora \textbf{dos tipos familias de funciones}, que serán de gran 
 
 \end{observacion}
 
-% TODO -- borrar esto?
-\begin{observacion}
-    Si reducimos la cota de error $\varepsilon$, es razonable pensar que el número de elementos de la combinación lineal crezca. Y de momento no tenemos control sobre cómo es este crecimiento en el número de sumandos.
-\end{observacion}
+Veamos ahora el segundo tipo de familia de funciones.
 
 \begin{definicion}[Subconjuntos de funciones linealmente independientes]
 
@@ -447,25 +441,16 @@ Introducimos ahora \textbf{dos tipos familias de funciones}, que serán de gran 
 
 \end{definicion}
 
-\begin{proposicion}[Existencia de \entrecomillado{bases} en espacios de funciones]
-    Para cada $N \in \N$ se tiene que $L^2(\R^N)$ admite un subconjunto numerable que sea linealmente independiente y total.
+El siguiente hecho también será consecuencia del Teorema de Proyección Ortogonal:
+
+\begin{proposicion}
+    Para cada $N \in \N$ se tiene que $L^2(\R^N)$ admite un subconjunto numerable linealmente independiente y total.
 \end{proposicion}
 
-\begin{observacion}
-    Estos conjuntos actuarán de forma similar a una base vectorial.
-\end{observacion}
-
-\begin{observacion}
-
-    Este resultado es, de nuevo, consecuencia del \textbf{Teorema de proyección ortogonal}. Es más, sabemos que todo espacio de \textit{Hilbert} finito-dimensional admite una base ortonormal, es decir, un subconjunto de funciones ortonormales dos a dos que es total. La ortonormalidad implica independiencia lineal, por lo que esto nos da la existencia de nuestras \entrecomillado{bases}.
-    \todo{Escribir el teorema de proyección ortogonal porque ya es la segunda vez que lo menciono.}
-
-\end{observacion}
-
-En nuestros dos modelos trabajaremos con la familia de funciones producto inducida. Así que vemos cómo se comporta esta transformación respecto a las dos caracterizaciones que acabamos de introducir:
+En nuestros dos modelos trabajaremos con la familia de funciones producto inducida. Así que vemos cómo se comporta esta transformación respecto a las dos clases que acabamos de introducir:
 
 \begin{proposicion}[Conservación de la totalidad e independencia lineal en la familia de funciones producto inducida] \label{prop:conservacion_totalidad_indp_lineal_func_prod}
-    Sea $\conjunto{f_d \in L^2(\R^s): d \in \deltaset{N} }$ total (resp. linealmente independiente). Entonces el subconjunto:
+    Sea $\conjunto{f_d \in L^2(\R^s): d \in \N }$ total (resp. linealmente independiente). Entonces el subconjunto:
 
     \begin{equation}
         \conjunto{(\nv{x_1}, \ldots, \nv{x_N}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}): d_i \in \N} \subseteq L^2((\R^s)^N)
