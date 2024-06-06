@@ -459,32 +459,31 @@ En nuestros dos modelos trabajaremos con la familia de funciones producto induci
     es total (resp. linealmente independiente) \cite{matematicas:descomposicion_ht}.
 \end{proposicion}
 
-\subsection{Relación del producto tensorial con los espacios de Hilbert y las dos caracterizaciones}
+\subsection{Relación del producto tensorial con los espacios de Hilbert}
 
-En esta sección vamos a ver cómo se relaciona el producto tensorial con todos los conceptos que hemos introducido previamente. Empecemos viendo que la estructura de espacio de Hilbert se conserva por el producto tensorial:
+% TODO -- seguir por aqui
+En esta sección vamos a ver cómo se relaciona el producto tensorial con todos los conceptos que hemos desarrollado anteriormente. Empecemos viendo que la estructura de espacio de Hilbert se conserva por el producto tensorial:
 
 \begin{proposicion}
 
-    Si los espacios $\mathbb{V}_1, \ldots, \mathbb{V}_N$ son espacios de Hilbert, podemos dotar de forma natural al espacio $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ de un producto escalar, siendo así $\MediumOtimes_{i = 1}^N \mathbb{V}_i$ un espacio de Hilbert. Para ello, consideremos los espacios de Hilbert  $(\mathbb{V}_i, \innerproduct{\cdot}{\cdot}_i)$. Con esto, definimos:
+    Sean $(\mathbb{V}_i, \innerproduct{\cdot}{\cdot})$, $i = 1, \ldots, n$ espacios de Hilbert reales. Entonces el producto tensorial $\otimes_{i = 1}^N \mathbb{V}_i$ es un espacio de Hilbert con el producto escalar dado por:
 
     \begin{equation}
         \innerproduct{\MediumOtimes_{i = 1}^{N} \phi_i}{\MediumOtimes_{i = 1}^{N} \psi_i} := \prod_{i = 1}^{N} \innerproduct{\phi_i}{\psi_i}_i.
     \end{equation}
-
-    Que es un producto escalar con el cual el producto tensorial de los espacios de Hilbert es un espacio de Hilbert.
 
 \end{proposicion}
 
 \begin{proof}
     Para realizar la prueba, comprobamos que la operación definida es en efecto un producto escalar. Una vez hecho esto, como consecuencia del teorema de Jordan-Von Neumann, aplicamos la completación del espacio en base al producto escalar y consideramos el resultado de este proceso como el espacio de Hilbert producto tensorial, llegando a lo que se busca.
 
-    Por lo tanto, solo resta comprobar que la operación es un producto escalar, aplicando adecuadamente la definición de la operación y las propiedades del producto escalar. Por simplicidad, realizaremos esta comprobación para $(\mathbb{V_1}, \innerproduct{\cdot}{\cdot}_1)$, $(\mathbb{V_2}, \innerproduct{\cdot}{\cdot}_2)$. Además, cabe recordar que estamos trabajando con espacios vectoriales reales, no complejos.
+    Por lo tanto, solo resta comprobar que la operación es un producto escalar, aplicando adecuadamente la definición de la operación y las propiedades del producto escalar. Por simplicidad, realizaremos esta comprobación para $(\mathbb{V_1}, \innerproduct{\cdot}{\cdot}_1)$, $(\mathbb{V_2}, \innerproduct{\cdot}{\cdot}_2)$.
 
     1. \textbf{Linealidad por la izquierda}:
 
     \begin{equation}
     \begin{split}
-        &\innerproduct{a(\phi_1 \otimes \phi_2) + b(\gamma_1 \otimes \gamma_2)}{\psi_1 \otimes \psi_2} = \\
+        &\innerproduct{a(\phi_1 \otimes \phi_2) + b(\gamma_1 \otimes \gamma_2)}{\psi_1 \otimes \psi_2} \\
         &= \innerproduct{a(\phi_1 \otimes \phi_2) + b((\lambda_1 \phi_1) \otimes (\lambda_2 \phi_2)}{\psi_1 \otimes \psi_2} \\
         &= \innerproduct{a(\phi_1 \otimes \phi_2) + b \lambda_1 \lambda_2 (\phi_1 \otimes \phi_2)}{\psi_1 \otimes \psi_2} \\
         &= \innerproduct{(a + b \lambda_1 \lambda_2) (\phi_1 \otimes \phi_2)}{\psi_1 \otimes \psi_2} \\
@@ -521,65 +520,13 @@ En esta sección vamos a ver cómo se relaciona el producto tensorial con todos 
 
 \end{proof}
 
-Un hecho de gran utilidad será el siguiente:
-
-\begin{proposicion} \label{prop:base_ortonormal_prod_tensorial}
-    Sean $\conjunto{\phi_i}_{i \in \N}$ y $\conjunto{\psi_j}_{j \in \N}$ bases ortonormales de los espacios de Hilbert $\mathbb{V}, \mathbb{W}$, respectivamente. Entonces $\conjunto{\phi_i \otimes \psi_j}_{i, j \in \N}$ es una base ortonormal del espacio de Hilbert $\mathbb{V} \otimes \mathbb{W}$.
-\end{proposicion}
-
-\begin{proof}
-
-    En primer lugar, comprobaremos que el conjunto $\conjunto{\phi_i \otimes \psi_j}_{i, j \in \N}$ es ortonormal. Para ello, usaremos la definición de producto escalar en el producto tensorial. En primer lugar:
-
-    \begin{equation}
-        \innerproduct{\phi_i \otimes \psi_j}{\phi_i \otimes \psi_j} \encima{=}{Def.} \innerproduct{\phi_i}{\phi_i} \innerproduct{\psi_j}{\psi_j} = 1 \cdot 1 = 1.
-    \end{equation}
-
-    En segundo lugar, dados elementos de las bases $\phi_i \neq \phi_i'$ y $\psi_j \neq \psi_j'$, tenemos que:
-
-    \begin{equation}
-        \innerproduct{\phi_i \otimes \psi_j}{\phi_i' \otimes \psi_j'} \encima{=}{Def.} \innerproduct{\phi_i}{\phi_i'} \innerproduct{\psi_j}{\psi_j'} = 0 \cdot 0 = 0.
-    \end{equation}
-
-    Sabemos que en esta situación la independencia lineal ya está asegurada, por lo que solo falta comprobar que el conjunto $\conjunto{\phi_i \otimes \psi_j}_{i, j \in \N}$ es total. Es decir, que el cierre de $span\conjunto{\phi_i \otimes \psi_j}_{i, j \in \N}$ es todo el conjunto $\mathbb{V} \otimes \mathbb{W}$. O lo que es lo mismo, para todo elemento de $\mathbb{V} \otimes \mathbb{W}$ tiene que existir una sucesión de $span\conjunto{\phi_i \otimes \psi_j}_{i, j \in \N}$ convergiendo a dicho elemento. Tomamos $\phi \otimes \psi \in \mathbb{V} \otimes \mathbb{W}$, por lo que podemos escribir:
-
-    \begin{equation}
-        \phi = \sum_{i} a_i \phi_i, \quad \psi = \sum_j b_i \psi_j.
-    \end{equation}
-
-    Con esto sabemos que $\sum_i |a_i|^2 < \infty$, $\sum_j |b_j|^2 < \infty$, por tanto, $sum_{i, j} |a_i b_j| < \infty$ y finalmente $\sum_{i, j} |a_i b_j|^2 < \infty$. Con esto, sabemos por (*) que $\sum_{i, j} a_i b_i \phi_i \otimes \psi_j$ converge y tenemos que:
-
-    \begin{equation}
-        \left|\left| \psi \otimes \phi - \sum_{\substack{i < m \\ j < n}} a_i b_i \phi_i \otimes \psi_j \right|\right| \encima{\longrightarrow}{n, m \to \infty} 0.
-    \end{equation}
-
-    (*) Vamos a ver que si $\sum_i |a_i|^2 < \infty$, entonces la suma $\sum_i a_i \phi_i$ converge. Consideramos la sucesión $\conjunto{x_n}$ de sumas parciales dada por:
-
-    \begin{equation}
-        x_n := \sum_{i = 1}^n a_i \phi_i, \; \forall n \in \N.
-    \end{equation}
-
-    Entonces, para $m > n$ tenemos que:
-
-    \begin{equation}
-        ||x_m - x_n||^2 = ||\sum_{i = n+1}^m a_i \phi_i ||^2 = \sum_{i = n+1}^{m} |a_i| ^ 2 < \infty.
-    \end{equation}
-
-    Tenemos una sucesión de Cauchy en un espacio completo, luego la sucesión converge.
-
-\end{proof}
-
-Y ahora veamos cómo se relaciona el producto tensorial con las dos caracterizaciones:
+Y ahora veamos cómo se relaciona el producto tensorial con las familias totales y las familias linealmente independientes.
 
 \begin{proposicion} \label{prop:conservacion_totalidad_indp_lineal_general}
-	Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(1)}_{\alpha_1}} \otimes \cdots \otimes  \nv{v^{(N)}_{\alpha_N}}  \} \subseteq \mathbb{V}_1 \otimes \cdots \otimes \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
+	Si los conjuntos $\{\nv{v_i^{(\alpha)}}\}_{\alpha} \subseteq \mathbb{V_i}, \dspace i \in \deltaset{N}$ son totales (resp. linealmente independientes), entonces $\{ \nv{v^{(\alpha_1)}_{(1)}} \otimes \cdots \otimes  \nv{v^{\alpha_N}_{(N)}}  \} \subseteq \mathbb{V}_1 \otimes \cdots \otimes \mathbb{V}_N$ es un conjunto total (resp. linealmente independiente)
 \end{proposicion}
 
-\begin{proof}
-    Sabemos que si tomamos dos espacios de Hilbert, $\mathcal{H}_1, \mathcal{H}_2$ con bases ortonormales $\conjunto{\phi_i}_{i \in \N}$, $\conjunto{\psi_j}_{j \in \N}$, entonces $\conjunto{\phi_i \otimes \psi_j}_{i, j \in \N}$ es una base ortonormal de $\mathcal{H}_1 \otimes \mathcal{H}_2$. De esto se deriva tanto la conservación de la totalidad como la independencia lineal.
-\end{proof}
-
-Como ya hemos comentado, será importante estudiar la familia de funciones producto inducida. El siguiente teorema da un paso en este estudio.
+La familia de funciones producto inducida permite identificar el producto tensorial de espacios $L^2$.
 
 \begin{teorema}
 	La siguiente función induce un isomorfismo entre espacios de Hilbert:
@@ -591,38 +538,8 @@ Como ya hemos comentado, será importante estudiar la familia de funciones produ
 		\end{split}
 	\end{equation}
 
-	Así, tenemos identificadas las funciones que vienen dadas como producto tensorial con funciones que vienen dadas como producto punto a punto.
+	Basta observar que lleva un sistema linealmente independiente y total en otro.
 \end{teorema}
-
-\begin{proof}
-
-    Para simplificar la demostración estudiaremos el isomorfismo entre $L^2(\R^S) \otimes L^2(\R^S)$ y $L^2((\R^S)^2)$. Sabemos que los espacios $L^2(\R^N)$ admiten una base ortonormal, así que denotaremos por $\conjunto{\phi_n}_{n \in \N}$ a la de $L^2(\R^S)$. Por lo tanto, sabemos que $\conjunto{\phi_n \otimes \phi_m}_{n, m \in \N}$ es una base ortonormal de $L^2(\R^S) \otimes L^2(\R^S)$. Consideramos la función lineal $U$ que lleva la base ortonormal de $L^2(\R^S) \otimes L^2(\R^S)$ a la base ortonormal de $L^2((\R^S)^2)$ como:
-
-    \begin{equation}
-        U(\phi_i \otimes \phi_j) := \phi_i(x) \phi_j(y).
-    \end{equation}
-
-    Podemos extenderla por linealidad a una función de $L^2(\R^S) \otimes L^2(\R^S)$ a $L^2((\R^S)^2)$. Dicha extensión será un isomorfimo de espacios de Hilbert, por llevar una base ortonormal en otra base ortonormal. Falta comprobar que dicha extensión coincide con la función del enunciado del teorema. Para ello, definimos las funciones $f, g \in L^2(\R^s)$ como:
-
-    \begin{equation}
-    \begin{split}
-        f &:= \sum_i c_i \phi_i, \\
-        g &:= \sum_j d_j \phi_j, \\
-    \end{split}
-    \end{equation}
-
-    y calculamos:
-
-    \begin{equation}
-    \begin{split}
-        U(f \otimes g) &= U((\sum_i c_i \phi_i) (\sum_j d_j \phi_j)) = U(\sum_{i, j} c_i d_j (\phi_i \otimes \phi_j)) \\
-        &= \sum_{i, j} c_i d_j \phi_i \phi_j = (\sum_i c_i \phi_i) (\sum_j d_i \phi_j) = f g.
-    \end{split}
-    \end{equation}
-
-    Y por tanto, el isomorfismo $U$ coincide con nuestra función, lo que concluye la prueba.
-
-\end{proof}
 
 \section{Elementos fundamentales en un modelo de aprendizaje automático} \label{sec:piezas_machine_learning_matematicas}
 
