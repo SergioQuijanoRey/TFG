@@ -643,7 +643,7 @@ También conocida como \textit{linear dense layer} o capa totalmente conectada. 
     (x_1, \ldots, x_N) \to \sigma(\sum_{i = 1}^{N} w_i \; x_i).
 \end{equation}
 
-En este planteamiento la salida de la capa es un único valor escalar. Sin embargo, podemos generalizar esta operación para que la salida sea un vector de dimensión $S$. Para ello, basta considerar:
+En la anterior ecuación tenemos lo que se conoce como neurona. En esta, la salida de la capa es un único valor escalar. Sin embargo, podemos generalizar esta operación para que la salida sea un vector de dimensión $S$, trabajando con $S$ neuronas. Para ello, basta considerar:
 
 \begin{equation}
 \begin{split}
@@ -652,11 +652,11 @@ En este planteamiento la salida de la capa es un único valor escalar. Sin embar
 \end{split}
 \end{equation}
 
-En las redes convolucionales se suelen usar como última capa. Toman los últimos mapas de activación, que pueden vectorizarse en caso de ser necesario, y generan la predicción final de la red.
+Por lo tanto, hemos pasado de tener una neurona a tener una capa de $S$ neuronas. En las redes convolucionales se suelen usar como última capa. Toman los últimos mapas de activación, que pueden vectorizarse en caso de ser necesario, y generan la predicción final de la red.
 
 \section{Funciones de representación} \label{sec:funciones_representacion}
 
-Una parte importante del presente trabajo será la justificación del modelado de las funciones de puntuación, que realizaremos en la \sectionref{sec:espacio_hipotesis_general}. En esta justificación necesitaremos tomar un conjunto de funciones totales de una familia paramétrica de funciones. En esta sección introducimos algunas de las familias más comunes en la práctica del aprendizaje automático. Dichas familias paramétricas serán de la forma:
+Una parte importante del presente trabajo será la justificación del modelado de las funciones de puntuación, que realizaremos en la \sectionref{sec:espacio_hipotesis_general}. En esta justificación necesitaremos tomar un conjunto total de una familia paramétrica de funciones. En esta sección introducimos algunas de las familias más comunes en la práctica del aprendizaje automático, que serán de la forma:
 
 \begin{equation}
 	\mathcal{F} = \conjunto{ f_{\theta}: \R^s \to \R: \; \theta \in \Theta}.
@@ -668,7 +668,7 @@ Las opciones más usadas en la práctica del aprendizaje automático son:
     \item Funciones de base radial (\textit{RBF}), en concreto, la Gaussiana con matriz de covarianzas diagonal:
 
 	      \begin{equation}
-		      f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2}))
+		      f_\theta(\nv{x}) = \mathcal{N}(\nv{x}; \nv{\mu}, diag(\nv{\sigma^2})),
 	      \end{equation}
 
           donde $\theta = (\nv{\mu}, \nv{\sigma^2})$ con $\nv{\mu} \in \R^s$, $\nv{\sigma^2} \in \R^s_+$.
@@ -676,12 +676,11 @@ Las opciones más usadas en la práctica del aprendizaje automático son:
       \item Neuronas: aunque las hemos introducido en la  \sectionref{subsubs:capa_totalmente_conectada}, repetimos su formulación. Serán funciones de la forma:
 
         \begin{equation}
-        \begin{split}
-            & f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b) \\
-        \end{split}
+            f_\theta(\nv{x}) = \sigma(\nv{x}^T \nv{w} + b),
         \end{equation}
 
-        donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$. Además, $\sigma$ será una función de activación no lineal. Las más comunes son la \textit{ReLU} $\sigma(x) := \max \conjunto{0, x}$ o la sigmoide $\sigma(x) := \frac{1}{1 + e^{-x}}$.
+        donde $\theta = (\nv{w}, b)$ con $\nv{w} \in \R^s$, $b \in \R$. Además, $\sigma$ será una función de activación no lineal, siendo frecuente el uso de la función \textit{ReLU} $\sigma(x) := \max \conjunto{0, x}$ o la función sigmoide $\sigma(x) := \frac{1}{1 + e^{-x}}$.
 \end{enumerate}
 
 Para el desarrollo posterior, necesitamos que la familia de funciones sea numerable y total. Esto es directo, tomando valores en $ \Q$. Para las \textit{RBF} tomamos $\nv{\mu} \in \Q^S$ y $\nv{\sigma^2} \in \Q^S_+$. Para las neuronas tomamos $\nv{w} \in \Q^s$ y $b \in \Q$.  Pero es más, en \cite{matematicas:principal} se afirma que es suficiente con tomar un número finito de funciones ${f_1, \ldots, f_M}$. De hecho, en el caso de estar trabajando con imágenes, proponen que basta con tomar $M$ entorno a 100. Este hecho simplificará en gran medida el desarrollo posterior.
+\todo{JMERI: pregunta del tribunal: tiene base matemática o es puramente experimental? Escribir ya la respuesta, porque en el paper de referencia hacen el desarrollo matemático que justifica este valor}
