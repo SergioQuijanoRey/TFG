@@ -612,12 +612,9 @@ Para definir la operación convolución hemos representado las imágenes como fu
 
 Sabiendo esto, lo normal es aplicar distintas convoluciones al mismo tensor de entrada, en lo que se conoce como \textbf{bloque convolucional}. Por ejemplo, aplicar 8 convoluciones sobre la imagen de entrada. Esto produce 8 tensores de salida de dimensiones $ancho' \times alto' \times 1$, que se juntan en un tensor de dimensiones $ancho' \times alto' \times 8$. Cada una de las salidas del bloque convolucional se denomina en el ámbito del aprendizaje automático como \textit{feature map} o mapa de características.
 
-Por tanto, un bloque convolucional toma un tensor de dimensiones $ancho \times alto \times canales$ y produce otro tensor de dimensiones $ancho' \times alto' \times canales'$. En el caso de ser el primer bloque, $canales \in \conjunto{1, 3}$ dependiendo del formato de la imagen. En el caso de bloques intermedios, tendremos que tener en cuenta el número de convoluciones que forman parte del bloque anterior. Por tanto, los parámetros que definen una capa convolucional son:
+Por tanto, un bloque convolucional toma un tensor de dimensiones $ancho \times alto \times canales$ y produce otro tensor de dimensiones $ancho' \times alto' \times canales'$. En el caso de ser el primer bloque, $canales \in \conjunto{1, 3}$ dependiendo del formato de la imagen. En el caso de bloques intermedios, tendremos que tener en cuenta el número de convoluciones que forman parte del bloque anterior.
 
-\begin{itemize}
-    \item Los parámetros de la operación de convolución que hemos comentado previamente.
-    \item Profundidad: cuántos filtros convolucionales se aplican en esta capa. Esto determina el número de mapas de características producidas.
-\end{itemize}
+En consecuencia, los parámetros que definen una capa convolucional son, en primer lugar, los parámetros de la operación de convolución que hemos comentado previamente y, en segundo lugar, la profundidad, es decir, cuántos filtros convolucionales se aplican en esta capa. Esto determina el número de mapas de características producidas.
 
 \subsection{\textit{Pooling}}
 
