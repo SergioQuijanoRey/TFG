@@ -564,33 +564,31 @@ La \imgref{img:ejemplo_cnn} ayuda a entender el funcionamiento de las redes conv
 
 \subsection{Convolución}
 
-La \textbf{convolución} es el elemento que caracteriza a las redes convolucionales, que son las redes utilizadas en la práctica del aprendizaje automático con las que vamos a comparar nuestras modelizaciones matemáticas. Las convoluciones \textbf{explotan eficientemente la estructura de las imágenes}, razón por la cual son utilizadas extensamente en tareas de visión por computador. También pueden explotar eficientemente otras estructuras, como pueden ser los grafos.
-
-Para empezar, dadas dos funciones de variable real, $f$ y $g$, se define su convolución como:
+La convolución es el elemento que caracteriza a las redes convolucionales, que son las redes utilizadas en la práctica del aprendizaje automático con las que vamos a comparar nuestras modelizaciones matemáticas. Las convoluciones \textbf{explotan eficientemente la estructura local de las imágenes}, razón por la cual son utilizadas extensamente en tareas de visión por computador. También pueden explotar eficientemente otras estructuras, como pueden ser los grafos. Para empezar, dadas dos funciones $f, g: \R^N \to \R$, se define su convolución como:
 
 \begin{equation}
-    (f * g)(x) := \int f(t) g(x - t) dt.
+    (f * g)(x) := \int f(t) g(x - t) dt,
 \end{equation}
 
-Podemos trabajar con una versión discretizada de la convolución, de la siguiente forma:
+siempre que la integral tenga sentido. Podemos trabajar con una versión discretizada de la convolución, de la siguiente forma:
 
 \begin{equation}
-    (f * g)(x) := \sum_{t \in \N} f(t) g(x - t).
+    (f * g)(x) := \sum_{t \in \N} f(t) g(x - t),
 \end{equation}
 
-En la práctica vamos a trabajar sobre conjuntos finitos, por lo que la anterior serie la podemos expresar como una simple suma:
+siempre que la suma tenga sentido. En la práctica vamos a trabajar sobre conjuntos finitos, por lo que la anterior serie la podemos expresar como una simple suma:
 
 \begin{equation}
     (f * g)(x) := \sum_{t \in N} f(t) g(x - t).
 \end{equation}
 
-Para representar imágenes en blanco y negro podemos utilizar funciones de dos variables $f: \R^2 \to [0, 1]$, en las que las dos entradas marcan la posición de un \textit{pixel} en concreto y la salida marca la intensidad lumínica de dicho \textit{pixel}, siendo 0 un \textit{pixel} totalmente negro y 1 un \textit{pixel} totalmente blanco. Para imágenes en color podemos usar funciones $f: \R^2 \to [0,1]^3$ en las que las entradas siguen la misma regla y cada componente de la salida marca la intensidad lumínica del color rojo, verde y azul, esto es, el conocido formato \textit{RGB}. Por sencillez, a partir de ahora consideramos imágenes en blanco y negro. Podemos realizar la convolución de dos imágenes una vez definamos la convolución discreta entre funciones de dos variables:
+Para representar imágenes en blanco y negro podemos utilizar funciones de dos variables $f: \R^2 \to [0, 1]$, en las que las dos entradas marcan la posición de un \textit{pixel} en concreto y la salida marca la intensidad lumínica de dicho \textit{pixel}, siendo $0$ un \textit{pixel} totalmente negro y $1$ un \textit{pixel} totalmente blanco. Para imágenes en color podemos usar funciones $f: \R^2 \to [0,1]^3$ en las que las entradas siguen la misma regla y cada componente de la salida marca la intensidad lumínica del color rojo, verde y azul, esto es, el conocido formato \textit{RGB}. Por sencillez, a partir de ahora consideramos imágenes en blanco y negro. Podemos realizar la convolución de dos imágenes una vez definamos la convolución discreta entre funciones de dos variables:
 
 \begin{equation}
     (f * g)(x, y) := \sum_{s \in N} \sum_{t \in M} f(s, t) g(x - s, y - t).
 \end{equation}
 
-Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique filtros a imágenes de esta forma. Una \textbf{operación convolucional} vendrá dada por los siguientes hiperparámetros:
+Con todo esto ya tenemos las bases matemáticas para implementar una operación que aplique filtros a imágenes de esta forma. Una operación convolucional vendrá dada por los siguientes hiperparámetros:
 
 \begin{itemize}
     \item Dimensiones de la convolución: podemos aplicar una convolución de tamaño $1 \times 1$, en la que en cada paso sólo nos fijamos en un elemento del tensor. O de tamaño $3 \times 3$, en la que en cada paso nos fijamos en 9 elementos del tensor. O cualquier tamaño, que normalmente se toma impar para poder centrar la convolución sobre cada \textit{pixel}.
@@ -598,21 +596,15 @@ Con todo esto ya tenemos las bases matemáticas para implementar una operación 
     \item \textit{Padding}: Según el tamaño de la convolución y el \textit{stride}, podemos tener problemas al llegar a los bordes del tensor. Podemos aplicar distintas políticas para resolver esto, pero una de las más comunes es ampliar el tensor por cierto tamaño, copiando los elementos del borde o usando la media de ciertos elementos.
 \end{itemize}
 
-El funcionamiento de esta operación se entiende perfectamente gracias a la siguiente imagen:
+El funcionamiento de esta operación se entiende perfectamente gracias a la \imgref{img:ejemplo_convolucion}. Esta operación tiene dos características principales.
+La primera, los \textbf{coeficientes compartidos}. La detección de patrones dentro de la imagen debe ser independiente de la posición en la que se encuentre dicho patrón. Por lo tanto, los coeficientes del operador son independientes de la posición en la que nos encontremos. La segunda, la \textbf{localidad}. El operador toma información de vecindarios de elementos, lo cual es relevante por la estructura local de las imágenes que hemos comentado previamente.
 
-\begin{figure}[H]
+\begin{figure}[!hbtp]
     \centering
-    \includegraphics[width=0.4\textwidth]{informatica/ejemplo_capa_convolucional}
+    \includegraphics[width=0.6\textwidth]{informatica/ejemplo_capa_convolucional}
     \caption{Ejemplo gráfico de la operación convolución sobre una imagen. El tamaño de la convolución es $2 \times 2$, el \textit{stride} es 1 y no usamos \textit{padding}, usamos otra política que consiste en ajustar la convolución para que no se salga de la imagen. Imagen extraída de \cite{informatica:paper_definicion_cnn}.}
+    \label{img:ejemplo_convolucion}
 \end{figure}
-\todo{Mejorar la calidad de esta imagen}
-
-Las características principales de esta operación son:
-
-\begin{itemize}
-    \item \textbf{Coeficientes compartidos}: los coeficientes del operador son independientes de la posición en la que nos encontremos. La detección de patrones dentro de la imagen debe ser independiente de la posición en la que se encuentre dicho patrón.
-    \item \textbf{Localidad}: el operador toma información de vecindarios de elementos. Esto es relevante por la estructura local que hemos comentado previamente.
-\end{itemize}
 
 \subsection{Bloques convolucionales y mapas de características}
 
