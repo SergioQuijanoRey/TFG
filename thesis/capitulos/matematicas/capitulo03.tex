@@ -4,7 +4,7 @@
 
 La tarea de aprendizaje que consideramos es la de \textbf{clasificación de imágenes}, para la cual el uso de redes convolucionales profundas ha supuesto un gran avance. Nos centraremos en modelar redes convolucionales (profundas y no profundas) para clasificar imágenes.
 
-Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \} = \deltaset{Y}$. Con esto, podemos ver que los datos de entrada viven en el espacio
+Dado un elemento $X = (\nv{x_1}, \ldots, \nv{x_N})$, donde $\nv{x_i} \in \R^s \ \forall i \in \deltaset{N}$, queremos clasificarlo en alguna de las etiquetas $\mathcal{Y} = \{1, \ldots, Y \}$. Con esto, podemos ver que los datos de entrada viven en el espacio
 
 \begin{equation}
 	\mathcal{X} := \R^s \times \overset{N}{\ldots} \times \R^s = (\R^s)^N.
@@ -32,22 +32,18 @@ Esta representación de los datos de entrada es natural en muchos escenarios. En
 Para decidir la etiqueta de un elemento, consideramos $Y$ \textbf{funciones de puntuación}:
 
 \begin{equation}
-	\conjunto{h_y: \mathcal{X} \to \R \dspace / \dspace y \in \mathcal{Y}}.
+	\conjunto{h_y: \mathcal{X} \to \R \dspace / \dspace y = 1, \ldots, Y}.
 \end{equation}
-
-\textbf{NOTA PARA JAVIER}: aquí me marcaste debajo de $Y$ y de $\mathcal{Y}$. Escribo $Y$ funciones de puntuación y luego $y \in \mathcal{Y}$ porque he definido $\mathcal{Y} := \deltaset{Y}$. No sé si esta definición aporta poco y lía más que otra cosa, en cuyo caso creo que es mejor quitar la definición de $\mathcal{Y} := \deltaset{Y}$. O si simplemente crees que es mejor que escoja una tipografía o letras que líen menos.
-\todo{Borrar esta nota para Javier}
 
 Con esto, dado un elemento $X \in \mathcal{X}$, lo clasificaremos buscando la etiqueta cuya función de puntuación sea máxima, es decir:
 
-$$\hat{y} := \underset{y \in \mathcal{Y}}{argmax} \dspace h_y(X).$$
+$$\hat{y} := \underset{y = 1, \ldots, Y}{argmax} \dspace h_y(X).$$
 
 Por tanto, nuestro \textbf{espacio de hipótesis} es el conjunto de funciones $\Gamma := \conjunto{f: \mathcal{X} \to \R}$. Tanto en la práctica con modelos reales de aprendizaje automático como en nuestras dos modelizaciones, trabajamos en un subconjunto $\tilde{\Gamma} \subseteq \Gamma$ de funciones de puntuación, implementables o bien por el modelo de \textit{machine learning} o bien por nuestra modelización teórica.
 
 \section{Espacio de hipótesis general} \label{sec:espacio_hipotesis_general}
-\todo{JMERI: leer de nuevo esta sección completa, porque es muy liosa, repito cosas, introduzco cosas donde no debería. Mirar los contenidos que he borrado}
 
-Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ que conformarán el espacio de hipótesis sobre el que trabajaremos. En la \sectionref{sec:repr_funciones_puntuacion} mostramos cuál es la elección final basada en el desarrollo previo. Usaremos ciertos hechos básicos sobre análisis funcional que hemos introducido en la \sectionref{sec:preliminares_funcional}.
+Nuestro objetivo en esta sección es justificar la elección de las funciones $h_y$ que conformarán el espacio de hipótesis sobre el que trabajaremos. Usaremos ciertos hechos básicos que hemos introducido en la \sectionref{sec:preliminares_funcional}.
 
 \subsection{Planteamiento para construir el espacio de hipótesis} \label{sec:justificacion_func_repr}
 
@@ -59,7 +55,7 @@ Recordemos que los datos de entrada viven en el espacio $\mathcal{X} = (\R^s)^N$
 
 Por lo tanto, buscamos \textbf{construir un espacio de hipótesis} $\mathcal{H} \subseteq L^2((R^s)^N)$ donde elegir nuestras funciones de puntuación. Dicha elección influirá en los modelos de aprendizaje que podamos desarrollar.
 
-Comenzaremos tomando un conjunto de funciones $\conjunto{f_d(\nv{x}): \; d \in \N} \subseteq L^2(\R^S)$ de forma que sea total y linealmente independiente. Llamaremos \textbf{funciones de representación} a las funciones de este conjunto. Gracias a la \propref{prop:conservacion_totalidad_indp_lineal_func_prod} sabemos que la familia de funciones producto inducida $\conjunto{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) }_{d_1, \ldots, d_N \in \N} \subseteq L^2((\R^S)^N)$ es también total y linealmente independiente. Por ser total, la \propref{prop:conjuntos_totales_epsilon_aproximacion} nos dice que podemos aproximar funciones de $L^2((\R^S)^N)$ arbitrariamente bien con combinaciones lineales finitas de funciones producto. En la \sectionref{sec:funciones_representacion} hemos visto que podemos escoger funciones de base radial \textit{RBF} o neuronas para tomar un conjunto de funciones de representación que sea total, linealmente independiente y además finito.
+Comenzaremos tomando un conjunto de funciones $\conjunto{f_d(\nv{x}): \; d \in \N} \subseteq L^2(\R^S)$ de forma que sea total y linealmente independiente. Llamaremos \textbf{funciones de representación} a las funciones de este conjunto. Gracias a la \propref{prop:conservacion_totalidad_indp_lineal_func_prod} sabemos que la familia de funciones producto inducida $\conjunto{(\nv{x_1}, \ldots, \nv{x_n}) \mapsto \prod_{i = 1}^N f_{d_i}(\nv{x_i}) }_{d_1, \ldots, d_N \in \N} \subseteq L^2((\R^S)^N)$ es también total y linealmente independiente. Por ser total, podemos aproximar funciones de $L^2((\R^S)^N)$ arbitrariamente bien con combinaciones lineales finitas de funciones producto. En la \sectionref{sec:funciones_representacion} hemos visto que podemos escoger funciones de base radial \textit{RBF} o neuronas para tomar un conjunto de funciones de representación que sea total y linealmente independiente.
 
 \subsection{Representación tensorial}
 
