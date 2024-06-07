@@ -601,7 +601,7 @@ La primera, los \textbf{coeficientes compartidos}. La detección de patrones den
 
 \begin{figure}[!hbtp]
     \centering
-    \includegraphics[width=0.6\textwidth]{informatica/ejemplo_capa_convolucional}
+    \includegraphics[width=0.7\textwidth]{informatica/ejemplo_capa_convolucional}
     \caption{Ejemplo gráfico de la operación convolución sobre una imagen. El tamaño de la convolución es $2 \times 2$, el \textit{stride} es 1 y no usamos \textit{padding}, usamos otra política que consiste en ajustar la convolución para que no se salga de la imagen. Imagen extraída de \cite{informatica:paper_definicion_cnn}.}
     \label{img:ejemplo_convolucion}
 \end{figure}
@@ -626,28 +626,18 @@ El propósito de este tipo de capas es resumir la información de la imagen o de
     \item \textit{Average Pooling}: igual que \textit{max pooling}, pero en vez de tomar el máximo, se toma la media de los valores considerados.
 \end{itemize}
 
-Por lo tanto, en el \textit{max pooling} y en el \textit{average pooling} tenemos que definir el tamaño de ventana, que determinará cuántos elementos se agregarán en cada paso. Todo esto queda explicado en la siguiente figura:
+Por lo tanto, en el \textit{max pooling} y en el \textit{average pooling} tenemos que definir el tamaño de ventana, que determinará cuántos elementos se agregarán en cada paso. La \imgref{img:ejemplos_pooling} muestra un ejemplo gráfico de los tres tipos de \textit{pooling} que hemos introducido. Esta capa ayuda a que la red sea más ligera, pues al reducir la dimensionalidad de los datos, reduce el número de parámetros que necesitamos ajustar. A partir de la experimentación se piensa que además ayuda a introducir cierta invarianza frente a traslaciones.
 
-\begin{figure}[H]
+\begin{figure}[!hbtp]
     \centering
-    \includegraphics[width=0.6\textwidth]{informatica/ejemplo_pooling}
+    \includegraphics[width=0.7\textwidth]{informatica/ejemplo_pooling}
     \caption{Ejemplo gráfico de los tres tipos de \textit{pooling} que hemos comentado. Imagen extraída de \cite{informatica:paper_definicion_cnn}}
+    \label{img:ejemplos_pooling}
 \end{figure}
-\todo{Solucionar imagen de mala calidad}
 
-Esta capa ayuda a que la red sea más ligera, pues al reducir la dimensionalidad de los datos, reduce el número de parámetros que necesitamos ajustar. A partir de la experimentación se piensa que además ayuda a introducir cierta invarianza frente a traslaciones.
+\subsubsection{Capa Lineal Densa} \label{subsubs:capa_totalmente_conectada}
 
-\subsubsection{Capa totalmente conectada} \label{subsubs:capa_totalmente_conectada}
-
-También conocidas como \textit{linear dense layers} o capas lineales densas. Estas capas toman un vector de valores de entrada, realizan una combinación lineal de sus valores y, en la mayoría de casos, aplican una función no lineal a la salida. Por lo tanto, una capa totalmente conectada viene dada por:
-
-\begin{itemize}
-    \item La dimensión de los vectores que puede procesar, $N$.
-    \item Los pesos de la combinación lineal que realiza sobre las entradas, $w_1, \ldots, w_N$.
-    \item La función de activación no lineal, si es que la hubiera, $\sigma: \R \to \R$.
-\end{itemize}
-
-Por lo tanto, el funcionamiento de una capa lineal densa se resume en:
+También conocida como \textit{linear dense layer} o capa totalmente conectada. Esta capa toma un vector de valores de entrada, realiza una combinación lineal de sus valores y aplica una función no lineal a la salida. Por lo tanto, una capa totalmente conectada viene dada por tres elementos: la dimensión de los vectores que puede procesar, $N$, los pesos de la combinación lineal que realiza sobre las entradas, $w_1, \ldots, w_N$ y, finalmente, la función de activación no lineal $\sigma: \R \to \R$. Por lo tanto, el funcionamiento de una capa lineal densa se resume en:
 
 \begin{equation}
     (x_1, \ldots, x_N) \to \sigma(\sum_{i = 1}^{N} w_i \; x_i).
