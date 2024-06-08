@@ -90,7 +90,7 @@ En la ecuación \eqref{eq:puntuacion_general} estamos usando las mismas funcione
 
 $$\{f_{\theta_d}(\nv{x_i}): \; d \in \deltaset{M},\ i \in \deltaset{N} \}.$$
 
-Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los vectores $\nv{x_i}$ para nada más. Con esto, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores, a la que llamaremos \textbf{capa de presentación} y que será una capa convolucional con $M$ canales. Por tanto, cada parche de entrada $\nv{x_i} \in \R^s$ acaba siendo representando por un descriptor de longitud $M$. Con esto, en todas las funciones de puntuación los descriptores resultado de la capa de representación serán los mismos. El siguiente diagrama muestra gráficamente cómo actúa la capa de representación, calculando los $N \cdot M$ coeficientes reales que componen los descriptores de dicha capa:
+Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los vectores $\nv{x_i}$ para nada más. De este modo, es natural considerar que nuestro modelo tenga una primera capa que compute esos valores, a la que llamaremos \textbf{capa de presentación} y que será una capa convolucional con $M$ canales. Por tanto, cada parche de entrada $\nv{x_i} \in \R^s$ acaba siendo representado por un descriptor de longitud $M$. Con esto, en todas las funciones de puntuación los descriptores resultado de la capa de representación serán los mismos. El siguiente diagrama muestra gráficamente cómo actúa la capa de representación, calculando los $N \cdot M$ coeficientes reales que componen los descriptores de dicha capa:
 
 \begin{figure}[!hbtp]
 	\centering
