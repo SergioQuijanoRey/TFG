@@ -98,10 +98,9 @@ Una vez que hayamos computado esos $M \cdot N$ valores, ya no necesitamos los ve
 	\caption{Ejemplo gráfico sobre cómo actúa la capa de representación. A partir de $N$ parches en $\R^s$, acabamos con $N \cdot M$ coeficientes reales que conformen los descriptores de la capa.}
 \end{figure}
 
-
 \subsection{Ejemplo de cómputo} \label{ejemplo:funcion_puntuacion}
 
-Supongamos que trabajamos con $N = 3, M = 2$. En este caso, una imagen de entrada se compone de los vectores $\nv{x_1}, \nv{x_2}, \nv{x_3} \in \R^s$ (no estamos interesados en el valor de $s \in \N$). Y tenemos dos funciones de representación $f_1, f_2: \R^s \to \R$. El primer paso es computar la capa de representación, que son los $N \cdot M$ coeficientes reales dados por:
+Supongamos que trabajamos con $N = 3, M = 2$. En este caso, una imagen de entrada se compone de los vectores $\nv{x_1}, \nv{x_2}, \nv{x_3} \in \R^s$ (no estamos interesados en el valor de $s \in \N$). Tenemos dos funciones de representación $f_1, f_2: \R^s \to \R$. El primer paso es computar la capa de representación, que son los $N \cdot M$ coeficientes reales dados por:
 
 \begin{equation}
 	\begin{split}
@@ -123,12 +122,10 @@ Queda claro que el tensor $\mathcal{A}^y$ contiene los coeficientes que realizan
 
 \section{Resumen}
 
-Buscamos resolver una tarea de clasificación de imágenes. Dada una imagen de entrada, debemos asignarle una de las etiquetas $\mathcal{Y} := \{1, \ldots, Y\} = \deltaset{Y}$. Para ello, tomamos la etiqueta cuya función de puntuación asociada $h_y$ sea mayor. Las imágenes de entrada se dividen en parches. Esto es, una imagen viene dada por $N$ vectores $x = (\nv{x_1}, \ldots, \nv{x_N}), \dspace \nv{x_i} \in \R^s \dspace \forall i \in \deltaset{N}$. Elegimos un conjunto finito de funciones de representación que sea total y linealmente independiente. Para ello podemos elegir funciones de base radial \textit{RBF} o neuronas. Aplicando adecuadamente las propiedades del conjunto de funciones, llegamos a la modelización:
+Buscamos resolver una tarea de clasificación de imágenes. Dada una imagen de entrada, debemos asignarle una de las etiquetas $\mathcal{Y} := \{1, \ldots, Y\}$. Para ello, tomamos la etiqueta cuya función de puntuación asociada $h_y$ sea mayor. Las imágenes de entrada se dividen en parches. Esto es, una imagen viene dada por $N$ vectores $x = (\nv{x_1}, \ldots, \nv{x_N}), \dspace \nv{x_i} \in \R^s \dspace \forall i \in \deltaset{N}$. Elegimos un conjunto finito de funciones de representación que sea total y linealmente independiente. Para ello podemos elegir funciones de base radial \textit{RBF} o neuronas. Aplicando adecuadamente las propiedades del conjunto de funciones, llegamos a la modelización:
 
 \begin{equation}
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}).
 \end{equation}
 
-Estudiando esta ecuación nos damos cuenta de que hay un cómputo compartido en todas las funciones de puntuación, que encapsulamos en la capa de representación. Lógicamente, el cómputo de esta capa es compartido para todas las funciones de puntuación.
-
-Las dos arquitecturas que introduciremos más adelante son el resultado de factorizar el tensor de coeficientes $\mathcal{A}^y$ con distintas descomposiciones. Ambas incorporan conceptos claves en la práctica del aprendizaje automático, como la localidad, coeficientes compartidos y \textit{pooling}.
+Estudiando esta ecuación nos damos cuenta de que hay un cómputo compartido en todas las funciones de puntuación, que encapsulamos en la capa de representación. Las dos arquitecturas que introduciremos más adelante son el resultado de factorizar el tensor de coeficientes $\mathcal{A}^y$ con distintas descomposiciones. Ambas incorporan conceptos claves en la práctica del aprendizaje automático, como la localidad, coeficientes compartidos y \textit{pooling}.
