@@ -1,11 +1,10 @@
 \chapter{Modelización de las redes neuronales} \label{ch:modelizacion}
 
-A partir de las herramientas matemáticas que hemos introducido en el  \sectionref{ch:matematicas_fundamentales} y de la modelización de la tarea de aprendizaje realizada en el \sectionref{ch:tarea_aprendizaje}, buscamos desarrollar una modelización matemática de las redes neuronales usuales. Para que sea una \textbf{buena modelización}, esta debería ser lo más parecida a los modelos usados en la práctica del aprendizaje automático y debería permitir obtener resultados interesantes.
+A partir de las herramientas matemáticas que hemos introducido en el  \sectionref{ch:matematicas_fundamentales} y de la modelización de la tarea de aprendizaje realizada en el \sectionref{ch:tarea_aprendizaje}, buscamos desarrollar una modelización matemática de las redes neuronales usuales. Para que sea una \textbf{buena modelización} esta debería ser lo más parecida a los modelos usados en la práctica del aprendizaje automático y debería permitir obtener resultados interesantes.
 
 Usando descomposiciones tensoriales, modelaremos dos tipos de redes. Las primeras serán redes neuronales no profundas, a partir de la descomposición \textit{CANDECOMP/PARAFAC} o descomposición \textit{CP}. Las segundas serán redes convolucionales profundas, a partir de la descomposición jerárquica de \textit{Tucker} o descomposición \textit{HT}, por sus siglas en inglés.
 
 Estas \textbf{modelizaciones son muy cercanas a las arquitecturas usadas en la práctica del aprendizaje automático}. Principalmente, porque tienen en cuenta las tres propiedades características de una red convolucional: localidad, compartición de parámetros y \textit{pooling}. La localidad junto a la compartición de parámetros da lugar a la convolución.
-\todo{Desarrollar de forma más extensa qué significan estas propiedades. Antes digo que voy a explicar qué son estas propiedades. Y además, estoy repitiendo el listado, por lo que tengo que desarrollar bien estas propiedades}
 
 \section{Modelo \textit{CP}}
 
