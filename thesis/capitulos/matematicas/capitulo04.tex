@@ -24,7 +24,7 @@ En esta sección introduciremos la descomposición tensorial \textit{CANDECOMP/P
 
 \begin{proof}
 
-	Sean $\nv{v} = (v_1, \ldots, v_N)$ y $\nv{w} = (w_1, \ldots, w_M)$ dos vectores cualesquiera. Entonces, usando la expresión del producto tensorial que introducimos en \customref{sec:otra_forma_tensores}, tenemos que:
+	Sean $\nv{v} = (v_1, \ldots, v_N)$ y $\nv{w} = (w_1, \ldots, w_M)$ dos vectores cualesquiera. Entonces, usando la expresión del producto tensorial que introdujimos en la \sectionref{sec:otra_forma_tensores}, tenemos que:
 
 	\begin{equation}
 		\nv{v} \otimes \nv{w} = (v_i w_j)_{i \in \deltaset{N},\ j \in \deltaset{M}}.
@@ -171,7 +171,7 @@ La anterior proposición muestra que los tensores puros que vienen dados como pr
 
 \begin{observacion}[Descomposición conjunta] \label{observacion:descomposicion_cp_conjunta}
 
-	Obsérvese que en la demostración hemos fijado un conjunto de vectores que solo depende del tensor a descomponer, esto porque tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots \times M_N}$ podemos tomar un conjunto de vectores con el que descomponer cualquier tensor del espacio. Dicho conjunto de vectores es:
+	Obsérvese que en la demostración hemos fijado un conjunto de vectores que solo depende del tensor a descomponer, esto es porque tenemos que considerar las dimensiones del tensor. Si fijamos un espacio de tensores, $\R^{M_1 \times \cdots \times M_N}$ podemos tomar un conjunto de vectores con el que descomponer cualquier tensor del espacio. Dicho conjunto de vectores es:
 
 	\begin{equation}
 		\conjunto{\delta_{k, L}: \; L \in \deltaset{M}, \; k \in \deltaset{L}}
@@ -205,7 +205,7 @@ Nuestra tarea ahora es aplicar la descomposición \textit{CP}, que acabamos de i
 	\mathcal{A}^y = \sum_{z = 1}^Z a_z^y \; \nv{\omega^{z, 1}} \otimes \dots \otimes \nv{\omega^{z, N}}.
 \end{equation}
 
-Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por la ecuación \eqref{eq:cp_decomp}, que $a_z^y \in \R$, y por tanto, podemos escribir $\nv{a^y} := (a_1^y, \ldots, a_Z^y) \in \R^Z$. En segundo lugar, y de nuevo, conforme a la ecuación \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien refleja los índices de la fórmula. Veamos que esta descomposición conjunta es universal:
+Desarrollemos los elementos que participan en esa ecuación. En primer lugar, sabemos por la ecuación \eqref{eq:cp_decomp}, que $a_z^y \in \R$, y por tanto, podemos escribir $\nv{a^y} := (a_1^y, \ldots, a_Z^y) \in \R^Z$. En segundo lugar, y de nuevo, conforme a la ecuación \eqref{eq:cp_decomp}, tenemos los vectores $\nv{\omega^{z, i}} \in \R^M$ con $z \in \deltaset{Z}$, $i \in \deltaset{N}$. Decimos que la \textbf{descomposición es conjunta} porque los vectores $\nv{\omega^{z, i}}$ son los mismos para todos los valores de $y \in \mathcal{Y}$. Solo cambian los coeficientes $\nv{a^y}$, como bien reflejan los índices de la fórmula. Veamos que esta descomposición conjunta es universal:
 
 \begin{proposicion}[Universalidad de la descomposición \textit{CP} conjunta]  \label{prop:cp_conjunta_universal}
 	Tomando $Z = M^N$ en la ecuación \eqref{eq:cp_decomp_conjunta}, la descomposición es universal. Esto es, podemos fijar un conjunto de vectores $\conjunto{\nv{\omega^{z, i}} \in \R^M: \; z \in \deltaset{Z}, \; i \in \deltaset{N}}$ de forma que cualquier tensor $\mathcal{A}^y$ de orden $N$ y dimensión $M$ en cada modo puede ser representado. Es decir:
@@ -307,7 +307,7 @@ Donde en (*) estamos usando que, fijados $i \in \deltaset{N}$ y $z \in \deltaset
 donde en $\xi$ simplemente hemos definido:
 
 \begin{equation}
-    omega_d^{z, i} := \omega_{d_i}^{z, i} \sum_{d_1, \ldots, d_{i -1}, d_{i+1}, \ldots, d_N}^M \omega^{z, 1}_{d_1} \cdots \omega^{z, i-1}_{d_{i-1}} \; \omega^{z, i+1}_{d_{i+1}} \cdots \omega^{z, N}_{d_N}.
+    \omega_d^{z, i} := \omega_{d_i}^{z, i} \sum_{d_1, \ldots, d_{i -1}, d_{i+1}, \ldots, d_N}^M \omega^{z, 1}_{d_1} \cdots \omega^{z, i-1}_{d_{i-1}} \; \omega^{z, i+1}_{d_{i+1}} \cdots \omega^{z, N}_{d_N}.
 \end{equation}
 
 Por lo tanto, nuestro \textbf{Modelo CP} se puede describir con la ecuación:
@@ -324,7 +324,7 @@ Veamos cómo esta modelización se relaciona con una arquitectura usual de apren
     \conjunto{f_{\theta_d}(\nv{x_i}) : \; d \in \deltaset{M}, \; i \in \deltaset{N}}.
 \end{equation}
 
-Una vez hecho esto, en la ecuación \eqref{eq:cp_model} podemos ver $\; \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $M$ elementos de la capa de representación que estamos considerando para el índice $i$. Por tanto, podríamos pensar ahora mismo en la ecuación como:
+Una vez hecho esto, en la ecuación \eqref{eq:cp_model} podemos ver $\; \sum_{d = 1}^{M} \omega^{z, i}_d \cdot f_{\theta_{d}}(\nv{x_i})$ como un bloque convolucional sobre los $M$ elementos de la capa de representación que estamos considerando para el índice $i$. Definiendo $Conv(i) := \sum_{d = 1}^M \omega_{d}^{z, i} \; f_{\theta_d}(\nv{x_i})$ podemos pensar en la ecuación como:
 
 \begin{equation}
 	h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace Conv(i).
@@ -424,7 +424,7 @@ Una vez introducido el significado de los índices de la descomposición pasamos
 	\phi^{l, j, \gamma} = \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha}
 \end{equation}
 
-estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$ para obtener el tensor $\phi^{l, j, \gamma}$ de orden $2^l$. Siguiendo el mismo razonamiento, los tensores $\phi^{L-1; j = 1, 2; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta asunción también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
+estamos operando con tensores $\phi^{l-1, j, \alpha}$ de orden $2^{l-1}$ para obtener el tensor $\phi^{l, j, \gamma}$ de orden $2^l$. Siguiendo el mismo razonamiento, los tensores $\phi^{L-1,\; j = 1, 2,\; \alpha}$ deberán tener un orden la mitad que nuestro tensor de coeficientes $\mathcal{A}^y$, es decir, $N / 2$. Por este motivo y por simplicidad del desarrollo posterior, consideraremos que $N$ (el orden del tensor $\mathcal{A}^y$) es una potencia de dos. Y con ello tenemos que $L := log_2(N)$. Esta suposición también se realiza en \cite{matematicas:descomposicion_ht} y no supone ningún problema.
 
 Cabe destacar también que estamos considerando solo productos tensoriales de dos elementos. Además, estamos combinando únicamente tensores contiguos de cada capa. El siguiente ejemplo gráfico muestra el proceso de generación de los tensores, que deja claro todo lo que acabamos de comentar. Por simplicidad, suponemos que $r = 1$. Es decir, que en cada localización $j$ solo tenemos un tensor, independientemente del nivel $l$ en el que nos encontremos.
 
@@ -533,8 +533,8 @@ coeficientes. Si asumimos que todos los rangos son iguales, $r := r_0 = \cdots =
 
 \begin{equation}
 	\begin{split}
-		M \cdot r \cdot N + \sum_{l = 1}^{L-1} r^2 \cdot \frac{N}{2^l} + r \cdot Y &= M \cdot r \cdot N + N \cdot r^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + r \cdot Y \longmapsto \ldots \\
-		\ldots & \encima{\longmapsto}{L \mapsto \infty} M \cdot r \cdot N + N \cdot r^2 + r \cdot Y,
+		M \cdot r \cdot N + \sum_{l = 1}^{L-1} r^2 \cdot \frac{N}{2^l} + r \cdot Y &= M \cdot r \cdot N + N \cdot r^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + r \cdot Y \longmapsto \cdots \\
+		\cdots & \encima{\longmapsto}{L \mapsto \infty} M \cdot r \cdot N + N \cdot r^2 + r \cdot Y,
 	\end{split}
 \end{equation}
 
