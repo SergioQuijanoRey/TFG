@@ -590,7 +590,7 @@ Como ocurría en la \sectionref{subs:comparticion_parametros_cp}, esta imposici�
 El número de coeficientes de cada modelo es un aspecto central en nuestro estudio. Por tanto, comparamos ahora la diferencia en dicho número de coeficientes entre los dos modelos. En primer lugar, un modelo \textit{CP} con cierto valor de $Z$ tiene  $N \cdot M \cdot Z + Z \cdot Y$ coeficientes que especificar \footnote{Este cálculo se desarrolla en la \sectionref{msubsec:parametros_modelo_cp}.}. Si queremos implementar el resultado de dicho modelo con un modelo \textit{HT}, teniendo en cuenta que \textit{HT} es una extensión de \textit{CP}, deberemos considerar $r = Z$ y por ello tendremos $N \cdot M \cdot Z + N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} + Z \cdot Y$ coeficientes \footnote{Este cálculo se desarrolla en la \sectionref{msubs:parametros_modelo_ht}.}. Por lo tanto, la diferencia en número de coeficientes (coeficientes de más que tiene un modelo \textit{HT} respecto a un modelo \textit{CP}) viene dada por:
 
 \begin{equation}
-	N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2
+	N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2.
 \end{equation}
 
 Es decir, que podemos implementar cualquier modelo \textit{CP} con un modelo \textit{HT}, pero tenemos una \textbf{penalización cuadrática} en el número de coeficientes que tenemos que aprender. Esto puede hacernos pensar que el modelo \textit{CP} es mejor, porque requiere menos coeficientes. Sin embargo, no olvidemos que estamos estudiando el caso en el que, dado un modelo \textit{CP}, lo replicamos con un modelo \textit{HT}. Hay varios puntos
