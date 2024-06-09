@@ -399,7 +399,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     \todo{JMeri: hay que poner el $R^{algo}$ en el que tenemos la medida cero.}
 
     \begin{equation}
-        \phi := \conjunto{\phi^{i, j, \gamma}: \; (j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}, rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
+        \phi := \conjunto{\phi^{i, j, \gamma}: \; (j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}, \; rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
     \end{equation}
     \todo{JMeri: esto son índices, es obvio que son finitos}
 
@@ -441,7 +441,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     Así, $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por doquier respecto al conjunto de todos los parámetros del modelo \textit{HT}, para valores concretos de $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$. Podemos hacer un argumento análogo al anterior para extender esta propiedad a todo $(j, \gamma)$ de forma conjunta. Sabemos que el siguiente conjunto
 
     \begin{equation}
-        \phi_l^{\gamma} := \conjunto{phi^{l, j, \gamma}: \; j \in \deltaset{N/2^l}, rank([\phi^{l, j, \gamma}]) \neq r}
+        \phi_l^{\gamma} := \conjunto{\phi^{l, j, \gamma}: \; j \in \deltaset{N/2^l}, \; rank([\phi^{l, j, \gamma}]) \neq r}
     \end{equation}
 
     es finito y por lo tanto tiene medida cero. Por lo tanto, el conjunto
@@ -453,7 +453,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     también tiene medida cero, con lo que finalmente:
 
     \begin{equation}
-        \phi := \conjunto{(j, \gamma) \in \deltaset{N/2^l \times \deltaset{r_l} \; : \; rank([\phi^{l, j, \gamma}]) \neq r}} \subseteq \phi_l \times \R
+        \phi := \conjunto{\phi^{l, j, \gamma}: \; j \in \deltaset{N/2^l}, \; \gamma \in \deltaset{r_l}, \; rank([\phi^{l, j, \gamma}]) \neq r} \subseteq \phi_l \times \R
     \end{equation}
 
     tiene medida cero, como buscábamos ver. Esto concluye la prueba para el caso no compartido.
@@ -481,7 +481,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
     que es la función de puntuación introducida en la ecuación \eqref{eq:puntuacion_general} dado el tensor de coeficientes $\mathcal{A}$. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^* \in \espaciotensores{N}{M}$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon > 0$ tal que:
 
     \begin{equation}
-        \int_{(\R^S)^N} |h(\mathcal{A}^\lambda) - h(\mathcal{A}^*)|^2 > \epsilon, \quad (\forall \lambda \in \Lambda).
+        \int_{(\R^S)^N} |h(\mathcal{A}^\lambda) - h(\mathcal{A}^*)|^2 > \epsilon \quad (\forall \lambda \in \Lambda).
     \end{equation}
 \end{lema}
 
@@ -492,7 +492,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         \zeta = \conjuntofit{\prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}): d_1, \ldots d_N \in \deltaset{M}}
     \end{equation}
 
-    también es linealmente independiente, por la \propref{prop:conservacion_totalidad_indp_lineal_func_prod}. Consideramos ahora una sucesión de funciones $\conjunto{h^{(t)}}_{t \in \N}$ en $span\conjunto{\zeta}$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la base dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente y obviamente total en $span \conjunto{\zeta}$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene determinado por la siguiente igualdad:
+    también es linealmente independiente, por la \propref{prop:conservacion_totalidad_indp_lineal_func_prod}. Consideramos ahora una sucesión de funciones $\conjunto{h^{(t)}}_{t \in \N} \subseteq span\conjunto{\zeta}$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la base dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente y obviamente total en $span \conjunto{\zeta}$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene determinado por la siguiente igualdad:
 
     \begin{equation}
         h^{(t)}(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1 = 1, \ldots, d_N = 1}^M \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}).
@@ -556,7 +556,7 @@ Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de
 \begin{observacion}
     En el \propref{teorema:teorema_principal_especificacion} hemos visto que un tensor generado por un modelo \textit{HT} tiene rango \textit{CP} de al menos $\min \conjunto{r_0, M}^{\frac{N}{2}}$  en casi todo punto respecto al espacio de parámetros que definen el modelo \textit{HT}, $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. El resultado anterior nos dice que el modelo \textit{CP} requerirá un tamaño exponencial: $Z \geq \min \conjunto{r_0, M}^{\frac{N}{2}}$.
 
-    Pero el resultado anterior da un paso más. Partimos de que las funciones de representación son linealmente independientes (ya hemos visto que en la práctica del \textit{deep learning} esto es lo común). El corolario afirma que no es que sea \entrecomillado{prácticamente imposible} realizar el coeficiente de tensores con un modelo \textit{CP} con menos de un número exponencial de canales en la capa oculta, sino que es \entrecomillado{prácticamente imposible} aproximar la función de puntuación con menos de dicho número exponencial de canales en la capa oculta.
+    Pero el resultado anterior da un paso más. Partimos de que las funciones de representación son linealmente independientes (ya hemos visto que en la práctica del \textit{deep learning} esto es lo común). El corolario afirma que no es que sea \entrecomillado{prácticamente imposible} realizar el tensor de coeficientes con un modelo \textit{CP} con menos de un número exponencial de canales en la capa oculta, sino que es \entrecomillado{prácticamente imposible} aproximar la función de puntuación con menos de dicho número exponencial de canales en la capa oculta.
 \end{observacion}
 
 \begin{proof}
@@ -569,7 +569,6 @@ Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de
     \end{itemize}
 
     El \propref{teorema:teorema_principal_especificacion} nos dice que, con probabilidad $1$, $\mathcal{A}^*$ no puede ser generado por un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. Luego $\mathcal{A}^* \notin \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$. Además, ya sabemos que $rank([\mathcal{A}^\lambda]) < \frac{N}{2} \leq rank([\mathcal{A}^*]), \; \forall \lambda \in \Lambda$. Por lo tanto, se cumplen todas las hipótesis del \propref{lema:lema_previo_corolario}, luego la distancia $L^2$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon_0 > 0:$
-    \todo{Relacionar el \entrecomillado{con probabilidad 1} con que nuestro teorema habla de medida nula}
 
     \begin{equation}
         d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}^\lambda)) \geq \epsilon_0, \; \forall \lambda \in \Lambda.
