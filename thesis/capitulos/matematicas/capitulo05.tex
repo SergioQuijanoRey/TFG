@@ -192,7 +192,7 @@ La siguiente proposición será necesaria para ver un detalle técnico en la pru
 
 \section{Demostración del teorema principal}
 
-Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema principal, y por ello los presentamos aquí y no con el resto de lemas en la  \sectionref{sec:lemas_previos}. Veamos el primero:
+Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema principal y por ello los presentamos aquí y no con el resto de lemas en la  \sectionref{sec:lemas_previos}. Veamos el primero:
 
 \begin{lema}[Primer lema fundamental, rango de una matrización de la forma $A D B^T$] \label{lema:primer_lema}
 
@@ -211,10 +211,10 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
     \textbf{Caso General}. Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ y $D(\nv{x}) \in \espaciomatrices{N}{N}$, es claro que:
 
     \begin{equation}
-        rank(U(\nv{x})) \leq r := \min \conjunto{N, M }; \dspace \forall \nv{x} \in \R^{2MN + N}.
+        rank(U(\nv{x})) \leq r := \min \conjunto{N, M }, \dspace \forall \nv{x} \in \R^{2MN + N}.
     \end{equation}
 
-    Por tanto, queda probar que $rank(U(\nv{x})) \geq r; \dspace \text{c.p.d. } \nv{x} \in \R^{2MN + N}$. Definimos $U_r(\nv{x})$ como la submatriz superior izquierda $r \times r$ de $U(\nv{x})$. Si fuese $U_r(\nv{x})$ no singular para cierto $\nv{x}$, claramente sabríamos que $r = rank(U_r(\nv{x})) \leq rank(U(\nv{x}))$. Así pues, buscamos probar que $U_r(\nv{x})$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{\nv{x} \in \R^{2MN + N} : det(U_r(\nv{x})) = 0 }$ tiene medida nula.
+    Por tanto, queda probar que $rank(U(\nv{x})) \geq r, \dspace \text{c.p.d. } \nv{x} \in \R^{2MN + N}$. Definimos $U_r(\nv{x})$ como la submatriz superior izquierda $r \times r$ de $U(\nv{x})$. Si fuese $U_r(\nv{x})$ no singular para cierto $\nv{x}$, claramente sabríamos que $r = rank(U_r(\nv{x})) \leq rank(U(\nv{x}))$. Así pues, buscamos probar que $U_r(\nv{x})$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{\nv{x} \in \R^{2MN + N} : det(U_r(\nv{x})) = 0 }$ tiene medida nula.
 
     Para ver esto tenemos en cuenta que $det(U_r(\nv{x}))$ es un polinomio con entradas en $\nv{x} \in \R^{2MN + N}$. Por el \propref{lema:prop_fundamentales_medida} sabemos que entonces o bien es el polinomio idénticamente nulo o bien el conjunto de sus ceros tiene medida nula. Basta ver por tanto que no es el polinomio idénticamente nulo. Para ello es suficiente probar que $\exists \nv{x_0} \in \R^{2MN + N}$ con el que se verifique que $det(U_r(\nv{x_0})) \neq 0$. Tomamos $\nv{x_0}$ de forma que $D(\nv{x_0}) = \mathbb{I}d_{N \times N}$ (haciendo que las últimas $N$ entradas de $\nv{x_0}$ sean 1) y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0})$ y $B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. Por cómo definimos las matrices $A(\nv{x})$, $B(\nv{x})$ y $D(\nv{x})$, es sencillo realizar esta elección de $\nv{x_0}$. En esta situación tenemos:
 
@@ -292,7 +292,6 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
     Entonces el conjunto $S$ tiene medida nula.
 \end{lema}
-\todo{Nota de Javier: no se entiende el enunciado de este lema}
 
 \begin{proof}
 
@@ -314,7 +313,7 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         A(\nv{x}, \nv{y_0}) = \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0}) \then det(A(\nv{x}, \nv{y_0})) = det(A_1(\nv{y_0})) \neq 0.
     \end{equation}
 
-    Por tanto, usando el \propref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
+    Por tanto, usando el \propref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Así pues, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
 
     Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar que el conjunto $S$ tiene medida nula. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
 
@@ -406,6 +405,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 
     tiene medida cero, lo que prueba el caso $l = 1$.
 
+    % TODO -- seguir por aqui
     \textbf{Hipótesis de inducción}: supuesto que es cierto para $l - 1$ veamos que se cumple para $l$. Usando la hipótesis de inducción sabemos que:
 
     \begin{equation}
@@ -432,7 +432,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \; \text{c.p.d.}
     \end{equation}
 
-    Podemos aplicar el \propref{lema:segundo_lema}, porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, porque sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y porque $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matrizaciones. Aplicando dicho lema obtenemos que:
+    Podemos aplicar el \propref{lema:segundo_lema} porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, porque sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y porque $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matrizaciones. Aplicando dicho lema obtenemos que:
 
     \begin{equation}
         [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \;\; \text{tiene rango al menos} \; \; r^{\frac{2^l}{2}} \text{ c.p.d. }
@@ -447,7 +447,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     es finito y por lo tanto tiene medida cero. Por lo tanto, el conjunto
 
     \begin{equation}
-        \phi_l := \union_{ \gamma \in \deltaset{r_l}} \phi_l^{\gamma}
+        \phi_l := \union_{\gamma \in \deltaset{r_l}} \phi_l^{\gamma}
     \end{equation}
 
     también tiene medida cero, con lo que finalmente:
