@@ -79,14 +79,13 @@ Nuestra idea inicial era la de aplicar las variantes \textit{online} de la funci
 
 En la \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en la \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. Describimos ahora cómo ejecutamos este proceso, las decisiones tomadas y qué información obtenemos.
 
-Por el gran tamaño de los conjuntos de datos ha sido imposible ejecutar \textit{k-Fold Cross Validation} como método en el que basar la exploración de los hiperparámetros. Tanto por los enormes tiempos de cómputo como por el colapso de la memoria disponible en el \textit{hardware} empleado. Por tanto, nos vemos obligados a emplear \textit{holdout} como técnica base. Los problemas de robustez que esta técnica puede provocar se reducen al tener encuenta el gran tamaño de los conjuntos de datos con los que trabajamos. Al igual que hacen otros trabajos del estado del arte, realizaremos la exploración de hiperparámetros sobre \textit{CACD}. El conjunto de datos \textit{FG-Net} se usará únicamente para validar el modelo final.
+Por el gran tamaño de los conjuntos de datos ha sido imposible ejecutar \textit{k-Fold Cross Validation} como método en el que basar la exploración de los hiperparámetros. Por tanto, empleamos \textit{holdout} como técnica base. Este enfoque es muy común al emplear grandes conjuntos de datos \cite{informatica:facenet} \cite{informatica:principal}. Los problemas de robustez que esta técnica puede provocar se reducen al tener en cuenta el gran tamaño de los conjuntos de datos con los que trabajamos. Al igual que hacen otros trabajos del estado del arte \cite{informatica:aim} \cite{informatica:dal}, realizaremos la exploración de hiperparámetros sobre \textit{CACD}. El conjunto de datos \textit{FG-Net} se usará únicamente para validar el modelo final.
 
-La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar. Lanzamos la búsqueda de hiperparámetros para maximizar el valor de \textit{Rank@1 accuracy} \footnotemark. Los resultados de la búsqueda pueden consultarse en la base de datos \textit{SQLITE} \lstinline{hp_tuning_optuna.db} que está en nuestro repositorio de \textit{Github} \footnotemark. La \tableref{table:hp_escogidos} muestra los mejores hiperparámetros encontrados.
+La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar. Lanzamos la búsqueda de hiperparámetros para maximizar el valor de \textit{Rank@1 accuracy} \footnotemark. La \tableref{table:hp_escogidos} muestra los mejores hiperparámetros encontrados.
 
 \footnotetext{Si el lector no está familiarizado con esta métrica, la hemos definido en \sectionref{isubs:rank_at_k}}
-\footnotetext{Si el lector quiere realizar consultas sobre esta base de datos, el fichero \lstinline{optuna_queries.sql} contiene las órdenes \textit{SQL} que más hemos usado para vigilar el proceso de búsqueda.}
 
-\begin{table}[!hbt]
+\begin{table}[!hbtp]
 \centering
     \begin{tabular}{|l|p{5cm}|}
     \hline
@@ -114,7 +113,7 @@ La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que expl
 \label{table:rangos_hiperparametros}
 \end{table}
 
-\begin{table}[!hbt]
+\begin{table}[!hbtp]
 \centering
 \begin{tabular}{|l|l|}
     \hline
@@ -140,12 +139,7 @@ La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que expl
 \label{table:hp_escogidos}
 \end{table}
 
-En la \tableref{table:hp_escogidos} podemos ver que el valor máximo alcanzado para \textit{Rank@1 Accuracy} es realmente malo, no llega al $0.1$. Por otro lado, de 92 pruebas de hiperparámetros, solo 11 consiguen terminar su ejecución de forma normal. Es decir, el 88\% de las pruebas fallan, la mayoría por explosión de gradientes. Esto ya indica dos inconvenientes de las nuevas técnicas que estudiamos en este trabajo:
-
-\begin{enumerate}
-    \item Producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte.
-    \item Provocan que el entrenamiento del modelo sea muy frágil y que sea realmente complicado encontrar configuraciones de hiperparámetros que produzcan un modelo sin errores en el proceso.
-\end{enumerate}
+En la \tableref{table:hp_escogidos} podemos ver que el valor máximo alcanzado para \textit{Rank@1 Accuracy} es realmente malo, no llega al $0.1$. Por otro lado, de 92 pruebas de hiperparámetros, solo 11 consiguen terminar su ejecución de forma normal. Esto ya indica dos inconvenientes de las nuevas técnicas que estudiamos en este trabajo. El primero, que producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte. El segundo, que provocan que el entrenamiento del modelo sea muy frágil y que sea realmente complicado encontrar configuraciones de hiperparámetros que produzcan un modelo sin errores en el proceso.
 
 En base a estos resultados, entrenaremos un modelo sobre todo el conjunto \textit{CACD} y validaremos los resultados sobre \textit{FG-Net}. Para ello, usaremos los hiperparámetros que hemos encontrado en la \tableref{table:hp_escogidos}. Esperamos obtener muy malos resultados, pues ya hemos comentado que \textit{FG-Net} es un conjunto de datos más complicado que \textit{CACD}, y el valor tan bajo de \textit{Rank@1 Accuracy} no es nada esperanzador.
 
@@ -192,6 +186,7 @@ El proceso de entrenamiento puede estudiarse a partir de las métricas que se mu
 
 \begin{figure}[!hbtp]
 
+    \ajustarsubcaptions
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/running_loss}
@@ -234,28 +229,23 @@ El proceso de entrenamiento puede estudiarse a partir de las métricas que se mu
         \caption{Norma de los \textit{embeddings}}
     \end{subfigure}
 
-    \caption{Valores de las métricas observadas durante el proceso de entrenamiento}
+    \caption{Valores de las métricas observadas durante el proceso de entrenamiento.}
     \label{img:metricas_entrenamiento}
 \end{figure}
 
 \begin{table}[!hbtp]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|l|l|}
     \hline
-    Métrica & Conjunto & Valor \\
+    Conjunto & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
     \hline
 
-    \textit{Rank@1 Accuracy} & Entrenamiento & 0.07185 \\
-    \textit{Rank@1 Accuracy} & Test & 0.01000 \\
-    \textit{Rank@5 Accuracy} & Entrenamiento & 0.15244 \\
-    \textit{Rank@5 Accuracy} & Test & 0.00100 \\
-    \textit{Silhouette} & Entrenamiento & -0.41858 \\
-    \textit{Silhouette} & Test & -0.32984 \\
-
+    Entrenamiento & 0.07185 & 0.15244 & -0.41858 \\
+    Test & 0.01000 & 0.00100 & -0.32984 \\
     \hline
 
 \end{tabular}
-\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de \textit{test}}
+\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de \textit{test}.}
     \label{table:resultados_sobre_fg_net}
 \end{table}
 
@@ -263,9 +253,10 @@ A partir de la \imgref{img:metricas_entrenamiento} podemos extraer algunas concl
 
 Los resultados obtenidos en \tableref{table:resultados_sobre_fg_net} son muy malos. En el conjunto de \textit{CACD} los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} son pésimos, y están muy lejos de los valores que hemos mostrado que alcanzan modelos estado del arte. Aunque no logremos ser competitivos con el estado del arte, podríamos haber obtenido un modelo aplicable en la práctica, competente y ligero. Pero este no es el caso, en este estado el modelo no es aplicable en ningún escenario. Como es de esperar, los resultados sobre \textit{FG-Net} son aún peores. Todo esto viene reforzado por los valores de la métrica \textit{Silhouette}.
 
-Inicialmente cometemos un error al interpretar estos datos. Pensábamos que el comportamiento del las distancias intracluster e intercluster, acompañado del descenso de la norma de los \textit{embeddings}, era un indicador de la primera fase del entrenamiento que se comenta en \cite{informatica:principal}: agrupamos todos los datos en un cierto centro de gravedad que permite más tarde generar agrupaciones separadas. Para arreglar esto, buscamos mejorar la búsqueda de hiperparámetros y normalizar la salida de las redes. También buscamos aplicar entrenamientos mucho más largos que no mejoran nada. Sin embargo, no nos damos cuenta de un comportamiento muy anómalo. Independientemente del valor del margen que establezcamos, la función de pérdida se queda atascada en este valor. Como comentaremos y justificaremos más tarde, lo que está ocurriendo es que la red aprende el comportamiento degenerado que consiste en transformar todas las entradas a un único punto del espacio vectorial fijo pero no nulo.
+Inicialmente cometemos un error al interpretar estos datos. Pensábamos que el comportamiento del las distancias intracluster e intercluster, acompañado del descenso de la norma de los \textit{embeddings}, era un indicador de la primera fase del entrenamiento que se comenta en \cite{informatica:principal}: agrupamos todos los datos en un cierto centro de gravedad que permite más tarde generar agrupaciones separadas. Para arreglar esto, buscamos mejorar la búsqueda de hiperparámetros y normalizar la salida de las redes. También buscamos aplicar entrenamientos mucho más largos que no mejoran nada. Sin embargo, no nos damos cuenta de un comportamiento muy anómalo. Independientemente del valor del margen que establezcamos, la función de pérdida se queda atascada en este valor. Como comentaremos y justificaremos más tarde, lo que está ocurriendo es que la red aprende el comportamiento degenerado que consiste en transformar todas las entradas a un único punto del espacio vectorial fijo pero no nulo.  Cabe destacar que en el trabajo de referencia \cite{informatica:principal} se comenta que el proceso de entrenamiento puede caer en un comportamiento degenerado, pero indican que esto ocurre en los experimentos \textit{offline} que realizan para comparar su propuesta. Y por ello, no dan ningún tipo de indicación para lidiar con el problema que estamos experimentando.
 
 \subsection{Experimentación inicial con \textit{MNIST}} \label{isubsec:experimentos_iniciales_mnist}
+% TODO -- seguir por aqui
 
 El primer paso que tomamos para solventar los problemas que se nos presentan es intentar entrenar un modelo sencillo sobre \textit{MNIST}. De esta forma, si obtuviésemos buenos resultados podríamos descartar un posible error por nuestra parte. Y a partir de ahí, buscar ciertas soluciones, como por ejemplo, emplear una arquitectura distinta, probar con una exploración de hiperparámetros más extensa o realizar entrenamientos mucho más extensos.
 
