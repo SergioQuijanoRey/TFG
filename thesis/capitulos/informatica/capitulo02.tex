@@ -143,16 +143,7 @@ Con todo esto ya tenemos las bases matemáticas para implementar una operación 
 	\item \textit{Padding}: Según el tamaño del filtro y el \textit{stride}, podemos tener problemas al llegar a los bordes de la imagen. Podemos aplicar distintas políticas para resolver esto, pero una de las más comunes es ampliar la imagen por cierto tamaño (por ejemplo, copiando los píxeles del borde o usando la media de ciertos píxeles).
 \end{itemize}
 
-El funcionamiento de este operador se muestra en el siguiente diagrama:
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.4\textwidth]{informatica/ejemplo_capa_convolucional}
-	\caption{Ejemplo gráfico de una capa convolucional. Estamos usando una convolución de tamaño $2 \times 2$, \textit{stride} = 1 y no usamos \textit{padding} (usamos otra política, que consiste en ajustar el filtro para que no se salga de la imagen). Imagen extraída de \cite{informatica:paper_definicion_cnn}.}
-\end{figure}
-\todo{Solucionar imagen de mala calidad}
-
-Esta operación tiene dos propiedades muy relevantes y que justifican su buen funcionamiento. La primera es la \textbf{compartición de coeficientes}. Los coeficientes del operador son independientes de la posición en la que nos encontremos. Si nuestro filtro detecta un patrón, dicha detección debe ser independiente de la posición en la que se encuentre dicho patrón. La segunda es la \textbf{localidad}. El operador toma información de vecindarios de píxeles. Esto es relevante por la estructura local que hemos comentado de las imágenes.
+El funcionamiento de este operador se muestra en la \imgref{img:ejemplo_convolucion}. Esta operación tiene dos propiedades muy relevantes y que justifican su buen funcionamiento. La primera es la \textbf{compartición de coeficientes}. Los coeficientes del operador son independientes de la posición en la que nos encontremos. Si nuestro filtro detecta un patrón, dicha detección debe ser independiente de la posición en la que se encuentre dicho patrón. La segunda es la \textbf{localidad}. El operador toma información de vecindarios de píxeles. Esto es relevante por la estructura local que hemos comentado de las imágenes.
 
 \subsubsection{Capa de \textit{pooling}}
 
@@ -164,14 +155,7 @@ El propósito de esta capa es resumir la información de la imagen (o conjunto d
 	\item \textit{Average Pooling}: igual que \textit{max pooling}, pero en vez de tomar el máximo, se toma la media de los valores considerados.
 \end{itemize}
 
-Esto queda explicado en la siguiente figura:
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\textwidth]{informatica/ejemplo_pooling}
-	\caption{Ejemplo gráfico de los tres tipos de \textit{pooling} que hemos comentado. Imagen extraída de \cite{informatica:paper_definicion_cnn}}
-\end{figure}
-\todo{Solucionar imagen de mala calidad}
+La \imgref{img:ejemplos_pooling} explica gráficamente estos tres tipos de \textit{pooling} que acabamos de introducir.
 
 \subsection{Visión por computador}
 

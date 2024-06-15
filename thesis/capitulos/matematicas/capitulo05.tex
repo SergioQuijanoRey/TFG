@@ -20,7 +20,7 @@ En resumen, casi todos los tensores $\mathcal{A}^y$ que podemos generar con un m
 
 El teorema nos afirmaba que casi todos los tensores realizables por una descomposición \textit{HT} no pueden realizarse eficientemente por un modelo \textit{CP}. El corolario añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
 
-El \propref{corol:corol_principal} introduce una mejora notable respecto a los trabajos previos. En estos, se aportan ejemplos de funciones realizables por el modelo \textit{HT} que no son realizables por un modelo \textit{CP} con un número de parámetros sustancialmente superior al número de parámetros del modelo \textit{HT}. Es decir, establecen la eficiencia en profundidad de ejemplos concretos de funciones. Nuestro corolario establece la eficiencia en profundida casi por doquier. Por otro lado, estos resultados también mejoran los trabajos previos sobre análisis tensorial. El trabajo que introduce la descomposición \textit{HT} \cite{matematicas:descomposicion_ht} da ejemplos específicos de tensores realizables por el modelo \textit{HT} y no por un modelo \textit{CP} con un número exponencial de parámetros. Nuestro corolario indica que esto no ocurre únicamente en ejemplos aislados, sino en casi todos los tensores realizables por un modelo \textit{HT}.
+El \propref{corol:corol_principal} introduce una mejora notable respecto a los trabajos previos. En estos, se aportan ejemplos de funciones realizables por el modelo \textit{HT} que no son realizables por un modelo \textit{CP} con un número de parámetros sustancialmente superior al número de parámetros del modelo \textit{HT}. Es decir, establecen la eficiencia en profundidad de ejemplos concretos de funciones. Nuestro corolario establece la eficiencia en profundidad casi por doquier. Por otro lado, estos resultados también mejoran los trabajos previos sobre análisis tensorial. El trabajo que introduce la descomposición \textit{HT} \cite{matematicas:descomposicion_ht} da ejemplos específicos de tensores realizables por el modelo \textit{HT} y no por un modelo \textit{CP} con un número exponencial de parámetros. Nuestro corolario indica que esto no ocurre únicamente en ejemplos aislados, sino en casi todos los tensores realizables por un modelo \textit{HT}.
 
 Finalmente, que cualquier tensor realizable por un modelo \textit{CP} pueda ser realizado por un modelo \textit{HT} con un aumento polinomial del número de coeficientes (véase la \sectionref{msubs:parametros_modelo_ht}) implica que la descomposición \textit{HT} es asintóticamente más eficiente que la \textit{CP}.
 
@@ -28,7 +28,7 @@ Finalmente, que cualquier tensor realizable por un modelo \textit{CP} pueda ser 
 
 En esta sección introduciremos algunos resultados que serán usados en las demostraciones del \propref{teorema:teorema_principal_especificacion} y el \propref{corolario:corolario_principal_concreto}. Empezamos con los siguientes resultados sobre la medida de Lebesgue:
 
-\begin{lema}[Propiedades fundamentales de la medida] \label{lema:prop_fundamentales_medida} Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
+\begin{lema}[Algunas propiedades de la medida] \label{lema:prop_fundamentales_medida} Las siguientes propiedades sobre la medida de Lebesgue son ciertas:
 
 \begin{enumerate}
     \item La unión numerable de conjuntos de medida nula es un conjunto de medida nula.
@@ -42,7 +42,7 @@ Usaremos la siguiente \textbf{matrización} de un tensor:
 
 \begin{definicion}[Matrización de un tensor]
 
-Sea $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ un tensor de orden $N$ y dimensión $M_i$ en cada modo $i \in \deltaset{N}$. Por simplicidad, supondremos que el orden del tensor es par. Denotaremos por $[\mathcal{A}]$ a la \textbf{matrización} del tensor $\mathcal{A}$, que será una matriz donde las filas corresponden a modos impares del tensor, y las columnas corresponden a los modos pares. Por lo tanto, $[\mathcal{A}]$ tiene $M_1 \cdot M_3 \cdots M_{N-1}$ filas y $M_2 \cdot M_4 \cdots M_N$ columnas. Asignaremos el valor de $\mathcal{A}_{d_1, \ldots, d_N}$ en $[\mathcal{A}]$ en la posición:
+Sea $\mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$ un tensor de orden $N$ par y dimensión $M_i$ en cada modo $i \in \deltaset{N}$. Por simplicidad, supondremos que el orden del tensor es par. Denotaremos por $[\mathcal{A}]$ a la \textbf{matrización} del tensor $\mathcal{A}$, que será una matriz donde las filas corresponden a modos impares del tensor, y las columnas corresponden a los modos pares. Por lo tanto, $[\mathcal{A}]$ tiene $M_1 \cdot M_3 \cdots M_{N-1}$ filas y $M_2 \cdot M_4 \cdots M_N$ columnas. Asignaremos el valor de $\mathcal{A}_{d_1, \ldots, d_N}$ en $[\mathcal{A}]$ en la posición:
 
 \begin{itemize}
     \item Fila $1 + \sum_{i = 1}^{N/2} (d_{2i - 1} - 1) \; \prod_{j = i + 1}^{N/2} M_{2j - 1}$.
@@ -171,28 +171,28 @@ La siguiente proposición será necesaria para ver un detalle técnico en la pru
 \end{proposicion}
 
 \begin{proof}
-    Llamamos $\zeta := \conjunto{M \in \espaciomatrices{M}{N}: \; rank(M) < r}$ y buscamos probar que todas las sucesiones de elementos de $\zeta$ que convergen lo hacen a un elemento de $\zeta$. Es decir:
+    Llamamos $\zeta := \conjunto{P \in \espaciomatrices{M}{N}: \; rank(P) < r}$ y buscamos probar que todas las sucesiones de elementos de $\zeta$ que convergen lo hacen a un elemento de $\zeta$. Es decir:
 
     \begin{equation}
         \begin{split}
-            \conjunto{M_n}_{n \in \N} \subseteq \zeta \\
-            \conjunto{M_n} \to M \in \espaciomatrices{M}{N} \\
+            \conjunto{P_n}_{n \in \N} \subseteq \zeta \\
+            \conjunto{P_n} \to M \in \espaciomatrices{M}{N} \\
         \end{split}
-        \then M \in \zeta.
+        \then P \in \zeta.
     \end{equation}
 
-    Sea $A_n$ un menor cualquiera de orden $r$ de $M_n$. Para cada $n \in \N$ elegiremos el mismo menor. Sea $A$ el menor de orden $r$ de $M$ asociado a las mismas entradas que el orden que hemos tomado en $M_n$. Entonces es claro que $\conjunto{A_n} \to A$. Como el determinante es una función continua, es claro entonces que:
+    Sea $A_n$ un menor cualquiera de orden $r$ de $P_n$. Para cada $n \in \N$ elegiremos el mismo menor. Sea $A$ el menor de orden $r$ de $P$ asociado a las mismas entradas que el orden que hemos tomado en $P_n$. Entonces es claro que $\conjunto{A_n} \to A$. Como el determinante es una función continua, es claro entonces que:
 
     \begin{equation}
         \conjunto{0}_{n \in \N} = \conjunto{det(A_n)} \to det(A).
     \end{equation}
 
-    Y con ello, hemos probado que $det(A) = 0$. Como podemos hacer esto con todos los posibles menores de orden $r$, hemos probado que $M$ tiene rango menor que $r$, y por tanto $M \in \zeta$.
+    Y con ello, hemos probado que $det(A) = 0$. Como podemos hacer esto con todos los posibles menores de orden $r$, hemos probado que $P$ tiene rango menor que $r$, y por tanto $P \in \zeta$.
 \end{proof}
 
 \section{Demostración del teorema principal}
 
-Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema principal, y por ello los presentamos aquí y no con el resto de lemas en la  \sectionref{sec:lemas_previos}. Veamos el primero:
+Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema principal y por ello los presentamos aquí y no con el resto de lemas en la  \sectionref{sec:lemas_previos}. Veamos el primero:
 
 \begin{lema}[Primer lema fundamental, rango de una matrización de la forma $A D B^T$] \label{lema:primer_lema}
 
@@ -211,10 +211,10 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
     \textbf{Caso General}. Como $U(\nv{x}) \in \espaciomatrices{M}{M}$ y $D(\nv{x}) \in \espaciomatrices{N}{N}$, es claro que:
 
     \begin{equation}
-        rank(U(\nv{x})) \leq r := \min \conjunto{N, M }; \dspace \forall \nv{x} \in \R^{2MN + N}.
+        rank(U(\nv{x})) \leq r := \min \conjunto{N, M }, \dspace \forall \nv{x} \in \R^{2MN + N}.
     \end{equation}
 
-    Por tanto, queda probar que $rank(U(\nv{x})) \geq r; \dspace \text{c.p.d. } \nv{x} \in \R^{2MN + N}$. Definimos $U_r(\nv{x})$ como la submatriz superior izquierda $r \times r$ de $U(\nv{x})$. Si fuese $U_r(\nv{x})$ no singular para cierto $\nv{x}$, claramente sabríamos que $r = rank(U_r(\nv{x})) \leq rank(U(\nv{x}))$. Así pues, buscamos probar que $U_r(\nv{x})$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{\nv{x} \in \R^{2MN + N} : det(U_r(\nv{x})) = 0 }$ tiene medida nula.
+    Por tanto, queda probar que $rank(U(\nv{x})) \geq r, \dspace \text{c.p.d. } \nv{x} \in \R^{2MN + N}$. Definimos $U_r(\nv{x})$ como la submatriz superior izquierda $r \times r$ de $U(\nv{x})$. Si fuese $U_r(\nv{x})$ no singular para cierto $\nv{x}$, claramente sabríamos que $r = rank(U_r(\nv{x})) \leq rank(U(\nv{x}))$. Así pues, buscamos probar que $U_r(\nv{x})$ es no singular salvo un conjunto de medida nula, es decir, que el conjunto $\conjunto{\nv{x} \in \R^{2MN + N} : det(U_r(\nv{x})) = 0 }$ tiene medida nula.
 
     Para ver esto tenemos en cuenta que $det(U_r(\nv{x}))$ es un polinomio con entradas en $\nv{x} \in \R^{2MN + N}$. Por el \propref{lema:prop_fundamentales_medida} sabemos que entonces o bien es el polinomio idénticamente nulo o bien el conjunto de sus ceros tiene medida nula. Basta ver por tanto que no es el polinomio idénticamente nulo. Para ello es suficiente probar que $\exists \nv{x_0} \in \R^{2MN + N}$ con el que se verifique que $det(U_r(\nv{x_0})) \neq 0$. Tomamos $\nv{x_0}$ de forma que $D(\nv{x_0}) = \mathbb{I}d_{N \times N}$ (haciendo que las últimas $N$ entradas de $\nv{x_0}$ sean 1) y que $A(\nv{x_0}) = B(\nv{x_0}) = (\delta_{i,j})_{i,j}$. Es decir, que $A(\nv{x_0})$ y $B(\nv{x_0})$ son matrices, no necesariamente cuadradas, con unos en la diagonal y ceros en el resto de posiciones. Por cómo definimos las matrices $A(\nv{x})$, $B(\nv{x})$ y $D(\nv{x})$, es sencillo realizar esta elección de $\nv{x_0}$. En esta situación tenemos:
 
@@ -266,8 +266,6 @@ Los dos siguientes \textbf{lemas son centrales} en la prueba del teorema princip
     Es claro que $U(\nv{x}) \in \espaciomatrices{M}{M}$. A partir de esto, podemos repetir análogamente todo el razonamiento, y en el último paso tomar de forma todavía más sencilla $\nv{x_0} \in \R^{MN + N}$ para que $D(\nv{x}) = \mathbb{I}d_{N \times N}$ y que $A(\nv{x}) = (\delta_{i, j})_{i, j}$.
 \end{proof}
 
-% TODO -- seguir por aqui
-
 Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
 \begin{lema}[Segundo lema fundamental] \label{lema:segundo_lema}
@@ -294,7 +292,6 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
 
     Entonces el conjunto $S$ tiene medida nula.
 \end{lema}
-\todo{Nota de Javier: no se entiende el enunciado de este lema}
 
 \begin{proof}
 
@@ -316,7 +313,7 @@ Veamos ahora el segundo lema clave en la prueba del teorema principal:
         A(\nv{x}, \nv{y_0}) = \sum_{i = 1}^{p} x_i A_i(\nv{y_0}) = A_1(\nv{y_0}) \then det(A(\nv{x}, \nv{y_0})) = det(A_1(\nv{y_0})) \neq 0.
     \end{equation}
 
-    Por tanto, usando el \propref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Y por lo tanto, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
+    Por tanto, usando el \propref{lema:prop_fundamentales_medida}, el determinante de la submatriz $r \times r$ superior izquierda de $A(\nv{x}, \nv{y})$ es un polinomio cuyo conjunto de ceros tiene medida nula. Así pues, el conjunto $S^{\nv{y_0}}$ tiene medida nula, porque casi todas las matrices $A(\nv{x}, \nv{y_0})$ tienen al menos rango $r$, como acabamos de ver.
 
     Ahora, usaremos el teorema de Fubini y el teorema de la convergencia monótona para demostrar que el conjunto $S$ tiene medida nula. $\mathbb{1}_A$ denotará la función indicadora del subconjunto $A$. Definimos los siguientes conjuntos:
 
@@ -389,7 +386,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     Por tanto, falta ver que dicha afirmación se mantiene para casi todo punto respecto al conjunto de todos los parámetros del modelo \textit{HT}, no solo los que determinan $\phi^{1, j, \gamma}$. Pero esto es directo usando el \propref{lema:prop_fundamentales_medida}. Ahora sabemos que $rank([\phi^{1, j, \gamma}]) = r$ en casi todo punto (respecto al conjunto de todos los parámetros que definen el modelo), para valores concretos de $j \in \deltaset{N/2}, \gamma \in \deltaset{r_1}$. Veamos que esto implica que la igualdad sigue siendo válida para cualquier $j, \gamma$ de forma conjunta. Como el conjunto
 
     \begin{equation}
-        \phi_1^\gamma := \conjunto{j \in \deltaset{N/2}: rank([\phi^{1, j, \gamma}] \neq r}
+        \phi_1^\gamma := \conjunto{\phi^{1, j, \gamma}: \; j \in \deltaset{N/2}, rank([\phi^{1, j, \gamma}] \neq r}
     \end{equation}
 
     es finito, tiene medida cero y por ello, el conjunto
@@ -398,10 +395,10 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         \phi_1 := \union_{\gamma \in \deltaset{r_1}} \phi_1^\gamma
     \end{equation}
 
-    también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero. Finalmente deducimos que:
+    también tiene medida cero. Por tanto, $\phi_1 \times \R$ claramente tiene medida cero en $\R^{2M + 1}$. Esta dimensionalidad viene dada porque sabemos que $\nv{\varphi^{j, \alpha}} \in \R^M$. Luego $\phi^{1, j, \gamma} \in \R^{2M}$ y, con ello, $\phi_1^\gamma \in \R^{2M}$. Así pues, $\phi_1 \in \R^{2M}$ y claramente $\phi_1 \times \R \subseteq \R^{2M + 1}$. Finalmente deducimos que:
 
     \begin{equation}
-        \phi := \conjunto{(j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}: rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
+        \phi := \conjunto{\phi^{i, j, \gamma}: \; (j, \gamma) \in \deltaset{N/2} \times \deltaset{r_1}, \; rank([\phi^{1, j, \gamma}]) \neq r} \subseteq \phi_1 \times \R
     \end{equation}
 
     tiene medida cero, lo que prueba el caso $l = 1$.
@@ -432,7 +429,7 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
         r^{\frac{2 \cdot 2^{l - 1}}{2}} = r^{\frac{2^{l}}{2}} \; \text{c.p.d.}
     \end{equation}
 
-    Podemos aplicar el \propref{lema:segundo_lema}, porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, porque sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y porque $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matrizaciones. Aplicando dicho lema obtenemos que:
+    Podemos aplicar el \propref{lema:segundo_lema} porque el conjunto $\conjunto{M_\alpha: \; \alpha \in \deltaset{r_{l-1}}}$ no depende de $\nv{a^{l, j, \gamma}}$ al solo codificar las entradas tensoriales del nivel anterior, porque sabemos que $rank(M_\alpha) \geq r^{\frac{2^l}{2}}$ y porque $\conjunto{\nv{a^{0, j, \gamma}}} \to M_\alpha$ es continuo por ser productos tensoriales, sumas y matrizaciones. Aplicando dicho lema obtenemos que:
 
     \begin{equation}
         [\phi^{l, j, \gamma}] = \sum_{\alpha = 1}^{r_{l-1}} a_\alpha^{l,j,\gamma} M_\alpha \;\; \text{tiene rango al menos} \; \; r^{\frac{2^l}{2}} \text{ c.p.d. }
@@ -441,19 +438,19 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
     Así, $rank([\phi^{l, j, \gamma}]) \geq r^{\frac{2^l}{2}}$ casi por doquier respecto al conjunto de todos los parámetros del modelo \textit{HT}, para valores concretos de $(j, \gamma) \in \deltaset{N/2^l} \times \deltaset{r_{l-1}}$. Podemos hacer un argumento análogo al anterior para extender esta propiedad a todo $(j, \gamma)$ de forma conjunta. Sabemos que el siguiente conjunto
 
     \begin{equation}
-        \phi_l^{\gamma} := \conjunto{j \in \deltaset{N/2^l} \; : \; rank([\phi^{l, j, \gamma}]) \neq r}
+        \phi_l^{\gamma} := \conjunto{\phi^{l, j, \gamma}: \; j \in \deltaset{N/2^l}, \; rank([\phi^{l, j, \gamma}]) \neq r}
     \end{equation}
 
     es finito y por lo tanto tiene medida cero. Por lo tanto, el conjunto
 
     \begin{equation}
-        \phi_l := \union_{ \gamma \in \deltaset{r_l}} \phi_l^{\gamma}
+        \phi_l := \union_{\gamma \in \deltaset{r_l}} \phi_l^{\gamma}
     \end{equation}
 
     también tiene medida cero, con lo que finalmente:
 
     \begin{equation}
-        \phi := \conjunto{(j, \gamma) \in \deltaset{N/2^l \times \deltaset{r_l} \; : \; rank([\phi^{l, j, \gamma}]) \neq r}} \subseteq \phi_l \times R
+        \phi := \conjunto{\phi^{l, j, \gamma}: \; j \in \deltaset{N/2^l}, \; \gamma \in \deltaset{r_l}, \; rank([\phi^{l, j, \gamma}]) \neq r} \subseteq \phi_l \times \R
     \end{equation}
 
     tiene medida cero, como buscábamos ver. Esto concluye la prueba para el caso no compartido.
@@ -466,7 +463,6 @@ Estamos ya en condiciones de probar el teorema principal del trabajo. Recordamos
 \section{Prueba del corolario principal}
 
 Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De nuevo, es tan relevante que lo presentamos aquí y no con el resto de lemas.
-\todo{Javier: A lo mejor merece la pena quitar la sección de herramientas}
 
 \begin{lema}[Tercer lema fundamental] \label{lema:lema_previo_corolario}
     Sean $f_{\theta_1}, \ldots, f_{\theta_M} \in L^2(\R^s)$ un conjunto de funciones linealmente independientes. Dado un tensor $\mathcal{A} \in \espaciotensores{N}{M}$ definimos la siguiente función:
@@ -478,10 +474,10 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         \end{split}
     \end{equation}
 
-    que es la función de puntuación introducida en la ecuación \eqref{eq:puntuacion_general} dado el tensor de coeficientes $\mathcal{A}$. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^* \in \espaciotensores{N}{M}$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon > 0$ tal que:
+    que es la función de puntuación introducida en la ecuación \eqref{eq:puntuacion_general} dado el tensor de coeficientes $\mathcal{A}$. Sea $\conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda} \subseteq \espaciotensores{N}{M}$ una familia de tensores, y $\mathcal{A}^* \in \espaciotensores{N}{M}$ un tensor que no esté en esa familia. Supongamos que $rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*])$, $\forall \lambda \in \Lambda$. Entonces la distancia en $L^2((\R^s)^N)$ entre $h(\mathcal{A}^*)$ y el conjunto $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon > 0$ tal que:
 
     \begin{equation}
-        \int |h(\mathcal{A}^\lambda) - h(\mathcal{A}^*)|^2 > \epsilon, \quad (\forall \lambda \in \Lambda).
+        \int_{(\R^S)^N} |h(\mathcal{A}^\lambda) - h(\mathcal{A}^*)|^2 > \epsilon \quad (\forall \lambda \in \Lambda).
     \end{equation}
 \end{lema}
 
@@ -492,7 +488,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         \zeta = \conjuntofit{\prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}): d_1, \ldots d_N \in \deltaset{M}}
     \end{equation}
 
-    también es linealmente independiente, por la \propref{prop:conservacion_totalidad_indp_lineal_func_prod}. Consideramos ahora una sucesión de funciones $\conjunto{h^{(t)}}_{t \in \N}$ en $span\conjunto{\zeta}$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la base dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente y obviamente total en $span \conjunto{\zeta}$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene determinado por la siguiente igualdad:
+    también es linealmente independiente, por la \propref{prop:conservacion_totalidad_indp_lineal_func_prod}. Consideramos ahora una sucesión de funciones $\conjunto{h^{(t)}}_{t \in \N} \subseteq span\conjunto{\zeta}$. Para cada $t \in \N$ denotamos por $\mathcal{A}^{(t)}$ al tensor de coeficientes de $h^{(t)}$ en la base dada por $\zeta$, gracias a que nuestra familia de funciones $\zeta$ es linealmente independiente y obviamente total en $span \conjunto{\zeta}$. Es decir, $\mathcal{A}^{(t)} \in \espaciotensores{N}{M}$ viene determinado por la siguiente igualdad:
 
     \begin{equation}
         h^{(t)}(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1 = 1, \ldots, d_N = 1}^M \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}).
@@ -510,7 +506,7 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         \lim_{t \to \infty} \int | h^{(t)} - h(\mathcal{A}^*)|^2 = 0.
     \end{equation}
 
-    Sabemos, por la \propref{prop:hilbert_convnorma_convcoef}, que en un espacio de Hilbert de dimensión finita, como es nuestro caso, convergencia en norma implica convergencia en los coeficientes de representación. Como hemos supuesto la convergencia en norma, con lo anterior tenemos que:
+    Sabemos, por la \propref{prop:hilbert_convnorma_convcoef}, que convergencia en norma implica convergencia en los coeficientes de representación. Como hemos supuesto la convergencia en norma, con lo anterior tenemos que:
 
     \begin{equation}
         \mathcal{A}^{(t)}_{d_1, \ldots, d_N} \encima{\longmapsto}{t \mapsto \infty} \mathcal{A}^*_{d_1, \ldots, d_N},
@@ -532,14 +528,14 @@ Para demostrar el corolario, necesitaremos primero probar el siguiente lema. De 
         d(A^{(t)}, \mathcal{A}^*) \not\longto 0 \then h^{(t)} \not\longto h(\mathcal{A}^*).
     \end{equation}
 
-    Ahora, esto es claro puesto que
+    Sin embargo, tenemos que $d(A^{(t)}, \mathcal{A}^*) \not\longto 0$ claramente puesto que:
 
     \begin{equation}
         rank([\mathcal{A}^\lambda]) < rank([\mathcal{A}^*]),
-        \; \forall \lambda \in \Lambda.
+        \; \forall \lambda \in \Lambda
     \end{equation}
 
-    Al tomar límite, el rango puede disminuir pero no aumentar. Además, usando la \propref{prop:matrizacion_no_degenera_distancias} sabemos que la matrización no degenera distancias, con lo que concluimos que:
+    y, al tomar límite, el rango puede disminuir pero no aumentar. Además, usando la \propref{prop:matrizacion_no_degenera_distancias} sabemos que la matrización no degenera distancias, con lo que concluimos que:
 
     \begin{equation}
         d(\mathcal{A}^*, \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}) > 0.
@@ -556,7 +552,7 @@ Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de
 \begin{observacion}
     En el \propref{teorema:teorema_principal_especificacion} hemos visto que un tensor generado por un modelo \textit{HT} tiene rango \textit{CP} de al menos $\min \conjunto{r_0, M}^{\frac{N}{2}}$  en casi todo punto respecto al espacio de parámetros que definen el modelo \textit{HT}, $\conjunto{\nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. El resultado anterior nos dice que el modelo \textit{CP} requerirá un tamaño exponencial: $Z \geq \min \conjunto{r_0, M}^{\frac{N}{2}}$.
 
-    Pero el resultado anterior da un paso más. Partimos de que las funciones de representación son linealmente independientes (ya hemos visto que en la práctica del \textit{deep learning} esto es lo común). El corolario afirma que no es que sea \entrecomillado{prácticamente imposible} realizar el coeficiente de tensores con un modelo \textit{CP} con menos de un número exponencial de canales en la capa oculta, sino que es \entrecomillado{prácticamente imposible} aproximar la función de puntuación con menos de dicho número exponencial de canales en la capa oculta.
+    Pero el resultado anterior da un paso más. Partimos de que las funciones de representación son linealmente independientes (ya hemos visto que en la práctica del \textit{deep learning} esto es lo común). El corolario afirma que no es que sea \entrecomillado{prácticamente imposible} realizar el tensor de coeficientes con un modelo \textit{CP} con menos de un número exponencial de canales en la capa oculta, sino que es \entrecomillado{prácticamente imposible} aproximar la función de puntuación con menos de dicho número exponencial de canales en la capa oculta.
 \end{observacion}
 
 \begin{proof}
@@ -569,7 +565,6 @@ Estamos ya en condiciones de probar el \textbf{segundo resultado fundamental} de
     \end{itemize}
 
     El \propref{teorema:teorema_principal_especificacion} nos dice que, con probabilidad $1$, $\mathcal{A}^*$ no puede ser generado por un modelo \textit{CP} con menos de $\min \conjunto{r_0, M}^{\frac{N}{2}}$ canales en la capa oculta. Luego $\mathcal{A}^* \notin \conjunto{\mathcal{A}^\lambda: \lambda \in \Lambda}$. Además, ya sabemos que $rank([\mathcal{A}^\lambda]) < \frac{N}{2} \leq rank([\mathcal{A}^*]), \; \forall \lambda \in \Lambda$. Por lo tanto, se cumplen todas las hipótesis del \propref{lema:lema_previo_corolario}, luego la distancia $L^2$ entre $h(\mathcal{A}^*)$ y $\conjunto{h(\mathcal{A}^\lambda): \lambda \in \Lambda}$ es estrictamente positiva. Es decir, $\exists \epsilon_0 > 0:$
-    \todo{Relacionar el \entrecomillado{con probabilidad 1} con que nuestro teorema habla de medida nula}
 
     \begin{equation}
         d_{L^2}(h(\mathcal{A}^*), h(\mathcal{A}^\lambda)) \geq \epsilon_0, \; \forall \lambda \in \Lambda.
