@@ -179,9 +179,9 @@ Los objetivos del presente trabajo son los siguientes:
 
 \section{Planificación} \label{isec:planificacion}
 
-Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para las técnicas que queremos explorar. Esto supone que \textbf{deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código}. Por tanto, decidimos realizar un \textbf{desarrollo en varias etapas}, iterando sobre distintas bases de datos. Empezamos trabajando con conjuntos de datos de menor interés y complejidad (estructura de los datos, facilidad de trabajo con ellos y tamaño), llegando al final a trabajar con los conjuntos de datos más complejos y relevantes para nuestro estudio. Como veremos en la \sectionref{isec:optimizacion_codigo}, esto permite desarrollar rápidamente una amplia base de código sin preocuparnos de realizar optimizaciones prematuras y poco relevantes. Solo se realiza un proceso de optimización cuando encontramos problemas reales de eficiencia. Una vez analizados y resuelto los puntos débiles en temas de rendimiento sobre conjuntos de datos sencillos, pasamos a tratar con los conjuntos que realmente nos interesan, centrándonos únicamente en la experimentación. Las bases de datos sobre las que iteramos se describen en detalle en la \sectionref{isec:base_datos_usada}.
+Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para todas las técnicas que queremos explorar. Esto supone que \textbf{deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código}. Por tanto, decidimos realizar un \textbf{desarrollo en varias etapas}, iterando sobre distintas bases de datos. Empezamos trabajando con conjuntos de datos de menor interés y complejidad (estructura de los datos, facilidad de trabajo con ellos y tamaño), llegando al final a trabajar con los conjuntos de datos más complejos y relevantes para nuestro estudio. Esto permite desarrollar rápidamente una amplia base de código sin preocuparnos de realizar optimizaciones prematuras y poco relevantes. Solo se realiza un proceso de optimización cuando encontramos problemas reales de eficiencia. Una vez analizados y resuelto los puntos débiles en temas de rendimiento sobre conjuntos de datos sencillos, pasamos a tratar con los conjuntos que realmente nos interesan, centrándonos únicamente en la experimentación. Las bases de datos sobre las que iteramos se describen en detalle en la \sectionref{isec:base_datos_usada}.
 
-Además, como veremos en el \sectionref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestro enfoque para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos. Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura, desconocemos los posibles problemas que pueden ir apareciendo. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones, en cada una de las cuales aplicamos el modelo en cascada. Este procedimiento encaja perfectamente con nuestro enfoque basado en iterar varios conjuntos de datos. El funcionamiento de este modelo se explica mejor en la siguiente imagen:
+Además, como veremos en el \sectionref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestras variantes \textit{online} para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos. Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura, desconocemos los posibles problemas que pueden ir apareciendo. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones, en cada una de las cuales aplicamos el modelo en cascada. Este procedimiento encaja perfectamente con nuestro enfoque basado en iterar varios conjuntos de datos. El funcionamiento de este modelo se explica mejor en la siguiente imagen:
 
 \begin{figure}[H]
 	\centering
@@ -195,7 +195,7 @@ Para cada base de datos sobre la que trabajamos, consideramos las siguientes fas
 	\item \textbf{Análisis}: realizamos un análisis exploratorio de la base de datos con la que trabajamos en esta iteración (véase la \sectionref{isec:base_datos_usada}). Estudiamos las técnicas que queremos aplicar y nos marcamos una serie de objetivos para esta iteración.
 	\item \textbf{Diseño}: en base al estudio realizado y las técnicas que queremos aplicar, definimos qué módulos de código debemos de introducir, qué interfaces se deben cumplir para interactuar con otros módulos, las propiedades que queremos verificar en los \textit{tests} y distintos \textit{pipelines} que seguir en la experimentación.
 	\item \textbf{Implementación}: desarrollamos el código necesario para cumplir con el diseño realizado previamente. En esta fase también incluimos el desarrollo de \textit{tests} para realizar las validaciones.
-	\item \textbf{Optimización}: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados y llevamos a cabo dichos cambios. Esto se explica en detalle en la \sectionref{isec:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes.
+	\item \textbf{Optimización}: en esta fase realizamos \textit{profiles} para detectar partes críticas del código, introducimos \textit{benchmarks} para estudiar el impacto de los cambios realizados y llevamos a cabo dichos cambios. Esto se explica en detalle en el \sectionref{apendice:optimizacion_codigo}. Esta fase es opcional, no se realiza salvo que en la iteración se detecten problemas de rendimiento relevantes.
 	\item \textbf{Experimentación}: lanzamos los \textit{pipelines} desarrollados en la fase anterior (véase la \sectionref{isec:pipeline}), analizamos los resultados obtenidos y buscamos anomalías en el proceso o en los resultados. Esta fase es fundamental a la hora de marcar los objetivos y problemas a resolver en la siguiente iteración sobre una nueva base de datos.
 \end{itemize}
 
@@ -208,15 +208,9 @@ Para organizar todas las tareas de cada iteración usamos la \textbf{metodologí
 	\item \textit{Done} o tareas que ya se han completado.
 \end{enumerate}
 
-Esto permite tener una visualización rápida del estado de la iteración. Como comentaremos detalladamente en la \sectionref{isec:github_buenas_practicas}, usaremos la utilidad de proyectos que ofrece \textit{Github} para tener acceso a un tablero \textit{kanban}. En la siguiente imagen se muestra un ejemplo del estado de este tablero:
+Esto permite tener una visualización rápida del estado de la iteración. Como comentaremos detalladamente en la \sectionref{isec:github_buenas_practicas}, usaremos la utilidad de proyectos que ofrece \textit{Github} para tener acceso a un tablero \textit{kanban}.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1.05\textwidth]{informatica/kanban_board}
-	\caption{Ejemplo del estado de nuestro tablero \textit{kanban} en un momento concreto durante la fase de desarrollo. Podemos ver las cuatro columnas que ya hemos descrito. \textit{Github} le da el nombre \textit{No Status} a la columna que nosotros usamos como \textit{backlog}}
-\end{figure}
-
-Comenzamos a desarrollar el proyecto en Febrero de 2022. Sabemos que, debido a los exámenes universitarios, apenas trabajaremos en los meses de Enero, Mayo y Junio. Por tanto, consideraremos que en estos meses no trabajemos ninguna hora (aunque en la práctica sí que consigamos sacar algo de tiempo). Los meses en los que más trabajaremos serán Febrero, Julio, Agosto y Septiembre. En estos meses tenemos previsto trabajar al menos 20 horas semanales. En el resto de meses consideramos que trabaremos al menos 2 horas semanales. Por tanto, en los dos años que dedicamos al proyecto de informática, dedicaremos al menos 720 horas. Teniendo todo esto en cuenta, inicialmente planificamos el proyecto tal y como describe el siguiente diagrama de Gannt:
+Comenzamos a desarrollar el proyecto en Febrero de 2022. Sabemos que, debido a los exámenes universitarios, apenas trabajaremos en los meses de Enero, Mayo y Junio. Por tanto, consideraremos que en estos meses no trabajemos ninguna hora (aunque en la práctica sí que consigamos sacar algo de tiempo). Los meses en los que más trabajaremos serán Febrero, Julio, Agosto y Septiembre. En estos meses tenemos previsto trabajar al menos 20 horas semanales. En el resto de meses consideramos que trabaremos al menos 2 horas semanales. Por tanto, en los dos primeros años que dedicamos al proyecto de informática, dedicaremos al menos 720 horas. Teniendo todo esto en cuenta, inicialmente planificamos el proyecto tal y como describe el siguiente diagrama de Gannt:
 
 \begin{figure}[H]
 	\centering
@@ -224,24 +218,24 @@ Comenzamos a desarrollar el proyecto en Febrero de 2022. Sabemos que, debido a l
 	\caption{Diagrama de \textit{Gantt} que describe la planificación original del proyecto. El color azul corresponde al conjunto de datos \textit{MNIST}. El color morado corresponde al conjunto de datos \textit{LFW}. El color naranja corresponde a los conjuntos de datos \textit{FG-Net} y \textit{CACD}. Estas bases de datos se describen en detalle en la \sectionref{isec:base_datos_usada}.}
 \end{figure}
 
-Sin embargo, por los problemas enfrentados durante el desarrollo, y por inexactitudes en la planificación, acabamos distribuyendo el tiempo dedicado al trabajo tal y como se muestra en el siguiente diagrama de Gannt:
+Sin embargo, por los problemas enfrentados durante el desarrollo hasta identificar y proponer una solución para el problema de diseño, y por inexactitudes en la planificación, acabamos distribuyendo el tiempo dedicado al trabajo tal y como se muestra en el siguiente diagrama de Gannt:
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1.0\textwidth]{informatica/diagrama_gannt_real}
-	\caption{Diagrama de \textit{Gantt} que describe la distribución real del tiempo dedicado al proyecto. Seguimos el mismo código de colores que en el diagrama anterior.}
+	\caption{Diagrama de \textit{Gantt} que describe la distribución real del tiempo dedicado al proyecto. Seguimos el mismo código de colores que en el diagrama anterior teniendo en cuenta que el color rojo se corresponde con el estudio y solución del problema de diseño.}
 	\label{img:gannt_real}
 \end{figure}
 
 En el repositorio abierto de \textit{Github} \cite{informatica:repogithub} donde hemos desarrollado el proyecto, podemos verificar los tiempos que aparecen en \imgref{img:gannt_real} \footnote{Recordamos que explicamos en detalle el uso de \textit{Git} en la \sectionref{isec:github_buenas_practicas}.}. En cuanto a la planificación económica, tenemos en cuenta los siguientes aspectos:
 
 \begin{itemize}
-	\item El salario aproximado de un investigador en Ciencia de Datos y Aprendizaje Automático es de 35 €/h. Teniendo en cuenta que hemos dedicado al menos 720 horas de trabajo, esto supone un coste de 25.200€.
+	\item El salario aproximado de un investigador en Ciencia de Datos y Aprendizaje Automático es de 35 €/h. Teniendo en cuenta que hemos dedicado al menos 720 horas de trabajo durante los dos primeros años, esto supone un coste de 25.200€. En el año adicional dedicamos únicamente los fines de semana y, por tanto, estimamos unos 5.000€ adicionales.
 	\item El valor del ordenador que hemos usado para trabajar: 600€.
-	\item El valor de los servidores \textit{nGPU} donde se han lanzado los procesos (véase la \sectionref{isec:entorno_ejecucion}). Se estima un coste de unos 145€ semanales. Teniendo en cuenta que hemos tenido acceso desde Marzo de 2023, y usamos estos servidores hasta Octubre de 2023, esto supone un coste de 4.640€.
+	\item El valor de los servidores \textit{nGPU} donde se han lanzado los procesos (véase la \sectionref{isec:entorno_ejecucion}). Se estima un coste de unos 145€ semanales. Teniendo en cuenta que hemos tenido acceso desde Marzo de 2023, y usamos estos servidores hasta Octubre de 2023, esto supone un coste de 4.640€. A partir de esa fecha usamos un par de veces el servidor por lo que no añadimos un coste adicional.
 \end{itemize}
 
-Todo esto supone un \textbf{coste total} de unos 30.440€.
+Todo esto supone un \textbf{coste total} de unos 35.440€.
 
 \section{Estructura del trabajo}
 
