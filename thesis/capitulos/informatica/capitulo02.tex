@@ -223,9 +223,22 @@ Por ejemplo, la distancia euclídea. Queremos que \textbf{datos semánticamente 
 
 	Y para finalizar, consideremos nuestra tarea en concreto. Buscamos que las imágenes de la misma persona, aunque hayan pasado los años, se transformen en vectores cercanos. Y al contrario, que imágenes de dos personas distintas estén lo más lejos posible.
 
-	Esto es especialmente complicado, como ya hemos comentando en la \sectionref{ich:descrp_problema}, porque por ejemplo, nuestro modelo debe ver como más cercanos imágenes de un niño y un adulto con barba (ambos siendo la misma persona) que dos imágenes de dos adultos con barba (siendo distintas personas). Este problema en concreto lo hemos mostrado en la \imgref{img:messi_distintos_otro_adulto}.
+	Esto es especialmente complicado, como ya hemos comentando en la \sectionref{ich:descrp_problema}, porque por ejemplo, nuestro modelo debe ver como más cercanos imágenes de un niño y un adulto con barba (ambos siendo la misma persona) que dos imágenes de dos adultos con barba (siendo distintas personas). Este problema en concreto lo hemos mostrado en la \imgref{img:ejemplo_dificultad_aifr}.
 \end{ejemplo}
 
+
+\subsection{Redes Siamesas}
+
+Las redes siamesas son redes neuronales que trabajan en paralelo compartiendo los mismos pesos que definen la arquitectura. Normalmente toman dos imágenes de entrada y producen dos vectores de salida de los que se estudia su similitud \cite{informatica:red_siamesa}. Esta forma de trabajar hace que sean una herramienta eficaz a la hora de aprender un \textit{embedding semántico}. Fueron introducidas en \cite{informatica:siamesa_lecunn} para resolver el problema de verificación de firmas manuales. El funcionamiento queda perfectamente explicado en la \imgref{img:siamesa_firma}.
+
+\begin{figure}[!hbtp]
+	\centering
+	\includegraphics[width=0.9\textwidth]{informatica/siamesa_firma}
+	\caption{Ejemplo de funcionamiento de una red siamesa para la verificación de firmas, como planteó \cite{informatica:siamesa_lecunn}. Imagen extraída de \cite{informatica:siamesa_web_imagen}.}
+	\label{img:siamesa_firma}
+\end{figure}
+
+Para el aprendizaje de las redes siamesas se utiliza principalmente o la función de pérdida \textit{Contrastive Loss} o la función de pérdida \textit{Triplet Loss}. Nuestro trabajo se centra principalmente en \textit{Triplet Loss}, profundizando en las dos variantes \textit{online} objeto de estudio.
 
 \subsection{\textit{Triplet Loss} como función de pérdida para aprender el \textit{embedding}} \label{isec:triplet_loss}
 

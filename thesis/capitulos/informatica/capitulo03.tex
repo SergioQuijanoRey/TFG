@@ -1,5 +1,6 @@
 \chapter{Estado del arte} \label{ich:estado_arte}
-\todo{En los listings, poner "codigo" y usar siempre la misma nomenclatura}
+
+% TODO {En los listings, poner "codigo" y usar siempre la misma nomenclatura}
 
 Procedemos a realizar un estudio del estado del arte para el problema que buscamos resolver. Consultaremos los mejores trabajos para la tarea de búsqueda en reconocimiento facial invariante a la edad sobre el conjunto de datos \textit{FG-Net}. Posteriormente en la \sectionref{isec:base_datos_usada} estudiaremos las bases de datos disponibles para resolver un problema de \textit{AIFR}. En base a este estudio posterior y motivados por el trabajo de \cite{informatica:best_fgnet_model}, nuestro enfoque va a ser el siguiente: realizar un entrenamiento sobre el conjunto de datos \textit{CACD}, y usar \textit{FG-Net} para validar nuestro modelo.
 
@@ -28,13 +29,13 @@ Por otro lado, estamos usando nuevas técnicas para computar \textit{triplet los
 
 Esta última búsqueda no produce resultados. Los resultados de las dos primeras búsquedas se muestran en la \imgref{img:scopus_together}.
 
-\begin{figure}[H]
+\begin{figure}[!hbtp]
 	\centering
-	\includegraphics[width=1.2\textwidth]{informatica/scopus_search_together}
+	\includegraphics[width=1.0\textwidth]{informatica/scopus_search_together}
 	\caption{Resultados de la búsqueda en \textit{SCOPUS} usando las \textit{keywords} del \coderef{code:scopus_search_tripletloss}. El descenso en el número de publicaciones en el último año puede ser debido a que no hemos finalizado el año o a que tenemos una tendencia a la baja}
 	\label{img:scopus_together}
 \end{figure}
-\todo{Esto antes lo tenía por separado y se veía bien el pico. Quizás volverlo a poner en la siguiente revisión}
+% TODO {Esto antes lo tenía por separado y se veía bien el pico. Quizás volverlo a poner en la siguiente revisión}
 
 Respecto a la \textbf{primera búsqueda}, vemos que a partir de 2012 este área de estudio gana bastante popularidad. Coincide este momento con la aparición de \textit{AlexNet}, que da paso a la popularidad de las redes convolucionales profundas en el campo de la visión por computador. Sin tener en cuenta el último año (pues, en el momento de la consulta, sigue en curso y está lejos de acabar), no vemos que la tendencia siga al alza, pudiendo llegar a pensar que la popularidad de este campo se está estancando. Aunque habría que tener en cuenta condiciones externas, como la pandemia de \textit{COVID}, que podrían explicar la bajada notable en los años 2020 y 2021. Respecto a la \textbf{segunda búsqueda}, vemos que entre 2017 y 2018 esta técnica da un grandísimo salto en popularidad. Sin embargo, en el último año la popularidad ha caído drásticamente. Aunque todavía no haya pasado el tiempo suficiente para observar el progreso de la tendencia, la caída en el último año es tan grande que pensamos que dicha tendencia va a seguir a la baja. Y como ya hemos comentado, la búsqueda determinada por \coderef{code:scopus_search_especifico} no produce ningún resultado. \textbf{SCOPUS no tiene constancia de ningún trabajo que aplique \textit{triplet loss} al campo del \textit{AIFR}}. Y esto, sin considerar que nuestro trabajo introduce nuevas técnicas que mejoran el uso del \textit{triplet loss} clásico, desarrollado en \sectionref{isec:triplet_loss}.
 
