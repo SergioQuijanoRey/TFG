@@ -38,7 +38,7 @@ Como ya se ha comentado, este trabajo estudia un problema de \textit{AIFR}. Reco
 
 En la \imgref{img:ejemplo_verificacion_retrieval} podemos ver dos ejemplos gráficos, uno que explica la tarea de verificación y otro que explica la tarea de \textit{retrieval}.
 
-\begin{figure}
+\begin{figure}[!h]
 	\centering
 	\begin{subfigure}{1.0\textwidth}
 		\centering
@@ -97,12 +97,13 @@ Los objetivos del presente trabajo son los siguientes:
 
 Tras un estudio inicial de los \textit{frameworks} de aprendizaje automático existentes, nos damos cuenta de que no hay implementaciones para todas las técnicas que queremos explorar. Esto supone que \textbf{deberemos dedicar un gran esfuerzo al diseño, implementación, optimización y validación de módulos de código}. Por tanto, decidimos realizar un \textbf{desarrollo en varias etapas}, iterando sobre distintas bases de datos. Empezamos trabajando con conjuntos de datos de menor interés y complejidad (estructura de los datos, facilidad de trabajo con ellos y tamaño), llegando al final a trabajar con los conjuntos de datos más complejos y relevantes para nuestro estudio. Esto permite desarrollar rápidamente una amplia base de código sin preocuparnos de realizar optimizaciones prematuras y poco relevantes. Solo se realiza un proceso de optimización cuando encontramos problemas reales de eficiencia. Una vez analizados y resuelto los puntos débiles en temas de rendimiento sobre conjuntos de datos sencillos, pasamos a tratar con los conjuntos que realmente nos interesan, centrándonos únicamente en la experimentación. Las bases de datos sobre las que iteramos se describen en detalle en la \sectionref{isec:base_datos_usada}.
 
-Además, como veremos en el \sectionref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestras variantes \textit{online} para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos. Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura, desconocemos los posibles problemas que pueden ir apareciendo. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones, en cada una de las cuales aplicamos el modelo en cascada. Este procedimiento encaja perfectamente con nuestro enfoque basado en iterar varios conjuntos de datos. El funcionamiento de este modelo se explica mejor en la siguiente imagen:
+Además, como veremos en el \sectionref{ich:estado_arte}, \textbf{no existen trabajos previos que hayan aplicado nuestras variantes \textit{online} para resolver el problema de \textit{AIFR}}. Por tanto, esperamos encontrarnos con dificultades desconocidas, tanto en la implementación como en la experimentación, que deberemos resolver sin tener literatura específica sobre la que apoyarnos. Todo esto justifica que no escojamos un modelo de desarrollo en cascada clásico: no sabemos cuándo nos vamos a enfrentar con problemas de rendimiento y, por la falta de literatura, desconocemos los posibles problemas que pueden ir apareciendo. Por lo tanto, \textbf{decidimos usar un modelo de desarrollo iterativo} \cite{informatica:libro_metodologias_desarrollo}. En este modelo de desarrollo, realizamos varias iteraciones, en cada una de las cuales aplicamos el modelo en cascada. Este procedimiento encaja perfectamente con nuestro enfoque basado en iterar varios conjuntos de datos. El funcionamiento de este modelo se explica mejor en la \imgref{img:ejemplo_desarrollo_incremental}.
 
-\begin{figure}[H]
+\begin{figure}[!hbtp]
 	\centering
 	\includegraphics[width=0.8\textwidth]{informatica/ejemplo_modelo_incremental}
 	\caption{Ejemplo del modelo de desarrollo incremental. Podemos ver que en cada iteración aplicamos un modelo de desarrollo en cascada. En nuestro caso, cada iteración corresponderá con cada una de las bases de datos sobre las que trabajamos. Imagen extraída de \cite{informatica:libro_metodologias_desarrollo}.}
+	\label{img:ejemplo_desarrollo_incremental}
 \end{figure}
 
 Para cada base de datos sobre la que trabajamos, consideramos las siguientes fases del modelo en cascada:
