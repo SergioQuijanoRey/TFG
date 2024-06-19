@@ -1,6 +1,6 @@
 \chapter{Proceso de optimización del código}  \label{apendice:optimizacion_codigo}
 
-Como ya se ha comentado en \sectionref{isec:planificacion}, una parte esperada del proceso de desarrollo es encontrar problemas de rendimiento, localizar qué partes del código están produciendo los problemas, y re-escribir implementaciones mucho más eficientes.
+Como ya se ha comentado en la \sectionref{isec:planificacion}, una parte esperada del proceso de desarrollo es encontrar problemas de rendimiento, localizar qué partes del código están produciendo los problemas, y re-escribir implementaciones mucho más eficientes.
 
 Además, en \sectionref{isubs:localizacion_partes_criticas} hemos justificado por qué es necesario realizar un \textit{profile} para identificar las secciones críticas del código. De otra forma, estaríamos realizando optimizaciones con muy poco impacto.
 
@@ -32,7 +32,7 @@ Usando el paquete \lstinline{snakeviz} podemos consultar de forma gráfica e int
 En este \textit{profile} usamos los siguientes parámetros durante el ciclo de entrenamiento:
 
 \begin{itemize}
-	\item Enfoque \textit{lazy} para el aumentado de datos (véase \sectionref{isec:aumentado_datos}).
+	\item Enfoque \textit{lazy} para el aumentado de datos (véase el \sectionref{isec:aumentado_datos}).
 	\item $P = 200$, $K = 2$.
 	\item Dimensión del \textit{embedding} a aprender igual a 5.
 \end{itemize}
@@ -85,7 +85,7 @@ Para evitar que estas diferencias al cambiar los parámetros $\{P, K\}$ interfie
 	\label{table:optimizacion_01}
 \end{table}
 
-Como era de esperar por lo comentado en \sectionref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva un tiempo de ejecución mayor. Solo estamos midiendo el tiempo de ejecución en el entrenamiento, no tenemos en cuenta los tiempos asociados a generar el \textit{dataset} aumentado. Y de esta forma, el enfoque clásico ya tiene todas las imágenes pre-computadas (lo que conlleva un tiempo considerable que no estamos teniendo en cuenta), mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que el enfoque \textit{lazy} permite usar valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos (sin considerar lo que tarda en generarse el \textit{dataset} aumentado de forma clásica).
+Como era de esperar por lo comentado en el \sectionref{isec:aumentado_datos}, el enfoque \textit{lazy} conlleva un tiempo de ejecución mayor. Solo estamos midiendo el tiempo de ejecución en el entrenamiento, no tenemos en cuenta los tiempos asociados a generar el \textit{dataset} aumentado. Y de esta forma, el enfoque clásico ya tiene todas las imágenes pre-computadas (lo que conlleva un tiempo considerable que no estamos teniendo en cuenta), mientras que el enfoque \textit{lazy} las tiene que generar a demanda. Sin embargo, acabamos de ver que el enfoque \textit{lazy} permite usar valores $\{P, K\}$ más altos. Y además, la diferencia no es demasiado grande: menos de un minuto de diferencia en tiempos totales de algo más de 15 minutos (sin considerar lo que tarda en generarse el \textit{dataset} aumentado de forma clásica).
 
 Una vez resuelto esto, realizamos un segundo \textit{profile} usando los siguientes parámetros:
 
@@ -95,7 +95,7 @@ Una vez resuelto esto, realizamos un segundo \textit{profile} usando los siguien
 	\item Dimensión del \textit{embedding} aprendido igual a 5.
 \end{itemize}
 
-Los resultados del segundo \textit{profile} se muestran en la \imgref{img:optimizacion_02}. En este caso, podemos ver que los resultados ya son más interesantes. Los tiempos de entrenamiento se dividen principalmente en dos bloques: el asociado a mostrar métricas con nuestra estructura de \textit{logging} (véase \sectionref{isec:loggin_metricas}) y el asociado al cálculo de la función de pérdida. Empecemos viendo el bloque de los \textit{loggers}, en la \imgref{img:second_profile_tiempos_metricas}.
+Los resultados del segundo \textit{profile} se muestran en la \imgref{img:optimizacion_02}. En este caso, podemos ver que los resultados ya son más interesantes. Los tiempos de entrenamiento se dividen principalmente en dos bloques: el asociado a mostrar métricas con nuestra estructura de \textit{logging} (véase el \sectionref{isec:loggin_metricas}) y el asociado al cálculo de la función de pérdida. Empecemos viendo el bloque de los \textit{loggers}, en la \imgref{img:second_profile_tiempos_metricas}.
 
 \begin{figure}[!hbtp]
 	\centering
@@ -111,7 +111,7 @@ Los resultados del segundo \textit{profile} se muestran en la \imgref{img:optimi
 	\label{img:second_profile_tiempos_metricas}
 \end{figure}
 
-Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (métrica que introducimos en \sectionref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre todos los pares de \textit{embeddings}.
+Podemos ver que la mayoría de tiempo se pasa en \lstinline{compute_intercluster_metrics} (métrica que introducimos en la \sectionref{isubs:teoria_distancia_intra_inter_cluster}). Un gran porcentaje del tiempo de esta última función se gasta en pre-computar las distancias entre todos los pares de individuos. A su vez, gran parte del tiempo se gasta en computar la función de distancia \lstinline{distance_function} entre todos los pares de \textit{embeddings}.
 
 Ahora estudiamos el bloque asociado al cálculo de la función de pérdida, en la \imgref{img:optimizacion_03}. Podemos ver que la mayor parte del tiempo se pasa en realizar una comprensión de lista (análogo a un bucle \lstinline{for}) para computar distancias entre todos los pares de puntos, como ya hemos visto en la \imgref{img:second_profile_tiempos_metricas}.
 
@@ -130,7 +130,7 @@ Algunos detalles sobre los \textit{benchmarks}:
 
 \begin{itemize}
 	\item Estudiaremos los tiempos de ejecución de las funciones \lstinline{compute_intercluster_metrics} y \lstinline{precompute_pairwise_distances} con los dos \textit{scripts} que se encuentran en \lstinline{./src/benchmarks}.
-	\item Correremos estos \textit{scripts} en la plataforma \textit{Google Colab} (véase \sectionref{isec:entorno_ejecucion}), usando un \textit{Notebook} que invoca el código de los \textit{benchmarks}: \lstinline{./src/benchmarks/Benchmarking notebook.ipynb}.
+	\item Correremos estos \textit{scripts} en la plataforma \textit{Google Colab} (véase la \sectionref{isec:entorno_ejecucion}), usando un \textit{Notebook} que invoca el código de los \textit{benchmarks}: \lstinline{./src/benchmarks/Benchmarking notebook.ipynb}.
 	\item Usaremos los parámetros:
 	      \begin{itemize}
 		      \item $P = 100, K = 2$.
@@ -283,13 +283,13 @@ Describimos los cambios realizados:
 
 En la \tableref{table:optimization_process_second} podemos ver que no estamos mostrando tiempos de cómputo de entrenamiento en las dos últimas entradas. Esto es porque el uso de la función de \lstinline{pytorch} para computar todos los \textit{embeddings} de golpe provoca que el consumo de memoria se eleve hasta abortar el proceso. Además, los \textit{benchmarks} han empeorado algo.
 
-Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar en cada momento. Puede ser que al acceder a los servidores \textit{nGPU} (véase \sectionref{isec:entorno_ejecucion}), mucho más potentes, la nueva implementación no provoque consumos elevados de memoria y acelere el proceso.
+Sin embargo, mantenemos las dos implementaciones, permitiendo elegir cuál usar en cada momento. Puede ser que al acceder a los servidores \textit{nGPU} (véase la \sectionref{isec:entorno_ejecucion}), mucho más potentes, la nueva implementación no provoque consumos elevados de memoria y acelere el proceso.
 
 \section{Comentarios y mejoras a tener en cuenta}
 
 En el momento de realizar este proceso de optimización, no teníamos acceso a los servidores \textit{nGPU}. Sin embargo, era necesario optimizar el código para seguir avanzando el proyecto sin detenernos.
 
-El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un \textbf{error a tener en cuenta}. Por ejemplo, en \sectionref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente. Por tanto, \textbf{una posible mejora} es repetir el proceso de optimización sobre los servidores \textit{nGPU}.
+El haber realizado la optimización sobre \textit{Google Colab} y no sobre los servidores \textit{nGPU} sobre los que finalmente correremos el aprendizaje y validación de modelos es un \textbf{error a tener en cuenta}. Por ejemplo, en el \sectionref{isubs:segunda_ronda_optimizaciones} podemos ver que las conclusiones no son del todo robustas al trabajar en un entorno inferior y ser conocedores de que en futuro usaríamos un entorno mucho más potente. Por tanto, \textbf{una posible mejora} es repetir el proceso de optimización sobre los servidores \textit{nGPU}.
 
 Sin embargo, al acceder a los servidores \textit{nGPU} y \textit{datasets} más grandes, no hemos tenido problemas de rendimiento. Con ello, un esfuerzo en optimizar el código no estaría del todo justificado. Por tanto, aún con los fallos que hemos comentado, \textbf{el proceso de optimización cumplió con su cometido} en el momento en el que era necesario.
 

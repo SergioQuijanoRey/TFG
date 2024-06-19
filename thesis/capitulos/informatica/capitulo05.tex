@@ -1,6 +1,6 @@
 \chapter{Implementación} \label{ich:implementacion}
 
-Las nuevas técnicas que introducimos implican un esfuerzo considerable en la implementación de módulos de código. Como comentamos en \sectionref{isubsubs:observaciones_conclusiones_pksampling}, el uso de \textit{P-K sampling} provoca que no podamos usar librerías de aprendizaje automático para realizar tareas comunes, como muestreo de datos, funciones de pérdida, métricas, \ldots
+Las nuevas técnicas que introducimos implican un esfuerzo considerable en la implementación de módulos de código. Como comentamos en la \sectionref{isubsubs:observaciones_conclusiones_pksampling}, el uso de \textit{P-K sampling} provoca que no podamos usar librerías de aprendizaje automático para realizar tareas comunes, como muestreo de datos, funciones de pérdida, métricas, \ldots
 
 Por tanto, en esta sección explicaremos todo el trabajo de implementación realizado.
 
@@ -13,9 +13,9 @@ Gracias al uso de \textit{Github} hemos podido implementar fácilmente una serie
 \begin{itemize}
 	\item El uso de \textbf{\textit{issues}} para especificar las necesidades del proyecto en cada momento, los errores encontrados durante el proceso de implementación, \ldots. Véase por ejemplo \cite{informatica:ejemplo_issue_14}, donde especificamos una necesidad y proponemos una solución. Además, se pueden ver todos los \textit{commits} que tratan con dicha \textit{issue}.
 	\item Gracias a estar usando \textit{issues}, trabajamos con la metodología de \textbf{\textit{feature branches}}. En esta metodología, por cada nueva característica a implementar, se crea una \textit{branch} de \textit{Git} para introducir los cambios. Una vez se implementa y valida dicha característica, el código de la nueva \textit{branch} se fusiona en la rama principal \cite{informatica:feature_branches}. Como se puede ver en \cite{informatica:repogithub}, el nombre de cada \textit{feature branch} referencia al identificador de la \textit{issue} con la que estamos trabajando.
-	\item El fusionado de \textit{feature branches} a la rama principal se realiza por medio de \textbf{\textit{pull requests}}. En cada \textit{pull request} podemos revisar el código una última vez antes de fusionarlo en la rama principal. Además, sirven como forma de localizar los cambios de alto nivel introducidos en nuestra base de código. En nuestro caso, los \textit{commits} individuales pueden llegar a ser demasiado granulares, y revisando la lista de todos los \textit{commits} realizados podemos perder el foco sobre la tarea de alto nivel que tratan de resolver. Por ejemplo, en una \textit{pull request} como \cite{informatica:ejemplo_pr_57} podemos ver que, para introducir las dos variantes de \textit{Rank@K accuracy} (véase \sectionref{isubs:rank_at_k}) empleamos 53 \textit{commits}.
-	\item El uso de \textbf{\textit{Github Actions}} para ejecutar ciertas tareas tras realizar una subida de \textit{commits} al repositorio (\entrecomillado{push}) o antes de aceptar una \textit{pull request}. Principalmente, hemos usado estas \entrecomillado{actions} para lanzar todos los \textit{tests} unitarios tras cada \textit{push} al repositorio y lanzar todos los \textit{tests} de integración antes de cada \textit{pull request}. El objetivo de esta base de \textit{tests} se especifica en \sectionref{isec:test_suite}.
-	\item El uso de \textbf{\textit{Github Projects}}, que nos ofrecen una tabla tipo \entrecomillado{Kanban} para organizar las tareas pendientes. Dicha forma de organizarnos ha sido ya comentada en \sectionref{isec:planificacion}.
+	\item El fusionado de \textit{feature branches} a la rama principal se realiza por medio de \textbf{\textit{pull requests}}. En cada \textit{pull request} podemos revisar el código una última vez antes de fusionarlo en la rama principal. Además, sirven como forma de localizar los cambios de alto nivel introducidos en nuestra base de código. En nuestro caso, los \textit{commits} individuales pueden llegar a ser demasiado granulares, y revisando la lista de todos los \textit{commits} realizados podemos perder el foco sobre la tarea de alto nivel que tratan de resolver. Por ejemplo, en una \textit{pull request} como \cite{informatica:ejemplo_pr_57} podemos ver que, para introducir las dos variantes de \textit{Rank@K accuracy} (véase la \sectionref{isubs:rank_at_k}) empleamos 53 \textit{commits}.
+	\item El uso de \textbf{\textit{Github Actions}} para ejecutar ciertas tareas tras realizar una subida de \textit{commits} al repositorio (\entrecomillado{push}) o antes de aceptar una \textit{pull request}. Principalmente, hemos usado estas \entrecomillado{actions} para lanzar todos los \textit{tests} unitarios tras cada \textit{push} al repositorio y lanzar todos los \textit{tests} de integración antes de cada \textit{pull request}. El objetivo de esta base de \textit{tests} se especifica en la \sectionref{isec:test_suite}.
+	\item El uso de \textbf{\textit{Github Projects}}, que nos ofrecen una tabla tipo \entrecomillado{Kanban} para organizar las tareas pendientes. Dicha forma de organizarnos ha sido ya comentada en la \sectionref{isec:planificacion}.
 \end{itemize}
 
 \section{Estructura de carpetas del proyecto} \label{isec:estructura_carpetas}
@@ -23,7 +23,7 @@ Gracias al uso de \textit{Github} hemos podido implementar fácilmente una serie
 Por la extensión de la base de código, es necesario que comentemos la estructura de carpetas del proyecto. En el directorio raíz tenemos los siguientes ficheros relevantes:
 
 \begin{itemize}
-	\item \lstinline{flake.nix} y \lstinline{flake.lock} especifican el entorno de desarrollo usando el gestor \textit{nix}. El fichero \lstinline{enviroment.yml} especifica el entorno de desarrollo usando el gestor \textit{Conda} (véase \sectionref{isec:entorno_ejecucion}).
+	\item \lstinline{flake.nix} y \lstinline{flake.lock} especifican el entorno de desarrollo usando el gestor \textit{nix}. El fichero \lstinline{enviroment.yml} especifica el entorno de desarrollo usando el gestor \textit{Conda} (véase la \sectionref{isec:entorno_ejecucion}).
 	\item Los ficheros \lstinline{interactive_slurm.sh} y \lstinline{launch_server_process.sh} son dos \textit{scripts Bash} que usamos para lanzar procesos en los servidores \textit{nGPU}. El primero lo utilizamos para entrar en una terminal de forma interactiva. El segundo, para lanzar un \textit{script} de \lstinline{Python} para que ejecute el aprendizaje y validación de un modelo.
 	\item \lstinline{justfile} especifica tareas para ejecutarse con la herramienta \lstinline{just} \cite{informatica:just}. Dicha herramienta es parecida a \lstinline{make}. La usamos para definir tareas como:
 	      \begin{itemize}
@@ -33,13 +33,13 @@ Por la extensión de la base de código, es necesario que comentemos la estructu
 		      \item Ejecutar ciertos análisis estáticos sobre la base de código (usando \lstinline{mypy} y \lstinline{ruff}).
 		      \item \ldots
 	      \end{itemize}
-	\item \lstinline{optuna_queries.sql} define las consultas \lstinline{SQL} necesarias para vigilar el proceso de \textit{hyperparameter tuning}, que especificaremos en \sectionref{isec:hp_tuning}
+	\item \lstinline{optuna_queries.sql} define las consultas \lstinline{SQL} necesarias para vigilar el proceso de \textit{hyperparameter tuning}, que especificaremos en el \sectionref{isec:hp_tuning}
 \end{itemize}
 
 En el directorio raíz del proyecto tenenos los siguientes subdirectorios:
 
 \begin{itemize}
-	\item \lstinline{.github/workflows} en el que definimos las \textit{Github Actions} que ejecutamos (véase \sectionref{isec:github_buenas_practicas}).
+	\item \lstinline{.github/workflows} en el que definimos las \textit{Github Actions} que ejecutamos (véase la \sectionref{isec:github_buenas_practicas}).
 	\item \lstinline{thesis} donde desarrollamos el proyecto \textit{Latex} que compone la presente memoria.
 	\item \lstinline{src} donde realizamos todo el desarrollo de código. Este a su vez se divide en los siguientes subdirectorios:
 	      \begin{itemize}
@@ -151,7 +151,7 @@ En Aprendizaje Automático, nos referimos por \textit{pipeline} a la descripció
 
 Existen múltiples soluciones para codificar estos \textit{pipelines}. Estas soluciones se encargan de facilitar la definición de los \textit{pipelines} y la automatización de ciertas tareas. Con estas soluciones podemos, por ejemplo, lanzar todo el proceso cada vez que se actualiza la base de datos, rechazar el nuevo modelo producido si este no cumple con ciertos criterios de calidad, desplegar en producción nuevos modelos, ...
 
-Sin embargo, por la simplicidad de nuestro \textit{pipeline}, codificamos manualmente este proceso. Simplemente, usaremos variables globales, almacenadas en la variable \lstinline{GLOBALS} (véase \sectionref{isec:loggin_metricas}), para decidir si ejecutar o no ciertas secciones opcionales.
+Sin embargo, por la simplicidad de nuestro \textit{pipeline}, codificamos manualmente este proceso. Simplemente, usaremos variables globales, almacenadas en la variable \lstinline{GLOBALS} (véase el \sectionref{isec:loggin_metricas}), para decidir si ejecutar o no ciertas secciones opcionales.
 
 El siguiente diagrama describe el \textit{pipeline} seguido en todos nuestros experimentos:
 
@@ -204,7 +204,7 @@ Los \textbf{\textit{tests} unitarios} buscan principalmente validar la correcci�
 
 \begin{itemize}
 	\item Validación de casos concretos: controlamos los datos de entrada de una funcionalidad, y comprobamos la salida con el resultado esperado. Esto es factible cuando las funciones a validar son deterministas y fáciles de calcular manualmente. Como puede ser el caso de las funciones de pérdida, validadas en \lstinline{src/test/loss_functions.py} usando principalmente este enfoque.
-	\item Validación de propiedades \cite{informatica:property_based_testing}: dados unos datos de entrada, comprobamos que ciertas propiedades de la funcionalidad a validar se cumplen. Esta técnica es realmente útil cuando usamos funciones no deterministas, o cuando no es viable computar manualmente la salida esperada. Como puede ser el caso del aumentado de datos (véase \sectionref{isec:aumentado_datos}), de naturaleza claramente aleatoria. Comprobamos propiedades como:
+	\item Validación de propiedades \cite{informatica:property_based_testing}: dados unos datos de entrada, comprobamos que ciertas propiedades de la funcionalidad a validar se cumplen. Esta técnica es realmente útil cuando usamos funciones no deterministas, o cuando no es viable computar manualmente la salida esperada. Como puede ser el caso del aumentado de datos (véase el \sectionref{isec:aumentado_datos}), de naturaleza claramente aleatoria. Comprobamos propiedades como:
 
 	      \begin{itemize}
 		      \item Que el tamaño del \textit{dataset} no aumenta si todos los individuos tienen al menos $K$ imágenes asociadas.
@@ -224,10 +224,10 @@ También usamos \textit{tests} unitarios cada vez que encontramos un error en nu
 
 Esto permite encontrar y solucionar los problemas más rápidamente, y además documentar errores previamente encontrados y propiedades que son importantes verificar en otros escenarios.
 
-Los \textbf{\textit{tests} de integración} buscan evitar el siguiente problema. Como hemos comentado en \sectionref{isec:planificacion}, hemos realizado un trabajo iterativo, partiendo de conjuntos de datos más sencillos hacia conjuntos de datos más grandes y complejos. En dicho trabajo iterativo puede ocurrir que, cambiando o añadiendo código a la librería, rompamos \textit{pipelines} en conjuntos de datos previos. Los \textit{tests} de integración buscan verificar que \textit{pipelines} en conjuntos de datos previos sigan funcionando.
+Los \textbf{\textit{tests} de integración} buscan evitar el siguiente problema. Como hemos comentado en la \sectionref{isec:planificacion}, hemos realizado un trabajo iterativo, partiendo de conjuntos de datos más sencillos hacia conjuntos de datos más grandes y complejos. En dicho trabajo iterativo puede ocurrir que, cambiando o añadiendo código a la librería, rompamos \textit{pipelines} en conjuntos de datos previos. Los \textit{tests} de integración buscan verificar que \textit{pipelines} en conjuntos de datos previos sigan funcionando.
 
 Para esto, cada \textit{test} de integración ejecuta el \textit{pipeline} de un conjunto de datos cuando abandonamos este para pasar al siguiente. Usamos valores de los parámetros para adecuar la tarea: usamos un subconjunto muy reducido de la base de datos, hacemos \textit{logging} de forma mucho menos frecuente, los valores de $\{P, K\}$ son más bajos, la red neuronal es muy ligera, ...
 
 Por el esfuerzo computacional que suponen, los \textit{tests} de integración únicamente se ejecutan a la hora de validar una \textit{pull request}.
 
-Y como ya hemos comentado en \sectionref{isec:github_buenas_practicas}, estamos usando \textit{Github Actions} para lanzar las dos \textit{suites} de \textit{tests}, aunque usando la herramienta \lstinline{just} (véase \sectionref{isec:estructura_carpetas}) se pueden lanzar en local.
+Y como ya hemos comentado en la \sectionref{isec:github_buenas_practicas}, estamos usando \textit{Github Actions} para lanzar las dos \textit{suites} de \textit{tests}, aunque usando la herramienta \lstinline{just} (véase \sectionref{isec:estructura_carpetas}) se pueden lanzar en local.

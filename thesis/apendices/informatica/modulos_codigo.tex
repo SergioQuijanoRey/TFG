@@ -88,7 +88,7 @@ Para realizar el aumento de datos estamos utilizando el módulo \lstinline{torch
 
 \section{Implementaciones propias de \textit{Datasets}} \label{isec:datasets_customs}
 
-Como ya hemos comentado en \sectionref{isec:base_datos_usada}, las bases de datos \textit{FG-Net} y \textit{CACD} no se ofrecen como parte de ninguna librería asociada a \lstinline{Pytorch}. Por tanto, tendremos que implementar la descarga, extracción y carga en objetos compatibles con \lstinline{Pytorch}. Estas tareas se realizan en el módulo \lstinline{src.lib.datasets.py}.
+Como ya hemos comentado en la \sectionref{isec:base_datos_usada}, las bases de datos \textit{FG-Net} y \textit{CACD} no se ofrecen como parte de ninguna librería asociada a \lstinline{Pytorch}. Por tanto, tendremos que implementar la descarga, extracción y carga en objetos compatibles con \lstinline{Pytorch}. Estas tareas se realizan en el módulo \lstinline{src.lib.datasets.py}.
 
 Este módulo contiene, además de las dos clases que más adelante estudiamos, las funciones \lstinline{download_fg_dataset} y \lstinline{download_cacd_dataset}, que descargan y extraen los dos \textit{datsets} de internet.
 
@@ -221,7 +221,7 @@ La clase \lstinline{FastRetrievalAdapter} añade algunas modificaciones para ace
 
 \begin{itemize}
 	\item Podemos ver en la \imgref{img:diagramas_clase_concretos_adaptadores} que esta clase se compone de un modelo que computa el \textit{embedding} semántico, \lstinline{self.base_net}, y un modelo que ya está adaptado a la tarea de \textit{retrieval}, \lstinline{self.wrapped_net}. \lstinline{self.wrapped_net} es el resultado de construir un objeto de la clase \lstinline{RetrievalAdapter} usando \lstinline{self.base_net}.
-	\item En \sectionref{isubs:rank_at_k} se especifica de qué forma se va a usar la adaptación. Siempre tomaremos una base de datos de imágenes, extraeremos una imagen que usaremos como \textit{key}, y realizaremos la \textit{query} contra el resto de imágenes de la base de datos.
+	\item En la \sectionref{isubs:rank_at_k} se especifica de qué forma se va a usar la adaptación. Siempre tomaremos una base de datos de imágenes, extraeremos una imagen que usaremos como \textit{key}, y realizaremos la \textit{query} contra el resto de imágenes de la base de datos.
 	\item Por tanto, en el método \lstinline{precompute_embeddings} pasamos toda la base de datos de imágenes, calculamos su proyección en el \textit{embedding} usando \lstinline{self.base_net}, y almacenaremos estos datos.
 	\item Con esto, el método \lstinline{query} simplemente especifica el índice de la \textit{key} y el número $k$ de individuos más parecidos que queremos seleccionar. Y usando \lstinline{self.wrapped_net} con su método \lstinline{query_embedding}, realizamos el cómputo sobre los \textit{embeddings} precomputados.
 \end{itemize}
@@ -303,4 +303,4 @@ Hemos usado \textbf{dos técnicas para mostrar las métricas calculadas}. La pri
 	\item El registro de parámetros globales usados en cada entrenamiento.
 \end{itemize}
 
-Para registrar todos los parámetros globales, creamos un diccionario de \lstinline{Python} en el que definimos los valores de dichos parámetros. Este diccionario, al que llamamos \lstinline{GLOBALS}, se registra directamente en la plataforma \textit{WANDB}. Los parámetros globales definen hiperparámetros del proceso de entrenamiento (por ejemplo, los valores de $\{P, K\}$), directorios en los que guardamos archivos, qué entorno de ejecución estamos usando o si queremos saltar ciertas secciones del \textit{pipeline} (véase \sectionref{isec:pipeline}).
+Para registrar todos los parámetros globales, creamos un diccionario de \lstinline{Python} en el que definimos los valores de dichos parámetros. Este diccionario, al que llamamos \lstinline{GLOBALS}, se registra directamente en la plataforma \textit{WANDB}. Los parámetros globales definen hiperparámetros del proceso de entrenamiento (por ejemplo, los valores de $\{P, K\}$), directorios en los que guardamos archivos, qué entorno de ejecución estamos usando o si queremos saltar ciertas secciones del \textit{pipeline} (véase la \sectionref{isec:pipeline}).
