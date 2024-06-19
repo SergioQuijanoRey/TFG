@@ -77,7 +77,7 @@ Nuestra idea inicial era la de aplicar las variantes \textit{online} de la funci
 
 \subsubsection{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
 
-En la \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en la \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. Describimos ahora cómo ejecutamos este proceso, las decisiones tomadas y qué información obtenemos.
+En la \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en el \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. Describimos ahora cómo ejecutamos este proceso, las decisiones tomadas y qué información obtenemos.
 
 Por el gran tamaño de los conjuntos de datos ha sido imposible ejecutar \textit{k-Fold Cross Validation} como método en el que basar la exploración de los hiperparámetros. Por tanto, empleamos \textit{holdout} como técnica base. Este enfoque es muy común al emplear grandes conjuntos de datos \cite{informatica:facenet} \cite{informatica:principal}. Los problemas de robustez que esta técnica puede provocar se reducen al tener en cuenta el gran tamaño de los conjuntos de datos con los que trabajamos. Al igual que hacen otros trabajos del estado del arte \cite{informatica:aim} \cite{informatica:dal}, realizaremos la exploración de hiperparámetros sobre \textit{CACD}. El conjunto de datos \textit{FG-Net} se usará únicamente para validar el modelo final.
 
