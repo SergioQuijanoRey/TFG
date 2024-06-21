@@ -6,7 +6,7 @@ En este capítulo explicaremos la experimentación realizada. Comenzaremos intro
 
 Como se comenta en el \entrecomillado{Apéndice D} de \cite{informatica:principal}, \textbf{el proceso de entrenamiento presenta una particularidad}: la función de pérdida rápidamente decae hasta un cierto valor en el que prácticamente se mantiene constante durante todo el entrenamiento. Sin embargo, otras métricas relevantes deberían mejorar durante el paso de las épocas de entrenamiento. Por tanto, \textbf{no es suficiente que observemos únicamente el valor de la función de pérdida}, sino que tenemos que seguir muy de cerca el valor de otras métricas relevantes durante el entrenamiento.
 
-En esta sección introduciremos algunas de las métricas más relevantes. En toda esta sección, supondremos que estamos trabajando con $N$ individuos, cada individuo $i$ tendrá $N_i$ imágenes asociadas. Usaremos la misma notación que la introducida en \sectionref{isubs:seleccion_de_triples}. El elemento $x_k^p$ indicará que estamos trabajando con la imagen $k$ de la clase $p$. Solo que esta vez, estamos considerando todo el conjunto de datos.
+En esta sección introduciremos algunas de las métricas más relevantes. En toda esta sección, supondremos que estamos trabajando con $N$ individuos, cada individuo $i$ tendrá $N_i$ imágenes asociadas. Usaremos la misma notación que la introducida en la \sectionref{isubs:seleccion_de_triples}. El elemento $x_k^p$ indicará que estamos trabajando con la imagen $k$ de la clase $p$. Solo que esta vez, estamos considerando todo el conjunto de datos.
 
 
 \subsection{Distancias intracluster e intercluster} \label{isubs:teoria_distancia_intra_inter_cluster}
@@ -39,13 +39,13 @@ Una vez definidas estas métricas, lo que esperamos ver durante el entrenamiento
 
 \subsection{Normas de los \textit{embeddings}} \label{isubs:normas_embeddings}
 
-Como ya hemos comentado en \sectionref{isec:triplet_loss}, un problema que puede ocurrir es que nuestro modelo decida colapsar cualquier entrada al vector $\vec{0}$. Esto justifica el uso de un margen. Pero en \sectionref{isec:margenes_suaves} hemos introducido una función para computar los márgenes de forma suave, sin especificar el valor del margen $\alpha$. Esta nueva variante podría dar lugar al colapso del modelo. Por tanto, vamos a observar durante el entrenamiento la norma euclídea de todas las salidas de nuestro modelo durante el entrenamiento. Esto es interesante sobre todo cuando no usamos la normalización de la salida, introducida en \sectionref{isubs:normalization_impl}.
+Como ya hemos comentado en la \sectionref{isec:triplet_loss}, un problema que puede ocurrir es que nuestro modelo decida colapsar cualquier entrada al vector $\vec{0}$. Esto justifica el uso de un margen. Pero en la \sectionref{isec:margenes_suaves} hemos introducido una función para computar los márgenes de forma suave, sin especificar el valor del margen $\alpha$. Esta nueva variante podría dar lugar al colapso del modelo. Por tanto, vamos a observar durante el entrenamiento la norma euclídea de todas las salidas de nuestro modelo durante el entrenamiento. Esto es interesante sobre todo cuando no usamos la normalización de la salida, introducida en el \sectionref{isubs:normalization_impl}.
 
 \subsection{Sumandos activos}
 
-En \sectionref{isubsubs:mejoras_sumandos_no_nulos} ya hemos desarrollado la noción de sumandos nulos y sumandos activos. Los sumandos nulos pueden llegar a ser nocivos para el aprendizaje de la red. Si demasiados triples no aportan valor a la función de pérdida, o bien no estamos aprovechando los ciclos de entrenamiento (en el caso de que estemos usando $\mathcal{L}_{BH \neq 0}, \mathcal{L}_{BA \neq 0}$) o bien  la red puede que no aprenda de los sumandos activos (en el caso de que estemos usando $\mathcal{L}_{BH}, \mathcal{L}_{BA}$). Por tanto, vamos a registrar el porcentaje de sumandos activos en la función de pérdida, en cada \textit{P-K batch} \footnotemark.
+En la \sectionref{isubsubs:mejoras_sumandos_no_nulos} ya hemos desarrollado la noción de sumandos nulos y sumandos activos. Los sumandos nulos pueden llegar a ser nocivos para el aprendizaje de la red. Si demasiados triples no aportan valor a la función de pérdida, o bien no estamos aprovechando los ciclos de entrenamiento (en el caso de que estemos usando $\mathcal{L}_{BH \neq 0}, \mathcal{L}_{BA \neq 0}$) o bien  la red puede que no aprenda de los sumandos activos (en el caso de que estemos usando $\mathcal{L}_{BH}, \mathcal{L}_{BA}$). Por tanto, vamos a registrar el porcentaje de sumandos activos en la función de pérdida, en cada \textit{P-K batch} \footnotemark.
 
-\footnotetext{Si el lector no está familiarizado con las funciones de pérdida $\mathcal{L}_{BH \neq 0}$, $\mathcal{L}_{BA \neq 0}$, $\mathcal{L}_{BH}$ o  $\mathcal{L}_{BA}$, estas son introducidas en \sectionref{isubs:seleccion_de_triples}. Por otro lado, el concepto de \textit{P-K batch} se introduce en \sectionref{isubs:muestreo_datos_pk_sampling_teoria}}
+\footnotetext{Si el lector no está familiarizado con las funciones de pérdida $\mathcal{L}_{BH \neq 0}$, $\mathcal{L}_{BA \neq 0}$, $\mathcal{L}_{BH}$ o  $\mathcal{L}_{BA}$, estas son introducidas en la \sectionref{isubs:seleccion_de_triples}. Por otro lado, el concepto de \textit{P-K batch} se introduce en la \sectionref{isubs:muestreo_datos_pk_sampling_teoria}}
 
 \subsection{\textit{Rank@k accuracy}} \label{isubs:rank_at_k}
 
@@ -65,26 +65,27 @@ Hemos descrito el proceso usual de cómputo de esta métrica. Sin embargo, nosot
 
 \section{Experimentos realizados} \label{isec:experimentos_realizados}
 
-En esta sección introduciremos los distintos experimentos que hemos llevado a cabo, explicando el proceso realizado paso a paso. Comenzaremos con la \sectionref{isubsec:experimentacion_inicial} estudiando los experimentos iniciales sobre dos \textit{datasets} de caras distintos, en los que obtenemos resultados nefastos. Alcanzamos resultados de la misma calidad en \textit{MNIST} en la \sectionref{isubsec:experimentos_iniciales_mnist}. La simplicidad de este conjunto de datos nos hace pensar que o bien estamos aplicando erróneamente la técnica o bien que existe algún fallo en el diseño de esta. A continuación, en la \sectionref{isubsec:experiemntacion_base_codigo_externa}, exploramos distintos experimentos sobre \textit{MNIST} usando otras bases de código, para confirmar que un problema de diseño en la función de pérdida es la responsable de estos resultados y no un fallo por nuestra parte. Con todo lo aprendido, identificamos el motivo que causa el rendimiento nefasto y proponemos una solución original en la \sectionref{isubsec:identificacion_problemas_propuesta_solucion}. Para finalizar, en la \sectionref{isubsec:experimentacion_mnist_bien} y en la \sectionref{isubsec:experimentacion_cacd_bien} repetimos los experimentos aplicando nuestra propuesta, para \textit{MNIST} y \textit{CACD} respectivamente, mejorando los resultados enormemente, con lo que validamos la efectividad de la solución planteada.
+En esta sección introduciremos los distintos experimentos que hemos llevado a cabo, explicando el proceso que nos ha permitido identificar un problema en la función de pérdida, proponer una solución original y validar su eficacia, paso a paso.
 
-Cabe destacar que el alcance inicial de este trabajo era el de aplicar las distintas técnicas que hemos ido desarrollando a los conjuntos de datos iniciales. Sin embargo, los resultados obtenidos son muy difíciles de defender, motivo por el cuál ha sido necesario encontrar la causa de estos, descartando un posible fallo por nuestra parte en la implementación y ejecución. Al haber encontrado esta causa, nuestro objetivo pasa a ser el de proponer una solución original y comprobar su eficacia. Por este cambio de objetivos y por falta de tiempo, no repetimos el \textit{hyperparameter tuning} para los nuevos experimentos.
+Comenzaremos con la \sectionref{isubsec:experimentacion_inicial} estudiando los experimentos iniciales sobre dos \textit{datasets} de caras distintos, en los que obtenemos malos resultados. Alcanzamos resultados de la misma calidad en \textit{MNIST}, en la \sectionref{isubsec:experimentos_iniciales_mnist}. La simplicidad de este último conjunto de datos nos hace pensar que existe un problema de diseño en las técnicas que estamos estudiando. En un primer paso, descartamos que exista un fallo por nuestra parte al implementar y ejecutar dichas técnicas, explorando experimentos de terceros sobre \textit{MNIST}, en la  \sectionref{isubsec:experiemntacion_base_codigo_externa}. Con todo lo aprendido, identificamos el motivo que causa el mal rendimiento y proponemos una solución original en la \sectionref{isubsec:identificacion_problemas_propuesta_solucion}. Para finalizar, en la \sectionref{isubsec:experimentacion_mnist_bien} y en la \sectionref{isubsec:experimentacion_cacd_bien}, repetimos los experimentos aplicando nuestra propuesta, para \textit{MNIST} y \textit{CACD} respectivamente, mejorando los resultados enormemente, con lo que validamos la efectividad de la solución planteada.
+
+Cabe destacar que el alcance inicial de este trabajo era el de estudiar las dos variantes \textit{online} de \textit{Triplet Loss} para resolver un problema de reconocimiento facial invariante a la edad. En este sentido, hemos detectado un fallo en estas nuevas técnicas, propuesto una solución original y validado su enorme eficacia. Por tanto, estamos satisfechos con el logro de estos objetivos.
 
 \subsection{Experimentación inicial en \textit{CACD} y \textit{FG-Net}} \label{isubsec:experimentacion_inicial}
 
-El alcance original del trabajo era el de aplicar distintas técnicas de minado de \textit{triplets online} para obtener un modelo que reconociera caras de forma invariante a la edad. Es por tanto, que a diferencia del resto de secciones, aplicamos todas las técnicas a nuestro alcance para mejorar el rendimiento del modelo, principalmente, \textit{hyperparameter tuning}.
+Nuestra idea inicial era la de aplicar las variantes \textit{online} de la función de pérdida \textit{triplet loss} sobre un problema de reconocimiento facial invariante a la edad, obteniendo directamente buenos resultados e iterativamente ir introduciendo mejoras para aumentar el rendimiento, sin tener que identificar y solucionar los problemas en su diseño. Por lo tanto, en esta primera etapa, aplicamos todas las técnicas que están a nuestro alcance para obtener buenos resultados (principalmente \textit{hyperparameter tuning}), desconocedores de los problemas de diseño que más tarde identificamos y que cambiaran el foco de nuestros esfuerzos.
 
 \subsubsection{Selección de hiperparámetros} \label{isec:experimentacion_hp_tuning}
 
-En la \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en la \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. Describimos ahora cómo ejecutamos este proceso, las decisiones tomadas y qué información obtenemos.
+En la \sectionref{isec:hptuning_kfold_cross_validation} hemos descrito detalladamente el proceso para la selección de hiperparámetros y en el \sectionref{isec:hp_tuning} hemos descrito cómo implementamos este proceso. Describimos ahora cómo ejecutamos este proceso, las decisiones tomadas y qué información obtenemos.
 
-Por el gran tamaño de los conjuntos de datos ha sido imposible ejecutar \textit{k-Fold Cross Validation} como método en el que basar la exploración de los hiperparámetros. Tanto por los enormes tiempos de cómputo como por el colapso de la memoria disponible en el \textit{hardware} empleado. Por tanto, nos vemos obligados a emplear \textit{holdout} como técnica base. Los problemas de robustez que esta técnica puede provocar se reducen al tener encuenta el gran tamaño de los conjuntos de datos con los que trabajamos. Al igual que hacen otros trabajos del estado del arte, realizaremos la exploración de hiperparámetros sobre \textit{CACD}. El conjunto de datos \textit{FG-Net} se usará únicamente para validar el modelo final.
+Por el gran tamaño de los conjuntos de datos ha sido imposible ejecutar \textit{k-Fold Cross Validation} como método en el que basar la exploración de los hiperparámetros. Por tanto, empleamos \textit{holdout} como técnica base. Este enfoque es muy común al emplear grandes conjuntos de datos \cite{informatica:facenet} \cite{informatica:principal}. Los problemas de robustez que esta técnica puede provocar se reducen al tener en cuenta el gran tamaño de los conjuntos de datos con los que trabajamos. Al igual que hacen otros trabajos del estado del arte \cite{informatica:aim} \cite{informatica:dal}, realizaremos la exploración de hiperparámetros sobre \textit{CACD}. El conjunto de datos \textit{FG-Net} se usará únicamente para validar el modelo final.
 
-La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar. Lanzamos la búsqueda de hiperparámetros para maximizar el valor de \textit{Rank@1 accuracy} \footnotemark. Los resultados de la búsqueda pueden consultarse en la base de datos \textit{SQLITE} \lstinline{hp_tuning_optuna.db} que está en nuestro repositorio de \textit{Github} \footnotemark. La \tableref{table:hp_escogidos} muestra los mejores hiperparámetros encontrados.
+La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que exploramos y el rango de valores que estos pueden tomar. Lanzamos la búsqueda de hiperparámetros para maximizar el valor de \textit{Rank@1 accuracy} \footnotemark. La \tableref{table:hp_escogidos} muestra los mejores hiperparámetros encontrados.
 
-\footnotetext{Si el lector no está familiarizado con esta métrica, la hemos definido en \sectionref{isubs:rank_at_k}}
-\footnotetext{Si el lector quiere realizar consultas sobre esta base de datos, el fichero \lstinline{optuna_queries.sql} contiene las órdenes \textit{SQL} que más hemos usado para vigilar el proceso de búsqueda.}
+\footnotetext{Si el lector no está familiarizado con esta métrica, la hemos definido en la \sectionref{isubs:rank_at_k}}
 
-\begin{table}[!hbt]
+\begin{table}[!hbtp]
 \centering
     \begin{tabular}{|l|p{5cm}|}
     \hline
@@ -112,7 +113,7 @@ La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que expl
 \label{table:rangos_hiperparametros}
 \end{table}
 
-\begin{table}[!hbt]
+\begin{table}[!hbtp]
 \centering
 \begin{tabular}{|l|l|}
     \hline
@@ -138,12 +139,7 @@ La \tableref{table:rangos_hiperparametros} muestra los hiperparámetros que expl
 \label{table:hp_escogidos}
 \end{table}
 
-En la \tableref{table:hp_escogidos} podemos ver que el valor máximo alcanzado para \textit{Rank@1 Accuracy} es realmente malo, no llega al $0.1$. Por otro lado, de 92 pruebas de hiperparámetros, solo 11 consiguen terminar su ejecución de forma normal. Es decir, el 88\% de las pruebas fallan, la mayoría por explosión de gradientes. Esto ya indica dos inconvenientes de las nuevas técnicas que estudiamos en este trabajo:
-
-\begin{enumerate}
-    \item Producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte.
-    \item Provocan que el entrenamiento del modelo sea muy frágil y que sea realmente complicado encontrar configuraciones de hiperparámetros que produzcan un modelo sin errores en el proceso.
-\end{enumerate}
+En la \tableref{table:hp_escogidos} podemos ver que el valor máximo alcanzado para \textit{Rank@1 Accuracy} es realmente malo, no llega al $0.1$. Por otro lado, de 92 pruebas de hiperparámetros, solo 11 consiguen terminar su ejecución de forma normal. Esto ya indica dos inconvenientes de las nuevas técnicas que estudiamos en este trabajo. El primero, que producen modelos con un rendimiento muy bajo, que no pueden usarse en la práctica y que están muy lejos de haber aprendido a solventar la tarea en cierta medida, mucho menos de ser comparables a los modelos estados del arte. El segundo, que provocan que el entrenamiento del modelo sea muy frágil y que sea realmente complicado encontrar configuraciones de hiperparámetros que produzcan un modelo sin errores en el proceso.
 
 En base a estos resultados, entrenaremos un modelo sobre todo el conjunto \textit{CACD} y validaremos los resultados sobre \textit{FG-Net}. Para ello, usaremos los hiperparámetros que hemos encontrado en la \tableref{table:hp_escogidos}. Esperamos obtener muy malos resultados, pues ya hemos comentado que \textit{FG-Net} es un conjunto de datos más complicado que \textit{CACD}, y el valor tan bajo de \textit{Rank@1 Accuracy} no es nada esperanzador.
 
@@ -190,6 +186,7 @@ El proceso de entrenamiento puede estudiarse a partir de las métricas que se mu
 
 \begin{figure}[!hbtp]
 
+    \ajustarsubcaptions
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/running_loss}
@@ -232,28 +229,23 @@ El proceso de entrenamiento puede estudiarse a partir de las métricas que se mu
         \caption{Norma de los \textit{embeddings}}
     \end{subfigure}
 
-    \caption{Valores de las métricas observadas durante el proceso de entrenamiento}
+    \caption{Valores de las métricas observadas durante el proceso de entrenamiento.}
     \label{img:metricas_entrenamiento}
 \end{figure}
 
 \begin{table}[!hbtp]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|l|l|}
     \hline
-    Métrica & Conjunto & Valor \\
+    Conjunto & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
     \hline
 
-    \textit{Rank@1 Accuracy} & Entrenamiento & 0.07185 \\
-    \textit{Rank@1 Accuracy} & Test & 0.01000 \\
-    \textit{Rank@5 Accuracy} & Entrenamiento & 0.15244 \\
-    \textit{Rank@5 Accuracy} & Test & 0.00100 \\
-    \textit{Silhouette} & Entrenamiento & -0.41858 \\
-    \textit{Silhouette} & Test & -0.32984 \\
-
+    Entrenamiento & 0.07185 & 0.15244 & -0.41858 \\
+    Test & 0.01000 & 0.00100 & -0.32984 \\
     \hline
 
 \end{tabular}
-\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de \textit{test}}
+\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de \textit{test}.}
     \label{table:resultados_sobre_fg_net}
 \end{table}
 
@@ -261,7 +253,7 @@ A partir de la \imgref{img:metricas_entrenamiento} podemos extraer algunas concl
 
 Los resultados obtenidos en \tableref{table:resultados_sobre_fg_net} son muy malos. En el conjunto de \textit{CACD} los valores de \textit{Rank@1} y \textit{Rank@5 Accuracy} son pésimos, y están muy lejos de los valores que hemos mostrado que alcanzan modelos estado del arte. Aunque no logremos ser competitivos con el estado del arte, podríamos haber obtenido un modelo aplicable en la práctica, competente y ligero. Pero este no es el caso, en este estado el modelo no es aplicable en ningún escenario. Como es de esperar, los resultados sobre \textit{FG-Net} son aún peores. Todo esto viene reforzado por los valores de la métrica \textit{Silhouette}.
 
-Inicialmente cometemos un error al interpretar estos datos. Pensábamos que el comportamiento del las distancias intracluster e intercluster, acompañado del descenso de la norma de los \textit{embeddings}, era un indicador de la primera fase del entrenamiento que se comenta en \cite{informatica:principal}: agrupamos todos los datos en un cierto centro de gravedad que permite más tarde generar agrupaciones separadas. Para arreglar esto, buscamos mejorar la búsqueda de hiperparámetros y normalizar la salida de las redes. También buscamos aplicar entrenamientos mucho más largos que no mejoran nada. Sin embargo, no nos damos cuenta de un comportamiento muy anómalo. Independientemente del valor del margen que establezcamos, la función de pérdida se queda atascada en este valor. Como comentaremos y justificaremos más tarde, lo que está ocurriendo es que la red aprende el comportamiento degenerado que consiste en transformar todas las entradas a un único punto del espacio vectorial fijo pero no nulo.
+Inicialmente cometemos un error al interpretar estos datos. Pensábamos que el comportamiento del las distancias intracluster e intercluster, acompañado del descenso de la norma de los \textit{embeddings}, era un indicador de la primera fase del entrenamiento que se comenta en \cite{informatica:principal}: agrupamos todos los datos en un cierto centro de gravedad que permite más tarde generar agrupaciones separadas. Para arreglar esto, buscamos mejorar la búsqueda de hiperparámetros y normalizar la salida de las redes. También buscamos aplicar entrenamientos mucho más largos que no mejoran nada. Sin embargo, no nos damos cuenta de un comportamiento muy anómalo. Independientemente del valor del margen que establezcamos, la función de pérdida se queda atascada en este valor. Como comentaremos y justificaremos más tarde, lo que está ocurriendo es que la red aprende el comportamiento degenerado que consiste en transformar todas las entradas a un único punto del espacio vectorial fijo pero no nulo.  Cabe destacar que en el trabajo de referencia \cite{informatica:principal} se comenta que el proceso de entrenamiento puede caer en un comportamiento degenerado, pero indican que esto ocurre en los experimentos \textit{offline} que realizan para comparar su propuesta. Y por ello, no dan ningún tipo de indicación para lidiar con el problema que estamos experimentando.
 
 \subsection{Experimentación inicial con \textit{MNIST}} \label{isubsec:experimentos_iniciales_mnist}
 
@@ -332,21 +324,18 @@ Como arquitectura usaremos un modelo muy ligero que especificamos en la \tablere
 \caption{Métricas observadas durante el entrenamiento.}
 \end{figure}
 
-\todo{Introducir las intra inter cluster de las que hablo pero que no he puesto}
+% TODO -- Introducir las intra inter cluster de las que hablo pero que no he puesto
 
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|l|l|}
     \hline
-    Métrica & Conjunto & Valor \\
+    Conjunto & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
     \hline
 
-    \textit{Rank@1 Accuracy} & Entrenamiento & 0.0937 \\
-    \textit{Rank@1 Accuracy} & Test & 0.085  \\
-    \textit{Rank@5 Accuracy} & Entrenamiento & 0.453  \\
-    \textit{Rank@5 Accuracy} & Test & 0.414 \\
-    \textit{Silhouette} & Entrenamiento & 0.000 \\
-    \textit{Silhouette} & Test & 0.000 \\
+    Entrenamiento & 0.0937 & 0.453 &  0.000 \\
+    Test & 0.085 & 0.414 &  0.000  \\
+
 
     \hline
 
@@ -366,15 +355,15 @@ Buscamos confirmar que existe un problema en el diseño de las técnicas que est
 En el repositorio de \textit{Github} \cite{informatica:adambielski_github} disponemos de dos experimentos, uno sobre \textit{MNIST} y otro sobre \textit{Fashion-MNIST}. Nos centraremos en los experimentos realizados sobre \textit{MNIST}. El autor realiza los siguientes experimentos:
 
 \begin{itemize}
-    \item Entrenar usando un enfoque directo, sin \textit{embeddings}, que emplea como \textit{baseline}.
+    \item Entrenar como un problema de clasificación usando \textit{Softmax}, sin \textit{embeddings}, que emplea como \textit{baseline}.
     \item Entrenar usando \textit{contrastive loss}, tanto de forma \textit{offline} como \textit{online}.
     \item Entrenar usando \textit{triplet loss} con minado \textit{offline}.
     \item Entrenar usando \textit{triplet loss} con minado \textit{online} a partir de triples aleatorios.
 \end{itemize}
 
-Cabe destacar que el autor ha implementado la estrategia \textit{Batch Hard} y una variante de esta a la que llama \textit{Batch SemiHard}. A pesar de esto, no las muestra en su experimentación, lo que parece indicar que está enfrentándose a los mismos problemas que nosotros. Por lo tanto, adaptamos su código para utilizar estas dos estrategias con su implementación. Al estar usando su base de código, no observamos tantas métricas como en experimentos previos, pero esto no va a suponer un problema pues los resultados van a ser muy interpretables.
+Cabe destacar que el autor ha implementado la estrategia \textit{Batch Hard} y una variante de esta a la que llama \textit{Batch SemiHard}, pero que no las muestra en su experimentación. Por lo tanto, adaptamos su código para utilizar estas dos estrategias con su implementación, pues son las funciones en las que realmente estamos interesados. Al estar usando su base de código, no observamos tantas métricas como en experimentos previos, pero esto no va a suponer un problema pues los resultados van a ser muy interpretables.
 
-Comencemos estudiando la experimentación sobre \textit{Batch Hard}. Usamos la misma arquitectura que en \sectionref{isubsec:experimentos_iniciales_mnist} y que hemos especificado en \tableref{table:arquitectura_mnist}. De hecho, la arquitectura es original de este autor y la hemos replicado en el anterior experimento para que sea más fácil realizar comparaciones entre ambos. Los hiperparámetros empleados se muestran en la \tableref{table:hp_adam_mnist}. El proceso de entrenamiento se pueden observar en la \imgref{img:proceso_entrenamiento_adam_mnist} y, finalmente, los resultados obtenidos se recogen en la \tableref{table:resultados_adam_mnist}.
+Comencemos estudiando la experimentación sobre \textit{Batch Hard}. Usamos la misma arquitectura que en la \sectionref{isubsec:experimentos_iniciales_mnist} y que hemos especificado en la \tableref{table:arquitectura_mnist}. De hecho, la arquitectura es original de este autor y la hemos replicado en el anterior experimento para que sea más fácil realizar comparaciones entre ambos. Los hiperparámetros empleados se muestran en la \tableref{table:hp_adam_mnist}. El proceso de entrenamiento se pueden observar en la \imgref{img:proceso_entrenamiento_adam_mnist} y, finalmente, los resultados obtenidos se recogen en la \tableref{table:resultados_adam_mnist}.
 
 \begin{table}[!hbtp]
 \centering
@@ -407,15 +396,12 @@ Comencemos estudiando la experimentación sobre \textit{Batch Hard}. Usamos la m
 \centering
 \begin{tabular}{|l|l|l|l|}
     \hline
-    Métrica & Conjunto & Valor \\
+    Conjunto & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
     \hline
 
-    \textit{Rank@1 Accuracy} & Entrenamiento & 0.05 \\
-    \textit{Rank@1 Accuracy} & Test & 0.05  \\
-    \textit{Rank@5 Accuracy} & Entrenamiento & 0.523  \\
-    \textit{Rank@5 Accuracy} & Test & 0.101 \\
-    \textit{Silhouette} & Entrenamiento & 0.000 \\
-    \textit{Silhouette} & Test & 0.000 \\
+    Entrenamiento &  0.05 &  0.523 &  0.000 \\
+    Test &  0.05 &  0.101 &  0.000 \\
+
     \hline
 
 \end{tabular}
@@ -423,24 +409,7 @@ Comencemos estudiando la experimentación sobre \textit{Batch Hard}. Usamos la m
     \label{table:resultados_adam_mnist}
 \end{table}
 
-De nuevo, en base a la \imgref{img:proceso_entrenamiento_adam_mnist} y \tableref{table:resultados_adam_mnist}, aseguramos que esta implementación está enfrentando los mismos problemas que nuestra implementación. Con ello, tenemos más confianza en que exista un problema de diseño y no un problema por nuestra parte. De hecho, como esta base de código impone la dimensión del \textit{embedding} a dos para hacer visualizaciones, mostramos esta visualización en la \imgref{img:train_hard_embeddings}. Estas visualizaciones han sido fundamentales para encontrar el motivo del mal comportamiento de todos los experimentos que hemos presentado hasta ahora. El modelo está transformando todas las entradas a dos vectores fijos del espacio, uno de ellos no nulo.
-
-\begin{figure}
-\ajustarsubcaptions
-\centering
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/hard_train_embedding.png}
-        \caption{\textit{Embeddings} aprendidos sobre el conjunto de entrenamiento.}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-        \centering
-        \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/hard_test_embedding.png}
-        \caption{\textit{Embeddings} aprendidos sobre el conjunto de test.}
-    \end{subfigure}
-\caption{Visualización de los \textit{embeddings} producidos por el modelo \textit{Batch Hard}. }
-\label{img:train_hard_embeddings}
-\end{figure}
+De nuevo, en base a la \imgref{img:proceso_entrenamiento_adam_mnist} y \tableref{table:resultados_adam_mnist}, aseguramos que esta implementación está enfrentando los mismos problemas que nuestra implementación. Con ello, tenemos más confianza en que exista un problema de diseño y no un problema por nuestra parte. De hecho, como esta base de código impone la dimensión del \textit{embedding} a dos para hacer visualizaciones, estudiamos la información que muestra. Estas visualizaciones han sido fundamentales para encontrar el motivo del mal comportamiento de todos los experimentos que hemos presentado hasta ahora. El modelo está transformando todas las entradas a dos vectores fijos del espacio, uno de ellos no nulo. Este comportamiento se ve claramente en las visualizaciones \footnote{No mostramos estas visualizaciones porque no aportan valor a nuestra argumentación. Muestran un espacio totalmente vacío salvo los dos puntos no nulos del espacio $\R^2$ en los que degenera el modelo}.
 
 Veamos ahora los resultados de la técnica \textit{Batch Semihard}. Esta es ligeramente distinta de las dos técnicas que estamos estudiando. En ella, dado un \textit{batch} de $P-K$ elementos, se elige aleatoriamente un triple entre aquellos que tienen un valor de \textit{Triplet Loss} no nulo. Los hiperparámetros serán los mismos que \tableref{table:hp_adam_mnist} salvo por la función de pérdida. El proceso de entrenamiento se muestra en la \imgref{img:proceso_entrenamiento_adam_mnist_random} y los resultados en la \tableref{table:resultados_adam_mnist_random}. Los \textit{embeddings} producidos se visualizan en la \imgref{img:embeddings_adam_random}.
 
@@ -453,17 +422,14 @@ Veamos ahora los resultados de la técnica \textit{Batch Semihard}. Esta es lige
 
 \begin{table}[!hbtp]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|l|l|}
     \hline
-    Métrica & Conjunto & Valor \\
+    Conjunto & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
     \hline
 
-    \textit{Rank@1 Accuracy} & Entrenamiento & 0.916  \\
-    \textit{Rank@1 Accuracy} & Test & 0.940  \\
-    \textit{Rank@5 Accuracy} & Entrenamiento & 0.980   \\
-    \textit{Rank@5 Accuracy} & Test & 0.976  \\
-    \textit{Silhouette} & Entrenamiento & 0.648 \\
-    \textit{Silhouette} & Test & 0.632 \\
+    Entrenamiento & 0.916 & 0.980 & 0.648 \\
+    Test & 0.940 & 0.976 & 0.632 \\
+
     \hline
 
 
@@ -485,11 +451,11 @@ Veamos ahora los resultados de la técnica \textit{Batch Semihard}. Esta es lige
         \includegraphics[width=0.8\linewidth]{informatica/wandb/experimento_mnist_adam/random_test_embeddings.png}
         \caption{\textit{Embeddings} aprendidos sobre el conjunto de test.}
     \end{subfigure}
-\caption{Visualización de los \textit{embeddings} producidos por el modelo \textit{Batch SemiHard}.}
+\caption{Visualización de los \textit{embeddings} producidos por el modelo \textit{Batch SemiHard}. Realizamos esta visualización de las salidas directamente gracias a que la dimensión del \textit{embedding} es dos.}
 \label{img:embeddings_adam_random}
 \end{figure}
 
-La función de pérdida que observamos en \imgref{img:proceso_entrenamiento_adam_mnist_random} ya no sufre de los problemas que estamos comentando. Aunque tiene una forma algo inusual, alejada de la curva que decrece monótonamente, esta es esperable debido a la fuerte naturaleza aleatoria de la función. Los resultados obtenidos y que mostramos en la \tableref{table:resultados_adam_mnist} ahora sí que están a la altura de la simpleza de \textit{MNIST}. Y para finalizar, los \textit{embeddings} obtenidos en la \imgref{img:embeddings_adam_random} ya no son triviales, se aprecia claramente que el modelo ha aprendido a resolver el problema planteado.
+La función de pérdida que observamos en la \imgref{img:proceso_entrenamiento_adam_mnist_random} ya no sufre de los problemas que estamos comentando. La forma de la curva de pérdida, que puede parecer inusual, se corresponde con un comportamiento esperado de la función \textit{Batch Hard} que lógicamente tiende a generar valores altos de la pérdida. Los resultados obtenidos y que mostramos en la \tableref{table:resultados_adam_mnist} ahora sí que están a la altura de la simpleza de \textit{MNIST}. Y para finalizar, los \textit{embeddings} obtenidos en la \imgref{img:embeddings_adam_random} ya no son triviales, se aprecia claramente que el modelo ha aprendido a resolver el problema planteado.
 
 Para finalizar, empleamos el código de \cite{informatica:implementacion_batch_distancias} para calcular las funciones de pérdida y así comprobar por última vez que no tenemos un fallo en nuestra implementación. Repetimos los experimentos tanto para \textit{MNIST} como para \textit{CACD} usando esta nueva implementación, obteniendo exactamente el mismo comportamiento y resultados nefastos. En conclusión, todo indica que existe un fallo en el diseño de las dos técnicas que estamos estudiando, y que los malos resultados no se deben a un fallo de implementación por nuestra parte. Por tanto, deberemos justificar por qué ocurre esto y qué podemos hacer para solventarlo.
 
@@ -506,21 +472,23 @@ El motivo del mal comportamiento se debe a que la red se queda atascada en la pr
 \end{split}
 \end{equation}
 
-Todos los resultados que hemos presentado hasta ahora se alinean con esta explicación. Tanto en la \imgref{img:metricas_entrenamiento} como en la \imgref{img:progreso_entrenamiento_mnist_mal} se aprecia que la función de pérdida se queda estancada exactamente en el valor del margen. Además, cuando cambiamos este hiperparámetro la función se estanca en este nuevo valor. Este comportamiento tan extraño ha quedado perfectamente explicado por la ecuación \eqref{eq:justificacion_relu}. Adicionalmente, en estas gráficas también podemos apreciar que las distancias intracluster e intercluster tienden a cero, comportamiento que también hemos explicado. La \imgref{img:train_hard_embeddings} termina de respaldar la ecuación \eqref{eq:justificacion_relu}, teniendo en cuenta que el modelo colapsa en dos vectores fijos en vez de en uno único.
+Todos los resultados que hemos presentado hasta ahora se alinean con esta explicación. Tanto en la \imgref{img:metricas_entrenamiento} como en la \imgref{img:progreso_entrenamiento_mnist_mal} se aprecia que la función de pérdida se queda estancada exactamente en el valor del margen. Además, cuando cambiamos este hiperparámetro la función se estanca en este nuevo valor. Este comportamiento tan extraño ha quedado perfectamente explicado por la ecuación \eqref{eq:justificacion_relu}. Adicionalmente, en estas gráficas también podemos apreciar que las distancias intracluster e intercluster tienden a cero, comportamiento que también hemos explicado. La visualización de los \textit{embeddings} en la que solo observamos dos puntos no nulos del espacio termina de respaldar la ecuación \eqref{eq:justificacion_relu}, teniendo en cuenta que el modelo colapsa en dos vectores fijos en vez de en uno único.
 
-Ahora que hemos identificado la raíz del problema, podemos proponer una solución a este. Queremos que las distancias intracluster tiendan a cero y que las intercluster crezcan. Las distancias intercluster las podemos controlar con el término de distancia entre ancla y negativo de la función de pérdida. Por tanto, vamos a penalizar distancias ancla-negativo pequeñas introduciendo un termino correctivo en la función de pérdida. Dado un \textit{batch} de $P-K$ imágenes obtenemos una lista de distancias positivas (distancias entre ancla y positivo) y distancias negativas (distancias entre ancla y negativo). Transformamos la función de pérdida penalizando distancias ancla-negativo pequeñas, dividiendo por la media del \textit{batch}. Consideramos $a, p, n$ como vectores de \textit{embeddings} y funciones $\hat{ReLU}$ y $\hat{d}(\cdot, \cdot)$ vectorizadas en:
+Ahora que hemos identificado la raíz del problema, podemos proponer una solución a este. Queremos que las distancias intracluster tiendan a cero y que las intercluster crezcan. Las distancias intercluster las podemos controlar con el término de distancia entre ancla y negativo de la función de pérdida. Por tanto, vamos a penalizar distancias ancla-negativo pequeñas introduciendo un termino correctivo en la función de pérdida. Dado un \textit{batch} de $P-K$ imágenes obtenemos una lista de distancias positivas (distancias entre ancla y positivo) y distancias negativas (distancias entre ancla y negativo). Transformamos la función de pérdida penalizando distancias ancla-negativo pequeñas, dividiendo por la media del \textit{batch}. Consideramos $a, p, n$ como vectores de \textit{embeddings} y funciones $\widehat{ReLU}$ y $\widehat{d}(\cdot, \cdot)$ vectorizadas en:
 
 \begin{equation}
-    \mathcal{L}(a, p, n) = \hat{ReLU}(\hat{d}(a, p) - \hat{d}(a, n) + \alpha)
+    \mathcal{L}(a, p, n) = \widehat{ReLU}(\widehat{d}(a, p) - \widehat{d}(a, n) + \alpha)
 \end{equation}
 
 Para corregir, consideramos:
 
 \begin{equation}
-    \mathcal{L}(a, p, n) = \hat{ReLU}((\hat{d}(a, p) - \hat{d}(a, n)) / mean(d(a, n)) + \alpha)
+    \mathcal{L}(a, p, n) = \widehat{ReLU}((\widehat{d}(a, p) - \widehat{d}(a, n)) / mean(d(a, n)) + \alpha)
 \end{equation}
+% TODO -- No me convence cómo he expresado estas operaciones
 
-\todo{No me convence cómo he expresado estas operaciones}
+No estamos cortando el flujo del gradiente al realizar la división. Esto puede introducir inestabilidad en los entrenamientos, pero en la experimentación posterior que usamos para validar esta propuesta no nos encontramos con este problema.
+
 
 En este punto nos preguntamos si esta solución es original o si ya ha sido considerada. Buscando una solución al problema de la función de pérdida colapsando en el margen nos encontramos con muchos foros que no proponen esta solución sino otras. De hecho, antes de encontrar la raíz del problema, hemos probado muchas de las soluciones propuestas sin llegar a una solución eficaz. Por ejemplo, en \cite{informatica:respuesta_erronea_problema} se menciona justo este problema pero se proponen otras soluciones alejadas de la corrección de distancias ancla-negativo. En \cite{informatica:github_issue_problema_tripletloss} también se mencionan problemas parecidos con \textit{triplet loss}. Únicamente en \cite{informatica:solucion_triplet_loss} encontramos la identificación del problema y la misma propuesta de solución. Sin embargo, no encontramos literatura científica que mencione o resuelva este problema de esta manera. Por todo esto, consideramos que nuestra propuesta es en cierta medida original.
 
@@ -592,7 +560,7 @@ Para comparar los resultados antes y después de aplicar la técnica usamos la m
         \includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_all_2dplot_test.png}
         \caption{\textit{Batch All}}
     \end{subfigure}
-\caption{\textit{Embeddings} producidos sobre el conjunto de \textit{test}.}
+\caption{\textit{Embeddings} producidos sobre el conjunto de \textit{test}. De nuevo, la visualización es directa al estar usando una dimensión del \textit{embedding} de dos.}
 \label{img:mnist_corregido_embeddings_aprendidos}
 \end{figure}
 
@@ -629,7 +597,7 @@ Para comparar los resultados antes y después de aplicar la técnica usamos la m
     \centering
     \begin{tabular}{|l|l|l|l|l|}
         \hline
-        Métrica & Conjunto & Antes & Después & Mejora \\
+        Métrica & Conjunto & Antes & Después & Factor de Mejora \\
         \hline
         \textit{Rank@1 Accuracy} & Entrenamiento & 0.0937 & 0.997 & 10.64  \\
         \textit{Rank@1 Accuracy} & Test & 0.085 & 0.992 & 11.67  \\
@@ -643,6 +611,7 @@ Para comparar los resultados antes y después de aplicar la técnica usamos la m
     \caption{Comparación de los resultados obtenidos antes y después de aplicar nuestra solución. Los resultados tras aplicar la solución se muestran solo para \textit{Batch Hard}, ya que para el experimento inicial solo mostramos estos.}
     \label{table:comparaciones_mnist_resultados}
 \end{table}
+% TODO -- introducir una grafica, porque esto es un punto central de nuestro trabajo
 
 Observando la \imgref{img:procesos_entrenamiento_mnist_corregido} lo primero que destacamos es que en ambos casos las funciones de pérdida no se quedan estancadas en el valor del margen. En el caso de \textit{Batch Hard}, la función de pérdida tiende a cero y, en el caso de \textit{Batch All}, pasamos rápidamente a estar por debajo del margen $\alpha = 1.0$. Las normas de los \textit{embeddings} muestran un buen comportamiento, descienden rápidamente hasta estabilizarse y van aumentando ligeramente con el paso de las épocas de entrenamiento. Las distancias intracluster tienden a cero en \textit{Batch All} y se mantienen constantes en \textit{Batch Hard}. En ambos casos, las distancias intercluster crecen ligeramente con el paso de las épocas. Todo esto indica que la solución ha sido efectiva para ambas técnicas. Los resultados que muestran la \tableref{table:resultados_mnist_corregido} son muy contundentes en ambos casos. Tanto las métricas \textit{Rank@k accuracy} como los valores de \textit{Silhouette} son casi perfectos, tanto en entrenamiento como en \textit{test}, que es lo que cabe esperar en este conjunto de datos tan sencillo. Por lo tanto, \textbf{es claro que nuestra solución ha sido efectiva} a la hora de solucionar los problemas que estábamos teniendo. La \tableref{table:comparaciones_mnist_resultados} refuerza aún más esta conclusión. En las métricas originales \textit{Rank@k} estamos obteniendo resultados diez veces mejores. En las variantes locales, por la permisividad de estas, las mejoras bajan hasta algo más del doble. Y no podemos calcular mejoras sobre \textit{Silhouette} por ser nulas, pero cabe destacar que estamos pasando de uno de los peores valores de la métrica a un valor casi perfecto. Y los \textit{embeddings} producidos sobre los conjuntos de \textit{test} que mostramos en la \imgref{img:mnist_corregido_embeddings_aprendidos} muestran visualmente que el modelo está aprendiendo adecuadamente a resolver el problema planteado.
 
@@ -755,6 +724,7 @@ Los hiperparámetros empleados para los dos experimentos se recogen en la tabla 
 \caption{Métricas de evaluación obtenidas sobre \textit{CACD} y \textit{FG-Net}, tras entrenar con la corrección aplicada a \textit{Batch Hard} y \textit{Batch All}.}
 \label{table:resultados_cacd_corregido}
 \end{table}
+% TODO -- por que los valores de entrenamiento son peores que los de validacion?
 
 Se repite la mejora de comportamiento observada en la anterior experimentación sobre \textit{MNIST}, aunque esta vez los resultados no sean tan buenos. En la \imgref{img:proceso_entrenamiento_cacd_corregido} podemos ver que las funciones de pérdida ya no se quedan atascadas en el valor del margen. Sin embargo, esta vez quedan por encima de dicho valor del margen disminuyendo lentamente. Esto nos indica que quizás deberíamos emplear otros hiperparámetros para lograr mejores resultados. Por ejemplo, tiempos de entrenamiento más largos o valores distintos para el \textit{learning rate}. Pero de nuevo, nuestro objetivo ahora no es obtener el mejor modelo posible sino validar la eficacia de nuestra solución. Las normas de los \textit{embeddings} muestran el comportamiento deseado, incrementan con el paso de las épocas de entrenamiento. Las distancias intracluster e intercluster ya no tienden a cero, aunque se mantienen estáticas y no parecen aumentar lo suficiente. Una vez más, esto es compatible con una solución eficaz, pero necesitaríamos realizar un estudio más profundo de otros factores para obtener buenos resultados. Por otro lado, los resultados expuestos en la \tableref{table:resultados_cacd_corregido} son buenos. Aunque estén alejados de ser realmente competentes, son más que suficientes para validar nuestra solución. Los valores de las métricas \textit{Rank@k} han mejorado significativamente en ambos casos. Los valores de \textit{Silhouette} siguen siendo igual de malos, otra vez, esto nos indica que para obtener un modelo con alto rendimiento deberíamos realizar un estudio en profundidad de la arquitectura e hiperparámetros utilizados. Cabe destacar que el rendimiento del modelo entrenado usando \textit{Batch All} es algo menor que el entrenado con \textit{Batch Hard}, pero sigue siendo suficiente para validar la eficacia de nuestra solución.
 
@@ -801,7 +771,7 @@ En primer lugar, los resultados recogidos por la \tableref{table:resultados_cacd
 
 \section{Conclusiones extraídas de la experimentación} \label{isec:conclusiones_experimentacion}
 
-El experimento inicial que mostramos en la \imgref{img:metricas_entrenamiento} y la \tableref{table:resultados_sobre_fg_net} deja claro que el entrenamiento a partir de las técnicas que hemos ido desarrollando en este trabajo, no producen un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una comparativa entre algunos modelos del estado del arte y nuestro modelo. Es evidente que nuestro modelo está muy lejos de ser competitivo con los modelos del estado del arte. Es más, está lejos de ser aplicable en ningún escenario práctico. Podríamos haber obtenido un modelo que, aunque no fuera competitivo con el estado del arte, tuviese un rendimiento decente. En cuyo caso tendríamos un modelo aplicable mucho más ligero que los modelos del estado del arte. Pero estamos muy lejos de encontrarnos en esa situación.
+El experimento inicial que mostramos en la \imgref{img:metricas_entrenamiento} y la \tableref{table:resultados_sobre_fg_net} deja claro que el entrenamiento a partir de las técnicas que hemos ido desarrollando en este trabajo no produce un modelo que resuelva la tarea propuesta de forma satisfactoria. En la \tableref{table:estado_del_arte_y_mi_modelo} vemos una comparativa entre algunos modelos del estado del arte y nuestro modelo. Es evidente que este modelo está muy lejos de ser competitivo con los modelos del estado del arte. Es más, está lejos de ser aplicable en ningún escenario práctico.
 
 \begin{table}[!hbtp]
 \centering
@@ -810,8 +780,8 @@ El experimento inicial que mostramos en la \imgref{img:metricas_entrenamiento} y
     Modelo                    & \textit{Rank@1 Accuracy} en \textit{FG-Net} \\
     \hline
 
-    \textbf{\textit{MTLFace}} & \textbf{94.78}                              \\
-    \textit{DAL}              & 0.945                                       \\
+    \textbf{\textit{MTLFace}} & \textbf{0.9478}                              \\
+    \textit{DAL}              & 0.9450                                       \\
     \textit{AIM}              & 0.9320                                      \\
     Nuestro modelo            & 0.0718                                      \\
     \hline
@@ -821,6 +791,6 @@ El experimento inicial que mostramos en la \imgref{img:metricas_entrenamiento} y
 \label{table:estado_del_arte_y_mi_modelo}
 \end{table}
 
-Estos resultados son demasiado malos como para ser defendibles. En base a ello aplicamos las técnicas de estudio al conjunto de datos \textit{MNIST}. Volvemos a obtener malos resultados, como mostramos en la \imgref{img:progreso_entrenamiento_mnist_mal} y en la \tableref{table:resultados_mnist_mal}. Exploramos distintas bases de código en la \sectionref{isubsec:experiemntacion_base_codigo_externa} para descartar la posibilidad de que la raíz del problema sea un fallo por nuestra parte, o bien en la implementación o bien en la ejecución de las distintas técnicas. Estas bases de código exhiben los mismos problemas que los que nosotros estamos enfrentando. Además, la extensa base de \textit{tests}, que explicamos en la \sectionref{isec:test_suite}, respalda el hecho de que el problema no venga por nuestra parte. Una vez descartada esta posibilidad, en \sectionref{isubsec:identificacion_problemas_propuesta_solucion} identificamos la raíz del problema.
+En base a ello aplicamos las técnicas de estudio al conjunto de datos \textit{MNIST}. Volvemos a obtener malos resultados, como mostramos en la \imgref{img:progreso_entrenamiento_mnist_mal} y en la \tableref{table:resultados_mnist_mal}. Estos resultados hacen que pensemos que existe un fallo de diseño en las variantes \textit{online} sobre \textit{Triplet Loss} que estamos estudiando. Exploramos distintas bases de código en la \sectionref{isubsec:experiemntacion_base_codigo_externa} para descartar la posibilidad de que la raíz del problema sea un fallo por nuestra parte. Estas bases de código exhiben los mismos problemas que los que nosotros estamos enfrentando. Además, la extensa base de \textit{tests}, que explicamos en la \sectionref{isec:test_suite}, respalda el hecho de que el problema no venga por nuestra parte. Una vez descartada esta posibilidad, en \sectionref{isubsec:identificacion_problemas_propuesta_solucion} identificamos la raíz del problema.
 
-A partir de identificar la raíz de los problemas que estamos enfrentando, nuestro objetivo pasa a ser el de proponer una solución a dicho problema y validar su eficacia. Por lo tanto, ya no nos preocupamos tanto de obtener un modelo competente entrenado sobre \textit{CACD} y que funcione adecuadamente sobre \textit{FG-Net}, por lo que pasamos a trabajar exclusivamente sobre \textit{CACD}. En este sentido cumplimos satisfactoriamente estos nuevos objetivos. En la \sectionref{isubsec:experimentacion_mnist_bien} y \sectionref{isubsec:experimentacion_cacd_bien} validamos la eficacia de la solución propuesta. Las mejoras de rendimiento son muy significativas, como muestran la \tableref{table:comparaciones_mnist_resultados} y la \tableref{table:comparaciones_cacd_resultados}, obteniendo mejoras en las distintas métricas que varían entre incrementos de dos a treinta veces.
+A partir de identificar la raíz de los problemas que estamos enfrentando, nuestro objetivo pasa a ser el de proponer una solución a dicho problema y validar su eficacia, trabajando ahora exclusivamente sobre \textit{MNIST} y \textit{CACD}. En este sentido cumplimos satisfactoriamente estos nuevos objetivos. En la \sectionref{isubsec:experimentacion_mnist_bien} y \sectionref{isubsec:experimentacion_cacd_bien} validamos la eficacia de la solución propuesta. Las mejoras de rendimiento son muy significativas, como muestran la \tableref{table:comparaciones_mnist_resultados} y la \tableref{table:comparaciones_cacd_resultados}, obteniendo mejoras en las distintas métricas que varían entre incrementos de dos a treinta veces.
