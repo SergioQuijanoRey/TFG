@@ -4,7 +4,7 @@ Different loss functions used in the project
 
 import itertools as it
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import torch
 import torch.nn as nn
@@ -40,10 +40,15 @@ class TripletLoss(nn.Module):
         self.margin = margin
 
     def forward(
-        self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor
+        self,
+        anchor: torch.Tensor,
+        positive: torch.Tensor,
+        negative: torch.Tensor,
+        correcting_factor: Optional[torch.Tensor] = None,
     ) -> float:
         distance_positive = distance_function(anchor, positive)
         distance_negative = distance_function(anchor, negative)
+        self.correcting_factor = correcting_factor
 
         # Usamos Relu para que el error sea cero cuando la resta de las distancias
         # este por debajo del margen. Si esta por encima del margen, devolvemos la
@@ -61,7 +66,29 @@ class TripletLoss(nn.Module):
         """
 
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
-        return torch.relu(positive_distance - negative_distance + self.margin)
+        if self.correcting_factor is None:
+            return torch.relu(positive_distance - negative_distance + self.margin)
+        else:
+            epsilon = 1e-4
+            return torch.relu(positive_distance - negative_distance + self.margin) / (
+                self.correcting_factor + epsilon
+            )
+
+    # TODO -- remove this cluttered function
+    def loss_from_distances_corrected(
+        self,
+        positive_distance: float,
+        negative_distance: float,
+        correcting_factor: float,
+    ) -> float:
+        """
+        Compute the loss using the using the pre-computed distances
+        @param positive_distance the distance among anchor and positive
+        @param negative_distance the distance among anchor and negative
+        """
+        return torch.relu(
+            (positive_distance - negative_distance) / correcting_factor + self.margin
+        )
 
 
 class OnlineTripletLoss(nn.Module):
@@ -89,7 +116,9 @@ class OnlineTripletLoss(nn.Module):
         an_distances = (
             (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)
         )  # .pow(.5)
-        losses = F.relu(ap_distances - an_distances + self.margin)
+        losses = F.relu(
+            (ap_distances - an_distances) / an_distances.mean() + self.margin
+        )
 
         return losses.mean(), len(triplets)
 
@@ -129,6 +158,7 @@ class SoftplusTripletLoss(nn.Module):
         """
 
         # We use ReLU to utilize the pytorch to compute max(0, val) used in the triplet loss
+        # TODO -- apply division by negative mean trick?
         return self.softplus(positive_distance - negative_distance)
 
 
@@ -410,7 +440,15 @@ class BatchHardTripletLoss(nn.Module):
             worst_positive = embeddings[worst_positive_idx]
             worst_negative = embeddings[worst_negative_idx]
 
-            curr_loss = self.base_loss(embedding, worst_positive, worst_negative)
+            # TODO -- trying to fix the collapsing problem
+            correcting_factor = negative_distances.float().mean()
+
+            curr_loss = self.base_loss(
+                embedding,
+                worst_positive,
+                worst_negative,
+                correcting_factor=correcting_factor,
+            )
             loss += curr_loss
 
             if curr_loss > 0:
@@ -512,17 +550,33 @@ class BatchAllTripletLoss(nn.Module):
 
         # Iterate over all elements, that act as anchors
         for [anchor_idx, _], anchor_label in zip(enumerate(embeddings), labels):
+            # TODO
+            # Compute the correcting factor to try to fix loss func collapsing
+            # to the margin value
+            negative_distances = torch.tensor(
+                [
+                    self.pairwise_distances[
+                        self.__resort_dict_idx(anchor_idx, negative_idx)
+                    ]
+                    for positive_idx in self.dict_of_classes[int(anchor_label)]
+                    for negative_idx in self.list_of_negatives[int(anchor_label)]
+                ]
+            )
+            correcting_factor = negative_distances.float().mean() ** 2
+
             # Compute all combinations of positive / negative loss
             # Use the precomputed distances to speed up this calculation
             losses = torch.tensor(
                 [
-                    self.base_loss.loss_from_distances(
+                    # TODO -- put this back
+                    self.base_loss.loss_from_distances_corrected(
                         self.pairwise_distances[
                             self.__resort_dict_idx(anchor_idx, positive_idx)
                         ],
                         self.pairwise_distances[
                             self.__resort_dict_idx(anchor_idx, negative_idx)
                         ],
+                        correcting_factor=correcting_factor,
                     )
                     for positive_idx in self.dict_of_classes[int(anchor_label)]
                     if positive_idx != anchor_idx

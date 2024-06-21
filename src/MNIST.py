@@ -7,17 +7,25 @@
 import datetime
 import gc
 import os
+import time
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
 
 import wandb
-from lib import embedding_to_classifier, metrics, utils
+from lib import (
+    embedding_to_classifier,
+    filesystem,
+    loss_functions_blog,
+    metrics,
+    split_dataset,
+    train_loggers,
+    trainers,
+    utils,
+)
 
 
 @dataclass
@@ -80,9 +88,8 @@ class GlobalParameters:
 
     def __init_ml_params(self):
         # P-K sampling main parameters
-        # TODO -- we are not using this in ADAM's pipeline!
-        self.P: int = 8
-        self.K: int = 4
+        self.P: int = 16
+        self.K: int = 8
 
         self.embedding_dimension = 5
 
@@ -90,14 +97,11 @@ class GlobalParameters:
         # So we can use `n * self.P * self.K`
         self.batch_size = self.P * self.K
 
-        # TODO -- previously was 20 training epochs
         self.training_epochs = 20
         self.learning_rate = 1e-3
         self.weight_decay = 1e-4
         self.margin = 1.0
-
-        #  self.logging_iterations = self.batch_size * 10
-        self.loggin_iterations = 50  # TODO <- Value set by Adam
+        self.loggin_iterations = self.batch_size * 100
 
         # Logging is very slow so just use a small portion of the data
         self.online_logger_train_percentage = 0.005
@@ -210,323 +214,148 @@ def try_to_clean_memory():
     gc.collect()
 
 
-# Import MNIST dataset
+# Load the data and use our custom sampler
 # ==============================================================================
 
+# Transformations that we want to apply when loading the data
+# Now we are only transforming images to tensors (pythorch only works with tensors)
+# But we can apply here some normalizations
+transform = transforms.Compose(
+    [
+        transforms.ToTensor()
+        # TODO -- apply some normalizations here
+    ]
+)
 
-# TODO -- values from ADAM's script
-mean, std = 0.1307, 0.3081
-
-print("=> Downloading the MNIST dataset")
+# Load the dataset
+# torchvision has a method to download and load the dataset
 train_dataset = torchvision.datasets.MNIST(
-    GLOBALS.data_path,
+    root=GLOBALS.data_path,
     train=True,
     download=True,
-    transform=transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((mean,), (std,))]
-    ),
+    transform=transform,
 )
+
 test_dataset = torchvision.datasets.MNIST(
-    GLOBALS.data_path,
+    root=GLOBALS.data_path,
     train=False,
     download=True,
-    transform=transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((mean,), (std,))]
-    ),
+    transform=transform,
 )
 
+# Train -> train / validation split
+train_dataset, validation_dataset = split_dataset.split_dataset(train_dataset, 0.8)
 
-## Use our custom sampler
-# ==============================================================================
-
-from adambielski_lib import datasets as adamdatasets
-
-print("=> Putting the dataset into dataloaders")
-
-
-# TODO -- ADAM -- use our global values
-# TODO -- ADAM -- understand what n_classes and n_samples mean in this context
-# We'll create mini batches by sampling labels that will be present in the mini batch and number of examples from each class
-train_batch_sampler = adamdatasets.BalancedBatchSampler(
-    train_dataset.train_labels, n_classes=10, n_samples=25
-)
-test_batch_sampler = adamdatasets.BalancedBatchSampler(
-    test_dataset.test_labels, n_classes=10, n_samples=25
+# Data loaders to access the datasets
+train_loader = torch.utils.data.DataLoader(
+    train_dataset,
+    batch_size=GLOBALS.batch_size,
+    shuffle=True,
+    num_workers=GLOBALS.num_workers,
+    pin_memory=True,
 )
 
-cuda = torch.cuda.is_available()
-kwargs = {"num_workers": GLOBALS.num_workers, "pin_memory": True} if cuda else {}
-online_train_loader = torch.utils.data.DataLoader(
-    train_dataset, batch_sampler=train_batch_sampler, **kwargs
-)
-online_test_loader = torch.utils.data.DataLoader(
-    test_dataset, batch_sampler=test_batch_sampler, **kwargs
+validation_loader = torch.utils.data.DataLoader(
+    validation_dataset,
+    batch_size=GLOBALS.batch_size,
+    shuffle=True,
+    num_workers=GLOBALS.num_workers,
+    pin_memory=True,
 )
 
+test_loader = torch.utils.data.DataLoader(
+    test_dataset,
+    batch_size=GLOBALS.batch_size,
+    shuffle=True,
+    num_workers=GLOBALS.num_workers,
+    pin_memory=True,
+)
 
 # Choose the loss function to use
 # ==============================================================================
-
-from adambielski_lib import losses as adamlosses
-from adambielski_lib import utils as adamutils
-
-batch_loss_function = adamlosses.OnlineTripletLoss(
-    GLOBALS.margin, adamutils.RandomNegativeTripletSelector(GLOBALS.margin)
-)
-
+batch_loss_function = None
+if GLOBALS.loss_batch_variant == "hard":
+    batch_loss_function = loss_functions_blog.HardTripletLoss(GLOBALS.margin)
+if GLOBALS.loss_batch_variant == "all":
+    batch_loss_function = loss_functions_blog.BatchAllTtripletLoss(
+        GLOBALS.margin,
+    )
 
 # Select the network that we are going to use
 # ==============================================================================
 
 from adambielski_lib import networks as adamnetworks
 
+cuda = torch.cuda.is_available()
 net = adamnetworks.EmbeddingNet()
 if cuda:
     net = net.cuda()
 
-# Training of the model
-# ==============================================================================
-
-from adambielski_lib import metrics as adammetrics
-from adambielski_lib import trainer as adamtrainer
-
-optimizer = torch.optim.Adam(
-    net.parameters(), lr=GLOBALS.learning_rate, weight_decay=GLOBALS.weight_decay
-)
-
-# TODO -- ADAM -- What is this?
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 8, gamma=0.1, last_epoch=-1)
-
-adamtrainer.fit(
-    online_train_loader,
-    online_test_loader,
-    net,
-    batch_loss_function,
-    optimizer,
-    scheduler,
-    GLOBALS.training_epochs,
-    cuda,
-    GLOBALS.loggin_iterations,
-    metrics=[adammetrics.AverageNonzeroTripletsMetric()],
-)
-
-# Evaluate the model
-# ==============================================================================
-
-mnist_classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-colors = [
-    "#1f77b4",
-    "#ff7f0e",
-    "#2ca02c",
-    "#d62728",
-    "#9467bd",
-    "#8c564b",
-    "#e377c2",
-    "#7f7f7f",
-    "#bcbd22",
-    "#17becf",
-]
-
-
-def plot_embeddings(embeddings, targets, title: str, xlim=None, ylim=None):
-    plt.figure(figsize=(10, 10))
-    for i in range(10):
-        inds = np.where(targets == i)[0]
-        plt.scatter(
-            embeddings[inds, 0], embeddings[inds, 1], alpha=0.5, color=colors[i]
-        )
-    if xlim:
-        plt.xlim(xlim[0], xlim[1])
-    if ylim:
-        plt.ylim(ylim[0], ylim[1])
-    plt.legend(mnist_classes)
-    try:
-        plt.savefig(os.path.join(GLOBALS.plots_path, title))
-    except Exception as e:
-        print("Could not save figure in disk")
-        print(f"Reason was: {e=}")
-
-
-def extract_embeddings(dataloader, model):
-    with torch.no_grad():
-        model.eval()
-        embeddings = np.zeros((len(dataloader.dataset), 2))
-        labels = np.zeros(len(dataloader.dataset))
-        k = 0
-        for images, target in dataloader:
-            if cuda:
-                images = images.cuda()
-            embeddings[k : k + len(images)] = (
-                model.get_embedding(images).data.cpu().numpy()
-            )
-            labels[k : k + len(images)] = target.numpy()
-            k += len(images)
-    return embeddings, labels
-
-
-train_embeddings_otl, train_labels_otl = extract_embeddings(online_train_loader, net)
-plot_embeddings(train_embeddings_otl, train_labels_otl, title="Train embeddings")
-val_embeddings_otl, val_labels_otl = extract_embeddings(online_test_loader, net)
-plot_embeddings(val_embeddings_otl, val_labels_otl, title="Validation embeddings")
-
-# TODO -- ADAM -- use our loggers in the training
+#  # TODO -- put them back again
 #  ## Defining the loggers we want to use
 #  # ==============================================================================
 
+print("=> Creating the training loggers that we are going to use")
 
-#  print("=> Creating the training loggers that we are going to use")
+cluster_sizes_logger = train_loggers.IntraClusterLogger(
+    net=net,
+    iterations=GLOBALS.loggin_iterations,
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
+)
 
-#  # Define the loggers we want to use
-#  triplet_loss_logger = TripletLoggerOnline(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      loss_func=parameters["criterion"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      greater_than_zero=GLOBALS["USE_GT_ZERO_MEAN_LOSS"],
-#  )
+intercluster_metrics_logger = train_loggers.InterClusterLogger(
+    net=net,
+    iterations=GLOBALS.loggin_iterations,
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
+)
 
-#  cluster_sizes_logger = IntraClusterLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#  )
-
-#  intercluster_metrics_logger = InterClusterLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#  )
-
-#  rank_at_one_logger = RankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=1,
-#  )
-
-#  rank_at_k_logger = RankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=GLOBALS["ACCURACY_AT_K_VALUE"],
-#  )
+# Combine them in a single logger
+logger = train_loggers.CompoundLogger(
+    [
+        cluster_sizes_logger,
+        intercluster_metrics_logger,
+    ]
+)
 
 
-#  local_rank_at_one_logger = LocalRankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=1,
-#  )
+## Running the training loop
+# ==============================================================================
 
-#  local_rank_at_k_logger = LocalRankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=GLOBALS["ACCURACY_AT_K_VALUE"],
-#  )
+parameters = dict()
+parameters["epochs"] = GLOBALS.training_epochs
+parameters["lr"] = GLOBALS.learning_rate
+parameters["weigth_decay"] = GLOBALS.weight_decay
 
-#  # Combine them in a single logger
-#  logger = CompoundLogger(
-#      [
-#          triplet_loss_logger,
-#          cluster_sizes_logger,
-#          intercluster_metrics_logger,
-#          rank_at_one_logger,
-#          rank_at_k_logger,
-#          local_rank_at_one_logger,
-#          local_rank_at_k_logger,
-#      ]
-#  )
+# We use the loss function that depends on the global parameter BATCH_TRIPLET_LOSS_FUNCTION
+# We selected this loss func in *Choose the loss function to use* section
+parameters["criterion"] = batch_loss_function
 
 
-# TODO -- run our training loop
-#  ## Running the training loop
-#  # ==============================================================================
+ts = time.time()
+training_history = trainers.train_model_online(
+    net=net,
+    path=os.path.join(GLOBALS.base_path, "tmp"),
+    parameters=parameters,
+    train_loader=train_loader,
+    validation_loader=test_loader,
+    name=GLOBALS.net_model,
+    logger=logger,
+    snapshot_iterations=None,
+    gradient_clipping=GLOBALS.gradient_clipping,
+)
 
-#  # Check if we want to skip training
-#  if GLOBALS["USE_CACHED_MODEL"] is False:
-#      # To measure the time it takes to train
-#      ts = time.time()
+# Compute how long it took
+te = time.time()
+print(f"It took {te - ts} seconds to train")
 
-#      # Run the training with the profiling
-#      if GLOBALS["PROFILE_TRAINING"] is True:
-#          _ = cProfile.run(
-#              f"""train_model_online(
-#                  net = net,
-#                  path = os.path.join(BASE_PATH, 'tmp'),
-#                  parameters = parameters,
-#                  train_loader = train_loader_augmented,
-#                  validation_loader = validation_loader_augmented,
-#                  name = NET_MODEL,
-#                  logger = logger,
-#                  snapshot_iterations = None,
-#                  gradient_clipping = GRADIENT_CLIPPING,
-#              )""",
-#              GLOBALS["PROFILE_SAVE_FILE"],
-#          )
+# Update the model cache
+filesystem.save_model(net, GLOBALS.model_cache_folder, "online_model_cached")
 
-#      # Run the training without the profiling
-#      else:
-#          training_history = train_model_online(
-#              net=net,
-#              path=os.path.join(GLOBALS["BASE_PATH"], "tmp"),
-#              parameters=parameters,
-#              train_loader=train_loader_augmented,
-#              validation_loader=validation_loader_augmented,
-#              name=GLOBALS["NET_MODEL"],
-#              logger=logger,
-#              snapshot_iterations=None,
-#              gradient_clipping=GLOBALS["GRADIENT_CLIPPING"],
-#          )
-
-#      # Compute how long it took
-#      te = time.time()
-#      print(f"It took {te - ts} seconds to train")
-
-#      # Update the model cache
-#      filesystem.save_model(net, GLOBALS["MODEL_CACHE_FOLDER"], "online_model_cached")
-
-#  # In case we skipped training, load the model from cache
-#  else:
-#      # Choose the function to construct the new network
-#      if GLOBALS["NET_MODEL"] == "ResNet18":
-#          net_func = lambda: ResNet18(GLOBALS["EMBEDDING_DIMENSION"])
-#      elif GLOBALS["NET_MODEL"] == "LightModel":
-#          net_func = lambda: LightModel(GLOBALS["EMBEDDING_DIMENSION"])
-#      elif GLOBALS["NET_MODEL"] == "LFWResNet18":
-#          net_func = lambda: LFWResNet18(GLOBALS["EMBEDDING_DIMENSION"])
-#      elif GLOBALS["NET_MODEL"] == "LFWLightModel":
-#          net_func = lambda: LFWLightModel(GLOBALS["EMBEDDING_DIMENSION"])
-#      elif GLOBALS["NET_MODEL"] == "FGLightModel":
-#          net_func = lambda: FGLigthModel(GLOBALS["EMBEDDING_DIMENSION"])
-#      elif GLOBALS["NET_MODEL"] == "CADResNet18":
-#          net_func = lambda: CACDResnet18(GLOBALS["EMBEDDING_DIMENSION"])
-#      elif GLOBALS["NET_MODEL"] == "CACDResNet50":
-#          net_func = lambda: CACDResnet50(GLOBALS["EMBEDDING_DIMENSION"])
-#      else:
-#          raise Exception("Parameter 'NET_MODEL' has not a valid value")
-
-#      # Load the model from cache
-#      net = filesystem.load_model(
-#          os.path.join(GLOBALS["MODEL_CACHE_FOLDER"], "online_model_cached"), net_func
-#      )
-
-#      # Load the network in corresponding mem device (cpu -> ram, gpu -> gpu mem
-#      device = core.get_device()
-#      net.to(device)
-
-
-#  # From this point, we won't perform training on the model
-#  # So eval mode is set for better performance
-#  net.eval()
+# From this point, we won't perform training on the model
+# So eval mode is set for better performance
+net.eval()
 
 
 # Model evaluation
@@ -538,30 +367,30 @@ with torch.no_grad():
 
     train_rank_at_one = metrics.rank_accuracy(
         k=1,
-        data_loader=online_train_loader,
+        data_loader=train_loader,
         network=net,
-        max_examples=len(online_train_loader),
+        max_examples=len(train_loader),
         fast_implementation=False,
     )
     test_rank_at_one = metrics.rank_accuracy(
         k=1,
-        data_loader=online_test_loader,
+        data_loader=test_loader,
         network=net,
-        max_examples=len(online_test_loader),
+        max_examples=len(test_loader),
         fast_implementation=False,
     )
     train_rank_at_five = metrics.rank_accuracy(
         k=5,
-        data_loader=online_train_loader,
+        data_loader=train_loader,
         network=net,
-        max_examples=len(online_train_loader),
+        max_examples=len(train_loader),
         fast_implementation=False,
     )
     test_rank_at_five = metrics.rank_accuracy(
         k=5,
-        data_loader=online_test_loader,
+        data_loader=test_loader,
         network=net,
-        max_examples=len(online_test_loader),
+        max_examples=len(test_loader),
         fast_implementation=False,
     )
 
@@ -595,10 +424,10 @@ with torch.no_grad():
     try_to_clean_memory()
 
     print("=> 📈 Silhouette metrics")
-    train_silh = metrics.silhouette(online_train_loader, net)
+    train_silh = metrics.silhouette(train_loader, net)
     print(f"Silhouette in training loader: {train_silh}")
 
-    test_silh = metrics.silhouette(online_test_loader, net)
+    test_silh = metrics.silhouette(test_loader, net)
     print(f"Silhouette in test loader: {test_silh}")
     print("")
 
@@ -624,7 +453,7 @@ with torch.no_grad():
     classifier = embedding_to_classifier.EmbeddingToClassifier(
         net,
         k=number_neigbours,
-        data_loader=online_train_loader,
+        data_loader=train_loader,
         embedding_dimension=2,
     )
 

@@ -5,354 +5,225 @@
 #  - Some notes on other papers related to our work
 #  - EDA of the dataset
 
-# Global Parameters of the Notebook
-# ==============================================================================
-#
-# - For ease of use, we are going to store all global parameters into a dict
-# - This way, we can pass this dict directly to wandb init, so we can keep track
-# of which parameters produced which output
-
-from typing import Dict, Union
-
-GLOBALS: Dict[str, Union[str, int, float, bool]] = dict()
-
-## Paths
-# ==============================================================================
-#
-# - Parameters related to data / model / lib paths
-
-# Lib to define paths
-import os
-
-# Define if we are running the notebook in our computer ("local")
-# or in Google Colab ("remote")
-# or in UGR's server ("ugr")
-GLOBALS["RUNNING_ENV"] = "ugr"
-
-# Base path for the rest of paths defined in the notebook
-GLOBALS["BASE_PATH"] = None
-if GLOBALS["RUNNING_ENV"] == "local":
-    GLOBALS["BASE_PATH"] = "./"
-elif GLOBALS["RUNNING_ENV"] == "remote":
-    GLOBALS["BASE_PATH"] = "/content/drive/MyDrive/Colab Notebooks/"
-elif GLOBALS["RUNNING_ENV"] == "ugr":
-    GLOBALS["BASE_PATH"] = "/mnt/homeGPU/squijano/TFG/"
-else:
-    raise Exception(f"RUNNING ENV is not valid, got value {GLOBALS['RUNNING_ENV']}")
-
-# Path to our lib dir
-GLOBALS["LIB_PATH"] = os.path.join(GLOBALS["BASE_PATH"], "lib")
-
-# Path where we store training / test data
-GLOBALS["DATA_PATH"] = os.path.join(GLOBALS["BASE_PATH"], "data")
-GLOBALS["CACD_DATA_PATH"] = os.path.join(GLOBALS["BASE_PATH"], "data/CACD")
-
-# Dataset has images and metadata. Here we store the path to the img dir
-GLOBALS["IMAGE_DIR_PATH"] = os.path.join(GLOBALS["DATA_PATH"], "FGNET/images")
-GLOBALS["CACD_IMAGE_DIR_PATH"] = os.path.join(GLOBALS["CACD_DATA_PATH"], "CACD2000")
-
-# URL where the datasets are stored
-GLOBALS["DATASET_URL"] = "http://yanweifu.github.io/FG_NET_data/FGNET.zip"
-GLOBALS[
-    "CACD_DATASET_URL"
-] = "https://drive.google.com/file/d/1hYIZadxcPG27Fo7mQln0Ey7uqw1DoBvM/view"
-
-# Dir with all cached models
-# This cached models can be loaded from disk when training is skipped
-GLOBALS["MODEL_CACHE_FOLDER"] = os.path.join(GLOBALS["BASE_PATH"], "cached_models")
-
-# Cache for the augmented dataset
-GLOBALS["AUGMENTED_DATASET_CACHE_FILE"] = os.path.join(
-    GLOBALS["BASE_PATH"], "cached_augmented_dataset.pt"
-)
-
-# File where the logs are written
-GLOBALS["LOGGING_FILE"] = os.path.join(GLOBALS["BASE_PATH"], "training.log")
-
-# Binary file where the stats of the profiling are saved
-GLOBALS["PROFILE_SAVE_FILE"] = os.path.join(
-    GLOBALS["BASE_PATH"], "training_profile.stat"
-)
-
-GLOBALS["OPTUNA_DATABASE"] = f"sqlite:///{GLOBALS['BASE_PATH']}/hp_tuning_optuna.db"
-
-## ML parameters
-# ==============================================================================
-#
-# - Parameters related to machine learning
-# - For example, batch sizes, learning rates, ...
-
-
-# Parameters of P-K sampling
-GLOBALS["P"] = 8  # Number of classes used in each minibatch
-GLOBALS["K"] = 2  # Number of images sampled for each selected class
-
-# Batch size for online training
-# We can use `P * K` as batch size. Thus, minibatches will be
-# as we expect in P-K sampling.
-#
-# But we can use `n * P * K`. Thus, minibatches will be n P-K sampling
-# minibatche concatenated together
-# Be careful when doing this because it can be really slow, and there is no
-# clear reason to do this
-GLOBALS["ONLINE_BATCH_SIZE"] = GLOBALS["P"] * GLOBALS["K"]
-
-# Training epochs
-GLOBALS["TRAINING_EPOCHS"] = 1
-
-# Learning rate for hard triplets, online training
-GLOBALS["ONLINE_LEARNING_RATE"] = 5.157 * 10 ** (-4)
-
-# How many single elements we want to see before logging
-# It has to be a multiple of P * K, otherwise `should_log` would return always
-# false as `it % LOGGING_ITERATIONS != 0` always
-#
-# `LOGGING_ITERATIONS = P * K * n` means we log after seeing `n` P-K sampled
-# minibatches
-#  GLOBALS['LOGGING_ITERATIONS'] = GLOBALS['P'] * GLOBALS['K'] * 500
-GLOBALS["LOGGING_ITERATIONS"] = GLOBALS["P"] * GLOBALS["K"] * 1_000
-
-# Which percentage of the training and validation set we want to use for the logging
-GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"] = 0.005
-GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"] = 0.005
-
-# Choose which model we're going to use
-# Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel",
-#        "CACDResNet18", "CACDResNet50"
-GLOBALS["NET_MODEL"] = "CACDResNet18"
-
-# Epochs used in k-Fold Cross validation
-# k-Fold Cross validation used for parameter exploration
-# TODO -- delete this, we are going to perform a search in the number of epochs
-GLOBALS["HYPERPARAMETER_TUNING_EPOCHS"] = 1
-
-# Number of tries in the optimization process
-# We are using optuna, so we try `HYPERPARAMETER_TUNING_TRIES` times with different
-# hyperparameter configurations
-GLOBALS["HYPERPARAMETER_TUNING_TRIES"] = 300
-
-# Wether to use the validation set in the hp tuning process or to use k-fold
-# cross validation (which is more robust but way slower)
-GLOBALS["FAST_HP_TUNING"] = True
-
-# Number of folds used in k-fold Cross Validation
-GLOBALS["NUMBER_OF_FOLDS"] = 2
-
-# Margin used in the loss function
-GLOBALS["MARGIN"] = 0.840
-
-# Dim of the embedding calculated by the network
-GLOBALS["EMBEDDING_DIMENSION"] = 9
-
-# Number of neighbours considered in K-NN
-# K-NN used for transforming embedding task to classification task
-GLOBALS["NUMBER_NEIGHBOURS"] = 4
-
-# Batch Triplet Loss Function
-# This way we can choose among "hard", "all"
-GLOBALS["BATCH_TRIPLET_LOSS_FUNCTION"] = "hard"
-
-# Whether or not use softplus loss function instead of vanilla triplet loss
-GLOBALS["USE_SOFTPLUS_LOSS"] = False
-
-# Count all sumamnds in the mean loss or only those summands greater than zero
-GLOBALS["USE_GT_ZERO_MEAN_LOSS"] = True
-
-# Wether or not use lazy computations in the data augmentation
-GLOBALS["LAZY_DATA_AUGMENTATION"] = True
-
-# Wether or not fail when calling `CustomSampler.__len__` without having previously
-# computed the index list
-GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"] = True
-
-# Where or not add penalty term to the loss function
-GLOBALS["ADD_NORM_PENALTY"] = False
-
-# If we add that penalty term, which scaling factor to use
-GLOBALS["PENALTY_FACTOR"] = 0.6
-
-# If we want to wrap our model into a normalizer
-# That wrapper divides each vector by its norm, thus, forcing norm 1 on each vector
-GLOBALS["NORMALIZED_MODEL_OUTPUT"] = False
-
-# If its None, we do not perform gradient clipping
-# If its a Float value, we perform gradient clipping, using that value as a
-# parameter for the max norm
-GLOBALS["GRADIENT_CLIPPING"] = None
-
-# Number of candidates that we are going to consider in the retrieval task,
-# used in the Rank@K accuracy metric
-# We use k = 1 and k = this value
-GLOBALS["ACCURACY_AT_K_VALUE"] = 5
-
-# Images in this dataset have different shapes. So this parameter fixes one shape
-# so we can normalize the images to have the same shape
-GLOBALS["IMAGE_SHAPE"] = (200, 200)
-
-# Degrees that we are going to use in data augmentation rotations
-GLOBALS["ROTATE_AUGM_DEGREES"] = (0, 20)
-
-## Section parameters
+# Importing the modules that we are going to use
 # ==============================================================================
 
-# - Flags to choose if some sections will run or not
-# - This way we can skip some heavy computations when not needed
-
-# Skip hyper parameter tuning for online training
-GLOBALS["SKIP_HYPERPARAMTER_TUNING"] = True
-
-# Skip training and use a cached model
-# Useful for testing the embedding -> classifier transformation
-# Thus, when False training is not computed and a cached model
-# is loaded from disk
-# Cached models are stored in `MODEL_CACHE_FOLDER`
-GLOBALS["USE_CACHED_MODEL"] = False
-
-# Skip data augmentation and use the cached augmented dataset
-GLOBALS["USE_CACHED_AUGMENTED_DATASET"] = False
-
-# Most of the time we're not exploring the data, but doing
-# either hyperparameter settings or training of the model
-# So if we skip this step we can start the process faster
-GLOBALS["SKIP_EXPLORATORY_DATA_ANALYSYS"] = True
-
-# Wether or not profile the training
-# This should be False most of the times
-# Note that profiling adds a significant overhead to the training
-GLOBALS["PROFILE_TRAINING"] = False
-
-
-## WANDB Parameters
-# ==============================================================================
-
-from datetime import datetime
-
-# Name for the project
-# One project groups different runs
-GLOBALS["WANDB_PROJECT_NAME"] = "FG-NET dataset"
-
-# Name for this concrete run
-# I don't care too much about it, because wandb tracks the parameters we use
-# in this run (see "Configuration for Weights and Biases" section)
-GLOBALS["WANDB_RUN_NAME"] = str(datetime.now())
-
-
-## Others
-# ==============================================================================
-
-# Number of workers we want to use
-# We can have less, equal or greater num of workers than CPUs
-# In the following forum:
-#   https://discuss.pytorch.org/t/guidelines-for-assigning-num-workers-to-dataloader/813/4
-# they recomend to explore this parameter, growing it until system RAM saturates
-# Using a value greater than 2 makes pytorch tell us that this value is not optimal
-# So sticking with what pytorch tells uss
-# TODO -- trying a higher value in UGR's server
-GLOBALS["NUM_WORKERS"] = 4
-
-# Fix random seed to make reproducible results
-GLOBALS["RANDOM_SEED"] = 123456789
-
-# Add some paths to PYTHONPATH
-# ==============================================================================
-
-# Python paths are difficult to manage
-# In this script we can do something like:
-# `import lib.core as core` and that's fine
-# But in lib code we cannot import properly the modules
-
-import sys
-
-sys.path.append(GLOBALS["BASE_PATH"])
-sys.path.append(os.path.join(GLOBALS["BASE_PATH"], "src"))
-sys.path.append(os.path.join(GLOBALS["BASE_PATH"], "src/lib"))
-
-
-# Importing the modules we are going to use
-# ==============================================================================
-
-import copy
 import cProfile
+import datetime
 import enum
-import functools
 import gc
-import logging
-import math
 import os
 import time
-from collections import Counter
-from datetime import datetime
-from pprint import pprint
-from typing import List
+from dataclasses import dataclass
+from typing import Dict, Optional
 
-import dotenv
 import matplotlib.pyplot as plt
-import numpy as np
 import optuna
-import seaborn as sns
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
-import torchvision.datasets as datasets
-
-# For using pre-trained ResNets
-import torchvision.models as models
 import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
 
-# All concrete pieces we're using form sklearn
-from sklearn.metrics import accuracy_score, roc_auc_score, silhouette_score
-from torch.utils.data import DataLoader, Dataset
-from tqdm import tqdm
-
-# Now that files are loaded, we can import pieces of code
-import lib.core as core
-import lib.data_augmentation as data_augmentation
-import lib.datasets as datasets
-import lib.embedding_to_classifier as embedding_to_classifier
-import lib.filesystem as filesystem
-import lib.hyperparameter_tuning as hptuning
-import lib.loss_functions as loss_functions
-import lib.metrics as metrics
-import lib.sampler as sampler
-import lib.split_dataset as split_dataset
-import lib.trainers as trainers
-import lib.utils as utils
 import wandb
+from lib import core, datasets, filesystem
+from lib import hyperparameter_tuning as hptuning
+from lib import metrics, split_dataset, utils
 from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
 from lib.embedding_to_classifier import EmbeddingToClassifier
-from lib.loss_functions import (
-    AddSmallEmbeddingPenalization,
-    BatchAllTripletLoss,
-    BatchHardTripletLoss,
-    MeanTripletBatchTripletLoss,
-)
-from lib.models import *
-from lib.models import (
-    CACDResnet18,
-    CACDResnet50,
-    FGLigthModel,
-    LFWLightModel,
-    LFWResNet18,
-    NormalizedNet,
-    ResNet18,
-    RetrievalAdapter,
-)
+from lib.loss_functions import (AddSmallEmbeddingPenalization,
+                                BatchAllTripletLoss, BatchHardTripletLoss,
+                                MeanTripletBatchTripletLoss)
+from lib.models import (CACDResnet18, CACDResnet50, FGLigthModel,
+                        LFWLightModel, LFWResNet18, NormalizedNet, ResNet18,
+                        RetrievalAdapter)
 from lib.sampler import CustomSampler
-from lib.train_loggers import (
-    CompoundLogger,
-    InterClusterLogger,
-    IntraClusterLogger,
-    LocalRankAtKLogger,
-    RankAtKLogger,
-    SilentLogger,
-    TrainLogger,
-    TripletLoggerOffline,
-    TripletLoggerOnline,
-)
+from lib.train_loggers import (CompoundLogger, InterClusterLogger,
+                               IntraClusterLogger, LocalRankAtKLogger,
+                               RankAtKLogger, SilentLogger, TrainLogger,
+                               TripletLoggerOffline, TripletLoggerOnline)
 from lib.trainers import train_model_online
-from lib.visualizations import *
+
+# Global parameters of the notebook
+# ==============================================================================
+
+
+@dataclass
+class GlobalParameters:
+    """Dataclass that will hold all the parameters for this experiment"""
+
+    def __init__(self):
+        #  Where are we running the script:
+        #      - "local" => our computer
+        #      - "remote" => Google Colab
+        #      - "ugr" => NGPU UGR
+        self.running_env: str = "ugr"
+
+        self.num_workers = 1
+        self.random_seed = 123456789
+
+        self.__init_path_params()
+        self.__init_ml_params()
+        self.__init_loss_params()
+        self.__init_hptuning_params()
+        self.__init_evaluation_metrics_params()
+        self.__init_section_params()
+        self.__init_wandb_params()
+        self.__init_knn_params()
+        self.__init_data_augmentation_params()
+
+    def __init_path_params(self):
+        # Select the base path, which depends on the running env
+        self.base_path: str = ""
+        if self.running_env == "local":
+            self.base_path = "./"
+        elif self.running_env == "remote":
+            self.base_path = "/content/drive/MyDrive/Colab Notebooks/"
+        elif self.running_env == "ugr":
+            self.base_path = "/mnt/homeGPU/squijano/TFG/"
+        else:
+            raise ValueError(
+                f"Running env '{self.running_env}' is not a valid running env"
+            )
+
+        # Path to our lib dir
+        self.lib_path = os.path.join(self.base_path, "lib")
+
+        # Path where we store the two datasets
+        self.data_path = os.path.join(self.base_path, "data")
+        self.cacd_data_path = os.path.join(self.data_path, "CACD")
+
+        # And where the images are stored
+        self.image_dir_path = os.path.join(self.data_path, "FGNET/images")
+        self.cacd_image_dir_path = os.path.join(self.cacd_data_path, "CACD2000")
+
+        # URLs from where we dowload the data
+        self.dataset_url = "http://yanweifu.github.io/FG_NET_data/FGNET.zip"
+        self.cacd_dataset_url = (
+            "https://drive.google.com/file/d/1hYIZadxcPG27Fo7mQln0Ey7uqw1DoBvM/view"
+        )
+
+        # Path where we can store figures
+        self.plots_path = os.path.join(self.base_path, "plots")
+
+        # Dir with all cached models
+        # This cached models can be loaded from disk when training is skipped
+        self.model_cache_folder = os.path.join(self.base_path, "cached_models")
+
+        # Cache for the augmented dataset
+        self.augmented_dataset_cache_file = os.path.join(
+            self.base_path, "cached_augmented_dataset.pt"
+        )
+
+        # Binary file where the stats of the profiling are saved
+        self.profile_save_file = os.path.join(self.base_path, "training_profile.stat")
+
+        # The SQLITE database where we are going to store the hp tuning process
+        self.optuna_database = f"sqlite:///{self.base_path}/hp_tuning_optuna.db"
+
+    def __init_ml_params(self):
+        # P-K sampling main parameters
+        self.P: int = 16
+        self.K: int = 4
+
+        # Minibatches must have size multiple of `P*K` in order to perform P-K sampling
+        # So we can use `n * self.P * self.K`
+        self.batch_size = self.P * self.K
+
+        # TODO -- originaly was 9
+        self.embedding_dimension = 10
+
+        self.training_epochs = 2
+        self.learning_rate = 1e-3
+        self.weight_decay = 1e-4
+        self.margin = 1.0
+
+        # How many elements we see before logging. We use `P*K` so we align with
+        # our batch size
+        self.logging_iterations = self.P * self.K * 200
+
+        # Logging is very slow so just use a small portion of the data
+        self.online_logger_train_percentage = 0.005
+        self.online_logger_validation_percentage = 0.005
+
+        # Choose which model we're going to use
+        # Can be "ResNet18", "LightModel", "LFWResNet18", "LFWLightModel", "FGLightModel",
+        #        "CACDResNet18", "CACDResNet50"
+        self.net_model = "CACDResNet18"
+
+        self.normalized_model_output = False
+
+    def __init_loss_params(self):
+        # Can be either `"hard"` or `"all"`
+        self.batch_triplet_loss_function = "hard"
+
+        # Whether or not use softplus dist function instead of vanilla euclidean dist
+        self.use_softplus = False
+
+        # Count all summands in the mean loss or only those summands greater than zero
+        self.use_gt_zero_mean_loss = True
+
+        # Wether or not add penalty term to the loss function, and how hardly
+        self.add_norm_penalty = False
+        self.penalty_factor = 0.6
+
+        # Wether or not apply gradient clipping to avoid some stability issues
+        self.gradient_clipping: Optional[float] = None
+
+    def __init_hptuning_params(self):
+        # Epochs used in k-Fold Cross validation
+        self.hptuning_epochs = 1
+
+        # Number of tries in the optimization process
+        self.hptuning_tries = 300
+
+        self.hptuning_kfolds = 2
+
+        # Wether to use the validation set in the hp tuning process or to use k-fold
+        # cross validation (which is more robust but way slower)
+        self.hptuning_fast = True
+
+    def __init_evaluation_metrics_params(self):
+        # Number of candidates that we are going to consider in the retrieval task,
+        # used in the Rank@K accuracy metric
+        # We use k = 1 and k = this value
+        self.accuracy_at_k_value = 5
+
+    def __init_section_params(self):
+        self.skip_hptuning = True
+
+        # When skipping training, we can load the latest cached model and evaluate it
+        self.skip_training = False
+        self.use_cached_model = False
+
+        self.skip_profiling = True
+
+        # Wether or not skip dataset augmentation and use the cached augmented dataset
+        self.use_cached_augmented_dataset = False
+
+    def __init_wandb_params(self):
+        self.wandb_project_name = "FG-NET dataset"
+        self.wandb_run_name = str(datetime.datetime.now())
+
+    def __init_knn_params(self):
+        self.number_neighbours = 4
+
+    def __init_data_augmentation_params(self):
+        self.lazy_data_augmentation = True
+        self.avoid_custom_sampler_fail = True
+
+        self.image_shape = (200, 200)
+        self.rotate_augm_degrees = (0, 20)
+
+    def dict(self) -> Dict:
+        """
+        Wandb need a dictionary representation of the class for saving values in
+        their system. So this method tries its best to create a dict repr for
+        this data class
+        """
+
+        return self.__dict__
+
+
+GLOBALS = GlobalParameters()
 
 # Server security check
 # ==============================================================================
@@ -360,7 +231,7 @@ from lib.visualizations import *
 # - Sometimes UGR's server does not provide GPU access
 # - In that case, fail fast so we start ASAP debugging the problem
 
-if GLOBALS["RUNNING_ENV"] == "ugr" and torch.cuda.is_available() is False:
+if GLOBALS.running_env == "ugr" and torch.cuda.is_available() is False:
     raise Exception(
         "`torch.cuda.is_available()` returned false, so we dont have access to GPU's"
     )
@@ -369,43 +240,19 @@ if GLOBALS["RUNNING_ENV"] == "ugr" and torch.cuda.is_available() is False:
 # TODO -- DELETE
 torch.autograd.set_detect_anomaly(True)
 
-# Configuration of the logger
-# ==============================================================================
-#
-# - Here we set the configuration for all logging done
-# - In lib, `logging.getLogger("MAIN_LOGGER")` is used everywhere, so we get it, configure it once, and use that config everywhere
-
-
-# Get the logger that is used everywhere
-file_logger = logging.getLogger("MAIN_LOGGER")
-
-# Configure it
-# Avoid propagating to upper logger, which logs to the console
-file_logger.propagate = False
-
-file_logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s::%(levelname)s::%(funcName)s::> %(message)s")
-file_handler = logging.FileHandler(GLOBALS["LOGGING_FILE"])
-file_handler.setFormatter(formatter)
-file_logger.addHandler(file_handler)
-
-# 'application' code
-file_logger.debug("debug message")
-
-
 # Configuration for Weigths and Biases
 # ==============================================================================
 #
 # - We're going to use `wandb` for tracking the training of the models
-# - We use our `GLOBALS` dict to init wandb, that is going to keep track of all
-# of that parameters
+# - We use our `GLOBALS` methot to represent it as a dict to init wandb, that is
+# going to keep track of all of that parameters
 
 # If we're running in UGR's servers, we need to set some ENV vars
 # Otherwise, wandb is going to write to dirs that it has no access
 # Also, pytorch tries to save pretrained models in the home folder
-if GLOBALS["RUNNING_ENV"] == "ugr":
+if GLOBALS.running_env == "ugr":
     print("-> Changing dir env values")
-    utils.change_dir_env_vars(base_path=GLOBALS["BASE_PATH"])
+    utils.change_dir_env_vars(base_path=GLOBALS.base_path)
     print("-> Changing done!")
     print("")
 
@@ -417,9 +264,9 @@ if GLOBALS["RUNNING_ENV"] == "ugr":
 # Init the wandb tracker
 # We need to do this before `wandb.login`
 wandb.init(
-    project=GLOBALS["WANDB_PROJECT_NAME"],
-    name=GLOBALS["WANDB_RUN_NAME"],
-    config=GLOBALS,
+    project=GLOBALS.wandb_project_name,
+    name=GLOBALS.wandb_run_name,
+    config=GLOBALS.dict(),
 )
 
 # Functions that we are going to use
@@ -457,12 +304,12 @@ def try_to_clean_memory():
 #  - So we download the dataset from an URL
 
 datasets.download_fg_dataset(
-    GLOBALS["DATA_PATH"], GLOBALS["DATASET_URL"], can_skip_download=True
+    GLOBALS.data_path, GLOBALS.dataset_url, can_skip_download=True
 )
 
 datasets.download_cacd_dataset(
-    GLOBALS["CACD_DATA_PATH"],
-    GLOBALS["CACD_DATASET_URL"],
+    GLOBALS.cacd_data_path,
+    GLOBALS.cacd_dataset_url,
     can_skip_download=True,
     can_skip_extraction=True,
 )
@@ -484,7 +331,7 @@ transform = transforms.Compose(
         # So convert all the images to black and white, but having three channels
         transforms.Grayscale(num_output_channels=3),
         # Images have different shapes, so this normalization is needed
-        transforms.Resize(GLOBALS["IMAGE_SHAPE"], antialias=True),
+        transforms.Resize(GLOBALS.image_shape, antialias=True),
         # Pytorch only work with tensors
         transforms.ToTensor(),
         # Some normalization
@@ -493,11 +340,11 @@ transform = transforms.Compose(
 )
 
 print("=> Wrapping the raw data into a `FGDataset")
-fgnet_dataset = datasets.FGDataset(path=GLOBALS["IMAGE_DIR_PATH"], transform=transform)
+fgnet_dataset = datasets.FGDataset(path=GLOBALS.image_dir_path, transform=transform)
 
 print("=> Wrapping the raw data into `CACDDataset`")
 cacd_dataset = datasets.CACDDataset(
-    path=GLOBALS["CACD_IMAGE_DIR_PATH"], transform=transform
+    path=GLOBALS.cacd_image_dir_path, transform=transform
 )
 
 ## Splitting the dataset
@@ -520,11 +367,9 @@ print(f"\tValidation dataset: {len(validation_dataset) / len(cacd_dataset) * 100
 print("")
 
 print("--> Logging sizes:")
+print(f"\tTrain dataset: {len(train_dataset) * GLOBALS.online_logger_train_percentage}")
 print(
-    f"\tTrain dataset: {len(train_dataset) * GLOBALS['ONLINE_LOGGER_TRAIN_PERCENTAGE']}"
-)
-print(
-    f"\tValidation dataset: {len(validation_dataset) * GLOBALS['ONLINE_LOGGER_VALIDATION_PERCENTAGE']}"
+    f"\tValidation dataset: {len(validation_dataset) * GLOBALS.online_logger_validation_percentage}"
 )
 print("")
 
@@ -540,34 +385,33 @@ print("=> Putting the dataset into dataloaders")
 # New dataloaders that use our custom sampler
 train_loader = torch.utils.data.DataLoader(
     train_dataset,
-    batch_size=GLOBALS["ONLINE_BATCH_SIZE"],
+    batch_size=GLOBALS.batch_size,
     sampler=CustomSampler(
-        GLOBALS["P"],
-        GLOBALS["K"],
+        GLOBALS.P,
+        GLOBALS.K,
         train_dataset,
-        avoid_failing=GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"],
+        avoid_failing=GLOBALS.avoid_custom_sampler_fail,
     ),
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
 validation_loader = torch.utils.data.DataLoader(
     validation_dataset,
-    batch_size=GLOBALS["ONLINE_BATCH_SIZE"],
+    batch_size=GLOBALS.batch_size,
     sampler=CustomSampler(
-        GLOBALS["P"],
-        GLOBALS["K"],
+        GLOBALS.P,
+        GLOBALS.K,
         dataset=validation_dataset,
-        avoid_failing=GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"],
+        avoid_failing=GLOBALS.avoid_custom_sampler_fail,
     ),
 )
 
 # TODO -- here I don't know if use default sampler or custom sampler
 test_loader = torch.utils.data.DataLoader(
     test_dataset,
-    batch_size=GLOBALS["ONLINE_BATCH_SIZE"],
+    batch_size=GLOBALS.batch_size,
     shuffle=True,
 )
-
 
 # Data augmentation
 # ==============================================================================
@@ -605,38 +449,36 @@ test_loader = torch.utils.data.DataLoader(
 
 
 # Use the cached dataset
-if GLOBALS["USE_CACHED_AUGMENTED_DATASET"] == True:
-    train_dataset_augmented = torch.load(GLOBALS["AUGMENTED_DATASET_CACHE_FILE"])
+if GLOBALS.use_cached_augmented_dataset is True:
+    train_dataset_augmented = torch.load(GLOBALS.augmented_dataset_cache_file)
 
 # We have to do the data augmentation if we mark that we want to do it (section parameter)
 # Or if the cached dataset was done for other number of images (ie. for 4 when
 # now we want 32)
 if (
-    GLOBALS["USE_CACHED_AUGMENTED_DATASET"] == False
-    or train_dataset_augmented.min_number_of_images != GLOBALS["K"]
+    GLOBALS.use_cached_augmented_dataset == False
+    or train_dataset_augmented.min_number_of_images != GLOBALS.K
 ):
     print("=> Performing data augmentation")
 
     # Select the data augmentation mechanism
     AugmentationClass = (
         LazyAugmentatedDataset
-        if GLOBALS["LAZY_DATA_AUGMENTATION"] is True
+        if GLOBALS.lazy_data_augmentation is True
         else AugmentatedDataset
     )
 
     train_dataset_augmented = AugmentationClass(
         base_dataset=train_dataset,
-        min_number_of_images=GLOBALS["K"],
+        min_number_of_images=GLOBALS.K,
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform=transforms.Compose(
             [
                 # NOTE: We have normalized our images to be (3, 300, 300), so new
                 # randomly generated images have to have the same shape
-                transforms.RandomResizedCrop(
-                    size=GLOBALS["IMAGE_SHAPE"], antialias=True
-                ),
-                transforms.RandomRotation(degrees=GLOBALS["ROTATE_AUGM_DEGREES"]),
+                transforms.RandomResizedCrop(size=GLOBALS.image_shape, antialias=True),
+                transforms.RandomRotation(degrees=GLOBALS.rotate_augm_degrees),
                 transforms.RandomAutocontrast(),
             ]
         ),
@@ -644,17 +486,15 @@ if (
 
     validation_dataset_augmented = AugmentationClass(
         base_dataset=validation_dataset,
-        min_number_of_images=GLOBALS["K"],
+        min_number_of_images=GLOBALS.K,
         # Remember that the trasformation has to be random type
         # Otherwise, we could end with a lot of repeated images
         transform=transforms.Compose(
             [
                 # NOTE: We have normalized our images to be (3, 300, 300), so new
                 # randomly generated images have to have the same shape
-                transforms.RandomResizedCrop(
-                    size=GLOBALS["IMAGE_SHAPE"], antialias=True
-                ),
-                transforms.RandomRotation(degrees=GLOBALS["ROTATE_AUGM_DEGREES"]),
+                transforms.RandomResizedCrop(size=GLOBALS.image_shape, antialias=True),
+                transforms.RandomRotation(degrees=GLOBALS.rotate_augm_degrees),
                 transforms.RandomAutocontrast(),
             ]
         ),
@@ -663,28 +503,28 @@ if (
     # TODO -- augmented dataset also for validation, in case we think that the
     #         CustomSampler is a good idea for the validation dataset
     # Save the augmented dataset to cache
-    torch.save(train_dataset_augmented, GLOBALS["AUGMENTED_DATASET_CACHE_FILE"])
+    torch.save(train_dataset_augmented, GLOBALS.augmented_dataset_cache_file)
 
 # Now put a loader in front of the augmented dataset
 train_loader_augmented = torch.utils.data.DataLoader(
     train_dataset_augmented,
-    batch_size=GLOBALS["ONLINE_BATCH_SIZE"],
+    batch_size=GLOBALS.batch_size,
     sampler=CustomSampler(
-        GLOBALS["P"],
-        GLOBALS["K"],
+        GLOBALS.P,
+        GLOBALS.K,
         train_dataset_augmented,
-        avoid_failing=GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"],
+        avoid_failing=GLOBALS.avoid_custom_sampler_fail,
     ),
 )
 
 validation_loader_augmented = torch.utils.data.DataLoader(
     validation_dataset_augmented,
-    batch_size=GLOBALS["ONLINE_BATCH_SIZE"],
+    batch_size=GLOBALS.batch_size,
     sampler=CustomSampler(
-        GLOBALS["P"],
-        GLOBALS["K"],
+        GLOBALS.P,
+        GLOBALS.K,
         validation_dataset_augmented,
-        avoid_failing=GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"],
+        avoid_failing=GLOBALS.avoid_custom_sampler_fail,
     ),
 )
 
@@ -695,7 +535,7 @@ validation_loader_augmented = torch.utils.data.DataLoader(
 # - If we're not doing hyperparameter tuning, we don't need to hold previous dataset and dataloader
 
 
-if GLOBALS["SKIP_HYPERPARAMTER_TUNING"] is True:
+if GLOBALS.skip_hptuning is True:
     # We are not using the old dataset and dataloader
     # So delete them to try to have as much RAM as we can
     # Otherwise, train will crash due to lack of RAM
@@ -719,23 +559,23 @@ if GLOBALS["SKIP_HYPERPARAMTER_TUNING"] is True:
 
 
 batch_loss_function = None
-if GLOBALS["BATCH_TRIPLET_LOSS_FUNCTION"] == "hard":
+if GLOBALS.batch_triplet_loss_function == "hard":
     batch_loss_function = BatchHardTripletLoss(
-        GLOBALS["MARGIN"],
-        use_softplus=GLOBALS["USE_SOFTPLUS_LOSS"],
-        use_gt_than_zero_mean=GLOBALS["USE_GT_ZERO_MEAN_LOSS"],
+        GLOBALS.margin,
+        use_softplus=GLOBALS.use_softplus,
+        use_gt_than_zero_mean=GLOBALS.use_gt_zero_mean_loss,
     )
-if GLOBALS["BATCH_TRIPLET_LOSS_FUNCTION"] == "all":
+if GLOBALS.batch_triplet_loss_function == "all":
     batch_loss_function = BatchAllTripletLoss(
-        GLOBALS["MARGIN"],
-        use_softplus=GLOBALS["USE_SOFTPLUS_LOSS"],
-        use_gt_than_zero_mean=GLOBALS["USE_GT_ZERO_MEAN_LOSS"],
+        GLOBALS.margin,
+        use_softplus=GLOBALS.use_softplus,
+        use_gt_than_zero_mean=GLOBALS.use_gt_zero_mean_loss,
     )
 
 # Sanity check
 if batch_loss_function is None:
     raise Exception(
-        f"BATCH_TRIPLET_LOSS global parameter got unexpected value: {GLOBALS['BATCH_TRIPLET_LOSS_FUNCTION']}"
+        f"BATCH_TRIPLET_LOSS global parameter got unexpected value: {GLOBALS.batch_triplet_loss_function}"
     )
 
 
@@ -743,10 +583,10 @@ if batch_loss_function is None:
 # ==============================================================================
 
 
-if GLOBALS["ADD_NORM_PENALTY"]:
+if GLOBALS.add_norm_penalty:
     batch_loss_function = AddSmallEmbeddingPenalization(
         base_loss=batch_loss_function,
-        penalty_factor=GLOBALS["PENALTY_FACTOR"],
+        penalty_factor=GLOBALS.penalty_factor,
     )
 
 
@@ -840,10 +680,8 @@ def objective(trial, implementation: TuningStrat):
         # Again, we want to end with the normalized shape
         transform=transforms.Compose(
             [
-                transforms.RandomResizedCrop(
-                    size=GLOBALS["IMAGE_SHAPE"], antialias=True
-                ),
-                transforms.RandomRotation(degrees=GLOBALS["ROTATE_AUGM_DEGREES"]),
+                transforms.RandomResizedCrop(size=GLOBALS.image_shape, antialias=True),
+                transforms.RandomRotation(degrees=GLOBALS.rotate_augm_degrees),
                 transforms.RandomAutocontrast(),
             ]
         ),
@@ -858,7 +696,7 @@ def objective(trial, implementation: TuningStrat):
             p,
             k,
             train_dataset,
-            avoid_failing=GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"],
+            avoid_failing=GLOBALS.avoid_custom_sampler_fail,
         ),
     )
 
@@ -890,11 +728,9 @@ def objective(trial, implementation: TuningStrat):
                 transform=transforms.Compose(
                     [
                         transforms.RandomResizedCrop(
-                            size=GLOBALS["IMAGE_SHAPE"], antialias=True
+                            size=GLOBALS.image_shape, antialias=True
                         ),
-                        transforms.RandomRotation(
-                            degrees=GLOBALS["ROTATE_AUGM_DEGREES"]
-                        ),
+                        transforms.RandomRotation(degrees=GLOBALS.rotate_augm_degrees),
                         transforms.RandomAutocontrast(),
                     ]
                 ),
@@ -917,7 +753,7 @@ def objective(trial, implementation: TuningStrat):
                     p,
                     k,
                     fold_dataset,
-                    avoid_failing=GLOBALS["AVOID_CUSTOM_SAMPLER_FAIL"],
+                    avoid_failing=GLOBALS.avoid_custom_sampler_fail,
                 ),
             )
         elif fold_type is hptuning.FoldType.VALIDATION_FOLD:
@@ -962,7 +798,7 @@ def objective(trial, implementation: TuningStrat):
         fold_dataloader: DataLoader, net: torch.nn.Module
     ) -> torch.nn.Module:
         parameters = dict()
-        parameters["epochs"] = GLOBALS["HYPERPARAMETER_TUNING_EPOCHS"]
+        parameters["epochs"] = GLOBALS.hptuning_epochs
         parameters["lr"] = learning_rate
         parameters["criterion"] = BatchHardTripletLoss(
             margin, use_softplus=softplus, use_gt_than_zero_mean=True
@@ -977,7 +813,7 @@ def objective(trial, implementation: TuningStrat):
 
         _ = train_model_online(
             net=net,
-            path=os.path.join(GLOBALS["BASE_PATH"], "tmp_hp_tuning"),
+            path=os.path.join(GLOBALS.base_path, "tmp_hp_tuning"),
             parameters=parameters,
             train_loader=fold_dataloader,
             validation_loader=None,
@@ -1014,8 +850,8 @@ def objective(trial, implementation: TuningStrat):
         try:
             losses = hptuning.custom_cross_validation(
                 train_dataset=train_dataset_augmented,
-                k=GLOBALS["NUMBER_OF_FOLDS"],
-                random_seed=GLOBALS["RANDOM_SEED"],
+                k=GLOBALS.hptuning_kfolds,
+                random_seed=GLOBALS.random_seed,
                 network_creator=network_creator,
                 network_trainer=network_trainer,
                 loader_generator=loader_generator,
@@ -1029,7 +865,6 @@ def objective(trial, implementation: TuningStrat):
             msg = "Could not run succesfully k-fold cross validation for this combination of parameters\n"
             msg = msg + f"Error was: {e}\n"
             print(msg)
-            file_logger.warn(msg)
 
             # Return None so optuna knows this trial failed
             return None
@@ -1046,13 +881,11 @@ def objective(trial, implementation: TuningStrat):
 
 
 # Launch the hp tuning process
-if GLOBALS["SKIP_HYPERPARAMTER_TUNING"] is False:
+if GLOBALS.skip_hptuning is False:
     # We want to chose the `objective` implementation to use. But optuna only
     # accepts functions with the shape `objective(trial)` so get a partial
     # function with the parameter `implementation chosen`
-    strat = (
-        TuningStrat.HOLDOUT if GLOBALS["FAST_HP_TUNING"] is True else TuningStrat.KFOLD
-    )
+    strat = TuningStrat.HOLDOUT if GLOBALS.hptuning_fast is True else TuningStrat.KFOLD
     partial_objective = lambda trial: objective(trial, implementation=strat)
 
     print(f"🔎 Started hyperparameter tuning with {strat=}")
@@ -1061,10 +894,10 @@ if GLOBALS["SKIP_HYPERPARAMTER_TUNING"] is False:
     study = optuna.create_study(
         direction="maximize",
         study_name="Rank@1 optimization",
-        storage=GLOBALS["OPTUNA_DATABASE"],
+        storage=GLOBALS.optuna_database,
         load_if_exists=True,
     )
-    study.optimize(partial_objective, n_trials=GLOBALS["HYPERPARAMETER_TUNING_TRIES"])
+    study.optimize(partial_objective, n_trials=GLOBALS.hptuning_tries)
 
     print("🔎 Hyperparameter tuning ended")
     print("")
@@ -1081,25 +914,25 @@ if GLOBALS["SKIP_HYPERPARAMTER_TUNING"] is False:
 
 print("=> Selecting the network model")
 net = None
-if GLOBALS["NET_MODEL"] == "ResNet18":
-    net = ResNet18(GLOBALS["EMBEDDING_DIMENSION"])
-elif GLOBALS["NET_MODEL"] == "LightModel":
-    net = LightModel(GLOBALS["EMBEDDING_DIMENSION"])
-elif GLOBALS["NET_MODEL"] == "LFWResNet18":
-    net = LFWResNet18(GLOBALS["EMBEDDING_DIMENSION"])
-elif GLOBALS["NET_MODEL"] == "LFWLightModel":
-    net = LFWLightModel(GLOBALS["EMBEDDING_DIMENSION"])
-elif GLOBALS["NET_MODEL"] == "FGLightModel":
-    net = FGLigthModel(GLOBALS["EMBEDDING_DIMENSION"])
-elif GLOBALS["NET_MODEL"] == "CACDResNet18":
-    net = CACDResnet18(GLOBALS["EMBEDDING_DIMENSION"])
-elif GLOBALS["NET_MODEL"] == "CACDResNet50":
-    net = CACDResnet50(GLOBALS["EMBEDDING_DIMENSION"])
+if GLOBALS.net_model == "ResNet18":
+    net = ResNet18(GLOBALS.embedding_dimension)
+elif GLOBALS.net_model == "LightModel":
+    net = LightModel(GLOBALS.embedding_dimension)
+elif GLOBALS.net_model == "LFWResNet18":
+    net = LFWResNet18(GLOBALS.embedding_dimension)
+elif GLOBALS.net_model == "LFWLightModel":
+    net = LFWLightModel(GLOBALS.embedding_dimension)
+elif GLOBALS.net_model == "FGLightModel":
+    net = FGLigthModel(GLOBALS.embedding_dimension)
+elif GLOBALS.net_model == "CACDResNet18":
+    net = CACDResnet18(GLOBALS.embedding_dimension)
+elif GLOBALS.net_model == "CACDResNet50":
+    net = CACDResnet50(GLOBALS.embedding_dimension)
 else:
     raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
 # Wrap the model if we want to normalize the output
-if GLOBALS["NORMALIZED_MODEL_OUTPUT"] is True:
+if GLOBALS.normalized_model_output is True:
     net = NormalizedNet(net)
 
 # The custom sampler takes care of minibatch management
@@ -1108,12 +941,14 @@ net.set_permute(False)
 
 # Training parameters
 parameters = dict()
-parameters["epochs"] = GLOBALS["TRAINING_EPOCHS"]
-parameters["lr"] = GLOBALS["ONLINE_LEARNING_RATE"]
+parameters["epochs"] = GLOBALS.training_epochs
+parameters["lr"] = GLOBALS.learning_rate
+parameters["weigth_decay"] = GLOBALS.weight_decay
 
 # We use the loss function that depends on the global parameter BATCH_TRIPLET_LOSS_FUNCTION
 # We selected this loss func in *Choose the loss function to use* section
 parameters["criterion"] = batch_loss_function
+
 
 print(net)
 
@@ -1127,58 +962,25 @@ print("=> Creating the training loggers that we are going to use")
 # Define the loggers we want to use
 triplet_loss_logger = TripletLoggerOnline(
     net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
+    iterations=GLOBALS.logging_iterations,
     loss_func=parameters["criterion"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-    greater_than_zero=GLOBALS["USE_GT_ZERO_MEAN_LOSS"],
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
+    greater_than_zero=GLOBALS.use_gt_zero_mean_loss,
 )
 
 cluster_sizes_logger = IntraClusterLogger(
     net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
+    iterations=GLOBALS.logging_iterations,
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
 )
 
 intercluster_metrics_logger = InterClusterLogger(
     net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-)
-
-rank_at_one_logger = RankAtKLogger(
-    net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-    k=1,
-)
-
-rank_at_k_logger = RankAtKLogger(
-    net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-    k=GLOBALS["ACCURACY_AT_K_VALUE"],
-)
-
-
-local_rank_at_one_logger = LocalRankAtKLogger(
-    net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-    k=1,
-)
-
-local_rank_at_k_logger = LocalRankAtKLogger(
-    net=net,
-    iterations=GLOBALS["LOGGING_ITERATIONS"],
-    train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-    validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-    k=GLOBALS["ACCURACY_AT_K_VALUE"],
+    iterations=GLOBALS.logging_iterations,
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
 )
 
 # Combine them in a single logger
@@ -1187,26 +989,24 @@ logger = CompoundLogger(
         triplet_loss_logger,
         cluster_sizes_logger,
         intercluster_metrics_logger,
-        rank_at_one_logger,
-        rank_at_k_logger,
-        local_rank_at_one_logger,
-        local_rank_at_k_logger,
     ]
 )
 
+# TODO -- remove this
+logger = CompoundLogger([])
 
 ## Running the training loop
 # ==============================================================================
 
 # Check if we want to skip training
-if GLOBALS["USE_CACHED_MODEL"] is False:
+if GLOBALS.use_cached_model is False:
     # To measure the time it takes to train
     ts = time.time()
 
     # Run the training with the profiling
-    if GLOBALS["PROFILE_TRAINING"] is True:
+    if GLOBALS.skip_profiling is False:
         _ = cProfile.run(
-            f"""train_model_online(
+            """train_model_online(
                 net = net,
                 path = os.path.join(BASE_PATH, 'tmp'),
                 parameters = parameters,
@@ -1217,21 +1017,21 @@ if GLOBALS["USE_CACHED_MODEL"] is False:
                 snapshot_iterations = None,
                 gradient_clipping = GRADIENT_CLIPPING,
             )""",
-            GLOBALS["PROFILE_SAVE_FILE"],
+            GLOBALS.profile_save_file,
         )
 
     # Run the training without the profiling
     else:
         training_history = train_model_online(
             net=net,
-            path=os.path.join(GLOBALS["BASE_PATH"], "tmp"),
+            path=os.path.join(GLOBALS.base_path, "tmp"),
             parameters=parameters,
             train_loader=train_loader_augmented,
             validation_loader=validation_loader_augmented,
-            name=GLOBALS["NET_MODEL"],
+            name=GLOBALS.net_model,
             logger=logger,
             snapshot_iterations=None,
-            gradient_clipping=GLOBALS["GRADIENT_CLIPPING"],
+            gradient_clipping=GLOBALS.gradient_clipping,
         )
 
     # Compute how long it took
@@ -1239,31 +1039,31 @@ if GLOBALS["USE_CACHED_MODEL"] is False:
     print(f"It took {te - ts} seconds to train")
 
     # Update the model cache
-    filesystem.save_model(net, GLOBALS["MODEL_CACHE_FOLDER"], "online_model_cached")
+    filesystem.save_model(net, GLOBALS.model_cache_folder, "online_model_cached")
 
 # In case we skipped training, load the model from cache
 else:
     # Choose the function to construct the new network
-    if GLOBALS["NET_MODEL"] == "ResNet18":
-        net_func = lambda: ResNet18(GLOBALS["EMBEDDING_DIMENSION"])
-    elif GLOBALS["NET_MODEL"] == "LightModel":
-        net_func = lambda: LightModel(GLOBALS["EMBEDDING_DIMENSION"])
-    elif GLOBALS["NET_MODEL"] == "LFWResNet18":
-        net_func = lambda: LFWResNet18(GLOBALS["EMBEDDING_DIMENSION"])
-    elif GLOBALS["NET_MODEL"] == "LFWLightModel":
-        net_func = lambda: LFWLightModel(GLOBALS["EMBEDDING_DIMENSION"])
-    elif GLOBALS["NET_MODEL"] == "FGLightModel":
-        net_func = lambda: FGLigthModel(GLOBALS["EMBEDDING_DIMENSION"])
-    elif GLOBALS["NET_MODEL"] == "CADResNet18":
-        net_func = lambda: CACDResnet18(GLOBALS["EMBEDDING_DIMENSION"])
-    elif GLOBALS["NET_MODEL"] == "CACDResNet50":
-        net_func = lambda: CACDResnet50(GLOBALS["EMBEDDING_DIMENSION"])
+    if GLOBALS.net_model == "ResNet18":
+        net_func = lambda: ResNet18(GLOBALS.embedding_dimension)
+    elif GLOBALS.net_model == "LightModel":
+        net_func = lambda: LightModel(GLOBALS.embedding_dimension)
+    elif GLOBALS.net_model == "LFWResNet18":
+        net_func = lambda: LFWResNet18(GLOBALS.embedding_dimension)
+    elif GLOBALS.net_model == "LFWLightModel":
+        net_func = lambda: LFWLightModel(GLOBALS.embedding_dimension)
+    elif GLOBALS.net_model == "FGLightModel":
+        net_func = lambda: FGLigthModel(GLOBALS.embedding_dimension)
+    elif GLOBALS.net_model == "CADResNet18":
+        net_func = lambda: CACDResnet18(GLOBALS.embedding_dimension)
+    elif GLOBALS.net_model == "CACDResNet50":
+        net_func = lambda: CACDResnet50(GLOBALS.embedding_dimension)
     else:
         raise Exception("Parameter 'NET_MODEL' has not a valid value")
 
     # Load the model from cache
     net = filesystem.load_model(
-        os.path.join(GLOBALS["MODEL_CACHE_FOLDER"], "online_model_cached"), net_func
+        os.path.join(GLOBALS.model_cache_folder, "online_model_cached"), net_func
     )
 
     # Load the network in corresponding mem device (cpu -> ram, gpu -> gpu mem
@@ -1278,7 +1078,6 @@ net.eval()
 
 # Model evaluation
 # ==============================================================================
-
 
 # Use the network to perform a retrieval task and compute rank@1 and rank@5 accuracy
 with torch.no_grad():
@@ -1298,6 +1097,14 @@ with torch.no_grad():
         max_examples=len(test_loader),
         fast_implementation=False,
     )
+    test_rank_at_one_cacd = metrics.rank_accuracy(
+        k=1,
+        data_loader=validation_loader_augmented,
+        network=net,
+        max_examples=len(validation_loader_augmented),
+        fast_implementation=False,
+    )
+
     train_rank_at_five = metrics.rank_accuracy(
         k=5,
         data_loader=train_loader_augmented,
@@ -1312,19 +1119,30 @@ with torch.no_grad():
         max_examples=len(test_loader),
         fast_implementation=False,
     )
+    test_rank_at_five_cacd = metrics.rank_accuracy(
+        k=5,
+        data_loader=validation_loader_augmented,
+        network=net,
+        max_examples=len(validation_loader_augmented),
+        fast_implementation=False,
+    )
 
     print(f"Train Rank@1 Accuracy: {train_rank_at_one}")
     print(f"Test Rank@1 Accuracy: {test_rank_at_one}")
+    print(f"Test CACD Rank@1 Accuracy: {test_rank_at_one_cacd}")
     print(f"Train Rank@5 Accuracy: {train_rank_at_five}")
     print(f"Test Rank@5 Accuracy: {test_rank_at_five}")
+    print(f"Test CACD Rank@5 Accuracy: {test_rank_at_five_cacd}")
 
     # Put this info in wandb
     wandb.log(
         {
             "Final Train Rank@1 Accuracy": train_rank_at_one,
             "Final Test Rank@1 Accuracy": test_rank_at_one,
+            "Final Test CACD Rank@1 Accuracy": test_rank_at_one_cacd,
             "Final Train Rank@5 Accuracy": train_rank_at_five,
             "Final Test Rank@5 Accuracy": test_rank_at_five,
+            "Final Test CACD Rank@5 Accuracy": test_rank_at_five_cacd,
         }
     )
 
@@ -1379,9 +1197,9 @@ with torch.no_grad():
     # With hopefully enough memory, try to convert the embedding to a classificator
     classifier = EmbeddingToClassifier(
         net,
-        k=GLOBALS["NUMBER_NEIGHBOURS"],
+        k=GLOBALS.number_neighbours,
         data_loader=train_loader_augmented,
-        embedding_dimension=GLOBALS["EMBEDDING_DIMENSION"],
+        embedding_dimension=GLOBALS.embedding_dimension,
     )
 
 # See how it works on a small test set
