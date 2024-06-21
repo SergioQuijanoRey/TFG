@@ -16,8 +16,16 @@ import torchvision
 import torchvision.transforms as transforms
 
 import wandb
-from lib import (embedding_to_classifier, filesystem, loss_functions_blog,
-                 metrics, split_dataset, train_loggers, trainers, utils)
+from lib import (
+    embedding_to_classifier,
+    filesystem,
+    loss_functions_blog,
+    metrics,
+    split_dataset,
+    train_loggers,
+    trainers,
+    utils,
+)
 
 
 @dataclass
@@ -89,14 +97,11 @@ class GlobalParameters:
         # So we can use `n * self.P * self.K`
         self.batch_size = self.P * self.K
 
-        # TODO -- previously was 20 training epochs
         self.training_epochs = 20
         self.learning_rate = 1e-3
         self.weight_decay = 1e-4
         self.margin = 1.0
-
-        #  self.logging_iterations = self.batch_size * 10
-        self.loggin_iterations = 50  # TODO <- Value set by Adam
+        self.loggin_iterations = self.batch_size * 100
 
         # Logging is very slow so just use a small portion of the data
         self.online_logger_train_percentage = 0.005
@@ -290,80 +295,29 @@ if cuda:
 #  ## Defining the loggers we want to use
 #  # ==============================================================================
 
-#  print("=> Creating the training loggers that we are going to use")
+print("=> Creating the training loggers that we are going to use")
 
-#  # Define the loggers we want to use
-#  triplet_loss_logger = TripletLoggerOnline(
-#      net=net,
-#      iterations=GLOBALS.loggin_iterations,
-#      loss_func=parameters["criterion"],
-#      train_percentage=GLOBALS.online_logger_train_percentage,
-#      validation_percentage=GLOBALS.online_logger_validation_percentage,
-#      greater_than_zero=GLOBALS.use_gt_zero_mean_loss,
-#  )
+cluster_sizes_logger = train_loggers.IntraClusterLogger(
+    net=net,
+    iterations=GLOBALS.loggin_iterations,
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
+)
 
-#  cluster_sizes_logger = IntraClusterLogger(
-#      net=net,
-#      iterations=GLOBALS.logging_iterations,
-#      train_percentage=GLOBALS.online_logger_train_percentage,
-#      validation_percentage=GLOBALS.online_logger_validation_percentage,
-#  )
+intercluster_metrics_logger = train_loggers.InterClusterLogger(
+    net=net,
+    iterations=GLOBALS.loggin_iterations,
+    train_percentage=GLOBALS.online_logger_train_percentage,
+    validation_percentage=GLOBALS.online_logger_validation_percentage,
+)
 
-#  intercluster_metrics_logger = InterClusterLogger(
-#      net=net,
-#      iterations=GLOBALS.logging_iterations,
-#      train_percentage=GLOBALS.online_logger_train_percentage,
-#      validation_percentage=GLOBALS.online_logger_validation_percentage,
-#  )
-
-#  rank_at_one_logger = RankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=1,
-#  )
-
-#  rank_at_k_logger = RankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=GLOBALS["ACCURACY_AT_K_VALUE"],
-#  )
-
-
-#  local_rank_at_one_logger = LocalRankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=1,
-#  )
-
-#  local_rank_at_k_logger = LocalRankAtKLogger(
-#      net=net,
-#      iterations=GLOBALS["LOGGING_ITERATIONS"],
-#      train_percentage=GLOBALS["ONLINE_LOGGER_TRAIN_PERCENTAGE"],
-#      validation_percentage=GLOBALS["ONLINE_LOGGER_VALIDATION_PERCENTAGE"],
-#      k=GLOBALS["ACCURACY_AT_K_VALUE"],
-#  )
-
-#  # Combine them in a single logger
-#  logger = CompoundLogger(
-#      [
-#          triplet_loss_logger,
-#          cluster_sizes_logger,
-#          intercluster_metrics_logger,
-#          rank_at_one_logger,
-#          rank_at_k_logger,
-#          local_rank_at_one_logger,
-#          local_rank_at_k_logger,
-#      ]
-#  )
-
-# TODO -- delete this code
-logger = train_loggers.CompoundLogger([])
+# Combine them in a single logger
+logger = train_loggers.CompoundLogger(
+    [
+        cluster_sizes_logger,
+        intercluster_metrics_logger,
+    ]
+)
 
 
 ## Running the training loop

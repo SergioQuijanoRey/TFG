@@ -1,8 +1,9 @@
-import torch
-import numpy as np
-
 import random
-from typing import Tuple, List
+from typing import List, Tuple
+
+import numpy as np
+import torch
+
 
 class WrappedSubset(torch.utils.data.Dataset):
     """
@@ -14,7 +15,6 @@ class WrappedSubset(torch.utils.data.Dataset):
     """
 
     def __init__(self, subset: torch.utils.data.Subset):
-
         # Use composition over inheritance. We inherit from Dataset to mark that
         # we are going to implement its interface.
         self.subset = subset
@@ -25,8 +25,7 @@ class WrappedSubset(torch.utils.data.Dataset):
     def __wrap_targets(self):
         try:
             self.targets = [
-                self.subset.dataset.targets[idx]
-                for idx in self.subset.indices
+                self.subset.dataset.targets[idx] for idx in self.subset.indices
             ]
         except Exception as e:
             err_msg = f"""Could not wrap subset with additional targets attribute
@@ -40,9 +39,9 @@ class WrappedSubset(torch.utils.data.Dataset):
     def __len__(self):
         return self.subset.__len__()
 
+
 def split_dataset(
-    dataset: torch.utils.data.Dataset,
-    first_element_percentage: float
+    dataset: torch.utils.data.Dataset, first_element_percentage: float
 ) -> Tuple[WrappedSubset, WrappedSubset]:
     """
     Given a `dataset`, splits it in two subset. First subset will have
@@ -62,8 +61,7 @@ def split_dataset(
     # Split randomly. This gives us a torch.utils.data.Subset class, that need
     # to be transformed to torch.utils.data.Dataset
     first_subset, second_subset = torch.utils.data.random_split(
-        dataset,
-        [first_size, second_size]
+        dataset, [first_size, second_size]
     )
 
     # Wrap subset into our WrappedSubset class
@@ -72,9 +70,9 @@ def split_dataset(
 
     return first_dataset, second_dataset
 
+
 def split_dataset_disjoint_classes(
-    dataset: torch.utils.data.Dataset,
-    first_element_percentage: float
+    dataset: torch.utils.data.Dataset, first_element_percentage: float
 ) -> Tuple[WrappedSubset, WrappedSubset]:
     """
     Sample split as `split_dataset`, but with one important property:
@@ -107,7 +105,6 @@ def split_dataset_disjoint_classes(
     first_indixes: np.array = np.array([])
 
     while len(first_indixes) < first_min_size:
-
         # Choose a new target and remove it from available targets
         current_target = int(random.choice(available_targets))
         available_targets.remove(current_target)
@@ -121,7 +118,7 @@ def split_dataset_disjoint_classes(
         if len(first_indixes) == 0:
             first_indixes = current_indixes
         else:
-            first_indixes = np.concatenate((first_indixes, current_indixes), axis = None)
+            first_indixes = np.concatenate((first_indixes, current_indixes), axis=None)
 
     # Get the indixes of the second dataset
     # Iterate over the available targets (which are targets that have been not
@@ -134,18 +131,16 @@ def split_dataset_disjoint_classes(
         if len(second_indixes) == 0:
             second_indixes = current_indixes
         else:
-            second_indixes = np.concatenate((second_indixes, current_indixes), axis = None)
+            second_indixes = np.concatenate(
+                (second_indixes, current_indixes), axis=None
+            )
 
     # Convert both `np.arrays` to normal python lists
     first_indixes = first_indixes.tolist()
     second_indixes = second_indixes.tolist()
 
     # Split in two datasets using our computed indixes for the datasets
-    first_dataset = WrappedSubset(
-        torch.utils.data.Subset(dataset, first_indixes)
-    )
-    second_dataset = WrappedSubset(
-        torch.utils.data.Subset(dataset, second_indixes)
-    )
+    first_dataset = WrappedSubset(torch.utils.data.Subset(dataset, first_indixes))
+    second_dataset = WrappedSubset(torch.utils.data.Subset(dataset, second_indixes))
 
     return first_dataset, second_dataset

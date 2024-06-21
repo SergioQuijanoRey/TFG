@@ -188,14 +188,14 @@ def train_model_online(
     lr = parameters["lr"]
     criterion = parameters["criterion"]
     epochs = parameters["epochs"]
+    weight_decay = parameters["weigth_decay"]
 
     # Use Adam as optimizer
-    optimizer = optim.Adam(net.parameters(), lr=lr)
+    optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
 
     # Select proper device and move the net to that device
     device = get_device()
     net.to(device)
-
     # Printing where we're training
     print(f"==> Training on device {device}")
     print("")
@@ -211,6 +211,7 @@ def train_model_online(
 
     # TODO -- trying to fix problems with loss computing
     # TODO -- margin is hardcoded!
+    #  criterion = loss_functions_blog.HardTripletLoss(margin=1.0, hardest=True)
     criterion = loss_functions_blog.BatchAllTtripletLoss(margin=1.0)
 
     # Training the network

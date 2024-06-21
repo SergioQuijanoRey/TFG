@@ -133,9 +133,9 @@ class BatchAllTtripletLoss(nn.Module):
 
         # get loss values for all possible n^3 triplets
         # shape: (batch_size, batch_size, batch_size)
-        triplet_loss = (
-            anchor_positive_dists - anchor_negative_dists
-        ) / correcting_factor + self.margin
+        triplet_loss = (anchor_positive_dists - anchor_negative_dists) / (
+            correcting_factor + 0.0005
+        ) + self.margin
 
         # step 3 - filter out invalid or easy triplets by setting their loss values to 0
 
@@ -203,9 +203,14 @@ class HardTripletLoss(nn.Module):
                 anchor_negative_dist, dim=1, keepdim=True
             )
 
+            # TODO -- trying to fix problems with collapsing loss value
+            correcting_factor = hardest_negative_dist.float().mean()
+
             # Combine biggest d(a, p) and smallest d(a, n) into final triplet loss
             triplet_loss = F.relu(
-                hardest_positive_dist - hardest_negative_dist + self.margin
+                (hardest_positive_dist - hardest_negative_dist)
+                / (correcting_factor + 1e-5)
+                + self.margin
             )
             triplet_loss = torch.mean(triplet_loss)
         else:

@@ -5,13 +5,45 @@
 #  - Some notes on other papers related to our work
 #  - EDA of the dataset
 
-# Global Parameters of the Notebook
+# Importing the modules that we are going to use
 # ==============================================================================
 
+import cProfile
 import datetime
+import enum
+import gc
 import os
+import time
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
+
+import matplotlib.pyplot as plt
+import optuna
+import torch
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
+
+import wandb
+from lib import core, datasets, filesystem
+from lib import hyperparameter_tuning as hptuning
+from lib import metrics, split_dataset, utils
+from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
+from lib.embedding_to_classifier import EmbeddingToClassifier
+from lib.loss_functions import (AddSmallEmbeddingPenalization,
+                                BatchAllTripletLoss, BatchHardTripletLoss,
+                                MeanTripletBatchTripletLoss)
+from lib.models import (CACDResnet18, CACDResnet50, FGLigthModel,
+                        LFWLightModel, LFWResNet18, NormalizedNet, ResNet18,
+                        RetrievalAdapter)
+from lib.sampler import CustomSampler
+from lib.train_loggers import (CompoundLogger, InterClusterLogger,
+                               IntraClusterLogger, LocalRankAtKLogger,
+                               RankAtKLogger, SilentLogger, TrainLogger,
+                               TripletLoggerOffline, TripletLoggerOnline)
+from lib.trainers import train_model_online
+
+# Global parameters of the notebook
+# ==============================================================================
 
 
 @dataclass
@@ -89,7 +121,7 @@ class GlobalParameters:
 
     def __init_ml_params(self):
         # P-K sampling main parameters
-        self.P: int = 8
+        self.P: int = 16
         self.K: int = 4
 
         # Minibatches must have size multiple of `P*K` in order to perform P-K sampling
@@ -97,16 +129,16 @@ class GlobalParameters:
         self.batch_size = self.P * self.K
 
         # TODO -- originaly was 9
-        self.embedding_dimension = 5
+        self.embedding_dimension = 10
 
-        self.training_epochs = 1
-        self.learning_rate = 1e-4
+        self.training_epochs = 2
+        self.learning_rate = 1e-3
         self.weight_decay = 1e-4
-        self.margin = 0.840
+        self.margin = 1.0
 
         # How many elements we see before logging. We use `P*K` so we align with
         # our batch size
-        self.logging_iterations = self.P * self.K * 1_000
+        self.logging_iterations = self.P * self.K * 200
 
         # Logging is very slow so just use a small portion of the data
         self.online_logger_train_percentage = 0.005
@@ -192,90 +224,6 @@ class GlobalParameters:
 
 
 GLOBALS = GlobalParameters()
-
-# Importing the modules we are going to use
-# ==============================================================================
-
-import copy
-import cProfile
-import enum
-import functools
-import gc
-import logging
-import math
-import time
-from collections import Counter
-from pprint import pprint
-from typing import List
-
-import dotenv
-import matplotlib.pyplot as plt
-import numpy as np
-import optuna
-import seaborn as sns
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
-import torchvision.datasets as datasets
-
-# For using pre-trained ResNets
-import torchvision.models as models
-import torchvision.transforms as transforms
-
-# All concrete pieces we're using form sklearn
-from sklearn.metrics import accuracy_score, roc_auc_score, silhouette_score
-from torch.utils.data import DataLoader, Dataset
-from tqdm import tqdm
-
-# Now that files are loaded, we can import pieces of code
-import lib.core as core
-import lib.data_augmentation as data_augmentation
-import lib.datasets as datasets
-import lib.embedding_to_classifier as embedding_to_classifier
-import lib.filesystem as filesystem
-import lib.hyperparameter_tuning as hptuning
-import lib.loss_functions as loss_functions
-import lib.metrics as metrics
-import lib.sampler as sampler
-import lib.split_dataset as split_dataset
-import lib.trainers as trainers
-import lib.utils as utils
-import wandb
-from lib.data_augmentation import AugmentatedDataset, LazyAugmentatedDataset
-from lib.embedding_to_classifier import EmbeddingToClassifier
-from lib.loss_functions import (
-    AddSmallEmbeddingPenalization,
-    BatchAllTripletLoss,
-    BatchHardTripletLoss,
-    MeanTripletBatchTripletLoss,
-)
-from lib.models import *
-from lib.models import (
-    CACDResnet18,
-    CACDResnet50,
-    FGLigthModel,
-    LFWLightModel,
-    LFWResNet18,
-    NormalizedNet,
-    ResNet18,
-    RetrievalAdapter,
-)
-from lib.sampler import CustomSampler
-from lib.train_loggers import (
-    CompoundLogger,
-    InterClusterLogger,
-    IntraClusterLogger,
-    LocalRankAtKLogger,
-    RankAtKLogger,
-    SilentLogger,
-    TrainLogger,
-    TripletLoggerOffline,
-    TripletLoggerOnline,
-)
-from lib.trainers import train_model_online
-from lib.visualizations import *
 
 # Server security check
 # ==============================================================================
@@ -995,10 +943,12 @@ net.set_permute(False)
 parameters = dict()
 parameters["epochs"] = GLOBALS.training_epochs
 parameters["lr"] = GLOBALS.learning_rate
+parameters["weigth_decay"] = GLOBALS.weight_decay
 
 # We use the loss function that depends on the global parameter BATCH_TRIPLET_LOSS_FUNCTION
 # We selected this loss func in *Choose the loss function to use* section
 parameters["criterion"] = batch_loss_function
+
 
 print(net)
 
@@ -1033,52 +983,17 @@ intercluster_metrics_logger = InterClusterLogger(
     validation_percentage=GLOBALS.online_logger_validation_percentage,
 )
 
-rank_at_one_logger = RankAtKLogger(
-    net=net,
-    iterations=GLOBALS.logging_iterations,
-    train_percentage=GLOBALS.online_logger_train_percentage,
-    validation_percentage=GLOBALS.online_logger_validation_percentage,
-    k=1,
-)
-
-rank_at_k_logger = RankAtKLogger(
-    net=net,
-    iterations=GLOBALS.logging_iterations,
-    train_percentage=GLOBALS.online_logger_train_percentage,
-    validation_percentage=GLOBALS.online_logger_validation_percentage,
-    k=GLOBALS.accuracy_at_k_value,
-)
-
-
-local_rank_at_one_logger = LocalRankAtKLogger(
-    net=net,
-    iterations=GLOBALS.logging_iterations,
-    train_percentage=GLOBALS.online_logger_train_percentage,
-    validation_percentage=GLOBALS.online_logger_validation_percentage,
-    k=1,
-)
-
-local_rank_at_k_logger = LocalRankAtKLogger(
-    net=net,
-    iterations=GLOBALS.logging_iterations,
-    train_percentage=GLOBALS.online_logger_train_percentage,
-    validation_percentage=GLOBALS.online_logger_validation_percentage,
-    k=GLOBALS.accuracy_at_k_value,
-)
-
 # Combine them in a single logger
 logger = CompoundLogger(
     [
         triplet_loss_logger,
         cluster_sizes_logger,
         intercluster_metrics_logger,
-        rank_at_one_logger,
-        rank_at_k_logger,
-        local_rank_at_one_logger,
-        local_rank_at_k_logger,
     ]
 )
 
+# TODO -- remove this
+logger = CompoundLogger([])
 
 ## Running the training loop
 # ==============================================================================
@@ -1164,7 +1079,6 @@ net.eval()
 # Model evaluation
 # ==============================================================================
 
-
 # Use the network to perform a retrieval task and compute rank@1 and rank@5 accuracy
 with torch.no_grad():
     net.set_permute(False)
@@ -1183,6 +1097,14 @@ with torch.no_grad():
         max_examples=len(test_loader),
         fast_implementation=False,
     )
+    test_rank_at_one_cacd = metrics.rank_accuracy(
+        k=1,
+        data_loader=validation_loader_augmented,
+        network=net,
+        max_examples=len(validation_loader_augmented),
+        fast_implementation=False,
+    )
+
     train_rank_at_five = metrics.rank_accuracy(
         k=5,
         data_loader=train_loader_augmented,
@@ -1197,19 +1119,30 @@ with torch.no_grad():
         max_examples=len(test_loader),
         fast_implementation=False,
     )
+    test_rank_at_five_cacd = metrics.rank_accuracy(
+        k=5,
+        data_loader=validation_loader_augmented,
+        network=net,
+        max_examples=len(validation_loader_augmented),
+        fast_implementation=False,
+    )
 
     print(f"Train Rank@1 Accuracy: {train_rank_at_one}")
     print(f"Test Rank@1 Accuracy: {test_rank_at_one}")
+    print(f"Test CACD Rank@1 Accuracy: {test_rank_at_one_cacd}")
     print(f"Train Rank@5 Accuracy: {train_rank_at_five}")
     print(f"Test Rank@5 Accuracy: {test_rank_at_five}")
+    print(f"Test CACD Rank@5 Accuracy: {test_rank_at_five_cacd}")
 
     # Put this info in wandb
     wandb.log(
         {
             "Final Train Rank@1 Accuracy": train_rank_at_one,
             "Final Test Rank@1 Accuracy": test_rank_at_one,
+            "Final Test CACD Rank@1 Accuracy": test_rank_at_one_cacd,
             "Final Train Rank@5 Accuracy": train_rank_at_five,
             "Final Test Rank@5 Accuracy": test_rank_at_five,
+            "Final Test CACD Rank@5 Accuracy": test_rank_at_five_cacd,
         }
     )
 
