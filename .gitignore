@@ -36,3 +36,9 @@
 /training.log
 /thesis/scopus_diagrams/.ipynb_checkpoints/
 /thesis/.venv/
+dissertation/dissertation.aux
+dissertation/dissertation.log
+dissertation/dissertation.nav
+dissertation/dissertation.out
+dissertation/dissertation.snm
+dissertation/dissertation.toc
