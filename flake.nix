@@ -91,6 +91,9 @@
             todonotes
             tikzmark
             cleveref
+
+            # Dissertation
+            beamer
             ;
         });
 
