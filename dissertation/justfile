@@ -46,6 +46,8 @@ clean:
     {{trash}} *.lot || echo "All .lot files already removed"
     {{trash}} *.bbl || echo "All .bbl files already removed"
     {{trash}} *.blg || echo "All .blg files already removed"
+    {{trash}} *.nav || echo "All .nav files already removed"
+    {{trash}} *.snm || echo "All .snm files already removed"
 
 # Opens the generated PDF file
 view:
