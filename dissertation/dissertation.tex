@@ -1,21 +1,41 @@
 \documentclass{beamer}
 
+
+% Math and other fonts
+\usepackage[mathscr]{eucal}
+\usepackage{amsfonts,amsmath,amstext,amssymb}
+
+% Info for the titlepage
 \title{Reidentificación de personas invariante a la edad mediante redes profundas y análisis de su eficiencia frente a redes de una capa}
 \author[Sergio Quijano Rey]{Sergio Quijano Rey}
 \date[28/06/2024]{28 de Junio del 2024}
+\institute{Universidad de Granada}
+
+% Nice looking theme with navigation bar
+\usetheme{Frankfurt}
 
 \begin{document}
 
 \begin{frame}
 	\titlepage
 \end{frame}
-
-\begin{frame}{Outline}
+\begin{frame}{Contenidos}
 	\tableofcontents
 \end{frame}
+
+% Show the table of contents at the begining of each section
+\AtBeginSection[] {
+	\begin{frame}
+		\frametitle{Contenidos}
+		\tableofcontents[currentsection, pausesections]
+	\end{frame}
+}
 
 % Two parts of the dissertation
 \include{matematicas}
 \include{informatica}
+
+% Bibliography
+\bibliography{references.bib}
 
 \end{document}
