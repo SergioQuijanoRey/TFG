@@ -1,5 +1,6 @@
 \section{Estudio sobre la expresividad de las redes neuronales profundas y no profundas}
 
+\subsection{Objetivos}
 \begin{frame}{Objetivos}
 	\begin{itemize}
 		\item Modelizar una \textbf{tarea de aprendizaje automático}.
@@ -28,6 +29,10 @@
 
 	\begin{itemize}
 		\item \textbf{Funciones de representación} $\conjunto{f_d(\nv{x}): \; d \in \N} \subseteq L^2(\R^S)$. El conjunto de funciones será total y linealmente independiente.
+		      \begin{itemize}
+			      \item Neuronas.
+			      \item \textit{Radial Basis Functions} (Gaussianas).
+		      \end{itemize}
 		\item Expresamos las combinaciones lineales finitas como:
 
 		      \begin{equation} \label{eq:hipotesis_en_general}
@@ -85,7 +90,6 @@
 			\ldots \\
 			\phi^{l, j, \gamma} &:= \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha} \\
 			\ldots \\
-			\phi^{L - 1, j, \gamma} &:= \sum_{\alpha = 1}^{r_{L-2}} a_{\alpha}^{L - 1, j, \gamma} \cdot \phi^{L-2, 2j-1, \alpha} \otimes \phi^{L-2, 2j, \alpha}. \\
 			\mathcal{A}^y &:= \sum_{\alpha = 1}^{r_{L-1}} a_{\alpha}^{L, y} \cdot \phi^{L-1, 1, \alpha} \otimes \phi^{L-1, 2, \alpha}
 		\end{split}
 	\end{equation}
@@ -160,9 +164,9 @@
 
 \begin{frame}
 	\begin{itemize}
-		\item El primer resultado nos dice que casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$ lo que implica que el modelo \textit{CP} necesita un número exponencial de parámetros.
+		\item El primer resultado nos dice que casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$, lo que implica que el modelo \textit{CP} necesita un número exponencial de parámetros.
 		\item El segundo resultado añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
-		\item Damos información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} dan ejemplos concretos en los que esto ocurre.
+		\item Damos información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} únicamente dan ejemplos concretos en los que esto ocurre.
 	\end{itemize}
 \end{frame}
 
