@@ -43,45 +43,130 @@
 \end{frame}
 
 \subsection{Modelización de las redes no profundas}
+\begin{frame}{Descomposición \textit{CP}}
+	\begin{itemize}
+		\item Aplicar la descomposición \textit{CP} en el tensor de coeficientes de \eqref{eq:puntuacion_general}.
 
+		      \begin{block}{Descomposición \textit{CANDECOMP/PARAFAC}}
+			      Todo tensor $\mathcal{A}$ puede ser expresado como la suma de tensores puros. Es decir, $\forall \mathcal{A} \in \R^{M_1 \times \cdots \times M_N}$, $\exists Z \in \N$:
+			      \begin{equation}
+				      \mathcal{A} = \sum_{i = 1}^Z \nv{v_i^{(1)}} \otimes \cdots \otimes \nv{v_i^{(N)}};
+				      \; \nv{v_i^{(k)}} \in \R^{M_k},
+				      \; \forall i \in \deltaset{Z},
+				      \; \forall k \in \deltaset{N}.
+			      \end{equation}
+		      \end{block}
 
-\subsection{Modelización de las redes profundas}
+		\item Nuestro modelo queda como:
 
+		      \begin{equation} \label{eq:cp_model}
+			      h_y(\nv{x_1}, \ldots, \nv{x_N}) =  \sum_{z = 1}^Z a_z^y \dspace \prod_{i = 1}^N \dspace \sum_{d = 1}^{M} \omega^{z, i}_d \; f_{\theta_{d}}(\nv{x_i}).
+		      \end{equation}
 
-
-\subsection{Modelización de las redes neuronales}
-\begin{frame}
-	\begin{block}{Teorema de pruebas}
-		Este es un teorema de pruebas
-	\end{block}
+	\end{itemize}
 \end{frame}
 
-\subsection{Teoremas centrales}
-\begin{frame}
-	\begin{block}{Teorema de pruebas}
-		Este es un teorema de pruebas
-	\end{block}
-
-	\begin{block}{Otro Teorema de pruebas}
-		Otro Este es un teorema de pruebas
-	\end{block}
-\end{frame}
-
-\begin{frame}
-
+\begin{frame}{Relación con arquitecturas de aprendizaje automático}
 	\begin{figure}
 		\centering
-		\includegraphics[width=1.0\textwidth]{matematicas/cnn_ejemplo.png}
-		\caption{Ejemplo visual de una red convolucional profunda.}
+		\includegraphics[width=0.7\textwidth]{matematicas/relacion_cnn_tikz}
+		\caption{Representación gráfica del modelo \textit{CP}.}
 	\end{figure}
 
 \end{frame}
 
-\subsection{Conclusiones}
+
+\subsection{Modelización de las redes profundas}
+\begin{frame}{Descomposición HT}
+
+	\begin{equation} \label{eq:descomposicion_ht}
+		\begin{split}
+			\phi^{1, j, \gamma} &:= \sum_{\alpha = 1}^{r_0} a_{\alpha}^{1, j, \gamma} \cdot \nv{\varphi^{2j-1, \alpha}} \otimes \nv{\varphi^{2j, \alpha}} \\
+			\ldots \\
+			\phi^{l, j, \gamma} &:= \sum_{\alpha = 1}^{r_{l-1}} a_{\alpha}^{l, j, \gamma} \cdot \phi^{l-1, 2j-1, \alpha} \otimes \phi^{l-1, 2j, \alpha} \\
+			\ldots \\
+			\phi^{L - 1, j, \gamma} &:= \sum_{\alpha = 1}^{r_{L-2}} a_{\alpha}^{L - 1, j, \gamma} \cdot \phi^{L-2, 2j-1, \alpha} \otimes \phi^{L-2, 2j, \alpha}. \\
+			\mathcal{A}^y &:= \sum_{\alpha = 1}^{r_{L-1}} a_{\alpha}^{L, y} \cdot \phi^{L-1, 1, \alpha} \otimes \phi^{L-1, 2, \alpha}
+		\end{split}
+	\end{equation}
+
+	\begin{itemize}
+		\item $l$: nivel en la descomposición.
+		\item $j$: posición dentro del nivel $l$.
+		\item $\gamma$: tensor de la capa $l$ y posición $j$.
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Primer ejemplo}
+
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth]{matematicas/descomp_ht_rank_1}
+		\caption{Ejemplo gráfico tomando $r = 1$, $L = 2$.}
+		\label{img:diagrama_ht_simple}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}{Segundo ejemplo}
+
+	\begin{figure}
+		\includegraphics[width=0.7\linewidth]{matematicas/descomp_ht_rank_2_paso_1}
+		\caption{Ejemplo gráfico tomando $r = 2$, $L = 2$ capas, primer paso.}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}{Segundo ejemplo}
+
+	\begin{figure}
+		\includegraphics[width=0.7\linewidth]{matematicas/descomp_ht_rank_2_paso_2}
+		\caption{Ejemplo gráfico tomando $r = 2$, $L = 2$ capas, segundo paso.}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}{Relación con arquitecturas de aprendizaje automático}
+
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.9\textwidth]{matematicas/diagrama_paper_modelo_ht}
+		\caption{Funcionamiento de nuestro modelo. Imagen extraída de \cite{matematicas:principal}.}
+	\end{figure}
+
+
+\end{frame}
+
+\subsection{Resultados principales}
+
+\begin{frame}{Primer resultado central}
+
+	\begin{block}{Rango \textit{CP} exponencial de un modelo \textit{HT}}
+		Sea $\mathcal{A}^y \in \espaciotensores{N}{M}$ dado por las ecuaciones \eqref{eq:descomposicion_ht}. Definamos $r := \min \conjunto{r_0, M}$ y consideremos el espacio de todas las posibles configuraciones de parámetros de nuestro modelo \textit{HT} $\conjunto{ \nv{a^{l, j, \gamma}}}_{l, j, \gamma}$. En este espacio, el tensor generado $\mathcal{A}^y$ tendrá rango \textit{CP} de al menos $r^{N/2}$ casi por doquier. Es decir, el conjunto de parámetros del modelo \textit{HT} con los que el modelo tiene rango \textit{CP} menor que $r^{N/2}$ tiene medida nula. El resultado se mantiene si forzamos los coeficientes compartidos en la ecuación \eqref{eq:descomposicion_ht}. Es decir, haciendo $\nv{a^{l, \gamma}} \equiv \nv{a^{l, j, \gamma}}$ y considerando el espacio de configuraciones $\{ \nv{a^{l, \gamma}}  \}_{l, \gamma}$.
+
+	\end{block}
+
+
+\end{frame}
+
+\begin{frame}{Segundo resultado central}
+
+	\begin{block}{Incapacidad del modelo \textit{CP} para aproximar eficientemente el modelo \textit{HT}}
+		Dado un conjunto de funciones de representación linealmente independientes, $\conjunto{f_{\theta_d}: \; d \in \deltaset{M}}$, aleatorizar los pesos de un modelo \textit{HT} \eqref{eq:descomposicion_ht} a partir de una distribución de probabilidad continua induce funciones de puntuación $h_y$ que con probabilidad uno no pueden ser aproximadas arbitrariamente bien (en el sentido $L^2$) por un modelo \textit{CP} con menos de $r := \min \{r_0, M \}^{N/2}$ canales. Este resultado se mantiene forzando los coeficientes compartidos en el modelo \textit{HT} mientras que dejamos el modelo \textit{CP} sin restricciones.
+	\end{block}
+
+\end{frame}
+
 \begin{frame}
 	\begin{itemize}
-		\item Primera conclusion
-		\item Segunda conclusion
-		\item Tercera conclusion
+		\item El primer resultado nos dice que casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$ lo que implica que el modelo \textit{CP} necesita un número exponencial de parámetros.
+		\item El segundo resultado añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
+		\item Damos información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} dan ejemplos concretos en los que esto ocurre.
 	\end{itemize}
+\end{frame}
+
+\subsection{Conclusiones}
+\begin{frame}{Conclusiones}
+	Se han cumplido los objetivos iniciales.
 \end{frame}
