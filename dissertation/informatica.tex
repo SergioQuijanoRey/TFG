@@ -149,10 +149,178 @@
 \end{frame}
 
 \subsection{Experimentación preliminar}
+\begin{frame}{\textit{CACD}}
+
+	\begin{figure}
+		\includegraphics[width=0.8\textwidth]{informatica/cacd_example}
+		\caption{Imagen extraída de \cite{informatica:paper_cacd}}
+		\label{img:cacd_imagenes_ejemplo}
+	\end{figure}
+
+\end{frame}
+
 \begin{frame}{Resultados preliminares sobre \textit{CACD}}
+	\begin{figure}
+		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/running_loss}
+		\caption{Error durante el entrenamiento}
+	\end{figure}
+\end{frame}
+\begin{frame}
+	\begin{figure}
+		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intracluster_distance}
+		\caption{Distanca \textit{intracluster} media}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Resultados preliminares sobre \textit{CACD}}
+	\begin{figure}
+		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intercluster_distance}
+		\caption{Distancia \textit{intercluster} media}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}{Resultados preliminares sobre \textit{CACD}}
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			Conjunto      & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
+			\hline
+
+			Entrenamiento & 0.07185                  & 0.15244                  & -0.41858            \\
+			Test          & 0.01000                  & 0.00100                  & -0.32984            \\
+			\hline
+		\end{tabular}
+		\caption{Valores de distintas métricas obtenidas sobre el conjunto \textit{CACD} de entrenamiento y sobre el conjunto \textit{FG-Net} de \textit{test}.}
+		\label{table:resultados_sobre_fg_net}
+	\end{table}
 
 \end{frame}
 
 \begin{frame}{Resultados preliminares sobre \textit{MNIST}}
+
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			Conjunto      & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
+			\hline
+
+			Entrenamiento & 0.0937                   & 0.453                    & 0.000               \\
+			Test          & 0.085                    & 0.414                    & 0.000               \\
+
+
+			\hline
+		\end{tabular}
+		\caption{Métricas de evaluación obtenidas tras entrenar el modelo sobre \textit{MNIST}.}
+		\label{table:resultados_mnist_mal}
+	\end{table}
+
+\end{frame}
+
+
+\begin{frame}{Resultados de terceros}
+
+	\begin{table}[!hbtp]
+		\centering
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			Conjunto      & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
+			\hline
+
+			Entrenamiento & 0.916                    & 0.980                    & 0.648               \\
+			Test          & 0.940                    & 0.976                    & 0.632               \\
+
+			\hline
+		\end{tabular}
+		\caption{Métricas de evaluación obtenidas tras entrenar el modelo sobre \textit{MNIST}, usando \textit{Batch SemiHard}, usando la base de código \cite{informatica:adambielski_github}.}
+		\label{table:resultados_adam_mnist_random}
+	\end{table}
+
+\end{frame}
+
+\subsection{Solución original}
+\begin{frame}{Raíz del problema}
+\end{frame}
+
+
+\begin{frame}{Solución original}
+\end{frame}
+
+\subsection{Validación experimental de nuestra solución}
+\begin{frame}{Resultados en \textit{MNIST} con nuestra solución}
+
+	\begin{figure}
+		\includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_hard_running_loss.png}
+		\caption{Función de pérdida.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Resultados en \textit{MNIST} con nuestra solución}
+
+	\begin{figure}
+		\includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_hard_intracluster.png}
+		\caption{Distancias intracluster.}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}{Resultados en \textit{MNIST} con nuestra solución}
+
+
+	\begin{figure}
+		\includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_hard_interclusater.png}
+		\caption{Distancias intercluster.}
+	\end{figure}
+
+
+\end{frame}
+
+\begin{frame}{Mejora de los resultados en \textit{MNIST}}
+
+
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|l|l|l|l|}
+			\hline
+			Métrica                  & Conjunto      & Antes  & Después & Mejora   \\
+			\hline
+			\textit{Rank@1 Accuracy} & Entrenamiento & 0.0937 & 0.997   & 10.64    \\
+			\textit{Rank@1 Accuracy} & Test          & 0.085  & 0.992   & 11.67    \\
+			\textit{Rank@5 Accuracy} & Entrenamiento & 0.453  & 0.997   & 2.20     \\
+			\textit{Rank@5 Accuracy} & Test          & 0.414  & 0.991   & 2.39     \\
+			\textit{Silhouette}      & Entrenamiento & 0.000  & 0.953   & $\infty$ \\
+			\textit{Silhouette}      & Test          & 0.000  & 0.922   & $\infty$ \\
+			\hline
+		\end{tabular}
+		\label{table:comparaciones_mnist_resultados}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Mejora de los resultados en \textit{CACD}}
+
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|l|l|l|l|}
+			\hline
+			Métrica                  & Conjunto      & Antes   & Después & Mejora \\
+			\hline
+			\textit{Rank@1 Accuracy} & Entrenamiento & 0.0092  & 0.2676  & 29.09  \\
+			\textit{Rank@1 Accuracy} & Test          & 0.0312  & 0.3732  & 11.96  \\
+			\textit{Rank@5 Accuracy} & Entrenamiento & 0.0136  & 0.4639  & 34.11  \\
+			\textit{Rank@5 Accuracy} & Test          & 0.0781  & 0.6152  & 7.88   \\
+			\textit{Silhouette}      & Entrenamiento & -0.1366 & -0.1648 & -0.02  \\
+			\textit{Silhouette}      & Test          & -0.1596 & -0.1832 & -0.023 \\
+			\hline
+		\end{tabular}
+		\label{table:comparaciones_cacd_resultados}
+	\end{table}
+
+
+\end{frame}
+
+\subsection{Conclusiones}
+\begin{frame}
 
 \end{frame}
