@@ -5,7 +5,7 @@
 
 	\begin{itemize}
 		\item Resolver una tarea de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \textit{AIFR}.
-		\item Estudiar dos variantes \textit{online} en la función de pérdida \textit{Triplet Loss}.
+		\item Estudiar dos \textbf{variantes \textit{online}} en la función de pérdida \textit{Triplet Loss}.
 	\end{itemize}
 
 \end{frame}
@@ -33,48 +33,19 @@
 
 \end{frame}
 
-\begin{frame}{Tarea concreta a resolver}
-
-	Tarea de \textbf{verificación}:
-
-	\begin{figure}[!h]
-		\includegraphics[width=0.7\textwidth]{informatica/ejemplos_tareas/verification}
-		\caption{Imágenes extraídas de \cite{informatica:cacd_dataset}.}
-	\end{figure}
-
-
-\end{frame}
-
-\begin{frame}{\textit{AIFR}}
-
-	Tarea de \textbf{\textit{retrieval}} o búsqueda:
-
-	\begin{figure}[!h]
-		\includegraphics[width=0.8\textwidth]{informatica/ejemplos_tareas/retrieval}
-		\caption{Imágenes extraídas de \cite{informatica:cacd_dataset}.}
-	\end{figure}
-
-	Esta es la tarea en la que centramos nuestro estudio.
-
-\end{frame}
-
 \subsection{Enfoque}
-\begin{frame}{Embedding semántico}
-
-	\begin{itemize}
-		\item Queremos que nuestra red aprenda un \textbf{\textit{embedding} semántico}.
-		\item Elementos de la misma identidad deberán estar cerca entre sí, mientras que elementos de distintas identidades deberán estar distantes.
-	\end{itemize}
-
-\end{frame}
 
 \begin{frame}{Embedding semántico}
-
-	\begin{figure}
-		\includegraphics[width=0.6\textwidth]{informatica/embedding_paper_principal}
-		\caption{Imagen extraída de \cite{informatica:principal}}
-	\end{figure}
-
+	\begin{columns}
+		\column{0.6\linewidth}
+		\centering
+		\includegraphics[width=1.0\textwidth]{informatica/embedding_paper_principal}
+		\column{0.5\linewidth}
+		\begin{itemize}
+			\item Queremos que nuestra red aprenda un \textbf{\textit{embedding} semántico}.
+			\item Elementos de la misma identidad deberán estar cerca entre sí, mientras que elementos de distintas identidades deberán estar distantes.
+		\end{itemize}
+	\end{columns}
 \end{frame}
 
 \begin{frame}{Redes siamesas}
@@ -121,19 +92,10 @@
 		      \end{itemize}
 	\end{itemize}
 
-\end{frame}
-
-\begin{frame}{\textit{P-K} sampling}
-
 	\begin{figure}
 		\includegraphics[width=0.6\textwidth]{informatica/ejemplo_grafico_pk_sampling}
 		\caption{Imagen extraída de \cite{informatica:paper_image_pk_sampling}.}
 	\end{figure}
-
-	\begin{itemize}
-		\item Elegimos $P$ clases aleatorias.
-		\item Por cada clase, elegimos $K$ imágenes aleatorias.
-	\end{itemize}
 
 \end{frame}
 
@@ -142,8 +104,8 @@
 	Sobre el anterior \textit{P-K} sampling:
 
 	\begin{itemize}
-		\item \textit{Batch All}: probar todas las combinaciones ancla - positivo - negativo.
-		\item \textit{Batch Hard}: por cada ancla, computar la pérdida con el positivo más lejano y el negativo más cercano (combinación más complicada).
+		\item \textbf{\textit{Batch All}}: probar todas las combinaciones ancla - positivo - negativo.
+		\item \textbf{\textit{Batch Hard}}: por cada ancla, computar la pérdida con el positivo más lejano y el negativo más cercano (combinación más complicada).
 	\end{itemize}
 
 \end{frame}
@@ -168,7 +130,7 @@
 \begin{frame}
 	\begin{figure}
 		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intracluster_distance}
-		\caption{Distanca \textit{intracluster} media}
+		\caption{Distancia \textit{intracluster} media}
 	\end{figure}
 \end{frame}
 
@@ -217,35 +179,32 @@
 		\label{table:resultados_mnist_mal}
 	\end{table}
 
-\end{frame}
-
-
-\begin{frame}{Resultados de terceros}
-
-	\begin{table}[!hbtp]
-		\centering
-		\begin{tabular}{|l|l|l|l|}
-			\hline
-			Conjunto      & \textit{Rank@1 Accuracy} & \textit{Rank@5 Accuracy} & \textit{Silhouette} \\
-			\hline
-
-			Entrenamiento & 0.916                    & 0.980                    & 0.648               \\
-			Test          & 0.940                    & 0.976                    & 0.632               \\
-
-			\hline
-		\end{tabular}
-		\caption{Métricas de evaluación obtenidas tras entrenar el modelo sobre \textit{MNIST}, usando \textit{Batch SemiHard}, usando la base de código \cite{informatica:adambielski_github}.}
-		\label{table:resultados_adam_mnist_random}
-	\end{table}
+	En la experimentación realizada por \cite{informatica:adambielski_github} observamos los mismos problemas que estamos exponiendo.
 
 \end{frame}
 
 \subsection{Solución original}
-\begin{frame}{Raíz del problema}
-\end{frame}
+\begin{frame}{Raíz del problema y nuestra propuesta de solución}
+	\begin{itemize}
+		\item La red aprende a transformar todas las entradas a un vector no nulo del \textit{embedding}.
+		\item En esta situación tenemos que:
+	\end{itemize}
 
+	\begin{equation} \label{eq:justificacion_relu}
+		\begin{split}
+			\mathcal{L}(a, p, n) &= ReLU(d(a, p) - d(a, n) + \alpha) \\
+			&= ReLU(d(\nv{v_0}, \nv{v_0}) - d(\nv{v_0}, \nv{v_0}) + \alpha) \\
+			&= ReLU(0 - 0 + \alpha) = ReLU(\alpha) = \alpha.
+		\end{split}
+	\end{equation}
 
-\begin{frame}{Solución original}
+	\begin{itemize}
+		\item Penalizar las distancias negativas pequeñas dividiendo por su media en el término ancla - positivo.
+	\end{itemize}
+	\begin{equation}
+		\mathcal{L}(a, p, n) = \widehat{ReLU}((\widehat{d}(a, p) - \widehat{d}(a, n)) / mean(d(a, n)) + \alpha)
+	\end{equation}
+
 \end{frame}
 
 \subsection{Validación experimental de nuestra solución}
@@ -321,6 +280,12 @@
 \end{frame}
 
 \subsection{Conclusiones}
-\begin{frame}
+\begin{frame}{Conclusiones}
+
+	\begin{itemize}
+		\item Hemos identificado un problema de diseño en las variantes \textit{online} de \textit{Triplet Loss}.
+		\item Hemos propuesto una solución original y validado experimentalmente su gran eficacia.
+		\item Obtenemos buenos resultados en la tarea de \textit{AIFR}.
+	\end{itemize}
 
 \end{frame}
