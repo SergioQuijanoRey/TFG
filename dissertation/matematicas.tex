@@ -3,11 +3,12 @@
 \subsection{Objetivos}
 \begin{frame}{Objetivos}
 	\begin{itemize}
+		\item Estudiar la mayor potencia expresiva de las redes profundas frente a las redes no profundas.
 		\item Modelizar una \textbf{tarea de aprendizaje automático}.
-		\item Modelizar \textbf{dos tipos de arquitecturas} de aprendizaje automático.
+		\item Modelizar \textbf{dos tipos de arquitecturas} de aprendizaje automático a partir de ciertas descomposiciones tensoriales.
 		      \begin{itemize}
-			      \item Arquitectura \textbf{profunda}.
-			      \item Arquitectura \textbf{no profunda} o somera.
+			      \item Arquitectura \textbf{no profunda} o somera, utilizando la descomposición \textit{CP}.
+			      \item Arquitectura \textbf{profunda}, empleando la descomposición \textit{HT}.
 		      \end{itemize}
 		\item Dar dos resultados para estudiar el fenómeno de \textbf{eficiencia en profundidad} y cómo de frecuentemente ocurre.
 	\end{itemize}
@@ -48,7 +49,7 @@
 \end{frame}
 
 \subsection{Modelización de las redes no profundas}
-\begin{frame}{Descomposición \textit{CP}}
+\begin{frame}{Descomposición \textit{CANDECOMP/PARAFAC}}
 	\begin{itemize}
 		\item Aplicar la descomposición \textit{CP} en el tensor de coeficientes de \eqref{eq:puntuacion_general}.
 
@@ -82,7 +83,7 @@
 
 
 \subsection{Modelización de las redes profundas}
-\begin{frame}{Descomposición HT}
+\begin{frame}{Descomposición \textit{Hierarchical \textit{Tucker}}}
 
 	\begin{equation} \label{eq:descomposicion_ht}
 		\begin{split}
@@ -143,6 +144,23 @@
 
 \end{frame}
 
+\begin{frame}{Eficiencia en profundidad}
+	\begin{itemize}
+		\item La \textbf{eficiencia en profundidad} es el fenómeno en el que una arquitectura polinomial obtiene una potencia expresiva que en otro modelo require un número exponencial de parámetros.
+		      \begin{block}{Penalización en número de parámetros}
+
+			      Dado un tensor $\mathcal{A}^y$ como resultado de un modelo \textit{CP}, realizar dicho tensor con un modelo \textit{HT} requiere de:
+			      \begin{equation}
+				      N \cdot Z^2 \cdot \frac{2^{L-1} - 1}{2^{L-1}} \encima{\longmapsto}{L \mapsto \infty} N \cdot Z^2.
+			      \end{equation}
+
+			      coeficientes adicionales.
+		      \end{block}
+
+		\item ¿Y al revés?
+	\end{itemize}
+\end{frame}
+
 \subsection{Resultados principales}
 
 \begin{frame}{Primer resultado central}
@@ -169,9 +187,4 @@
 		\item El segundo resultado añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
 		\item Damos información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} únicamente dan ejemplos concretos en los que esto ocurre.
 	\end{itemize}
-\end{frame}
-
-\subsection{Conclusiones}
-\begin{frame}{Conclusiones}
-	Se han cumplido los objetivos iniciales.
 \end{frame}
