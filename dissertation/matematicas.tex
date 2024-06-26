@@ -20,7 +20,7 @@
 	\begin{itemize}
 		\item Buscamos resolver una tarea de \textbf{clasificación de imágenes}.
 		\item Representamos las imágenes de entrada como \textbf{parches}, $(\nv{x_1}, \ldots, \nv{x_N})$ con $\nv{x_i} \in \R^S$. Esta representación se utiliza en la práctica \cite{matematicas:vit}.
-		\item Clasificamos la imagen de entrada como el valor $y$ para el cual se maximiza la \textbf{función de puntuación} $h_y: \R^S \times \cdots \R^S \to \R$.
+		\item Clasificamos la imagen de entrada como el valor $y$ para el cual se maximiza la \textbf{función de puntuación} $h_y: \R^S \times \cdots \times \R^S \to \R$.
 		\item Por lo tanto, buscamos aprender $Y$ funciones de puntuación a partir de los datos y las arquitecturas de aprendizaje automático que desarrollemos.
 	\end{itemize}
 
@@ -75,8 +75,7 @@
 \begin{frame}{Relación con arquitecturas de aprendizaje automático}
 	\begin{figure}
 		\centering
-		\includegraphics[width=0.7\textwidth]{matematicas/relacion_cnn_tikz}
-		\caption{Representación gráfica del modelo \textit{CP}.}
+		\includegraphics[height=0.9\textheight]{matematicas/relacion_cnn_tikz}
 	\end{figure}
 
 \end{frame}
@@ -137,7 +136,7 @@
 
 	\begin{figure}
 		\centering
-		\includegraphics[width=0.9\textwidth]{matematicas/diagrama_paper_modelo_ht}
+		\includegraphics[height=0.42\textheight]{matematicas/diagrama_paper_modelo_ht}
 		\caption{Funcionamiento de nuestro modelo. Imagen extraída de \cite{matematicas:principal}.}
 	\end{figure}
 
@@ -146,7 +145,7 @@
 
 \begin{frame}{Eficiencia en profundidad}
 	\begin{itemize}
-		\item La \textbf{eficiencia en profundidad} es el fenómeno en el que una arquitectura polinomial obtiene una potencia expresiva que en otro modelo require un número exponencial de parámetros.
+		\item La \textbf{eficiencia en profundidad} es el fenómeno en el que un modelo con un número de parámetros polinomial obtiene una potencia expresiva que en otro modelo require un número exponencial de parámetros.
 		      \begin{block}{Penalización en número de parámetros}
 
 			      Dado un tensor $\mathcal{A}^y$ como resultado de un modelo \textit{CP}, realizar dicho tensor con un modelo \textit{HT} requiere de:
@@ -181,10 +180,11 @@
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Conclusiones}
 	\begin{itemize}
+		\item Hemos modelado la tarea de aprendizaje y los dos tipos de arquitectura, profunda y no profunda.
 		\item El primer resultado nos dice que casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$, lo que implica que el modelo \textit{CP} necesita un número exponencial de parámetros.
 		\item El segundo resultado añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
-		\item Damos información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} únicamente dan ejemplos concretos en los que esto ocurre.
+		\item Hemos dado información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} únicamente dan ejemplos concretos en los que esto ocurre.
 	\end{itemize}
 \end{frame}
