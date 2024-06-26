@@ -5,6 +5,9 @@
 
 	\begin{itemize}
 		\item Resolver una tarea de \textbf{reconocimiento facial invariante a cambios en la edad}, por sus siglas en inglés, \textit{AIFR}.
+	\end{itemize}
+
+	\begin{itemize}
 		\item Estudiar dos \textbf{variantes \textit{online}} en la función de pérdida \textit{Triplet Loss}.
 	\end{itemize}
 
@@ -16,13 +19,17 @@
 
 	\begin{figure}
 		\includegraphics[width=0.8\textwidth]{informatica/ejemplo_dificultad_aifr}
-		\caption{Ejemplo de datos con los que trabajamos en una tarea de \textit{AIFR}. Imagen extraída de \cite{informatica:aifr_survey}.}
+		\caption{Ejemplo de datos con los que trabajamos en una tarea de \textit{AIFR}. Imagen extraída de \footcite{informatica:aifr_survey}.}
 		\label{img:ejemplo_dificultad_aifr}
 	\end{figure}
 
 \end{frame}
 
 \begin{frame}{Problemas asociados a la tarea}
+
+	\begin{figure}
+		\includegraphics[height=0.4\textheight]{informatica/ejemplo_dificultad_aifr}
+	\end{figure}
 
 	\begin{itemize}
 		\item Pueden ser más similares dos personas distintas de la misma edad que la misma persona en dos edades muy distantes.
@@ -39,7 +46,10 @@
 	\begin{columns}
 		\column{0.6\linewidth}
 		\centering
-		\includegraphics[width=1.0\textwidth]{informatica/embedding_paper_principal}
+		\begin{figure}
+			\includegraphics[width=1.0\textwidth]{informatica/embedding_paper_principal}
+			\caption{Imagen extraída de \cite{informatica:principal}.}
+		\end{figure}
 		\column{0.5\linewidth}
 		\begin{itemize}
 			\item Queremos que nuestra red aprenda un \textbf{\textit{embedding} semántico}.
@@ -111,10 +121,17 @@
 \end{frame}
 
 \subsection{Experimentación preliminar}
+\begin{frame}{Métricas más relevantes}
+	\begin{itemize}
+		\item \textit{Rank@k}: dada una imagen de entrada, la red devuelve las $k$ imágenes que detecta como más cercanas. Contamos como acierto si al menos una imagen corresponde a la identidad apropiada.
+		\item \textit{Silhouette}: mide la calidad de los \textit{clusters} o agrupaciones obtenidas. Va desde -1 (peor valor) hasta 1 (valor perfecto).
+	\end{itemize}
+\end{frame}
+
 \begin{frame}{\textit{CACD}}
 
 	\begin{figure}
-		\includegraphics[width=0.8\textwidth]{informatica/cacd_example}
+		\includegraphics[width=0.9\textwidth]{informatica/cacd_example}
 		\caption{Imagen extraída de \cite{informatica:paper_cacd}}
 		\label{img:cacd_imagenes_ejemplo}
 	\end{figure}
@@ -124,20 +141,18 @@
 \begin{frame}{Resultados preliminares sobre \textit{CACD}}
 	\begin{figure}
 		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/running_loss}
-		\caption{Error durante el entrenamiento}
 	\end{figure}
 \end{frame}
-\begin{frame}
+
+\begin{frame}{Resultados preliminares sobre \textit{CACD}}
 	\begin{figure}
 		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intracluster_distance}
-		\caption{Distancia \textit{intracluster} media}
 	\end{figure}
 \end{frame}
 
 \begin{frame}{Resultados preliminares sobre \textit{CACD}}
 	\begin{figure}
 		\includegraphics[width=1.0\textwidth]{informatica/wandb/entrenamiento_principal/intercluster_distance}
-		\caption{Distancia \textit{intercluster} media}
 	\end{figure}
 
 \end{frame}
@@ -212,7 +227,6 @@
 
 	\begin{figure}
 		\includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_hard_running_loss.png}
-		\caption{Función de pérdida.}
 	\end{figure}
 \end{frame}
 
@@ -220,7 +234,6 @@
 
 	\begin{figure}
 		\includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_hard_intracluster.png}
-		\caption{Distancias intracluster.}
 	\end{figure}
 
 \end{frame}
@@ -230,7 +243,6 @@
 
 	\begin{figure}
 		\includegraphics[width=0.8\linewidth]{informatica/wandb/mnist_corregido/batch_hard_interclusater.png}
-		\caption{Distancias intercluster.}
 	\end{figure}
 
 
@@ -286,6 +298,7 @@
 		\item Hemos identificado un problema de diseño en las variantes \textit{online} de \textit{Triplet Loss}.
 		\item Hemos propuesto una solución original y validado experimentalmente su gran eficacia.
 		\item Obtenemos buenos resultados en la tarea de \textit{AIFR}.
+		\item Desarrollo en abierto de toda la base de código en nuestro repositorio de \textit{Github} \cite{informatica:repogithub}.
 	\end{itemize}
 
 \end{frame}
