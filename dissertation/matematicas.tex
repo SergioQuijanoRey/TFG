@@ -19,7 +19,7 @@
 
 	\begin{itemize}
 		\item Buscamos resolver una tarea de \textbf{clasificación de imágenes}.
-		\item Representamos las imágenes de entrada como \textbf{parches}, $(\nv{x_1}, \ldots, \nv{x_N})$ con $\nv{x_i} \in \R^S$. Esta representación se utiliza en la práctica \cite{matematicas:vit}.
+		\item Representamos las imágenes de entrada como \textbf{parches}, $(\nv{x_1}, \ldots, \nv{x_N})$ con $\nv{x_i} \in \R^S$. Esta representación se utiliza en la práctica \doblecita{matematicas:vit}.
 		\item Clasificamos la imagen de entrada como el valor $y$ para el cual se maximiza la \textbf{función de puntuación} $h_y: \R^S \times \cdots \times \R^S \to \R$.
 		\item Por lo tanto, buscamos aprender $Y$ funciones de puntuación a partir de los datos y las arquitecturas de aprendizaje automático que desarrollemos.
 	\end{itemize}
@@ -39,7 +39,7 @@
 		      \begin{equation} \label{eq:hipotesis_en_general}
 			      h_y(\nv{x_1}, \ldots, \nv{x_N}) \approx \sum_{d_1, \ldots, d_N \in \N} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{d_i}(\nv{x_i}).
 		      \end{equation}
-		\item En \cite{matematicas:principal} se justifica empíricamente que al trabajar con imágenes podemos tomar $M=100$ con lo que se verifica:
+		\item En \doblecita{matematicas:principal} se justifica empíricamente que al trabajar con imágenes podemos tomar $M=100$ con lo que se verifica:
 
 		      \begin{equation} \label{eq:puntuacion_general}
 			      h_y(\nv{x_1}, \ldots, \nv{x_N}) = \sum_{d_1, \ldots, d_N = 1}^{M} \mathcal{A}^y_{d_1, \ldots, d_N} \prod_{i = 1}^N f_{\theta_{d_i}}(\nv{x_i}).
@@ -137,7 +137,7 @@
 	\begin{figure}
 		\centering
 		\includegraphics[height=0.42\textheight]{matematicas/diagrama_paper_modelo_ht}
-		\caption{Funcionamiento de nuestro modelo. Imagen extraída de \cite{matematicas:principal}.}
+		\caption{Funcionamiento de nuestro modelo. Imagen extraída de \doblecita{matematicas:principal}.}
 	\end{figure}
 
 
@@ -185,6 +185,6 @@
 		\item Hemos modelado la tarea de aprendizaje y los dos tipos de arquitectura, profunda y no profunda.
 		\item El primer resultado nos dice que casi todos los tensores $\mathcal{A}^y$ que podemos generar con un modelo \textit{HT} tienen rango \textit{CP} de al menos $r^{N/2}$, lo que implica que el modelo \textit{CP} necesita un número exponencial de parámetros.
 		\item El segundo resultado añade a este hecho que ni siquiera pueden aproximarse eficientemente (menos de un número exponencial de coeficientes) por una descomposición \textit{CP}.
-		\item Hemos dado información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \cite{matematicas:descomposicion_ht} únicamente dan ejemplos concretos en los que esto ocurre.
+		\item Hemos dado información precisa sobre cómo de frecuente ocurre este hecho (casi por doquier). Otros trabajos \doblecita{matematicas:descomposicion_ht} únicamente dan ejemplos concretos en los que esto ocurre.
 	\end{itemize}
 \end{frame}

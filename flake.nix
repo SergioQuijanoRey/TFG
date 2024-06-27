@@ -92,8 +92,12 @@
             tikzmark
             cleveref
 
+
             # Dissertation
             beamer
+            biber
+            biblatex
+            collection-bibtexextra
             ;
         });
 

@@ -18,7 +18,7 @@ compile:
     try {
         # We run pdflatex this way so references work well
         pdflatex "{{texfile}}"
-        bibtex "{{trim_end_match(texfile, '.tex')}}"
+        biber "{{trim_end_match(texfile, '.tex')}}"
         pdflatex "{{texfile}}"
         pdflatex "{{texfile}}"
         notify-send "📃" "Latex compiled!"
